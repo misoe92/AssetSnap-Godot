@@ -38,7 +38,8 @@ To get started using this addon merely download this repository as a zip file, a
 After that you can activate it in the project under:
 Project->Project Settings->Plugins
 
-And then make sure AssetSnap is checked.
+And then make sure AssetSnap is checked. 
+You might have to rebuild. Don't know if it builds the addons files upon adding only the addon folder, will find out in a couple of days and update this after.
 
 #### Add a library
 In the general window of the new "Assets" tab in the bottom dock you will find a button named "Add Folder",
