@@ -1,6 +1,6 @@
 # AssetSnapGodot4
 ###### Version 0.1 - Development Status: In Development - Stable Projection: 3-4 Months - Codebase: C#
-![image](https://github.com/misoe92/AssetSnap-Godot4/assets/38956582/675dea2d-ad05-411e-9027-b97b417b3342)
+![image](https://github.com/misoe92/AssetSnap-Godot/assets/38956582/f653b54a-f4ac-44b1-a1b2-31f334a6d109)
 
 ### Description
 This tool was mainly started due to the fact that my nephew wanted to make a game - as such i found it prudent to do my best to help him.
