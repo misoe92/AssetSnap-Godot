@@ -153,7 +153,16 @@ namespace AssetSnap.Raycast
 			
 			GetNode().GlobalTransform = GlobalTrans;
 		}
-		
+			
+		/*
+		** Resets the current collider
+		**
+		** @return void
+		*/
+		public void ResetCollider()
+		{
+			_Collider = null;
+		}
 		/*
 		** Fetches the collision transform
 		**

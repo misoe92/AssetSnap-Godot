@@ -23,12 +23,14 @@
 #if TOOLS
 namespace AssetSnap
 {
+	using AssetSnap.Front.Nodes;
 	using Godot;
 
 	[Tool]
 	public partial class NodeExplorer : CameraExplorer
 	{
 		protected AssetSnap.Front.Nodes.AsMeshInstance3D _Model;
+		protected Node _HandleNode;
 		protected Library.Instance _CurrentLibrary;
 		protected Callable? UpdateHandleCallable;
 		
@@ -40,7 +42,14 @@ namespace AssetSnap
 		/*
 		** The current node being handled
 		*/
-		public Node HandleNode;
+		public Node HandleNode
+		{
+			get => _HandleNode;
+			set {
+				_HandleNode = value;
+			}
+		}
+		
 
 		/*
 		** The node to force focus to
@@ -165,11 +174,10 @@ namespace AssetSnap
 		*/
 		public Node3D GetHandle()
 		{
-			Node3D Handle = Model;
-
+			Node3D Handle = HandleNode as Node3D;
 			if (Handle == null)
 			{
-				Handle = HandleNode as Node3D;
+				Handle = Model;
 			}
 			
 			if (Handle == null)
@@ -202,6 +210,7 @@ namespace AssetSnap
 
 			return Handle is AssetSnap.Front.Nodes.AsMeshInstance3D;
 		}
+		
 	}
 }
 #endif

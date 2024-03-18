@@ -94,7 +94,7 @@ namespace AssetSnap.Front.Modifiers
 			Handle.GetParent().RemoveChild(Handle);
 			
 			await _GlobalExplorer._Plugin.ToSignal(_GlobalExplorer._Plugin.GetTree(), SceneTree.SignalName.ProcessFrame);
-			EditorInterface.Singleton.EditNode(Group);
+			_GlobalExplorer.SetFocusToNode(Group);
 			
 			return true;
 		}
@@ -127,7 +127,7 @@ namespace AssetSnap.Front.Modifiers
 			_GlobalExplorer.Waypoints.Remove(Handle, Handle.Transform.Origin);
 			Handle.GetParent().GetParent().RemoveChild(Handle.GetParent());
 			
-			EditorInterface.Singleton.EditNode(InstancedGroup);
+			_GlobalExplorer.SetFocusToNode(InstancedGroup);
 			
 			InstancedGroup.Transform = Transform;
 			InstancedGroup.ForceUpdateTransform();

@@ -123,28 +123,22 @@ public partial class AsLibraryPanelContainer : PanelContainer
 					LibraryName = Library.GetName(),
 				};
 
-				EditorInterface.Singleton.EditNode(_Instance);
+				explorer.Library.Reset();
+				
+				explorer.SetFocusToNode(_Instance);
+
 				Library.ClearActivePanelState(this);
 				SetState(true);
-				
-				explorer.HandleNode = _Instance;
-				explorer.Model = _Instance;
-				explorer.CurrentLibrary = Library;
 
-				explorer.CurrentLibrary._LibrarySettings._LSEditing.SetText(_Instance.Name);
-				
-				if( GlobalExplorer.GetInstance().InputDriver is DragAddInputDriver DraggableInputDriver ) 
-				{
-					DraggableInputDriver.CalculateObjectSize();
-				}
-				// // SetAsset((Mesh)_Ressource, _Instance);
+				explorer.CurrentLibrary._LibrarySettings._LSSnapToHeight.state = true;
+				explorer.CurrentLibrary._LibrarySettings._LSSnapToHeight.UsingGlue = true;
+
+				explorer.CurrentLibrary._LibrarySettings.UpdateSpawnSettings("_LSSnapToHeight.state", true);
+				explorer.CurrentLibrary._LibrarySettings.UpdateSpawnSettings("_LSSnapToHeight.UsingGlue", true);
 			}
 			else if( false == _buttonEvent.Pressed && _buttonEvent.ButtonIndex == MouseButton.Left && _Active == true) 
 			{
-				explorer.HandleNode = null;
-				explorer.Model = null;
-				Library.ClearActivePanelState(null);
-				Library._LibrarySettings._LSEditing.SetText("None");
+				explorer.SetFocusToNode(null);
 				SetState(false);
 			}
 		}

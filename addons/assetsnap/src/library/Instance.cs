@@ -32,11 +32,11 @@ namespace AssetSnap.Library
 		private GlobalExplorer _GlobalExplorer;
 		private string _Folder;
 		private string _FileName; 
-		private Godot.Collections.Array<AsLibraryPanelContainer> Panels = null;
+		private Godot.Collections.Array<AsLibraryPanelContainer> Panels = new();
 		
 		private TabContainer _Container;
 		private PanelContainer _PanelContainer;
-		private HBoxContainer _BoxContainerRight;
+		private HBoxContainer _BoxContainerRight; 
 		
 		private readonly List<string> BodyComponents = new()
 		{
@@ -117,8 +117,6 @@ namespace AssetSnap.Library
 			_GlobalExplorer = GlobalExplorer.GetInstance();
 			_GlobalExplorer._Plugin.AddChild(this);
 			
-			Panels = new Godot.Collections.Array<AsLibraryPanelContainer>();
-			 
 			_PanelContainer = new()
 			{
 				Name = _FileName.Capitalize()
@@ -180,14 +178,14 @@ namespace AssetSnap.Library
 		*/
 		public void ClearActivePanelState( AsLibraryPanelContainer panel )
 		{
-			for( int i = 0; i < Panels.Count; i++) 
+			foreach( AsLibraryPanelContainer _panel in Panels ) 
 			{
-				AsLibraryPanelContainer _panel = Panels[i];
-				if( _panel != panel )
+				if( IsInstanceValid( _panel ) ) 
 				{
 					_panel.SetState(false);			
 				}
-			}	
+				
+			}
 		}
 		
 		/*
@@ -206,11 +204,20 @@ namespace AssetSnap.Library
 		
 		public void RemoveAllPanelState()
 		{
-			for( int i = 0; i < Panels.Count; i++)  
+			foreach( AsLibraryPanelContainer _panel in Panels ) 
 			{
-				AsLibraryPanelContainer _panel = Panels[i];
-				_panel.QueueFree();			
-			}	
+				if ( IsInstanceValid ( _panel ) ) 
+				{
+					if( IsInstanceValid( _panel.GetParent() ) ) 
+					{
+						_panel.GetParent().RemoveChild(_panel);
+					}
+
+					_panel.QueueFree();	
+				}
+			}
+
+			Panels = new();
 		}
 		 
 		/*
@@ -396,6 +403,28 @@ namespace AssetSnap.Library
 		*/ 
 		public override void _ExitTree()
 		{
+			if( Panels != null)  
+			{
+				for( int i = 0; i < Panels.Count; i++) 
+				{
+					GodotObject _object = Panels[i];
+					if( _object is AsLibraryPanelContainer item ) 
+					{
+						if( IsInstanceValid(item) ) 
+						{
+							// if( null != item.GetParent() ) 
+							// {
+							// 	item.GetParent().RemoveChild(item);
+							// }
+							
+							item.QueueFree();
+						} 
+					}
+				}
+	
+				Panels = null;
+			}
+			
 			if( IsInstanceValid(_BoxContainerRight) ) 
 			{
 				_BoxContainerRight.QueueFree();

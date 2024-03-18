@@ -118,8 +118,9 @@ namespace AssetSnap.Front.Components
 			{
 				if( GlobalExplorer.GetInstance().DeltaTime - ValueIntervalTimer > 1) 
 				{
-					Library._LibraryListing.Update();
 					_Searched = true;
+					ValueIntervalTimer = 0.0;
+					Library._LibraryListing.Update();
 				} 
 			}
 		}

@@ -28,6 +28,7 @@ namespace AssetSnap.Instance.Input
 	public class BaseInputDriver 
 	{
 		private static BaseInputDriver _Instance;
+		public bool IsMulti = false;
 		
 		public static BaseInputDriver GetInstance()
 		{
@@ -65,9 +66,24 @@ namespace AssetSnap.Instance.Input
 			}
 			if(Event is InputEventMouseButton _MouseButtonEvent)
 			{
-				if( HasMouseLeftPressed(_MouseButtonEvent) )
+				if (HasMouseLeftPressed(_MouseButtonEvent))
 				{
 					MeshInstance3D ModelInstance = messageBus.Decal.GetMeshInstance();
+				
+					if (
+						CanMultiDrop() &&
+						ShiftInputPressed(_MouseButtonEvent) &&
+						AltInputPressed(_MouseButtonEvent) &&
+						ModelInstance is AssetSnap.Front.Nodes.AsMeshInstance3D
+					)
+					{
+						IsMulti = true;
+					}
+					else 
+					{
+						IsMulti = false;
+					}
+					
 					messageBus.Waypoints.Spawn(ModelInstance, messageBus.Decal.GetNode().Transform.Origin, ModelInstance.RotationDegrees, ModelInstance.Scale);
 					
 					if( false == ShouldFocusAsset() ) 

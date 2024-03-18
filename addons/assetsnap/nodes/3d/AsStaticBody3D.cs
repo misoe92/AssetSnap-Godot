@@ -180,7 +180,12 @@ namespace AssetSnap.Front.Nodes
 			if( HasNode("AsCollision") ) 
 			{
 				CollisionShape3D OldCol = GetNode("AsCollision") as CollisionShape3D;
-				OldCol.QueueFree();
+				
+				if( IsInstanceValid( OldCol ) ) 
+				{
+					RemoveChild(OldCol);
+					OldCol.QueueFree();
+				}
 			}
  
 			SceneTree Tree = _GlobalExplorer._Plugin.GetTree();

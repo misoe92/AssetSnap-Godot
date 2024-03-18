@@ -132,10 +132,15 @@ namespace AssetSnap.Front.Components
 			int angle = _GlobalExplorer.ContextMenu.GetCurrentAngle();
 			Node3D Handle = _GlobalExplorer.HandleNode as Node3D;
 			
-			if( Handle == null)
+			if( null == Handle && null != _GlobalExplorer.Model )
 			{ 
 				Handle = _GlobalExplorer.Model;
-			}    
+			}
+			
+			if ( null == Handle ) 
+			{
+				return;
+			}
 
 			if( ShouldScaleAll(angle) ) 
 			{

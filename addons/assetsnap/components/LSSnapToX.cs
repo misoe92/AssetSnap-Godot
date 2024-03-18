@@ -403,6 +403,10 @@ namespace AssetSnap.Front.Components
 			{
 				UsingGlue = true;				
 			}
+			else 
+			{
+				UsingGlue = false;				
+			}
 			
 			string key = "_LSSnapToX.state";
 			UpdateSpawnSettings(key, state);
