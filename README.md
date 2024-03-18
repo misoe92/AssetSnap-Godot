@@ -80,7 +80,6 @@ The code base also needs to be polished alot more, and maybe a better structure.
 ### Known Issues
 1. Upon rebuild of C# project it has issues regarding activating some parts of the plugin until a reload of the scene. I am aware of it, and working to find out why and how i can fix it.
 2. Some minor issues with the 2 modifiers - they still work but they throw a few errors still, tho this should be fixed in a couple of days.
-3. After search, it fails to place object (Looking into this asap)
    
 ### License
 This project is released under the MIT License.
