@@ -1,0 +1,21 @@
+[gd_scene load_steps=3 format=3 uid="uid://bxehi2qsa633l"]
+
+[ext_resource type="Theme" uid="uid://c528pe12u8j3m" path="res://addons/assetsnap/assets/themes/contextmenu.tres" id="1_gesve"]
+[ext_resource type="Script" path="res://addons/assetsnap/nodes/interface/AsContextMenu.cs" id="2_pj4bm"]
+
+[node name="ContextMenuBase" type="Control"]
+z_as_relative = false
+layout_mode = 3
+anchor_left = 0.216146
+anchor_top = 0.121914
+anchor_right = 0.282
+anchor_bottom = 0.154
+offset_right = 0.135986
+offset_bottom = 0.207993
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+theme = ExtResource("1_gesve")
+script = ExtResource("2_pj4bm")
+metadata/_edit_use_anchors_ = true
