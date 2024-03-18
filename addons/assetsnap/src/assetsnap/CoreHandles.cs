@@ -92,6 +92,11 @@ namespace AssetSnap.Core
 		*/
 		private void _HandleModel( AssetSnap.Front.Nodes.AsMeshInstance3D _Node ) 
 		{
+			if( _GlobalExplorer.ContextMenu.IsHidden() ) 
+			{
+				_GlobalExplorer.ContextMenu.Show();
+			}
+			
 			if( false != _Node.IsPlaced() ) 
 			{
 				if( null != _GlobalExplorer.Library ) 
@@ -123,11 +128,6 @@ namespace AssetSnap.Core
 				
 				Library._LibrarySettings._LSEditing.SetText(_Node.Name);
 				
-				if( _GlobalExplorer.ContextMenu.IsHidden() ) 
-				{
-					_GlobalExplorer.ContextMenu.Show();
-				}
-				
 				/** Update library settings **/
 				if( _Node.HasLibrarySettings() ) 
 				{
@@ -139,10 +139,6 @@ namespace AssetSnap.Core
 				{
 					DraggableInputDriver.CalculateObjectSize();
 				}
-			}
-			else 
-			{
-				ResetHandle();
 			}
 		}
 		

@@ -90,18 +90,8 @@ namespace AssetSnap.Front.Components
 					GD.PushWarning("No Parent");
 					return;
 				}
-				
-				_GlobalExplorer.CurrentLibrary = CurrentLibrary;
-				_GlobalExplorer.HandleNode = _MeshInstance3D;
-				_GlobalExplorer.Model = _MeshInstance3D;
-			
-				EditorInterface.Singleton.EditNode(_MeshInstance3D);
-				_GlobalExplorer.CurrentLibrary._LibrarySettings._LSEditing.SetText(_MeshInstance3D.Name);
-				
-				if( _GlobalExplorer.InputDriver is DragAddInputDriver DraggableInputDriver ) 
-				{
-					DraggableInputDriver.CalculateObjectSize();
-				}
+
+				_GlobalExplorer.SetFocusToNode(_MeshInstance3D);
 
 				if ( null != Parent && Parent is AsStaticBody3D ) 
 				{

@@ -24,6 +24,7 @@ namespace AssetSnap.Core
 {
 	using AssetSnap.Component;
 	using AssetSnap.Front.Components;
+	using AssetSnap.Front.Nodes;
 	using Godot;
 	
 	public class CoreProcess : Core 
@@ -238,11 +239,12 @@ namespace AssetSnap.Core
 		{
 			if( EditorPlugin.IsInstanceValid(_GlobalExplorer.Raycast) ) 
 			{
+				_GlobalExplorer.Raycast.ResetCollider();
+				
 				Transform3D GlobalTrans = _GlobalExplorer.Raycast.GetTransform();
 				GlobalTrans.Origin = _GlobalExplorer.GetProjectOrigin();
 				GlobalTrans.Basis.Y = _GlobalExplorer.GetProjectNormal();
 				_GlobalExplorer.Raycast.SetTransform(GlobalTrans);
-				
 				_GlobalExplorer.Raycast.TargetPosition = new Vector3(0, 1000, 0);
 				_GlobalExplorer.Raycast.Update();
 			}

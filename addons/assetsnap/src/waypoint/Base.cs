@@ -84,7 +84,7 @@ namespace AssetSnap.Waypoint
 				{
 					meshInstance3D.SetLibraryName( GlobalExplorer.GetInstance().CurrentLibrary.GetName() );
 				}
-					
+
 				_SpawnNode( _model );
 				_ConfigureNode( _model, Origin, Rotation, Scale );
 				
@@ -93,13 +93,12 @@ namespace AssetSnap.Waypoint
 					_model = _AddCollisions(_model);
 				}
 				
-				_GlobalExplorer.Model = null;
-				_GlobalExplorer.HandleNode = null;
-				
 				// Focus the selected node in the editor
 				// EditorInterface.Singleton.GetSelection().Clear();
-				if( _GlobalExplorer.InputDriver.ShouldFocusAsset() ) 
+				if( _GlobalExplorer.InputDriver.ShouldFocusAsset() && false == _GlobalExplorer.InputDriver.IsMulti ) 
 				{
+					_GlobalExplorer.Model = null;
+					_GlobalExplorer.HandleNode = null;
 					_GlobalExplorer.InputDriver.FocusAsset(_model);	
 				}
 			}
@@ -466,8 +465,8 @@ namespace AssetSnap.Waypoint
 					Mesh = model.Mesh,
 					Transform = model.Transform,
 					InstanceTransform = model.Transform,
-					InstanceScale = model.Scale,
-					InstanceRotation = model.RotationDegrees,
+					InstanceScale = new Vector3(1, 1, 1),
+					InstanceRotation = new Vector3(0, 0, 0),
 					InstanceLibrary = model.GetLibraryName(),
 					InstanceSpawnSettings = model.SpawnSettings,
 				};

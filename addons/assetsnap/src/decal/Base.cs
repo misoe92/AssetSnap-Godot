@@ -267,7 +267,7 @@ namespace AssetSnap.Decal
 		*/
 		private void PlaceDecalPreview( bool State, bool ChildFound, AssetSnap.Front.Nodes.AsMeshInstance3D Model, AssetSnap.Front.Nodes.AsMeshInstance3D model )
 		{
-			if( true == State && false == ChildFound) 
+			if( true == State && false == ChildFound ) 
 			{
 				EditorInterface.Singleton.EditNode(model);
 				_Decal.AddChild(model);

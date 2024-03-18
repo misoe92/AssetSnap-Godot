@@ -22,8 +22,6 @@
 
 namespace AssetSnap.Front.Components
 {
-	using System;
-	using System.Reflection;
 	using AssetSnap.Component;
 	using Godot;
 
@@ -201,27 +199,27 @@ namespace AssetSnap.Front.Components
 		{
 			if( IsInstanceValid(_Label) ) 
 			{
-				_Label.Free();
+				_Label.QueueFree();
 			}
 			if( IsInstanceValid(_TextureRect) ) 
 			{
-				_TextureRect.Free();
+				_TextureRect.QueueFree();
 			}
 			if( IsInstanceValid(_LabelMarginContainer) ) 
 			{
-				_LabelMarginContainer.Free();
+				_LabelMarginContainer.QueueFree();
 			}
 			if( IsInstanceValid(_InnerContainer) ) 
 			{
-				_InnerContainer.Free();
+				_InnerContainer.QueueFree();
 			}
 			if( IsInstanceValid(_MarginContainer) ) 
 			{
-				_MarginContainer.Free();
+				_MarginContainer.QueueFree();
 			}
 			if( IsInstanceValid(_PanelContainer) )
 			{
-				_PanelContainer.Free();
+				_PanelContainer.QueueFree();
 			}
 		}
 	}

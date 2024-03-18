@@ -25,6 +25,7 @@ namespace AssetSnap
 {
 	using System;
 	using System.Reflection;
+	using AssetSnap.Front.Nodes;
 	using AssetSnap.Instance.Input;
 	using Godot;
 
@@ -98,6 +99,38 @@ namespace AssetSnap
 				if( 0 != child.GetChildCount() ) 
 				{
 					PrintChildNames(child);
+				}
+			}
+		}
+		
+		public void SetFocusToNode( Node3D Node ) 
+		{
+			if( null == Node ) 
+			{
+				CurrentLibrary.ClearActivePanelState(null);
+				CurrentLibrary._LibrarySettings._LSEditing.SetText("None");
+				
+				HandleNode = null;
+				Model = null;
+				CurrentLibrary = null;
+
+				return;
+			}
+		
+			EditorInterface.Singleton.EditNode(Node);
+			
+			if( Node is AsMeshInstance3D _instance ) 
+			{
+				HandleNode = _instance;
+				Model = _instance;
+				
+				Library.Instance Library = GetLibraryByName(_instance.GetLibraryName());
+				CurrentLibrary = Library;
+				Library._LibrarySettings._LSEditing.SetText(Node.Name);
+								
+				if( InputDriver is DragAddInputDriver DraggableInputDriver ) 
+				{
+					DraggableInputDriver.CalculateObjectSize();
 				}
 			}
 		}

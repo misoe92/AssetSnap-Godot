@@ -67,7 +67,7 @@ namespace AssetSnap.Front.Modifiers
 			
 			Handle.GetParent().RemoveChild(Handle);
 			
-			EditorInterface.Singleton.EditNode(GroupInstance);
+			_GlobalExplorer.SetFocusToNode(GroupInstance);
 			
 			return true;
 		}
@@ -103,7 +103,7 @@ namespace AssetSnap.Front.Modifiers
 			GroupInstance.Transform = Transform;
 			GroupInstance.ForceUpdateTransform();
 			
-			EditorInterface.Singleton.EditNode(GroupInstance);
+			_GlobalExplorer.SetFocusToNode(GroupInstance);
 
 			Group.Update();
 			

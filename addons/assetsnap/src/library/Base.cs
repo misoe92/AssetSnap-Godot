@@ -176,6 +176,15 @@ namespace AssetSnap.Library
 			}
 		}
 		
+		public void Reset()
+		{
+			foreach(Instance Library in _Libraries ) 
+			{
+				Library.ClearAllPanelState();
+				Library._LibrarySettings.ClearAll();
+			}
+		}
+		
 		/*
 		** Get library listing
 		**

@@ -110,13 +110,17 @@ namespace AssetSnap.ContextMenu
 			if( _Instance is AsContextMenu ContextMenu ) 
 			{
 				Node3D Handle = GlobalExplorer.GetInstance().GetHandle();
-				ContextMenu.SetRotationX(Handle.RotationDegrees.X);
-				ContextMenu.SetRotationY(Handle.RotationDegrees.Y);
-				ContextMenu.SetRotationZ(Handle.RotationDegrees.Z);
 				
-				ContextMenu.SetScaleX(Handle.Scale.Z);
-				ContextMenu.SetScaleY(Handle.Scale.Z);
-				ContextMenu.SetScaleZ(Handle.Scale.Z);
+				if( IsInstanceValid( Handle ) ) 
+				{
+					ContextMenu.SetRotationX(Handle.RotationDegrees.X);
+					ContextMenu.SetRotationY(Handle.RotationDegrees.Y);
+					ContextMenu.SetRotationZ(Handle.RotationDegrees.Z);
+					
+					ContextMenu.SetScaleX(Handle.Scale.Z);
+					ContextMenu.SetScaleY(Handle.Scale.Z);
+					ContextMenu.SetScaleZ(Handle.Scale.Z);
+				}
 			}
 		}
 		

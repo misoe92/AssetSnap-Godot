@@ -34,8 +34,8 @@ namespace AssetSnap.Front.Components
 		private ScrollContainer _ScrollContainer;
 		private	MarginContainer _MarginContainer;
 		private	VBoxContainer _InnerContainer;
-		private Godot.Collections.Array<HBoxContainer> Containers;
-		private Godot.Collections.Array<LibraryListEntry> Items;
+		private Godot.Collections.Array<HBoxContainer> Containers = new();
+		private Godot.Collections.Array<LibraryListEntry> Items = new();
 		
 		public string Folder 
 		{
@@ -54,9 +54,6 @@ namespace AssetSnap.Front.Components
 		public LibraryListing()
 		{
 			Name = "LibraryListing";
-			
-			Containers = new();
-			Items = new();
 			// _include = false; 
 		}
 		
@@ -114,11 +111,13 @@ namespace AssetSnap.Front.Components
 		*/
 		public void Update()
 		{
+			// _Library.RemoveAllPanelState();
 			foreach(HBoxContainer child in _InnerContainer.GetChildren()) 
 			{
 				if( IsInstanceValid( child ) ) 
 				{
-					// _InnerContainer.RemoveChild(child);
+					_Library.RemoveAllPanelState();
+					_InnerContainer.RemoveChild(child);	
 					child.QueueFree();	
 				}
 			}
@@ -234,22 +233,43 @@ namespace AssetSnap.Front.Components
 		*/
 		public override void _ExitTree()
 		{
-			if( Items != null)  
-			{
-				for( int i = 0; i < Items.Count; i++) 
-				{
-					GodotObject _object = Items[i];
-					if( _object is LibraryListEntry item ) 
-					{
-						if( IsInstanceValid(item) ) 
-						{
-							item.QueueFree();
-						} 
-					}
-				}
+			Items = null;
+			Containers = null;
+			// if( Items != null)  
+			// {
+			// 	foreach( LibraryListEntry _item in Items ) 
+			// 	{
+			// 		if( IsInstanceValid(_item) ) 
+			// 		{
+			// 			// if( IsInstanceValid( item.GetParent() ) ) 
+			// 			// {
+			// 			// 	item.GetParent().RemoveChild(item);
+			// 			// }
+						
+			// 			_item.QueueFree();
+			// 		}
+			// 	}
+
+			// 	Items = null;
+			// }
+			
+			// if( Containers != null ) 
+			// {
+			// 	foreach( HBoxContainer _container in Containers ) 
+			// 	{
+			// 		if( IsInstanceValid(_container) ) 
+			// 		{
+			// 			// if( IsInstanceValid( item.GetParent() ) ) 
+			// 			// {
+			// 			// 	item.GetParent().RemoveChild(item);
+			// 			// }
+						
+			// 			_container.QueueFree();
+			// 		}
+			// 	}
 	
-				Items = null;
-			}
+			// 	Containers = null;
+			// }
 			
 			if( IsInstanceValid(_InnerContainer) ) 
 			{
