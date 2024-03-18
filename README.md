@@ -92,4 +92,4 @@ misoe92 - So far for everything
 Im still new to c# - a more experienced developer would prob. ensure a much better structure and overall experience with the addon. And i would love to improve myself.
 So if you want to help out let me know. Especially if you have experience in setting up testing envrionment. That can be run to ensure everything works before a compilation.
 
-You can write to me at mikebsorensen1@gmail.com
+You can write to me at mikebsorensen1@gmail.com ATT: AssetSnap
