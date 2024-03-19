@@ -35,6 +35,9 @@ I would also love to setup some testing framework for the code, but my experienc
 #### Installing the plugin
 To get started using this addon merely download this repository as a zip file, and unzip the content of that zip file into your project folder, or open the zip file and move into the addons folder and move that folder directly to your project folder.
 
+Ensure that a C# Solution is initialized by going to:
+Project -> Tools -> C# -> Create C# Solution
+
 After that you can activate it in the project under:
 Project->Project Settings->Plugins
 
