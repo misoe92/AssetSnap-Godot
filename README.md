@@ -75,6 +75,10 @@ When it's snapped to the object you can left click as normal and it will then sn
 The video which will have it's links placed below in a small weeks time, it will be about how the plugin works, how it can be used and where various of things are.
 It will overall give an more in depth feel of usage. That said my skills in building envrionments aren't great.. So have that in mind.. 
 
+#### Installing AssetSnap
+https://www.youtube.com/watch?v=giCKSwaCULs
+
+More will come soon, merely need to create them. But im going to fix bugs while doing it to ensure that i catch the bugs i've found.
 
 ### Current state
 The project is currently under development, hence the code is not ready in any way for an professional environment. And alot of improvement and polish would still need to be done before anything in that manner would be a talking point.
