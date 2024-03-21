@@ -78,6 +78,9 @@ It will overall give an more in depth feel of usage. That said my skills in buil
 #### Installing AssetSnap
 https://www.youtube.com/watch?v=giCKSwaCULs
 
+#### Adding / Removing libraries
+https://www.youtube.com/watch?v=A9d1HyfMfE4
+
 More will come soon, merely need to create them. But im going to fix bugs while doing it to ensure that i catch the bugs i've found.
 
 ### Current state
