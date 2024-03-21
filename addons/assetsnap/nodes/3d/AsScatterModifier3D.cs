@@ -41,7 +41,6 @@ public partial class AsScatterModifier3D : AsGroup3D
 	public MultiMesh _MultiMesh;
 	public StaticBody3D _Body;
 	public CollisionShape3D _Collision;
-	public MeshInstance3D _BoundaryBody;
 	public Node3D _BoundaryNode;
 
 	private Godot.Collections.Array<Node3D> _Instances;
@@ -251,7 +250,7 @@ public partial class AsScatterModifier3D : AsGroup3D
 	}
 	
 	[ExportCategory("General")]
-	private int _ScatterRadius = 0;
+	private int _ScatterRadius = 1;
 	
 	[Export]
 	public int ScatterRadius {
@@ -345,11 +344,19 @@ public partial class AsScatterModifier3D : AsGroup3D
 			UpdateScatter();
 		}
 	}
-	
+
+	public override void _EnterTree()
+	{
+		SetProcess(true);
+		
+		base._EnterTree();
+	}
+
 	public override void _Ready()
 	{
 		Noise = new();
 		_Instances = new();
+		_SceneRoot = GlobalExplorer.GetInstance()._Plugin.GetTree().EditedSceneRoot;
 		
 		_BoundaryBoxColor = new Color(
 			(float)GD.RandRange(0.0, 0.5),
@@ -357,8 +364,6 @@ public partial class AsScatterModifier3D : AsGroup3D
 			(float)GD.RandRange(0.0, 0.5),
 			(float)GD.RandRange(0.2, 0.5)
 		);
-		
-		_SetupBoundaryBox();
 		
 		Noise.Connect(FastNoiseLite.SignalName.Changed, new Callable(this, "_OnNoiseChange"));
 		Initialized = true;
@@ -428,23 +433,18 @@ public partial class AsScatterModifier3D : AsGroup3D
 
 	public override void _Process(double delta)
 	{
-		if( ShowBoundaryBox && null == _BoundaryNode.GetParent() ) 
+		if( ShowBoundaryBox && false == IsInstanceValid(_BoundaryNode.GetParent()) ) 
 		{
-			SphereMesh BoundaryMesh = new()
-			{
-				Radius = _ScatterRadius,
-				Height = _BoundaryBoxHeight
-			};
-			
-			_BoundaryBody.Mesh = BoundaryMesh;
-
-			AddChild(_BoundaryNode);
-			_BoundaryNode.Owner = GetTree().EditedSceneRoot;
+			_SetupBoundaryBox();
 		}
-		else if( false == ShowBoundaryBox && null != _BoundaryNode.GetParent() ) 
+		else if( false == ShowBoundaryBox ) 
 		{
-			RemoveChild(_BoundaryNode);
-			_BoundaryNode.Owner = null;
+			if( HasNode("BoundaryNode") ) 
+			{
+				var node = GetNode("BoundaryNode");
+				RemoveChild(node);
+				node.QueueFree();
+			}
 		}
 		
 		base._Process(delta);
@@ -477,8 +477,9 @@ public partial class AsScatterModifier3D : AsGroup3D
 			Height = _BoundaryBoxHeight,
 		};
 		
-		_BoundaryBody = new()
+		MeshInstance3D _BoundaryBody = new()
 		{
+			Name = "BoundaryBody",
 			Mesh = BoundaryMesh,
 			MaterialOverride = transparentMaterial
 		};
@@ -514,7 +515,6 @@ public partial class AsScatterModifier3D : AsGroup3D
 		}
 
 		ClearCurrentChildren();
-		_SetupBoundaryBox();
 		
 		if( _UseMultiMesh ) 
 		{
@@ -592,7 +592,7 @@ public partial class AsScatterModifier3D : AsGroup3D
 
 				// Add the MeshInstance to the scene
 				AddChild(_Model, true);
-				_Model.Owner = GlobalExplorer.GetInstance()._Plugin.GetTree().EditedSceneRoot;
+				_Model.Owner = _SceneRoot;
 					
 				if( ShouldAddCollision() && _NoCollisions == false || _ForceCollisions ) 
 				{
@@ -687,7 +687,7 @@ public partial class AsScatterModifier3D : AsGroup3D
 		
 		// Add the MeshInstance to the scene
 		AddChild(_MultiMeshInstance);
-		_MultiMeshInstance.Owner = GlobalExplorer.GetInstance()._Plugin.GetTree().EditedSceneRoot;
+		_MultiMeshInstance.Owner = _SceneRoot;
 		
 		if( ShouldAddCollision() && _NoCollisions == false || _ForceCollisions ) 
 		{
@@ -792,7 +792,7 @@ public partial class AsScatterModifier3D : AsGroup3D
 			};
 			
 			AddChild(_Body, true);
-			_Body.Owner = GlobalExplorer.GetInstance()._Plugin.GetTree().EditedSceneRoot;
+			_Body.Owner = _SceneRoot;
  
 			int typeState = 0;
 			int argState = 0;
@@ -827,6 +827,7 @@ public partial class AsScatterModifier3D : AsGroup3D
 			
 			_Body.Initialize(typeState, argState);
 			model.GetParent().RemoveChild(model);
+			model.QueueFree();
 		}
 	}
 	
@@ -853,7 +854,7 @@ public partial class AsScatterModifier3D : AsGroup3D
 			};
 
 			AddChild(_Body);
-			_Body.Owner = _GlobalExplorer._Plugin.GetTree().EditedSceneRoot;
+			_Body.Owner = _SceneRoot;
 			
 			int typeState = 0;
 			int argState = 0;
@@ -891,7 +892,6 @@ public partial class AsScatterModifier3D : AsGroup3D
 
 	}
 
-	
 	private bool ShouldAddCollision()
 	{
 		GlobalExplorer _GlobalExplorer = GlobalExplorer.GetInstance();
@@ -906,18 +906,21 @@ public partial class AsScatterModifier3D : AsGroup3D
 	
 	public override void _ExitTree()
 	{
-		if( IsInstanceValid( _BoundaryBody ) ) 
-		{
-			_BoundaryBody.GetParent().RemoveChild(_BoundaryBody);
-			_BoundaryBody.QueueFree();
-			_BoundaryBody = null;
-		}
+		SetProcess(false);
+		// if( IsInstanceValid( _BoundaryBody ) ) 
+		// {
+		// 	if( IsInstanceValid(_BoundaryBody.GetParent()) ) 
+		// 	{
+		// 		_BoundaryBody.GetParent().RemoveChild(_BoundaryBody);
+		// 	}
+
+		// 	_BoundaryBody.QueueFree();
+		// 	// _BoundaryBody = null;
+		// }
 		
 		if( IsInstanceValid( _BoundaryNode ) ) 
 		{
-			RemoveChild(_BoundaryNode);
 			_BoundaryNode.QueueFree();
-			_BoundaryNode = null;
 		}
 		
 		if( IsInstanceValid( _MultiMeshInstance ) ) 
