@@ -160,11 +160,11 @@ namespace AssetSnap.Front.Components
 			fileDialog = new FileDialog();
 			_GlobalExplorer._Plugin.AddChild(fileDialog);
 
-			fileDialog.Mode = Godot.Window.ModeEnum.Maximized;
 			// Set the dialog mode to "OpenDir" for folder selection
 			fileDialog.FileMode = FileDialog.FileModeEnum.OpenDir;
 			// Connect the "dir_selected" signal to another Callable function
 			fileDialog.DirSelected += _OnFolderSelected;
+			fileDialog.MinSize = new Vector2I(768, 768);
 			// Show the file dialog
 			fileDialog.PopupCentered();
 		}
