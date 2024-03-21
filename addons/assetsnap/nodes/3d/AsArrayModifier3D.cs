@@ -446,6 +446,7 @@ public partial class AsArrayModifier3D : AsGroup3D
 				Transform = InstanceTransform,
 				Scale = InstanceScale,
 				RotationDegrees = InstanceRotation,
+				Floating = true,
 			}; 
 						
 			if( _Model == null ) 
@@ -497,6 +498,10 @@ public partial class AsArrayModifier3D : AsGroup3D
 			if( ShouldAddCollision() && _NoCollisions == false || _ForceCollisions ) 
 			{
 				_AddCollisions(_Model, i);
+			}
+			else 
+			{
+				_Model.SetIsFloating(false);
 			}
 			
 			Randomnize();
