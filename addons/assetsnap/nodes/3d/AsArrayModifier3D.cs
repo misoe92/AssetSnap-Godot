@@ -21,7 +21,6 @@
 // SOFTWARE.
 
 using AssetSnap;
-using AssetSnap.ASNode.MeshInstance;
 using AssetSnap.Front.Nodes;
 using Godot;
 using System;
@@ -319,6 +318,8 @@ public partial class AsArrayModifier3D : AsGroup3D
 	public override void _Ready()
 	{
 		Initialized = true;
+		_SceneRoot = GlobalExplorer.GetInstance()._Plugin.GetTree().EditedSceneRoot;
+		
 		base._Ready();
 	}
 
@@ -429,11 +430,18 @@ public partial class AsArrayModifier3D : AsGroup3D
 		{
 			throw new Exception("Mesh is invalid");
 		}
+
+		if( null == GetTree() ) 
+		{
+			GD.PushError("No tree was found");
+			return;
+		}
 		
 		for( int i = 0; i < _Amount; i++) 
 		{
 			AssetSnap.Front.Nodes.AsMeshInstance3D _Model = new()
 			{
+				Name = Name + "/" + i,
 				Mesh = _Mesh,
 				Transform = InstanceTransform,
 				Scale = InstanceScale,
@@ -483,12 +491,7 @@ public partial class AsArrayModifier3D : AsGroup3D
 			Trans.Origin.Z = ( OffsetZ * i) + ( ExtraOffsetZ * i ) + Trans.Origin.Z;
 			
 			AddChild(_Model, true);
-			if( GetTree() != null && _Model.Owner == null ) 
-			{
-				_Model.Owner = _SceneRoot;
-			}
-
-			_Model.Name = _Model.Name + "/" + i;
+			_Model.Owner = _SceneRoot;
 			_Model.Transform = Trans;
 			
 			if( ShouldAddCollision() && _NoCollisions == false || _ForceCollisions ) 
@@ -548,7 +551,7 @@ public partial class AsArrayModifier3D : AsGroup3D
 		}
 
 		AddChild(_MultiMeshInstance);
-		_MultiMeshInstance.Owner = GetTree().EditedSceneRoot;
+		_MultiMeshInstance.Owner = _SceneRoot;
 		_MultiMeshInstance.Name = _InstanceName + "/multiMesh";
 		
 		if( ShouldAddCollision() && _NoCollisions == false || _ForceCollisions ) 
@@ -562,8 +565,6 @@ public partial class AsArrayModifier3D : AsGroup3D
 	
 	private void _AddCollisions(Node3D _model, int index)
 	{
-		GlobalExplorer _GlobalExplorer = GlobalExplorer.GetInstance();
-		
 		// Only add collisions to models
 		if( _model.HasMeta("AsModel") == false ) 
 		{
@@ -621,7 +622,9 @@ public partial class AsArrayModifier3D : AsGroup3D
 			} 
 			
 			_Body.Initialize(typeState, argState);
+			
 			model.GetParent().RemoveChild(model);
+			model.QueueFree();
 		}
 	}
 	
@@ -643,11 +646,11 @@ public partial class AsArrayModifier3D : AsGroup3D
 				Mesh = _Mesh,
 				MeshName = _Mesh.ResourceName,
 				InstanceLibrary = InstanceLibrary,
-				InstanceScale = _MultiMeshInstance.Multimesh.GetInstanceTransform(i).Basis.Scale
+				InstanceScale = _MultiMeshInstance.Multimesh.GetInstanceTransform(i).Basis.Scale,
 			};
 
 			AddChild(_Body);
-			_Body.Owner = _GlobalExplorer._Plugin.GetTree().EditedSceneRoot;
+			_Body.Owner = _SceneRoot;
 			
 			int typeState = 0;
 			int argState = 0;
@@ -694,8 +697,6 @@ public partial class AsArrayModifier3D : AsGroup3D
  
 	public override void _ExitTree()
 	{
-		ClearCurrentChildren();
-		
 		_Parent = null;
 		Mesh = null;
 		

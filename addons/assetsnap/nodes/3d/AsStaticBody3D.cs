@@ -99,10 +99,12 @@ namespace AssetSnap.Front.Nodes
 						Scale = InstanceScale,
 						RotationDegrees = InstanceRotation,
 						SpawnSettings = InstanceSpawnSettings,
+						Floating = true,
 					};
 	
 					AddChild(_Instance);
 					_Instance.Owner = Tree.EditedSceneRoot;
+					_Instance.SetIsFloating(false);
 				}
 
 				var CurrentLibrary = _GlobalExplorer.GetLibraryByName(InstanceLibrary);
