@@ -30,9 +30,13 @@ namespace AssetSnap.Waypoint
 	
 	public class WaypointList
 	{
-		private BaseWaypoint[] Waypoints = Array.Empty<BaseWaypoint>();
+		private BaseWaypoint[] Waypoints;
 		public delegate void CallableMethod(BaseWaypoint waypoint);
 
+		public WaypointList()
+		{
+			Waypoints = Array.Empty<BaseWaypoint>();
+		}
 		/*
 		** Adds a single waypoint
 		**
@@ -73,7 +77,7 @@ namespace AssetSnap.Waypoint
 					if( ModelInstance.HasMeta("AsModel")) 
 					{
 						AsMeshInstance3D _Model = ModelInstance as AssetSnap.Front.Nodes.AsMeshInstance3D;
-						if (Model.Mesh != _Model.Mesh) 
+						if (Model.Mesh == _Model.Mesh) 
 						{
 							state = false;
 						}
@@ -117,6 +121,20 @@ namespace AssetSnap.Waypoint
 					}
 				}
 			}
+		}
+		
+		public bool Has( Node3D node ) 
+		{
+			GD.Print(Waypoints.Length);
+			foreach( BaseWaypoint Waypoint in Waypoints ) 
+			{
+				if( Waypoint.GetModel() == node ) 
+				{
+					return true;
+				}
+			}
+
+			return false;
 		}
 		
 		public void Each( CallableMethod callback ) 
