@@ -94,7 +94,6 @@ namespace AssetSnap.Front.Modifiers
 			};
 			
 			Transform3D Transform = Handle.GetParent<StaticBody3D>().Transform;
-			Group.SetSceneRoot( Handle.GetTree().EditedSceneRoot );
 			_GlobalExplorer.Waypoints.Remove(Handle, Handle.Transform.Origin);
 			_GlobalExplorer.Waypoints.Spawn(Group, Handle.Transform.Origin, Handle.RotationDegrees, Handle.Scale);
 			Node3D GroupInstance = _GlobalExplorer.Waypoints.GetWorkingNode();
