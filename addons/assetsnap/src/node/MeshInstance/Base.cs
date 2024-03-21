@@ -22,7 +22,6 @@
 
 namespace AssetSnap.ASNode.MeshInstance
 {
-	using AssetSnap.ASNode.Types;
 	using Godot;
 	
 	[Tool]
@@ -42,7 +41,7 @@ namespace AssetSnap.ASNode.MeshInstance
 
 		public override void _EnterTree()
 		{
-			if( false == Floating && IsInstanceValid(this) && false == WaypointAdded) 
+			if( false == Floating && IsInstanceValid(this)) 
 			{
 				GlobalExplorer.GetInstance().Waypoints.Register(this, Transform.Origin, RotationDegrees, Scale);
 				WaypointAdded = true;
@@ -55,7 +54,7 @@ namespace AssetSnap.ASNode.MeshInstance
 		{
 			Floating = state;
 			 
-			if( false == state && IsInstanceValid(this) && false == WaypointAdded ) 
+			if( false == state && IsInstanceValid(this)) 
 			{
 				GlobalExplorer.GetInstance().Waypoints.Register(this, Transform.Origin, RotationDegrees, Scale);
 				WaypointAdded = true;
@@ -196,6 +195,9 @@ namespace AssetSnap.ASNode.MeshInstance
 					GlobalExplorer.GetInstance().Waypoints.Remove(this, Transform.Origin);
 				}
 			}
+
+			Floating = true;
+			WaypointAdded = false;
 			
 			base._ExitTree(); 
 		}
