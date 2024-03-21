@@ -260,7 +260,7 @@ namespace AssetSnap.Instance.Input
 		{
 			foreach( AssetSnap.Front.Nodes.AsMeshInstance3D Instance in _Buffer ) 
 			{
-				// Instance.GetParent().RemoveChild(Instance);
+				Instance.GetParent().RemoveChild(Instance);
 				Instance.QueueFree();
 			}
 
