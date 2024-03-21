@@ -83,7 +83,7 @@ namespace AssetSnap.Waypoint
 						state = false;
 					}
 				}
-				else if( ModelInstance.HasMeta("AsModel") ) 
+				else
 				{
 					state = false;
 				}
@@ -123,7 +123,16 @@ namespace AssetSnap.Waypoint
 		{
 			foreach( BaseWaypoint Waypoint in Waypoints ) 
 			{
-				callback(Waypoint);
+				if( EditorPlugin.IsInstanceValid( Waypoint.GetModel() ) ) 
+				{
+					callback(Waypoint);					
+				}
+				else
+				{
+					List<BaseWaypoint> _SpawnPointsList = new List<BaseWaypoint>(Waypoints);
+					_SpawnPointsList.Remove(Waypoint);
+					Waypoints = _SpawnPointsList.ToArray();
+				}
 			} 
 		}
 		
