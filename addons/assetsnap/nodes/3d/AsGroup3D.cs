@@ -715,10 +715,6 @@ public partial class AsGroup3D : Node3D
 		}
 	}
 	
-	public void SetSceneRoot( Node SceneRoot )
-	{
-		_SceneRoot = SceneRoot;
-	}
 	protected void ClearCurrentChildren()
 	{
 		foreach( Node child in GetChildren())
