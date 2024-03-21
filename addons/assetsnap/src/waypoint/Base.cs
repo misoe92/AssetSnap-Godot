@@ -68,6 +68,11 @@ namespace AssetSnap.Waypoint
 					_model.QueueFree();
 					_model = ModelInstance as AssetSnap.Front.Nodes.AsMeshInstance3D;
 					_model.Name = ModelInstance.Name;
+					
+					if( _model is AsMeshInstance3D _meshInstance ) 
+					{
+						_meshInstance.Floating = true;
+					}
 				}
 				else if ( ModelInstance.HasMeta("AsGroup") ) 
 				{
@@ -140,6 +145,16 @@ namespace AssetSnap.Waypoint
 			_WaypointList.Add(node, Origin, Rot, Scale);
 		}
 
+		/*
+		** Checks if a node is already registered
+		**
+		** @param Node3D node
+		** @return bool
+		*/
+		public bool Has( Node3D node ) 
+		{
+			return _WaypointList.Has(node);
+		}
 		/*
 		** Updates the scale value on a waypoint
 		** positioned on a given origin x,y,z point
@@ -398,11 +413,10 @@ namespace AssetSnap.Waypoint
 				}
 			}
 
-			if( _model is AssetSnap.Front.Nodes.AsMeshInstance3D asMeshInstance3D ) 
+			if( _model is AssetSnap.Front.Nodes.AsMeshInstance3D asMeshInstance3D && true == asMeshInstance3D.Floating && false == _ShouldAddCollision() ) 
 			{
 				// AssetSnap.ASNode.MeshInstance.SpawnSettings SpawnSettings = asMeshInstance3D.SpawnSettings;
 				// SpawnSettings.Update();
-				
 				asMeshInstance3D.SetIsFloating(false);
 			}
 			
