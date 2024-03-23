@@ -7,6 +7,10 @@ This tool was mainly started due to the fact that my nephew wanted to make a gam
 My background is not in C# programming nor is it in the production of games as such my know how and knowledge in the area was and still is not complete in any way. And i still learn every day.
 
 Some periods i might be off for some days or even a week, due to health issues. So keep that in mind if i don't answer right away.
+If you wish to follow the project on a more often basis plus getting sneak peaks from time to time this can be gotten from the thread here:
+https://forum.godotengine.org/t/asset-placement-toolkit/48328/4
+
+Where i will post things im working on, and often also mention something about when i expect x things to be ready for an initial realease.
 
 I really hope that people will enjoy the addon, and even more i hope others will join and help make it better :) This tool for me personally is mainly being build due to me wanting to make a game with my nephew, the more help i can get by others the better tool we will have to work with when he and i starts in 3-4 months time. 
 
