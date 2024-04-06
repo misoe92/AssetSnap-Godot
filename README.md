@@ -83,7 +83,7 @@
 
 [![Product Name Screen Shot][product-screenshot]](https://example.com)
 
-This toolkit was started as a way for me to give my nephew an easier entry in to game development, more specifically 3D game development. This toolkit essentially aims to statisfy all the level building needs that you might have. And if it does not yet do this, please post an issue and we will see on how we can fit your need into the calculation.
+This toolkit was started as a way for me to give my nephew an easier entry in to game development, more specifically 3D game development. This toolkit essentially aims to statisfy all the level building needs that you might have. And if it does not yet do this, please post an issue and we will see on how we can fit your need into the calculation. It is a work in progress, so bugs still might occur. Therefore usage in professional environment should still be cautious. Will update this part of the text when the product is polished enough for a professional usage case. 
 
 The plugin is quite extensive already, but below you can get a heads up about the overall functionality that it provides below. And then i can only recommend to download it and try it out. It is after all completely free - and i would love the feedback.
 
