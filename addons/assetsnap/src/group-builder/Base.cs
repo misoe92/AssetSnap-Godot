@@ -23,8 +23,10 @@
 namespace AssetSnap.GroupBuilder
 {
 	using System.Collections.Generic;
+	using AssetSnap.Explorer;
 	using AssetSnap.Front.Components;
 	using AssetSnap.Front.Nodes;
+	using AssetSnap.States;
 	using Godot;
 	
 	[Tool]
@@ -64,6 +66,8 @@ namespace AssetSnap.GroupBuilder
 		{
 			_GlobalExplorer = GlobalExplorer.GetInstance();
 			_InitializeMenu();
+
+			StatesUtils.SetLoad("GroupBuilder", true);
 		}
 
 		/*
@@ -77,9 +81,9 @@ namespace AssetSnap.GroupBuilder
 				SizeFlagsVertical = Control.SizeFlags.ExpandFill,
 				SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
 			};
-			
+
 			/** Add the tab item if settings is turned on **/
-			Component.Base Components = _GlobalExplorer.Components;
+			Component.Base Components = ExplorerUtils.Get().Components;
 			if ( Components.HasAll( OuterComponents.ToArray() )) 
 			{
 				_GroupContainer = Components.Single<GroupContainer>();
@@ -107,6 +111,8 @@ namespace AssetSnap.GroupBuilder
 						_Editor.Initialize();
 					}
 				}
+			
+				StatesUtils.SetLoad("GroupBuilderContainer", true);
 			}
 		}
 		
