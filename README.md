@@ -128,7 +128,7 @@ Easy auto collisions for your objects when you space them, or change them afterw
 #### Grab already placed objects
 By holding shift + alt and clicking A you can grab up already placed objects in the world, making it an ease to pick them up and move them to their new place.
 
-### Inspector
+#### Inspector
 Ability to keep an eye on the states, this is mainly usefull when things don't work.. So let's hope it does not need to be used.
 
 ### Modifiers
