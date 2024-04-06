@@ -1,109 +1,328 @@
-# AssetSnapGodot4
-###### Version 0.1 - Development Status: In Development - Stable Projection: 3-4 Months - Codebase: C#
-![image](https://github.com/misoe92/AssetSnap-Godot/assets/38956582/f653b54a-f4ac-44b1-a1b2-31f334a6d109)
+<!-- Improved compatibility of back to top link: See: https://github.com/othneildrew/Best-README-Template/pull/73 -->
+<a name="readme-top"></a>
+<!--
+*** Thanks for checking out the Best-README-Template. If you have a suggestion
+*** that would make this better, please fork the repo and create a pull request
+*** or simply open an issue with the tag "enhancement".
+*** Don't forget to give the project a star!
+*** Thanks again! Now go create something AMAZING! :D
+-->
 
-### Description
-This tool was mainly started due to the fact that my nephew wanted to make a game - as such i found it prudent to do my best to help him.
-My background is not in C# programming nor is it in the production of games as such my know how and knowledge in the area was and still is not complete in any way. And i still learn every day.
 
-Some periods i might be off for some days or even a week, due to health issues. So keep that in mind if i don't answer right away.
-If you wish to follow the project on a more often basis plus getting sneak peaks from time to time this can be gotten from the thread here:
-https://forum.godotengine.org/t/asset-placement-toolkit/48328/4
 
-Where i will post things im working on, and often also mention something about when i expect x things to be ready for an initial realease.
+<!-- PROJECT SHIELDS -->
+<!--
+*** I'm using markdown "reference style" links for readability.
+*** Reference links are enclosed in brackets [ ] instead of parentheses ( ).
+*** See the bottom of this document for the declaration of the reference variables
+*** for contributors-url, forks-url, etc. This is an optional, concise syntax you may use.
+*** https://www.markdownguide.org/basic-syntax/#reference-style-links
+-->
 
-I really hope that people will enjoy the addon, and even more i hope others will join and help make it better :) This tool for me personally is mainly being build due to me wanting to make a game with my nephew, the more help i can get by others the better tool we will have to work with when he and i starts in 3-4 months time. 
+[![Contributors][contributors-shield]][contributors-url]
+[![Forks][forks-shield]][forks-url]
+[![Stargazers][stars-shield]][stars-url]
+[![Issues][issues-shield]][issues-url]
+[![MIT License][license-shield]][license-url]
 
-The tool tries to streamline the asset management and placement of them, it does this by enabling certain tools to be used to make the tasks less tedious which is needed if you have to keep a young persons interest throughout the process.
+<!-- PROJECT LOGO -->
+<br />
+<div align="center">
+  <a href="https://github.com/othneildrew/Best-README-Template">
+    <img src="images/logo.jpg" alt="Logo" width="300" height="225">
+  </a>
 
-Some of these features are
-1. Ability to add folders as libraries, enabling preview and easy placement.
-2. Ability to snap model to X,Y,Z Axis or snap the model to other models with the ability to offset
-3. Ability to add modifiers to placed models, so far Array and Scatter modifier is available.
-4. Ability to drag add models, in which it takes 2 clicks which it then spawns models in that path based on rules you set
-5. Ability to randomnize rotation or/and scale to children of group nodes / modifiers.
-6. Ability to make continous placement of a model holding alt + shit while placing
-7. Ability to grab already placed models to replace them, with the ability to also continous placement and more.
-8. Ability to add auto collisions to models placed, both before and after placement.
-9. Persistent spawn settings for models, allowing for easy updating of it later on.
-10. Shortcuts to quickly change between rotate/scale on models you are placing.
-11. Lot's of control in how the addon works through settings.
+  <h3 align="center">AssetSnap</h3>
 
-Above points is obviously just a start, but before i add anything else i want to make sure they are completely stable and ready to use and that the codebase is final before adding anything else.
-So the only thing needed to think of at that point is to ensure features and stability.
+  <p align="center">
+    Asset placement toolkit for Godot 4 Mono
+    <br />
+    <a href="#"><strong>Docs comming soon »</strong></a>
+    <br />
+    <br />
+    <a href="https://github.com/misoe92/AssetSnap-Godot-Template">Example Project</a>
+    ·
+    <a href="https://github.com/misoe92/AssetSnap-Godot/issues/new?labels=bug&template=bug-report---.md">Report Bug</a>
+    ·
+    <a href="https://github.com/misoe92/AssetSnap-Godot/issues/new?labels=enhancement&template=feature-request---.md">Request Feature</a>
+  </p>
+</div>
 
-I would also love to setup some testing framework for the code, but my experience sadly is lacking in that area. Any help in this area would be greatly appreciated.
 
-### Getting started
 
-#### Installing the plugin
-To get started using this addon merely download this repository as a zip file, and unzip the content of that zip file into your project folder, or open the zip file and move into the addons folder and move that folder directly to your project folder.
+<!-- TABLE OF CONTENTS -->
+<details>
+  <summary>Table of Contents</summary>
+  <ol>
+    <li>
+      <a href="#about-the-project">About The Project</a>
+      <ul>
+        <li><a href="#built-with">Built With</a></li>
+      </ul>
+    </li>
+    <li>
+      <a href="#getting-started">Getting Started</a>
+      <ul>
+        <li><a href="#prerequisites">Prerequisites</a></li>
+        <li><a href="#installation">Installation</a></li>
+      </ul>
+    </li>
+    <li><a href="#usage">Usage</a></li>
+    <li><a href="#roadmap">Roadmap</a></li>
+    <li><a href="#contributing">Contributing</a></li>
+    <li><a href="#license">License</a></li>
+    <li><a href="#contact">Contact</a></li>
+    <li><a href="#acknowledgments">Acknowledgments</a></li>
+  </ol>
+</details>
 
-Ensure that a C# Solution is initialized by going to:
-Project -> Tools -> C# -> Create C# Solution
 
-After that you can activate it in the project under:
-Project->Project Settings->Plugins
 
-And then make sure AssetSnap is checked. 
-You might have to rebuild. Don't know if it builds the addons files upon adding only the addon folder, will find out in a couple of days and update this after.
+<!-- ABOUT THE PROJECT -->
+## About The Project
 
-#### Add a library
-In the general window of the new "Assets" tab in the bottom dock you will find a button named "Add Folder",
-Click on it and in the new window that opens move to the folder where your model files are and click "Select Current Folder"
+[![Product Name Screen Shot][product-screenshot]](https://example.com)
 
-This will add a new library, and the models in that folder will be loaded in and made available.
+This toolkit was started as a way for me to give my nephew an easier entry in to game development, more specifically 3D game development. This toolkit essentially aims to statisfy all the level building needs that you might have. And if it does not yet do this, please post an issue and we will see on how we can fit your need into the calculation.
 
-#### Place a model
-When you have added a library, you will see a tab in your "Assets" window named the name of your folder.
-Click on that, so we move into the library.
+The plugin is quite extensive already, but below you can get a heads up about the overall functionality that it provides below. And then i can only recommend to download it and try it out. It is after all completely free - and i would love the feedback.
 
-Click on the model you wish to place and click on the snapping you wish to use while placing, most of the time "Snap to height" will be the one used.
-Move the cursor around the 3D world, and notice that the 3D model is following your mouse. Click with left click and notice the model is now placed.
+#### Groups
+Currently it allows for the creation of Groups, which are groups of 3D objects that have their positions defined in local space. Which allows for building a house as an example with modular blocks and then easily use it again, or duplicate an earlier house, change 1 block and use that. 
 
-#### Using modifiers
-When you have placed an model you can perform certain tasks on them depending on your needs, let's say you need to insert a straight road for a good amount then you can repeat the model through an array modifier, which can both use normal meshinstances and multimeshinstance again depending on the needs.
+##### Persistency
+Groups inner structure are persistent, meaning if you change an group 3D object origin, rotation or scale it will instantly be updated on all instances of that group. This does not count for things like default collisions and more that are set when you spawn your group.
 
-When you click your model, a menu on the right bottom corner becomes visible, with options to perform modifiers on the model. Click on the one you want, i.e "Array".
-Right after you will see the scene tree change, and your model has become a child of a new node. This is a modifier node, which you can then control and configure by clicking on the modifier node in the scene tree and edit it's settings.
+##### 3D Preview
+Preview your creation in a 3D Preview environment while you are building it. Allowing you to fly around your 3D object to ensure all the details are as they need to be.
 
-When you change the settings the changes will be updated on the model instantly. So you can see the result right away. 
+#### Libraries
+Create libraries that houses a folder and all of it 3D models, allowing you to search, place, and perform various actions on the models when placing them in the 3D world.
 
-#### Using object snapping
-If you already have placed models in the 3D world and you wish to ensure you snap to that object with exact precision you can then use "Snap to objects" which opens up for custom offset as well.
-When this is enabled and you move close to another model in the 3D world your model will snap to it. This feature is still heavily under development and still needs alot of polishment. So beware of issues.
+##### Add and remove libraries
+You can add and remove libraries easily from the main page of the tab "Assets"
 
-When it's snapped to the object you can left click as normal and it will then snap to that object. If you wish to add offset to the model you can do that by setting the offset input boxes after Object snapping has been turned on.
+##### Placement Modes
+###### Simple placement mode
+Use to place mesh instances, this is mainly for fewer spawns and where you need certain things to have a certain script and such.
 
-### Video Introduction
-The video which will have it's links placed below in a small weeks time, it will be about how the plugin works, how it can be used and where various of things are.
-It will overall give an more in depth feel of usage. That said my skills in building envrionments aren't great.. So have that in mind.. 
+###### Advanced placement mode
+Use to place multi meshes, in configureable chunks. Which allows for a more optimized end result when you are spawning alot of objects.
 
-#### Installing AssetSnap
-https://www.youtube.com/watch?v=giCKSwaCULs
+##### Continuos placement
+Fast placement of many objects with continous placement, which relieves you from the task of having to select the item again and again.
+All you have to do is hold alt + shift.
 
-#### Adding / Removing libraries
-https://www.youtube.com/watch?v=A9d1HyfMfE4
+##### Drag path placement
+Drag a path and spawn a configureable amount using an offset to control the total spawn amount.
 
-More will come soon, merely need to create them. But im going to fix bugs while doing it to ensure that i catch the bugs i've found.
+##### Plane Snapping
+Snap to planes on the X,Y and Z Axis, the axis boundary can be configured to match the needs you have for the task.
 
-### Current state
-The project is currently under development, hence the code is not ready in any way for an professional environment. And alot of improvement and polish would still need to be done before anything in that manner would be a talking point.
-The various areas is functional now, and most if not all things are working but might still contain small amount of bugs in smaller degrees.
-The code base also needs to be polished alot more, and maybe a better structure.
+##### Object Snapping
+Snap to other placed 3D objects in the 3D world as long as they have been spawned with the same spawn layer as the object you are spawning.
 
-### Known Issues
-1. Upon rebuild of C# project it has issues regarding activating some parts of the plugin until a reload of the scene. I am aware of it, and working to find out why and how i can fix it.
-2. Some minor issues with the 2 modifiers - they still work but they throw a few errors still, tho this should be fixed in a couple of days.
-   
-### License
-This project is released under the MIT License.
+##### Auto collisions
+Easy auto collisions for your objects when you space them, or change them afterwards directly while the object is in focus.
 
-### Credits
-misoe92 - So far for everything
+##### Grab already placed objects
+By holding shift + alt and clicking A you can grab up already placed objects in the world, making it an ease to pick them up and move them to their new place.
 
-### Want to help?
-Im still new to c# - a more experienced developer would prob. ensure a much better structure and overall experience with the addon. And i would love to improve myself.
-So if you want to help out let me know. Especially if you have experience in setting up testing envrionment. That can be run to ensure everything works before a compilation.
+#### Inspector
+Ability to keep an eye on the states, this is mainly usefull when things don't work.. So let's hope it does not need to be used.
 
-You can write to me at mikebsorensen1@gmail.com ATT: AssetSnap
+#### Modifiers
+Ability to convert Mesh instances into Scatter or Array Modifiers.
+
+##### Scatter Modifier
+Scatter an configureable amount of entries of an object in an specified radius with various of tools and optimizations to go with the modifier.
+
+##### Array Modifier
+Spawn an configureable array of objects with various of tools and optimizations to go with the modifier.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+### Built With
+
+This plugin was build with Godot and for Godot.
+
+Beside that Icons from <a href="https://heroicons.com">HeroIcons</a> have been used.
+And 3D objects from libraries from [Here](https://fertile-soil-productions.itch.io/modular-village-pack) and [Here](https://fertile-soil-productions.itch.io/modular-terrain-pack) has been used while building it, and is the 3D objects seen in the preview images.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+
+<!-- GETTING STARTED -->
+## Getting Started
+
+Below you can find a detailed guide on how to download and install AssetSnap for your Godot 4.2 Mono project.
+If you rather get going quickly you can also download a free example project with AssetSnap already setup from <a>here</a>
+
+### Prerequisites
+Godot 4.2 Mono
+* For Windows
+  ```sh
+  https://godotengine.org/download/windows/
+  ```
+* For Linux
+  ```sh
+  https://godotengine.org/download/linux/
+  ```
+
+### Installation
+
+Download your copy of AssetSnap by either downloading a zip of the current repository, Forking or Cloning the repository.
+
+* Download Zip
+1. Click on the green button labeled `Code`
+2. Click on `Download Zip`
+3. Save the zip file at a place of your choice
+4. Unzip the zip file
+5. Copy the folder named Addons from within the new folder into your project
+6. **Only for new projects** Click on the ``Project`` menu
+7. **Only for new projects** Move your cursor to ``Tools``
+8. **Only for new projects** Move your cursor to ``C#``
+9. **Only for new projects** Click ``Create C# Solution``
+10. Click on the hammer in the right corner to build your current solution
+11. Click on ``Project``, And click on ``Project Settings``
+12. Click on ``Plugin`` in the top of the new window, and check the ``Enable`` checkbox next to the plugin named AssetSnap
+13. AssetSnap Should now work as expected
+
+* Forking
+1. Explanation for this section is comming soong
+
+* Cloning
+1. Explanation for this section is comming soong
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+
+<!-- USAGE EXAMPLES -->
+## Usage
+
+For usage resources please either head to the Youtube Channel, where things will be posted on how to use various of things.
+
+[Channel](https://www.youtube.com/channel/UCt0HT7KVysrvraMEn1U3QXQ)
+
+or wait for a bit longer until i get a documentation set up.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+
+<!-- ROADMAP -->
+## Roadmap
+As of 0.1.1
+- [x] Simple placement of objects using meshinstances
+- [x] Optimized placement of objects using multimeshinstances
+- [x] Auto collisions
+- [x] Placement of pre defined groups of objects
+- [X] Live preview of grouped objects while building
+- [x] Continuous placement
+- [x] Drag placement with offsetting
+- [x] Object snapping on multiple layers
+- [x] Plane Snapping
+- [x] Library listing of objects with previews and search
+- [x] Searchable library listing
+- [x] Simple Settings control
+- [x] Scatter modifier, that enables configureable scattering of an object
+- [x] Array modifier, that enables configureable array spawn of an object
+
+As of 0.1.2
+- [ ] Upgraded settings UI
+- [ ] Level of detail Control
+- [ ] Better Decal UI
+- [ ] Better folder structure for components
+
+See the [open issues](https://github.com/misoe92/AssetSnap-Godot/issues) for a full list of proposed features (and known issues).
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+
+<!-- CONTRIBUTING -->
+## Contributing
+
+Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
+
+If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
+Don't forget to give the project a star! Thanks again!
+
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+
+<!-- LICENSE -->
+## License
+
+Distributed under the MIT License. See `LICENSE.txt` for more information.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+
+<!-- CONTACT -->
+## Contact
+
+Mike Sørensen - [@MikeSrensen19](https://twitter.com/MikeSrensen19) - mikebsorensen1@gmail.com
+
+Project Link: [https://github.com/misoe92/AssetSnap-Godot](https://github.com/misoe92/AssetSnap-Godot)
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+
+<!-- ACKNOWLEDGMENTS -->
+## Acknowledgments
+
+For this project several of resources have been used, below you will find a link and description of the various items.
+None of the items beside HeroIcons can be found in the project when you download it.
+
+* [Readme Layout](https://github.com/othneildrew/Best-README-Template)
+* [Modular Terrain Pack](https://fertile-soil-productions.itch.io/modular-terrain-pack)
+* [Modular Village Pack](https://fertile-soil-productions.itch.io/modular-village-pack)
+* [HeroIcons](https://heroicons.com/)
+
+Also a mention should go to Godot as well, for their free and awesome piece of software. 
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+
+<!-- MARKDOWN LINKS & IMAGES -->
+<!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
+[contributors-shield]: https://img.shields.io/github/contributors/misoe92/AssetSnap-Godot.svg?style=for-the-badge
+[contributors-url]: https://github.com/misoe92/AssetSnap-Godot/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/misoe92/AssetSnap-Godot.svg?style=for-the-badge
+[forks-url]: https://github.com/misoe92/AssetSnap-Godot/network/members
+[stars-shield]: https://img.shields.io/github/stars/misoe92/AssetSnap-Godot.svg?style=for-the-badge
+[stars-url]: https://github.com/misoe92/AssetSnap-Godot/stargazers
+[issues-shield]: https://img.shields.io/github/issues/misoe92/AssetSnap-Godot.svg?style=for-the-badge
+[issues-url]: https://github.com/misoe92/AssetSnap-Godot/issues
+[license-shield]: https://img.shields.io/github/license/misoe92/AssetSnap-Godot.svg?style=for-the-badge
+[license-url]: https://github.com/misoe92/AssetSnap-Godot/LICENSE
+[product-screenshot]: images/screenshot.png
+[Next.js]: https://img.shields.io/badge/next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white
+[Next-url]: https://nextjs.org/
+[React.js]: https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB
+[React-url]: https://reactjs.org/
+[Vue.js]: https://img.shields.io/badge/Vue.js-35495E?style=for-the-badge&logo=vuedotjs&logoColor=4FC08D
+[Vue-url]: https://vuejs.org/
+[Angular.io]: https://img.shields.io/badge/Angular-DD0031?style=for-the-badge&logo=angular&logoColor=white
+[Angular-url]: https://angular.io/
+[Svelte.dev]: https://img.shields.io/badge/Svelte-4A4A55?style=for-the-badge&logo=svelte&logoColor=FF3E00
+[Svelte-url]: https://svelte.dev/
+[Laravel.com]: https://img.shields.io/badge/Laravel-FF2D20?style=for-the-badge&logo=laravel&logoColor=white
+[Laravel-url]: https://laravel.com
+[Bootstrap.com]: https://img.shields.io/badge/Bootstrap-563D7C?style=for-the-badge&logo=bootstrap&logoColor=white
+[Bootstrap-url]: https://getbootstrap.com
+[JQuery.com]: https://img.shields.io/badge/jQuery-0769AD?style=for-the-badge&logo=jquery&logoColor=white
+[JQuery-url]: https://jquery.com 
