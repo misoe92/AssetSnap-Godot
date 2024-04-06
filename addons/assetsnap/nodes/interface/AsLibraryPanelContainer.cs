@@ -22,8 +22,6 @@
 
 #if TOOLS
 using AssetSnap;
-using AssetSnap.Front.Nodes;
-using AssetSnap.Instance.Input;
 using Godot;
 
 [Tool]
@@ -120,6 +118,11 @@ public partial class AsLibraryPanelContainer : PanelContainer
 
 				PrepareMeshInstance();
 				
+				if( null == _Instance ) 
+				{
+					return;
+				}
+				
 				explorer.SetFocusToNode(_Instance);
 				explorer.CurrentLibrary._LibrarySettings.UpdateSpawnSettings("_LSSnapToHeight.state", true);
 				explorer.CurrentLibrary._LibrarySettings.UpdateSpawnSettings("_LSSnapToHeight.UsingGlue", true);
@@ -200,7 +203,34 @@ public partial class AsLibraryPanelContainer : PanelContainer
 	
 	private void PrepareMeshInstance()
 	{
-		_Mesh = (Mesh)_Ressource;
+		if( _Ressource is PackedScene scene ) 
+		{
+			Node3D child = scene.Instantiate().GetChild<Node3D>(0);
+			
+			if( child is MeshInstance3D meshInstance3D ) 
+			{
+				_Mesh = meshInstance3D.Mesh;
+			}
+			else 
+			{
+				Node3D lastChild = child.GetChild<Node3D>(0);
+				
+				if( lastChild is MeshInstance3D lastMeshInstance3D ) 
+				{
+					_Mesh = lastMeshInstance3D.Mesh;
+				}
+				else 
+				{
+					GD.PushError("Invalid model file");
+					return;
+				}
+			}
+		}
+		else 
+		{
+			_Mesh = (Mesh)_Ressource;
+		}
+		
 		var FileNameSplit = _FileName.Split("\\");
 		_Instance = new()
 		{
