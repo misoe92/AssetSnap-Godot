@@ -25,10 +25,14 @@ namespace AssetSnap.Front.Configs
 	using System;
 	using System.Collections.Generic;
 	using AssetSnap.Settings;
+	using AssetSnap.States;
 	using Godot;
-	
+
 	public partial class SettingsConfig : Config.BaseConfig
 	{
+		[Signal]
+		public delegate void FoldersLoadedEventHandler();
+		
 		private string _ConfigPath;
 		private string[] _Folders;
 		private Godot.Collections.Dictionary<string,Variant> _Settings;
@@ -77,7 +81,7 @@ namespace AssetSnap.Front.Configs
 		public void Initialize() 
 		{
 			_ConfigPath = "config.cfg";
-			LoadConfig( _ConfigPath ); 
+			LoadConfig( _ConfigPath );
 			
 			// If the file didn't load, ignore it.
 			if (LoadOk)
@@ -119,6 +123,14 @@ namespace AssetSnap.Front.Configs
 			}
 		}
 		
+		public void MaybeEmitFoldersLoaded()
+		{
+			if( 0 != FolderCount ) 
+			{
+				EmitSignal(SignalName.FoldersLoaded);
+			}
+		}
+		
 		/*
 		** Resets the settings config
 		** 
@@ -141,6 +153,7 @@ namespace AssetSnap.Front.Configs
 			}
 			
 			Initialize();
+			MaybeEmitFoldersLoaded();
 		}
 
 		/*
@@ -162,6 +175,8 @@ namespace AssetSnap.Front.Configs
 			
 			_Container = new();
 			_Container.Initialize();
+			
+			StatesUtils.SetLoad("SettingsContainer", true);
 		} 
 		
 		/*
