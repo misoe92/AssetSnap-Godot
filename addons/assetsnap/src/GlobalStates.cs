@@ -26,11 +26,13 @@ namespace AssetSnap
 	using System;
 	using System.Collections.Generic;
 	using System.Reflection;
-	using AssetSnap.Front.Nodes;
+    using AssetSnap.States;
+
+    using AssetSnap.Front.Nodes;
 	using Godot;
 
 	[Tool]
-	public partial class GlobalStates
+	public partial class GlobalStates : LoadStates
 	{
 	
 		/** Library Enums **/
@@ -649,15 +651,6 @@ namespace AssetSnap
 			StateChanged();
 		}
 		
-		private void StateChanged()
-		{
-			GlobalExplorer _GlobalExplorer = GlobalExplorer.GetInstance();
-			if( null != _GlobalExplorer._Plugin ) 
-			{
-				Plugin _plugin = _GlobalExplorer._Plugin;
-				_plugin.EmitSignal(Plugin.SignalName.StatesChanged);
-			}
-		}
 	}
 }
 #endif
