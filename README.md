@@ -88,15 +88,21 @@ This toolkit was started as a way for me to give my nephew an easier entry in to
 The plugin is quite extensive already, but below you can get a heads up about the overall functionality that it provides below. And then i can only recommend to download it and try it out. It is after all completely free - and i would love the feedback.
 
 ### Groups
+![image](https://github.com/misoe92/AssetSnap-Godot/assets/38956582/0043dd77-443a-412e-9682-0b9caf5bfdfa)
+
 Currently it allows for the creation of Groups, which are groups of 3D objects that have their positions defined in local space. Which allows for building a house as an example with modular blocks and then easily use it again, or duplicate an earlier house, change 1 block and use that. 
 
 #### Persistency
 Groups inner structure are persistent, meaning if you change an group 3D object origin, rotation or scale it will instantly be updated on all instances of that group. This does not count for things like default collisions and more that are set when you spawn your group.
 
 #### 3D Preview
+![image](https://github.com/misoe92/AssetSnap-Godot/assets/38956582/85489a08-130f-4676-bc1d-453dd533f6fa)
+
 Preview your creation in a 3D Preview environment while you are building it. Allowing you to fly around your 3D object to ensure all the details are as they need to be.
 
 ### Libraries
+![image](https://github.com/misoe92/AssetSnap-Godot/assets/38956582/39809aa6-8288-4e93-b03a-8bd871a8938f)
+
 Create libraries that houses a folder and all of it 3D models, allowing you to search, place, and perform various actions on the models when placing them in the 3D world.
 
 #### Add and remove libraries
