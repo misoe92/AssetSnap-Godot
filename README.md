@@ -87,57 +87,57 @@ This toolkit was started as a way for me to give my nephew an easier entry in to
 
 The plugin is quite extensive already, but below you can get a heads up about the overall functionality that it provides below. And then i can only recommend to download it and try it out. It is after all completely free - and i would love the feedback.
 
-#### Groups
+### Groups
 Currently it allows for the creation of Groups, which are groups of 3D objects that have their positions defined in local space. Which allows for building a house as an example with modular blocks and then easily use it again, or duplicate an earlier house, change 1 block and use that. 
 
-##### Persistency
+#### Persistency
 Groups inner structure are persistent, meaning if you change an group 3D object origin, rotation or scale it will instantly be updated on all instances of that group. This does not count for things like default collisions and more that are set when you spawn your group.
 
-##### 3D Preview
+#### 3D Preview
 Preview your creation in a 3D Preview environment while you are building it. Allowing you to fly around your 3D object to ensure all the details are as they need to be.
 
-#### Libraries
+### Libraries
 Create libraries that houses a folder and all of it 3D models, allowing you to search, place, and perform various actions on the models when placing them in the 3D world.
 
-##### Add and remove libraries
+#### Add and remove libraries
 You can add and remove libraries easily from the main page of the tab "Assets"
 
-##### Placement Modes
-###### Simple placement mode
+#### Placement Modes
+##### Simple placement mode
 Use to place mesh instances, this is mainly for fewer spawns and where you need certain things to have a certain script and such.
 
-###### Advanced placement mode
+##### Advanced placement mode
 Use to place multi meshes, in configureable chunks. Which allows for a more optimized end result when you are spawning alot of objects.
 
-##### Continuos placement
+#### Continuos placement
 Fast placement of many objects with continous placement, which relieves you from the task of having to select the item again and again.
 All you have to do is hold alt + shift.
 
-##### Drag path placement
+#### Drag path placement
 Drag a path and spawn a configureable amount using an offset to control the total spawn amount.
 
-##### Plane Snapping
+#### Plane Snapping
 Snap to planes on the X,Y and Z Axis, the axis boundary can be configured to match the needs you have for the task.
 
-##### Object Snapping
+#### Object Snapping
 Snap to other placed 3D objects in the 3D world as long as they have been spawned with the same spawn layer as the object you are spawning.
 
-##### Auto collisions
+#### Auto collisions
 Easy auto collisions for your objects when you space them, or change them afterwards directly while the object is in focus.
 
-##### Grab already placed objects
+#### Grab already placed objects
 By holding shift + alt and clicking A you can grab up already placed objects in the world, making it an ease to pick them up and move them to their new place.
 
-#### Inspector
+### Inspector
 Ability to keep an eye on the states, this is mainly usefull when things don't work.. So let's hope it does not need to be used.
 
-#### Modifiers
+### Modifiers
 Ability to convert Mesh instances into Scatter or Array Modifiers.
 
-##### Scatter Modifier
+#### Scatter Modifier
 Scatter an configureable amount of entries of an object in an specified radius with various of tools and optimizations to go with the modifier.
 
-##### Array Modifier
+#### Array Modifier
 Spawn an configureable array of objects with various of tools and optimizations to go with the modifier.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
