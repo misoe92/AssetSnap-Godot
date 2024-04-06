@@ -20,6 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using AssetSnap.Config;
 using AssetSnap.Front.Nodes;
 using Godot;
 
@@ -49,7 +50,6 @@ namespace AssetSnap.Core
 			// Adding base components to the tree
 			_GlobalExplorer._Plugin.AddChild(_GlobalExplorer.Settings);
 			_GlobalExplorer._Plugin.AddChild(_GlobalExplorer.Waypoints);
-			_GlobalExplorer._Plugin.AddChild(_GlobalExplorer.Components);
 			_GlobalExplorer._Plugin.AddChild(_GlobalExplorer.ContextMenu);
 			_GlobalExplorer._Plugin.AddChild(_GlobalExplorer.BottomDock);
 			_GlobalExplorer._Plugin.AddChild(_GlobalExplorer.Inspector);
@@ -61,14 +61,15 @@ namespace AssetSnap.Core
 			_GlobalExplorer._Plugin.AddChild(_GlobalExplorer.Modifiers);
  
 			_GlobalExplorer._Plugin.AddChild(_GlobalExplorer.GroupBuilder);
+
+			_GlobalExplorer.Settings.FoldersLoaded += () => { LoadContainers(); };
  
 			/** Initialize **/  
 			_GlobalExplorer.Settings.Initialize();
-			_GlobalExplorer.Waypoints.Initialize();
 			_GlobalExplorer.Components.Initialize();
+			_GlobalExplorer.Waypoints.Initialize();
 			_GlobalExplorer.BottomDock.Initialize();  
 			_GlobalExplorer.ContextMenu.Initialize(); 
-			
 			_GlobalExplorer.Snap.Initialize();
 			 
 			_GlobalExplorer.Decal.Initialize();  
@@ -76,20 +77,41 @@ namespace AssetSnap.Core
 			
 			// Finalize Group builder container  
 			_GlobalExplorer.GroupBuilder.Initialize();
-			_GlobalExplorer.GroupBuilder.InitializeContainer();  
-			_GlobalExplorer.BottomDock.Add(_GlobalExplorer.GroupBuilder.Container); 
 			
-			_GlobalExplorer.Library.Initialize();
- 
 			_GlobalExplorer.Inspector.Initialize();
-	
 			_GlobalExplorer.Inspector.AddToDock();
 			
-			// Finalize settings container 
-			_GlobalExplorer.Settings.InitializeContainer();  
-			_GlobalExplorer.BottomDock.Add(_GlobalExplorer.Settings.Container); 
+			_GlobalExplorer.BottomDock.AddToBottomPanel();
+
+			_GlobalExplorer.Settings.MaybeEmitFoldersLoaded();
+		}
+		
+		private void LoadContainers()
+		{
+			GD.Print("Loading containers");
+			_GlobalExplorer.GroupBuilder.InitializeContainer();
+			if(
+				null == _GlobalExplorer.GroupBuilder.Container ||
+				false == EditorPlugin.IsInstanceValid( _GlobalExplorer.GroupBuilder.Container )
+			) 
+			{
+				GD.PushError("Invalid Group Container");
+			}
 			
-			_GlobalExplorer.BottomDock.AddToBottomPanel(); 
+			_GlobalExplorer.BottomDock.Add(_GlobalExplorer.GroupBuilder.Container); 
+		
+			_GlobalExplorer.Library.Initialize();
+		
+			_GlobalExplorer.Settings.InitializeContainer();
+			if(
+				null == _GlobalExplorer.Settings.Container ||
+				false == EditorPlugin.IsInstanceValid( _GlobalExplorer.Settings.Container )
+			) 
+			{
+				GD.PushError("Invalid Group Container");
+			}
+			
+			_GlobalExplorer.BottomDock.Add(_GlobalExplorer.Settings.Container);
 		}
 	}
 }

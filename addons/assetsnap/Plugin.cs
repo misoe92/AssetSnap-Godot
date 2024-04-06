@@ -55,6 +55,8 @@ namespace AssetSnap
 		/** Editor Node Types **/ 
 		public NodeType[] NodeTypes = Array.Empty<NodeType>();
 
+		public Node internalNode;
+
 		private static Plugin _Instance;
 		
 		public static Plugin GetInstance()
@@ -71,6 +73,9 @@ namespace AssetSnap
 		{
 			Name = "AssetSnapPlugin";
 			Plugin._Instance = this;
+
+			internalNode = new();
+			AddChild(internalNode);
 
 			if( null == GlobalExplorer.InitializeExplorer() ) 
 			{
@@ -93,6 +98,11 @@ namespace AssetSnap
 		{
 			// Finalize Initialize of plugin 
 			_CoreEnter.InitializeCore();
+		}
+		
+		public Node GetInternalContainer()
+		{
+			return internalNode;
 		}
 		
 		private void _OnSceneChanged(Node Scene)
