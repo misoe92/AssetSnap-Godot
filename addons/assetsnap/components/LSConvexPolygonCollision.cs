@@ -22,12 +22,12 @@
 
 namespace AssetSnap.Front.Components
 {
-	using System.Transactions;
 	using AssetSnap.Component;
 	using AssetSnap.Front.Nodes;
 	using Godot;
 
-	public partial class LSConvexPolygonCollision : LibraryComponent
+	[Tool]
+	public partial class LSConvexPolygonCollision : LSCollisionComponent
 	{
 		private readonly string _Title = "Convex Polygon";
 		private readonly string _cleanTitle = "Clean";
@@ -36,23 +36,7 @@ namespace AssetSnap.Front.Components
 		private readonly string _cleanCheckboxTooltip = "If clean is true (default), duplicate and interior vertices are removed automatically. You can set it to false to make the process faster if not needed.";
 		private readonly string _simplifyCheckboxTooltip = "If simplify is true, the geometry can be further simplified to reduce the number of vertices. Disabled by default.";
 		private bool Exited = false;
-		
-		private MarginContainer _MarginContainer;
-		private MarginContainer _ValuesMarginContainer;
-		private VBoxContainer _InnerContainer;
-		private VBoxContainer _ValuesInnerContainer;
-		private CheckBox _Checkbox;
-		private CheckBox _cleanCheckbox;
-		private CheckBox _simplifyCheckbox;
-		
-		private Callable? _CheckboxCallable;
-		private Callable? _cleanCheckboxCallable;
-		private Callable? _simplifyCheckboxCallable;
-		
-		public bool state = false;
-		public bool clean = false;
-		public bool simplify = false;
-		 
+
 		/*
 		** Constructor of the component
 		**
@@ -61,7 +45,7 @@ namespace AssetSnap.Front.Components
 		public LSConvexPolygonCollision()
 		{
 			Name = "LSConvexPolygonCollision";
-			// _include = false;
+			//_include = false;
 		} 
 	
 		/*
@@ -71,70 +55,66 @@ namespace AssetSnap.Front.Components
 		*/
 		public override void Initialize()
 		{
-			if( Container is VBoxContainer BoxContainer ) 
-			{
-				_MarginContainer = new();
-				_InnerContainer = new();
-				_ValuesMarginContainer = new();
-				_ValuesInnerContainer = new();
+			AddTrait(typeof(Checkable));
+			base.Initialize();
+
+			Callable _callable = Callable.From(() => { _OnCheckboxPressed(); });
+			Callable _cleanCallable = Callable.From(() => { _OnCleanCheckboxPressed(); });
+			Callable _simplifyCallable = Callable.From(() => { _OnSimplifyCheckboxPressed(); });
+			
+			Initiated = true;
+			
+			Trait<Checkable>()
+				.SetName("ConvexCollision")
+				.SetAction( _callable )
+				.SetDimensions(140, 20)
+				.SetMargin(10, "left")
+				.SetMargin(10, "right")
+				.SetMargin(2, "top")
+				.SetMargin(0, "bottom")
+				.SetText(_Title)
+				.SetTooltipText(_CheckboxTooltip)
+				.Instantiate();
 				
+			Trait<Checkable>()
+				.SetName("ConvexClean")
+				.SetAction( _cleanCallable )
+				.SetDimensions(140, 20)
+				.SetMargin(10, "left")
+				.SetMargin(10, "right")
+				.SetMargin(2, "top")
+				.SetMargin(0, "bottom")
+				.SetText(_cleanTitle)
+				.SetTooltipText(_cleanCheckboxTooltip)
+				.SetVisible(false)
+				.Instantiate();
+					
+			Trait<Checkable>()
+				.SetName("ConvexSimplify")
+				.SetAction( _simplifyCallable )
+				.SetDimensions(140, 20)
+				.SetMargin(10, "left")
+				.SetMargin(10, "right")
+				.SetMargin(2, "top")
+				.SetMargin(0, "bottom")
+				.SetText(_simplifyTitle)
+				.SetTooltipText(_simplifyCheckboxTooltip)
+				.SetVisible(false)
+				.Instantiate();
+
+			Trait<Checkable>()
+				.Select(0)
+				.AddToContainer(Container);
+								
+			Trait<Checkable>()
+				.Select(1)
+				.AddToContainer( Container );
+								
+			Trait<Checkable>()
+				.Select(2)
+				.AddToContainer( Container );
 				
-				_Checkbox = new()
-				{
-					Text = _Title,
-					TooltipText = _CheckboxTooltip,
-				};
-				
-				_cleanCheckbox = new()
-				{
-					Text = _cleanTitle,
-					TooltipText = _cleanCheckboxTooltip,
-				};
-				
-				_simplifyCheckbox = new()
-				{
-					Text = _simplifyTitle,
-					TooltipText = _simplifyCheckboxTooltip,
-				};
-				
-				_CheckboxCallable = new(this, "_OnCheckboxPressed");
-				_cleanCheckboxCallable = new(this, "_OnCleanCheckboxPressed");
-				_simplifyCheckboxCallable = new(this, "_OnSimplifyCheckboxPressed");
-				
-				_MarginContainer.AddThemeConstantOverride("margin_left", 10); 
-				_MarginContainer.AddThemeConstantOverride("margin_right", 10);
-				_MarginContainer.AddThemeConstantOverride("margin_top", 2);
-				_MarginContainer.AddThemeConstantOverride("margin_bottom", 2);
-				
-				_ValuesMarginContainer.AddThemeConstantOverride("margin_left", 20); 
-				_ValuesMarginContainer.AddThemeConstantOverride("margin_right", 20);
-				_ValuesMarginContainer.AddThemeConstantOverride("margin_top", 0);
-				_ValuesMarginContainer.AddThemeConstantOverride("margin_bottom", 0);
-				
-				if( _CheckboxCallable is Callable _checkboxCallable) 
-				{
-					_Checkbox.Connect(CheckBox.SignalName.Pressed,_checkboxCallable);
-				}
-				
-				if( _cleanCheckboxCallable is Callable _CleanCheckboxCallable) 
-				{
-					_cleanCheckbox.Connect(CheckBox.SignalName.Pressed,_CleanCheckboxCallable);
-				}
-				
-				if( _simplifyCheckboxCallable is Callable _SimplifyCheckboxCallable) 
-				{
-					_simplifyCheckbox.Connect(CheckBox.SignalName.Pressed,_SimplifyCheckboxCallable);
-				}
-				
-				_InnerContainer.AddChild(_Checkbox);
-				_ValuesInnerContainer.AddChild(_cleanCheckbox);
-				_ValuesInnerContainer.AddChild(_simplifyCheckbox);
-				_MarginContainer.AddChild(_InnerContainer);
-				_ValuesMarginContainer.AddChild(_ValuesInnerContainer);
-				
-				BoxContainer.AddChild(_MarginContainer);
-				BoxContainer.AddChild(_ValuesMarginContainer);
-			}
+			Plugin.GetInstance().StatesChanged += () => { MaybeUpdateValue(); };
 		}
 
 		/*
@@ -143,75 +123,88 @@ namespace AssetSnap.Front.Components
 		**
 		** @return void
 		*/
-		public override void _Process(double delta)
+		public override void MaybeUpdateValue()
 		{
-			if( false == IsInstanceValid(_Checkbox) ) 
+			if(
+				false == IsValid()
+			) 
 			{
 				return;
 			}
 			
-			if( _GlobalExplorer == null || _GlobalExplorer._Plugin == null ) 
+			if( IsActive() ) 
 			{
-				return;
+				SetCleanCheckboxVisibility(true);
+				SetSimplifyCheckboxVisibility(true);
+			}
+			else
+			{
+				SetCleanCheckboxVisibility(false);
+				SetSimplifyCheckboxVisibility(false);
 			}
 			
-			if( _Checkbox != null && state && _Checkbox.ButtonPressed == false ) 
+			if( IsCleanActive() && false == CleanCheckboxChecked() ) 
 			{
-				_Checkbox.ButtonPressed = true;
+				SetCleanCheckboxState(true);
 			}
-			else if( _Checkbox != null && false == state && _Checkbox.ButtonPressed == true ) 
+			else if( false == IsCleanActive() && true == CleanCheckboxChecked() ) 
 			{
-				_Checkbox.ButtonPressed = false;
-			}
-			
-			if( _cleanCheckbox != null && clean && _cleanCheckbox.ButtonPressed == false ) 
-			{
-				_cleanCheckbox.ButtonPressed = true;
-			}
-			else if( _cleanCheckbox != null && false == clean && _cleanCheckbox.ButtonPressed == true ) 
-			{
-				_cleanCheckbox.ButtonPressed = false;
+				SetCleanCheckboxState(false);
 			}
 			
-			if( _simplifyCheckbox != null && simplify && _simplifyCheckbox.ButtonPressed == false ) 
+			if( IsSimplifyActive() && false == SimplifyCheckboxChecked() ) 
 			{
-				_simplifyCheckbox.ButtonPressed = true;
+				SetSimplifyCheckboxState(true);
 			}
-			else if( _simplifyCheckbox != null && false == simplify && _simplifyCheckbox.ButtonPressed == true ) 
+			else if( false == IsSimplifyActive() && true == SimplifyCheckboxChecked() ) 
 			{
-				_simplifyCheckbox.ButtonPressed = false;
-			}
-			
-			if( _cleanCheckbox != null && state && _cleanCheckbox.Visible == false )  
-			{
-				_cleanCheckbox.Visible = true;
-			}
-			else if( _cleanCheckbox != null && false == state && _cleanCheckbox.Visible == true )  
-			{
-				_cleanCheckbox.Visible = false;
+				SetSimplifyCheckboxState(false);
 			}
 			
-			if( null != _simplifyCheckbox && state && false ==_simplifyCheckbox.Visible )  
-			{
-				_simplifyCheckbox.Visible = true;
-			}
-			else if( null != _simplifyCheckbox && false == state && true == _simplifyCheckbox.Visible )  
-			{
-				_simplifyCheckbox.Visible = false;
-			}
-			
-			if( null != _ValuesMarginContainer && state && false == _ValuesMarginContainer.Visible ) 
-			{
-				_ValuesMarginContainer.Visible = true;
-			}
-			else if( null != _ValuesMarginContainer && false == state && true == _ValuesMarginContainer.Visible ) 
-			{
-				_ValuesMarginContainer.Visible = false;
-			}
-			
-			base._Process(delta);
+			base.MaybeUpdateValue();
 		}
-
+		
+		public void SetCleanCheckboxState( bool state ) 
+		{
+			if( false == IsValid() )
+			{
+				return;
+			}
+			
+			Trait<Checkable>().Select(1).SetValue( state );
+		}
+		
+		public void SetSimplifyCheckboxState( bool state ) 
+		{
+			if( false == IsValid() )
+			{
+				return;
+			}
+			
+			Trait<Checkable>().Select(2).SetValue( state );
+		}
+		
+		public void SetCleanCheckboxVisibility( bool state ) 
+		{
+			if( false == IsValid() )
+			{
+				return;
+			}
+			
+			Trait<Checkable>().Select(1).SetVisible( state );
+		}
+		
+		public void SetSimplifyCheckboxVisibility( bool state )
+		{
+			if( false == IsValid() )
+			{
+				return;
+			}
+			
+			Trait<Checkable>().Select(2).SetVisible( state );
+		}
+		
+		
 		/*
 		** Updates the state 
 		** and updates staticbody collision
@@ -220,16 +213,29 @@ namespace AssetSnap.Front.Components
 		*/
 		private void _OnCheckboxPressed()
 		{
-			state = !state;
-
 			Node3D handle = _GlobalExplorer.GetHandle();
-			
-			if( state == true ) 
+
+			if( false == IsActive() ) 
 			{
-				Library._LibrarySettings._LSConcaveCollision.GetCheckbox().ButtonPressed = false;
-				Library._LibrarySettings._LSConcaveCollision.state = false;
-				Library._LibrarySettings._LSSimpleSphereCollision.GetCheckbox().ButtonPressed = false;
-				Library._LibrarySettings._LSSimpleSphereCollision.state = false;
+				_GlobalExplorer.States.ConvexCollision = GlobalStates.LibraryStateEnum.Enabled;
+				_GlobalExplorer.States.SphereCollision = GlobalStates.LibraryStateEnum.Disabled;
+				_GlobalExplorer.States.ConcaveCollision = GlobalStates.LibraryStateEnum.Disabled;
+								
+				UpdateSpawnSettings("ConvexCollision", true);
+				UpdateSpawnSettings("SphereCollision", false);
+				UpdateSpawnSettings("ConcaveCollision", false);
+				UpdateSpawnSettings("ConvexClean", false);
+				UpdateSpawnSettings("ConvexSimplify", false);
+			}
+			else
+			{
+				_GlobalExplorer.States.ConvexCollision = GlobalStates.LibraryStateEnum.Disabled;
+				_GlobalExplorer.States.ConvexClean = GlobalStates.LibraryStateEnum.Disabled;
+				_GlobalExplorer.States.ConvexSimplify = GlobalStates.LibraryStateEnum.Disabled;
+										
+				UpdateSpawnSettings("ConvexCollision", false);
+				UpdateSpawnSettings("ConvexClean", false);
+				UpdateSpawnSettings("ConvexSimplify", false);
 			}
 			
 			if( handle is AssetSnap.Front.Nodes.AsMeshInstance3D meshInstance3D ) 
@@ -240,8 +246,6 @@ namespace AssetSnap.Front.Components
 				}
 			}
 			
-			string key = "_LSConvexPolygonCollision.state";
-			UpdateSpawnSettings(key, state);
 		}
 		
 		/*
@@ -252,7 +256,17 @@ namespace AssetSnap.Front.Components
 		*/
 		private void _OnCleanCheckboxPressed()
 		{
-			clean = !clean;
+			bool state = false; 
+			
+			if( false == IsCleanActive() ) 
+			{
+				_GlobalExplorer.States.ConvexClean = GlobalStates.LibraryStateEnum.Enabled;
+				state = true;
+			}
+			else 
+			{
+				_GlobalExplorer.States.ConvexClean = GlobalStates.LibraryStateEnum.Disabled;
+			}
 			
 			Node3D handle = _GlobalExplorer.GetHandle();
 			if( handle is AssetSnap.Front.Nodes.AsMeshInstance3D meshInstance3D ) 
@@ -262,6 +276,9 @@ namespace AssetSnap.Front.Components
 					staticBody3D.UpdateCollision();
 				}
 			}
+			
+			string key = "_LSConvexPolygonCollisionClean.state";
+			UpdateSpawnSettings(key, state);
 		}
 							
 		/*
@@ -272,7 +289,17 @@ namespace AssetSnap.Front.Components
 		*/
 		private void _OnSimplifyCheckboxPressed()
 		{
-			simplify = !simplify;
+			bool state = false; 
+			
+			if( false == IsSimplifyActive() ) 
+			{
+				_GlobalExplorer.States.ConvexClean = GlobalStates.LibraryStateEnum.Enabled;
+				state = true;
+			}
+			else 
+			{
+				_GlobalExplorer.States.ConvexClean = GlobalStates.LibraryStateEnum.Disabled;
+			}
 			
 			Node3D handle = _GlobalExplorer.GetHandle();
 			if( handle is AssetSnap.Front.Nodes.AsMeshInstance3D meshInstance3D ) 
@@ -282,51 +309,72 @@ namespace AssetSnap.Front.Components
 					staticBody3D.UpdateCollision();
 				}
 			}
+			
+			string key = "_LSConvexPolygonCollisionSimplify.state";
+			UpdateSpawnSettings(key, state);
 		}
-					
-		/*
-		** Fetches the main checkbox
-		**
-		** @return CheckBox
-		*/
-		public CheckBox GetCheckbox()
+			
+		public bool IsSimplifyActive()
 		{
-			return _Checkbox;
+			return _GlobalExplorer.States.ConvexSimplify == GlobalStates.LibraryStateEnum.Enabled;
 		}
-					
+			
+		public bool IsCleanActive()
+		{
+			return _GlobalExplorer.States.ConvexClean == GlobalStates.LibraryStateEnum.Enabled;
+		}		
 		/*
 		** Checks if the collision should use
 		** the ConvexPolygon collision
 		**
 		** @return bool
 		*/
-		public bool IsActive() 
+		public override bool IsActive() 
 		{
-			return state == true;
+			return _GlobalExplorer.States.ConvexCollision == GlobalStates.LibraryStateEnum.Enabled;
+		}
+		
+		private bool CleanCheckboxChecked()
+		{
+			if( false == IsValid() )
+			{
+				return false;
+			}
+			
+			return Trait<Checkable>().Select(1).GetValue();
 		}
 					
-		/*
-		** Checks if the collision should use
-		** the internal extension "Clean"
-		**
-		** @return bool
-		*/
-		public bool ShouldClean() 
+		private bool CleanCheckboxVisible()
 		{
-			return clean == true;
+			if( false == IsValid() )
+			{
+				return false;
+			}
+			
+			return Trait<Checkable>().Select(1).IsVisible();
+		}
+		
+
+		private bool SimplifyCheckboxChecked()
+		{
+			if( false == IsValid() )
+			{
+				return false;
+			}
+
+			return Trait<Checkable>().Select(2).GetValue();
 		}
 					
-		/*
-		** Checks if the collision should use
-		** the internal extension "Simplify"
-		**
-		** @return bool
-		*/
-		public bool ShouldSimplify() 
+		private bool SimplifyCheckboxVisible()
 		{
-			return simplify == true;
+			if( false == IsValid() )
+			{
+				return false;
+			}
+			
+			return Trait<Checkable>().Select(2).IsVisible();
 		}
-					
+		
 		/*
 		** Resets the state back to disabled
 		**
@@ -334,85 +382,39 @@ namespace AssetSnap.Front.Components
 		*/
 		public void Reset()
 		{
-			state = false;
-			clean = false;
-			simplify = false;
+			_GlobalExplorer.States.ConvexCollision = GlobalStates.LibraryStateEnum.Disabled; 
+			_GlobalExplorer.States.ConvexClean = GlobalStates.LibraryStateEnum.Disabled; 
+			_GlobalExplorer.States.ConvexSimplify = GlobalStates.LibraryStateEnum.Disabled; 
 		}
 			
 		/*
-		** Cleans up in references, fields and parameters.
-		** 
+		** Syncronizes it's value to a global
+		** central state controller
+		**
 		** @return void
 		*/
+		public override void Sync() 
+		{
+			if( true == Initiated && Trait<Checkable>().Select(0).IsValid() )
+			{
+				_GlobalExplorer.States.ConvexCollision = Trait<Checkable>().Select(0).GetValue() ? GlobalStates.LibraryStateEnum.Enabled : GlobalStates.LibraryStateEnum.Disabled;
+			}
+			
+			if( true == Initiated && Trait<Checkable>().Select(1).IsValid() )
+			{
+				_GlobalExplorer.States.ConvexClean = Trait<Checkable>().Select(1).GetValue() ? GlobalStates.LibraryStateEnum.Enabled : GlobalStates.LibraryStateEnum.Disabled;
+			}
+			
+			if( true == Initiated && Trait<Checkable>().Select(2).IsValid() )
+			{
+				_GlobalExplorer.States.ConvexSimplify = Trait<Checkable>().Select(2).GetValue() ? GlobalStates.LibraryStateEnum.Enabled : GlobalStates.LibraryStateEnum.Disabled;
+			}
+		}
+				
 		public override void _ExitTree()
 		{
-			Exited = true;
-			
-			if( IsInstanceValid(_Checkbox) && _Checkbox != null && _CheckboxCallable is Callable _checkboxCallable) 
-			{
-				if( _Checkbox.IsConnected(CheckBox.SignalName.Pressed, _checkboxCallable)) 
-				{
-					_Checkbox.Disconnect(CheckBox.SignalName.Pressed,_checkboxCallable);
-				}
-			}
-			
-			if( IsInstanceValid(_cleanCheckbox) && _cleanCheckbox != null && _cleanCheckboxCallable is Callable _CleanCheckboxCallable) 
-			{
-				if( _cleanCheckbox.IsConnected(CheckBox.SignalName.Pressed, _CleanCheckboxCallable)) 
-				{
-					_cleanCheckbox.Disconnect(CheckBox.SignalName.Pressed,_CleanCheckboxCallable);
-				}
-			}
-			
-			if( IsInstanceValid(_simplifyCheckbox) && _simplifyCheckbox != null && _simplifyCheckboxCallable is Callable _SimplifyCheckboxCallable) 
-			{
-				if( _simplifyCheckbox.IsConnected(CheckBox.SignalName.Pressed, _SimplifyCheckboxCallable)) 
-				{
-					_simplifyCheckbox.Disconnect(CheckBox.SignalName.Pressed,_SimplifyCheckboxCallable);
-				}
-			}
-			
-			if( IsInstanceValid(_Checkbox)) 
-			{
-				_Checkbox.QueueFree();
-				_Checkbox = null;
-			}
-			
-			if( IsInstanceValid(_cleanCheckbox) ) 
-			{
-				_cleanCheckbox.QueueFree();
-				_cleanCheckbox = null;
-			}
-			
-			if( IsInstanceValid(_simplifyCheckbox) ) 
-			{
-				_simplifyCheckbox.QueueFree();
-				_simplifyCheckbox = null;
-			}
-			
-			if( IsInstanceValid(_ValuesInnerContainer) ) 
-			{
-				_ValuesInnerContainer.QueueFree();
-				_ValuesInnerContainer = null;
-			}
-			
-			if( IsInstanceValid(_InnerContainer) ) 
-			{
-				_InnerContainer.QueueFree();
-				_InnerContainer = null;
-			}
-			
-			if( IsInstanceValid(_MarginContainer) ) 
-			{
-				_MarginContainer.QueueFree();
-				_MarginContainer = null;
-			}
-			
-			if( IsInstanceValid(_ValuesMarginContainer ) ) 
-			{
-				_ValuesMarginContainer.QueueFree();
-				_ValuesMarginContainer = null;
-			}
+			Initiated = false;
+			base._ExitTree();
 		}
 	}
 }

@@ -25,6 +25,7 @@ namespace AssetSnap.Front.Components
 	using AssetSnap.Component;
 	using Godot;
 
+	[Tool]
 	public partial class LibraryListEntry : LibraryComponent
 	{
 		private string _Folder;
@@ -63,7 +64,7 @@ namespace AssetSnap.Front.Components
 		public LibraryListEntry()
 		{
 			Name = "LibraryListEntry";
-			// _include = false;
+			//_include = false;
 		}
 			
 		/*
@@ -73,6 +74,7 @@ namespace AssetSnap.Front.Components
 		*/
 		public override void Initialize()
 		{
+			Initiated = true;
 			if( IsInstanceValid(Container) && Container is HBoxContainer BoxContainer ) 
 			{
 				if( Filename == null || Folder == null) 

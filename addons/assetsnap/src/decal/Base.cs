@@ -24,6 +24,7 @@
 namespace AssetSnap.Decal
 {
 	using AssetSnap.Front.Nodes;
+	using AssetSnap.Instance.Input;
 	using Godot;
 
 	public partial class Base : Node
@@ -31,6 +32,7 @@ namespace AssetSnap.Decal
 		private AsDecal3D _Decal;
 		private Mesh _ModelMesh;
 		private MeshInstance3D _ModelMeshInstance;
+		private AsGroup3D _Group;
 		private GlobalExplorer _GlobalExplorer;
 		
 		public AsDecal3D Decal 
@@ -60,6 +62,15 @@ namespace AssetSnap.Decal
 			}
 		}
 
+		public AsGroup3D Group 
+		{
+			get => _Group;
+			set
+			{
+				_Group = value;
+			}
+		}
+		
 		private static Base _Instance;
 		
 		public static Base GetInstance()
@@ -115,24 +126,43 @@ namespace AssetSnap.Decal
 		*/
 		public void _UpdateDecalPreview( bool State ) 
 		{
-			if( false == _GlobalExplorer.HandleIsModel() && IsInstanceValid(_Decal) ) 
+			if( false == IsInstanceValid( _GlobalExplorer.GetHandle() ) || false == IsInstanceValid(_Decal) ) 
 			{
 				return;
 			}
 
-			AsMeshInstance3D model = _GlobalExplorer.GetHandle() as AssetSnap.Front.Nodes.AsMeshInstance3D;
-			AsMeshInstance3D Model = null;
-			bool ChildFound = false;
-						
-			if (_Decal.GetChildCount() > 0)
+			if( _GlobalExplorer.States.PlacingMode == GlobalStates.PlacingModeEnum.Group ) 
 			{
-				Model = _Decal.GetChild(0) as AssetSnap.Front.Nodes.AsMeshInstance3D;
-				ChildFound = true;
-	
-				ClearCurrentChildren(Model, model);
-			}
+				AsGrouped3D group = _GlobalExplorer.States.GroupedObject;
+				Node child = null;
+				bool ChildFound = false;
+							
+				if (_Decal.GetChildCount() > 0)
+				{
+					child = _Decal.GetChild(0);
+					ChildFound = true;
+					ClearCurrentChildren(child, group);
+				}
 
-			PlaceDecalPreview( State, ChildFound, Model, model );
+				PlaceDecalPreview( State, ChildFound, child, group );
+			}
+			
+			if( _GlobalExplorer.States.PlacingMode == GlobalStates.PlacingModeEnum.Model )
+			{
+				AsMeshInstance3D model = _GlobalExplorer.GetHandle() as AssetSnap.Front.Nodes.AsMeshInstance3D;
+				AsMeshInstance3D Model = null;
+				bool ChildFound = false;
+							
+				if (_Decal.GetChildCount() > 0)
+				{
+					Model = _Decal.GetChild(0) as AssetSnap.Front.Nodes.AsMeshInstance3D;
+					ChildFound = true;
+		
+					ClearCurrentChildren(Model, model);
+				}
+
+				PlaceDecalPreview( State, ChildFound, Model, model );
+			}
 			
 			if ( IsHidden() ) {
 				Show();
@@ -146,14 +176,22 @@ namespace AssetSnap.Decal
 		*/
 		public void Show()
 		{
-		
 			/** Only show if we have an actual model to show **/
-			if( null == ModelMeshInstance || null == ModelMesh )
+			if(
+				_GlobalExplorer.GetHandle() == null ||
+				_GlobalExplorer.GetHandle() is AsMeshInstance3D meshInstance3D &&
+				meshInstance3D.IsPlaced() ||
+				_GlobalExplorer.GetHandle() is AsGrouped3D grouped3d &&
+				grouped3d.IsPlaced() ||
+				_GlobalExplorer.InputDriver is DragAddInputDriver _input &&
+				_input.IsDragging()
+			)
 			{
 				return;
 			}
-			
+
 			_Decal.Visible = true;
+			_GlobalExplorer.States.DecalVisible = GlobalStates.VisibilityStateEnum.Visible;
 		}
 		
 		/*
@@ -169,6 +207,7 @@ namespace AssetSnap.Decal
 			}
 			
 			_Decal.Visible = false;
+			_GlobalExplorer.States.DecalVisible = GlobalStates.VisibilityStateEnum.Hidden;
 		}
 		
 		/*
@@ -235,7 +274,7 @@ namespace AssetSnap.Decal
 		** @param AssetSnap.Front.Nodes.AsMeshInstance3D model
 		** @return void
 		*/
-		private void ClearCurrentChildren( AssetSnap.Front.Nodes.AsMeshInstance3D Model, AssetSnap.Front.Nodes.AsMeshInstance3D model )
+		private void ClearCurrentChildren( Node Model, Node model )
 		{
 			if( IsInstanceValid( Model ) && Model != model ) 
 			{
@@ -265,14 +304,22 @@ namespace AssetSnap.Decal
 		** @param AssetSnap.Front.Nodes.AsMeshInstance3D model
 		** @return void
 		*/
-		private void PlaceDecalPreview( bool State, bool ChildFound, AssetSnap.Front.Nodes.AsMeshInstance3D Model, AssetSnap.Front.Nodes.AsMeshInstance3D model )
+		private void PlaceDecalPreview( bool State, bool ChildFound, Node Model, Node model )
 		{
 			if( true == State && false == ChildFound ) 
 			{
 				EditorInterface.Singleton.EditNode(model);
 				_Decal.AddChild(model);
-				ModelMeshInstance = model;
-				ModelMesh = ModelMeshInstance.Mesh;
+				if( model is AsMeshInstance3D meshInstance3D ) 
+				{
+					ModelMeshInstance = meshInstance3D;
+					ModelMesh = ModelMeshInstance.Mesh;
+				}
+				
+				if( model is AsGrouped3D group3D ) 
+				{
+					Group = group3D;
+				}
 			}
 		}
 		
@@ -317,6 +364,7 @@ namespace AssetSnap.Decal
 		private void AddNodeTo( Node To )
 		{
 			To.AddChild(_Decal);
+			_GlobalExplorer.States.DecalSpawned = GlobalStates.SpawnStateEnum.Spawned;
 		}
 		
 		/*

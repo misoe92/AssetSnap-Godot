@@ -125,7 +125,6 @@ namespace AssetSnap.Waypoint
 		
 		public bool Has( Node3D node ) 
 		{
-			GD.Print(Waypoints.Length);
 			foreach( BaseWaypoint Waypoint in Waypoints ) 
 			{
 				if( Waypoint.GetModel() == node ) 

@@ -22,6 +22,7 @@
 
 namespace AssetSnap.Core 
 {
+	using AssetSnap.Front.Nodes;
 	using Godot;
 	public class CoreInput : Core 
 	{
@@ -32,7 +33,7 @@ namespace AssetSnap.Core
 		*/
 		public int Handle(Camera3D Camera, InputEvent @event)
 		{
-			if( null == _GlobalExplorer || null == _GlobalExplorer.Settings || null == _GlobalExplorer.InputDriver )
+			if( null == _GlobalExplorer )
 			{
 				return (int)EditorPlugin.AfterGuiInput.Pass;
 			}
@@ -49,6 +50,14 @@ namespace AssetSnap.Core
 				{
 					return (int)EditorPlugin.AfterGuiInput.Pass;
 				}
+			}
+			
+			if( 
+				_GlobalExplorer.GetHandle() is AsMeshInstance3D meshInstance3D && meshInstance3D.IsPlaced() ||
+				_GlobalExplorer.GetHandle() is AsGrouped3D grouped3D && grouped3D.IsPlaced()
+			) 
+			{
+				return (int)EditorPlugin.AfterGuiInput.Pass;
 			}
 
 			// Maybe project from camera, depending on the current event

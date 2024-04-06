@@ -96,6 +96,12 @@ namespace AssetSnap.Waypoint
 		*/
 		public Aabb GetAabb()
 		{
+			if( EditorPlugin.IsInstanceValid( Model ) && Model is AsGrouped3D ) 
+			{
+				AsGrouped3D _Model = Model as AsGrouped3D;
+				return _Model.GetAabb();
+			}
+			
 			if( IsModel && EditorPlugin.IsInstanceValid( Model ) ) 
 			{
 				AsMeshInstance3D _Model = Model as AssetSnap.Front.Nodes.AsMeshInstance3D; 

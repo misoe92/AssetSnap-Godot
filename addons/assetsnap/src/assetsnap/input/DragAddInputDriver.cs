@@ -38,7 +38,9 @@ namespace AssetSnap.Instance.Input
 		private float SizeY = 0.0f;
 		private float SizeZ = 0.0f;
 		private int NumPoints = 0;
-		private Godot.Collections.Array<MeshInstance3D> _Buffer;
+		private Godot.Collections.Array<Node3D> _Buffer;
+
+		public float SizeOffset = 0;
 		
 		private static DragAddInputDriver _Instance;
 		
@@ -71,19 +73,30 @@ namespace AssetSnap.Instance.Input
 		public override int _Input( Camera3D Camera, InputEvent Event) 
 		{
 			GlobalExplorer explorer = GlobalExplorer.GetInstance();
-			
 			/** Check if Ctrl is pressed **/
-			if( false == Dragging && Event is InputEventMouseButton _MouseButtonInitialEvent) 
+			if(
+				false == Dragging &&
+				Event is InputEventMouseButton _MouseButtonInitialEvent
+			) 
 			{
-				if(_MouseButtonInitialEvent.ButtonIndex == MouseButton.Left && _MouseButtonInitialEvent.Pressed && Input.IsKeyPressed(Key.Ctrl) && explorer.HasPositionDrawn())
+				if(
+					_MouseButtonInitialEvent.ButtonIndex == MouseButton.Left &&
+					false == _MouseButtonInitialEvent.Pressed &&
+					Input.IsKeyPressed(Key.Ctrl) &&
+					explorer.HasPositionDrawn()
+				)
 				{
 					Dragging = true;
 					DragFrom = explorer.GetPositionDrawn();
+					explorer.Decal.Hide();
 					return (int)EditorPlugin.AfterGuiInput.Stop;
 				}
-			} 
+			}
 			
-			if( Dragging && Event is InputEventKey _InputEventKey ) 
+			if(
+				Dragging &&
+				Event is InputEventKey _InputEventKey
+			) 
 			{
 				if( _InputEventKey.Keycode == Key.Escape ) 
 				{
@@ -96,7 +109,11 @@ namespace AssetSnap.Instance.Input
 				}
 			} 
 			
-			if( Dragging && Event is InputEventMouseMotion _MouseMotionEvent  && explorer.HasPositionDrawn() ) 
+			if(
+				Dragging &&
+				Event is InputEventMouseMotion  &&
+				explorer.HasPositionDrawn()
+			) 
 			{
 				ResetBuffer();
 				
@@ -113,7 +130,11 @@ namespace AssetSnap.Instance.Input
 				SpawnCalculatedAmount(path);
 			} 
 			
-			if( Dragging && Event is InputEventMouseButton _MouseButtonEvent && explorer.HasPositionDrawn() ) 
+			if(
+				Dragging &&
+				Event is InputEventMouseButton _MouseButtonEvent &&
+				explorer.HasPositionDrawn()
+			) 
 			{
 				ResetBuffer();
 			
@@ -130,7 +151,10 @@ namespace AssetSnap.Instance.Input
 				SpawnCalculatedAmount(path);
 				
 				/** Apply Dragging **/				
-				if(_MouseButtonEvent.ButtonIndex == MouseButton.Left && _MouseButtonEvent.Pressed)
+				if(
+					_MouseButtonEvent.ButtonIndex == MouseButton.Left &&
+					false == _MouseButtonEvent.Pressed
+				)
 				{
 					/** Place the whole buffer of objects **/
 					SpawnBuffer();
@@ -145,7 +169,10 @@ namespace AssetSnap.Instance.Input
 				}
 				
 				/** Cancel Dragging **/
-				if(_MouseButtonEvent.ButtonIndex == MouseButton.Right && _MouseButtonEvent.Pressed)
+				if(
+					_MouseButtonEvent.ButtonIndex == MouseButton.Right &&
+					false == _MouseButtonEvent.Pressed
+				)
 				{
 					/** Reset buffer **/
 					ResetBuffer();
@@ -156,6 +183,36 @@ namespace AssetSnap.Instance.Input
 					
 					return (int)EditorPlugin.AfterGuiInput.Stop;
 				}
+			}
+			
+			if(
+				Dragging &&
+				Input.IsKeyPressed(Key.Ctrl) &&
+				Event is InputEventMouseButton inputEventMouseButton &&
+				(
+					inputEventMouseButton.ButtonIndex == MouseButton.WheelUp ||
+					inputEventMouseButton.ButtonIndex == MouseButton.WheelDown
+				)
+			)
+			{
+				if( false == inputEventMouseButton.Pressed ) 
+				{
+					float scrollAmount = Mathf.Abs(inputEventMouseButton.Factor); // Get the absolute scroll amount
+					
+					if( inputEventMouseButton.ButtonIndex == MouseButton.WheelUp ) 
+					{
+						SizeOffset += 0.1f * scrollAmount;
+					}
+					else if( inputEventMouseButton.ButtonIndex == MouseButton.WheelDown )
+					{
+						SizeOffset -= 0.1f * scrollAmount;
+					}
+					
+					GlobalExplorer.GetInstance().States.DragSizeOffset = SizeOffset;
+				}
+				
+				GlobalExplorer.GetInstance().AllowScroll = Abstracts.AbstractExplorerBase.ScrollState.SCROLL_DISABLED;	
+				return (int)EditorPlugin.AfterGuiInput.Stop;
 			}
 
 			if( ! Dragging ) 
@@ -174,16 +231,71 @@ namespace AssetSnap.Instance.Input
 		*/
 		public Vector3 CalculateObjectSize()
 		{
-			// Get the AABB of the model
-			AssetSnap.Front.Nodes.AsMeshInstance3D meshInstance3D = GlobalExplorer.GetInstance().GetHandle() as AssetSnap.Front.Nodes.AsMeshInstance3D;
-			Aabb aabb = meshInstance3D.GetAabb();
+			Node3D handle = GlobalExplorer.GetInstance().GetHandle();
+			
+			if( handle is AsMeshInstance3D asMeshInstance3D ) 
+			{
+				// Get the AABB of the model
+				Aabb aabb = asMeshInstance3D.GetAabb();
+				
+				SizeX = aabb.Size.X;
+				SizeY = aabb.Size.Y;
+				SizeZ = aabb.Size.Z;
+				
+				return aabb.Size;
+			}
 
-			// Calculate the size along X, Y, and Z axes
-			SizeX = aabb.Size.X;
-			SizeY = aabb.Size.Y;
-			SizeZ = aabb.Size.Z;
+			if( handle is AsGrouped3D asGrouped3D ) 
+			{
+				Vector3 aabb = CalculateAABB(handle);
+				
+				SizeX = aabb.X;
+				SizeY = aabb.Y;
+				SizeZ = aabb.Z;
+				
+				return aabb;
+			}
 
-			return aabb.Size;
+			SizeX = 0;
+			SizeY = 0;
+			SizeZ = 0;
+
+			return Vector3.Zero;
+		}
+		
+		public bool IsDragging()
+		{
+			return Dragging;
+		}
+		
+		// Helper method to calculate AABB of a child node
+		public Vector3 CalculateAABB(Node3D node)
+		{
+			Vector3 combinedSize = Vector3.Zero;
+
+			// Calculate AABB of the node itself
+			if (node is AsMeshInstance3D meshInstance)
+			{
+				Aabb childAABB = meshInstance.GetAabb();
+				combinedSize += childAABB.Size;
+			}
+
+			// Traverse children recursively
+			foreach (Node child in node.GetChildren())
+			{
+				if (child is AsMeshInstance3D childMeshInstance)
+				{
+					Aabb childAABB = childMeshInstance.GetAabb();
+					combinedSize += childAABB.Size;
+				}
+				else if (child is Node3D childNode)
+				{
+					Vector3 childAABB = CalculateAABB(childNode);
+					combinedSize += childAABB;
+				}
+			}
+
+			return combinedSize;
 		}
 		
 		/*
@@ -193,29 +305,54 @@ namespace AssetSnap.Instance.Input
 		*/
 		private void SpawnCalculatedAmount(Vector3[] paths)
 		{
-			AssetSnap.Front.Nodes.AsMeshInstance3D Handle = GlobalExplorer.GetInstance().GetHandle() as AssetSnap.Front.Nodes.AsMeshInstance3D;
-			/** Spawn Element **/
-			/** Add spawned element to buffer for easy unloading **/
-			for( int i = 0; i < paths.Length; i++) 
+			Node3D Handle = GlobalExplorer.GetInstance().GetHandle();
+			if( Handle is AsMeshInstance3D _meshinstance3d ) 
 			{
-				Vector3 Path = paths[i];
-				AssetSnap.Front.Nodes.AsMeshInstance3D Duplicate = new()
+				/** Spawn Element **/
+				/** Add spawned element to buffer for easy unloading **/
+				for( int i = 0; i < paths.Length; i++) 
 				{
-					Floating = true,
-					Mesh = Handle.Mesh,
-					SpawnSettings = Handle.SpawnSettings,
-				};
+					Vector3 Path = paths[i];
+					AssetSnap.Front.Nodes.AsMeshInstance3D Duplicate = new()
+					{
+						Floating = true,
+						Mesh = _meshinstance3d.Mesh,
+						SpawnSettings = _meshinstance3d.SpawnSettings,
+					};
 
-				Duplicate.SetLibraryName(Handle.GetLibraryName());
-				
-				GlobalExplorer.GetInstance()._Plugin.AddChild(Duplicate);
-				
-				Transform3D Trans = Duplicate.Transform;
-				Trans.Origin = Path;
-				Duplicate.Transform = Trans;
+					Duplicate.SetLibraryName(_meshinstance3d.GetLibraryName());
+					
+					GlobalExplorer.GetInstance()._Plugin.AddChild(Duplicate);
+					
+					Transform3D Trans = Duplicate.Transform;
+					Trans.Origin = Path;
+					Duplicate.Transform = Trans;
 
-				_Buffer.Add(Duplicate);
+					_Buffer.Add(Duplicate);
+				}
 			}
+			else if( Handle is AsGrouped3D _grouped3d )
+			{
+				/** Spawn Element **/
+				/** Add spawned element to buffer for easy unloading **/
+				for( int i = 0; i < paths.Length; i++) 
+				{
+					Vector3 Path = paths[i];
+					AsGrouped3D Duplicate = _grouped3d.Duplicate() as AsGrouped3D;
+					GlobalExplorer.GetInstance()._Plugin.AddChild(Duplicate);
+					
+					Transform3D Trans = Duplicate.Transform;
+					Trans.Origin = Path;
+					Duplicate.Transform = Trans;
+
+					_Buffer.Add(Duplicate);
+				}
+			}
+			else
+			{
+				GD.PushWarning("No drag add method found for: ", Handle);
+			}
+			
 		}
 		
 		/*
@@ -225,29 +362,47 @@ namespace AssetSnap.Instance.Input
 		*/
 		private void SpawnBuffer()
 		{
-			int ite = 0;
-			string OriginalName = "";
-			foreach( AssetSnap.Front.Nodes.AsMeshInstance3D Instance in _Buffer ) 
+			Node3D Handle = GlobalExplorer.GetInstance().GetHandle();
+			if( Handle is AsMeshInstance3D _meshinstance3d ) 
 			{
-				if( ite == 0 ) 
+				int ite = 0;
+				string OriginalName = "";
+				foreach( AsMeshInstance3D Instance in _Buffer ) 
 				{
-					OriginalName = Instance.Name;				
-				}
+					if( ite == 0 ) 
+					{
+						OriginalName = Instance.Name;				
+					}
 
-				AssetSnap.Front.Nodes.AsMeshInstance3D Duplicate = new()
+					AsMeshInstance3D Duplicate = new()
+					{
+						Floating = true,
+						Name = OriginalName + ite,
+						Mesh = Instance.Mesh,
+						SpawnSettings = Instance.SpawnSettings.Duplicate(true),
+						Transform = Instance.Transform,
+						Scale = Instance.Scale,
+						RotationDegrees = Instance.RotationDegrees
+					};
+					Duplicate.SetLibraryName(Instance.GetLibraryName());
+					
+					GlobalExplorer.GetInstance().Waypoints.Spawn(Duplicate, Instance.Transform.Origin, Instance.RotationDegrees, Instance.Scale);
+					ite += 1;
+				}
+			}
+			else if( Handle is AsGrouped3D _grouped3d ) 
+			{
+				int ite = 0;
+				foreach( AsGrouped3D Instance in _Buffer ) 
 				{
-					Floating = true,
-					Name = OriginalName + ite,
-					Mesh = Instance.Mesh,
-					SpawnSettings = Instance.SpawnSettings,
-					Transform = Instance.Transform,
-					Scale = Instance.Scale,
-					RotationDegrees = Instance.RotationDegrees
-				};
-				Duplicate.SetLibraryName(Instance.GetLibraryName());
-				
-				GlobalExplorer.GetInstance().Waypoints.Spawn(Duplicate, Instance.Transform.Origin, Instance.RotationDegrees, Instance.Scale);
-				ite += 1;
+					
+					GlobalExplorer.GetInstance().Waypoints.Spawn(Instance, Instance.Transform.Origin, Instance.RotationDegrees, Instance.Scale);
+					ite += 1;
+				}
+			}
+			else
+			{
+				GD.PushWarning("No drag add method found for: ", Handle);
 			}
 		}
 		
@@ -258,9 +413,13 @@ namespace AssetSnap.Instance.Input
 		*/
 		private void ResetBuffer()
 		{
-			foreach( AssetSnap.Front.Nodes.AsMeshInstance3D Instance in _Buffer ) 
+			foreach( Node3D Instance in _Buffer ) 
 			{
-				Instance.GetParent().RemoveChild(Instance);
+				if( EditorPlugin.IsInstanceValid(Instance.GetParent()) )
+				{
+					Instance.GetParent().RemoveChild(Instance);
+				}
+				
 				Instance.QueueFree();
 			}
 
@@ -342,21 +501,20 @@ namespace AssetSnap.Instance.Input
 			
 			if( Facing() == 1 ) 
 			{
-				Size = SizeX;
+				Size = SizeX - SizeOffset;
 			}
 			
 			if( Facing() == 2 ) 
 			{
-				Size = SizeY;
+				Size = SizeY - SizeOffset;
 			}
 			
 			if( Facing() == 3 ) 
 			{
-				Size = SizeZ;
+				Size = SizeZ - SizeOffset;
 			}
 
 			NumPoints = Mathf.CeilToInt(Distance / Size);
-			
 			return NumPoints;
 		}
 	}

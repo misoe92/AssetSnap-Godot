@@ -208,6 +208,15 @@ namespace AssetSnap.Static
 			return "Allows you to grab models by simply click shift + alt + g when model is in focus.";		
 		}
 		
+		public static string allow_group_builder_title()
+		{
+			return "Group objects toghether and place them";		
+		}
+		
+		public static string allow_group_builder_description()
+		{
+			return "Allows you to use the placement tool to place a group of models at the same time, predefining their structure.";		
+		}
 	}
 }
 #endif

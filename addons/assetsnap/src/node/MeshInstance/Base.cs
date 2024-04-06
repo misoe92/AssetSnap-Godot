@@ -163,7 +163,7 @@ namespace AssetSnap.ASNode.MeshInstance
 		
 		public bool IsPlaced()
 		{
-			return GetParent() != null;
+			return GetParent() != null && GetParent().Name != "AsDecal";
 		}
 		
 		public bool HasLibrarySettings()

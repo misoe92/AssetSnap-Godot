@@ -39,6 +39,8 @@ namespace AssetSnap.BottomDock
 		private VBoxContainer SubContainerThree;
 		private TabContainer _Container;
 
+		private readonly Callable _callable = Callable.From((long index) => { _OnTabChanged(index); } );
+
 		private List<string> GeneralComponents = new()
 		{
 			"Introduction",
@@ -81,6 +83,14 @@ namespace AssetSnap.BottomDock
 			SetupGeneralTab();
 		}
 		
+		public void SetTab( Library.Instance library ) 
+		{
+			Container.CurrentTab = library.Index + 2;
+		}
+		public void SetTabByIndex( int index ) 
+		{
+			Container.CurrentTab = index;
+		}
 		/*
 		** Configures and initializes the container
 		**
@@ -93,6 +103,8 @@ namespace AssetSnap.BottomDock
 				Name = "AssetSnapTabContainer",
 				Theme = _Theme
 			};
+
+			_Container.Connect(TabContainer.SignalName.TabChanged, _callable);
 		}
 		
 		/*
@@ -105,7 +117,7 @@ namespace AssetSnap.BottomDock
 			SetupGeneralTabContainers();
 			PlaceGeneralTabContainers();
 
-			InitializeGeneralTabComponents();
+			InitializeGeneralTabComponents(); 
 		}
 		
 		/*
@@ -187,10 +199,10 @@ namespace AssetSnap.BottomDock
 				 
 				AddFolderToLibrary _AddFolderToLibrary = GlobalExplorer.GetInstance().Components.Single<AddFolderToLibrary>();
 				
-				if( _AddFolderToLibrary != null ) 
+				if( _AddFolderToLibrary != null )  
 				{
 					_AddFolderToLibrary.Container = SubContainerOne;
-					_AddFolderToLibrary.Initialize();
+					_AddFolderToLibrary.Initialize(); 
 				} 
 				
 				LibrariesListing _LibrariesListing = GlobalExplorer.GetInstance().Components.Single<LibrariesListing>();
@@ -299,6 +311,21 @@ namespace AssetSnap.BottomDock
 				}
 			}
 		}
+		
+		private static void _OnTabChanged( long index )
+		{
+			if( 
+				null == GlobalExplorer.GetInstance() ||
+				null == GlobalExplorer.GetInstance().States ||
+				null == GlobalExplorer.GetInstance().GetLibraryByIndex(index-1)
+			) 
+			{
+				return; 
+			}
+			
+			GlobalExplorer.GetInstance().States.CurrentLibrary = GlobalExplorer.GetInstance().GetLibraryByIndex(index-1);
+		}
+		
 		/*
 		** Cleaning, for when the dock is removed from
 		** the tree.
@@ -328,16 +355,20 @@ namespace AssetSnap.BottomDock
 				MainContainer = null;
 			}
 			if( EditorPlugin.IsInstanceValid(_PanelContainer) ) 
-			{
+			{ 
 				_PanelContainer.QueueFree();
 				_PanelContainer = null;
 			} 
-			
+			 
 			RemoveFromBottomPanel();
 
 			if( EditorPlugin.IsInstanceValid(_Container) ) 
 			{
-				_Container.Free();
+				if( _Container.IsConnected(TabContainer.SignalName.TabChanged, _callable) ) 
+				{
+					_Container.Disconnect(TabContainer.SignalName.TabChanged, _callable);
+				}
+				_Container.QueueFree();
 				_Container = null;
 			} 
 		}

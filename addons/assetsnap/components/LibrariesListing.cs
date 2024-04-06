@@ -19,26 +19,19 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-
 namespace AssetSnap.Front.Components
 {
-	using System.Collections.Generic;
 	using AssetSnap.Component;
 	using Godot;
 
-	public partial class LibrariesListing : BaseComponent
+	[Tool]
+	public partial class LibrariesListing : TraitableComponent
 	{
 		private readonly string TitleText = "Libraries";
-		private readonly string NotFoundText = "No folder libraries was found, please add a folder first.";
+		private readonly string NotFoundText = "No folder libraries was found, to start using the addon add a folder first by using the button on the left with the label 'Add Library'.";
 		private int CurrentFolderCount = 0;
-		 
-		private MarginContainer _TitleMarginContainer;
-		private VBoxContainer _TitleInnerContainer;
-		private Label _Title;
-		private MarginContainer _FolderListMarginContainer;
-		private VBoxContainer _FolderListInnerContainer;
-		private Godot.Collections.Array<Control> _Instances; 
-		
+
+		private Godot.Collections.Array<BaseComponent> _Entries = new();
 		/*
 		** Constructor of the class
 		** 
@@ -47,14 +40,7 @@ namespace AssetSnap.Front.Components
 		public LibrariesListing()
 		{
 			Name = "LibrariesListing";
-			// _include = false;
-		}
-
-		public override void _EnterTree()
-		{
-			_Instances = new();
-			
-			base._EnterTree();
+			//_include = false;
 		}
 
 		/*
@@ -64,9 +50,24 @@ namespace AssetSnap.Front.Components
 		*/ 
 		public override void Initialize()
 		{
-			CurrentFolderCount = _GlobalExplorer.Settings.FolderCount;
+			base.Initialize();
+			AddTrait(typeof(Containerable));
+			AddTrait(typeof(Marginable));
+			AddTrait(typeof(Panelable));
+			AddTrait(typeof(Titleable));
+			AddTrait(typeof(Listable));
+			AddTrait(typeof(Labelable));
+			Initiated = true;
 			
-			_SetupListTitle(); 
+			CurrentFolderCount = _GlobalExplorer.Settings.FolderCount;
+
+			Trait<Titleable>()
+				.SetName( "ListingTitle" )
+				.SetType( Titleable.TitleType.HeaderLarge)
+				.SetTitle( TitleText )
+				.Initialize() 
+				.AddToContainer( Container ) ;
+			 
 			_SetupListTable(); 
 		}
 		
@@ -77,37 +78,26 @@ namespace AssetSnap.Front.Components
 		*/
 		public void ForceUpdate()
 		{
-			if( CurrentFolderCount != 0 ) 
+			if( Trait<Labelable>().ContainsIndex(0) )
 			{
-				_ClearList(); 
+				if( false == ClearTrait<Labelable>() ) 
+				{
+					GD.PushError("Labelable was not cleared");
+				}
+				AddTrait(typeof(Labelable));
+			}
+			
+			if( Trait<Listable>().ContainsIndex(0) )
+			{
+				if( false == ClearTrait<Listable>() ) 
+				{
+					GD.PushError("Listable was not cleared");
+				}
+				AddTrait(typeof(Listable));
 			}
 			
 			CurrentFolderCount = 0;
 			_UpdateListTable();
-		}
-		
-		/*
-		** Set's up the list title
-		** 
-		** @return void
-		*/
-		private void _SetupListTitle()
-		{
-			_TitleMarginContainer = new();
-			_TitleInnerContainer = new();
-			_Title = new();
-			
-			_TitleMarginContainer.AddThemeConstantOverride("margin_left", 15);
-			_TitleMarginContainer.AddThemeConstantOverride("margin_right", 15);
-			_TitleMarginContainer.AddThemeConstantOverride("margin_top", 10);
-			_TitleMarginContainer.AddThemeConstantOverride("margin_bottom", 4);
-
-			_Title.ThemeTypeVariation = "HeaderLarge"; 
-			_Title.Text = TitleText;
-
-			_TitleInnerContainer.AddChild(_Title);
-			_TitleMarginContainer.AddChild(_TitleInnerContainer);
-			Container.AddChild(_TitleMarginContainer);
 		}
 		
 		/*
@@ -133,22 +123,21 @@ namespace AssetSnap.Front.Components
 		*/
 		private void _SetupNoFoldersTable()
 		{
-			_FolderListMarginContainer = new();
-			_FolderListInnerContainer = new();
-			
-			_FolderListMarginContainer.AddThemeConstantOverride("margin_left", 15);
-			_FolderListMarginContainer.AddThemeConstantOverride("margin_right", 15);
-			_FolderListMarginContainer.AddThemeConstantOverride("margin_top", 3);
-			_FolderListMarginContainer.AddThemeConstantOverride("margin_bottom", 0);
+			Trait<Containerable>()
+				.SetName( "ListingBoxContainer" )
+				.SetMargin(15, "left")
+				.SetMargin(15, "right")
+				.SetMargin(0, "top")
+				.SetMargin(0, "bottom")
+				.Instantiate();
 
-			Label Title = new()
-			{
-				Text = NotFoundText
-			};
-
-			_FolderListInnerContainer.AddChild(Title);
-			_FolderListMarginContainer.AddChild(_FolderListInnerContainer);
-			Container.AddChild(_FolderListMarginContainer);
+			_SetupNoFolderLabel();
+						
+			Trait<Containerable>()
+				.Select(0)
+				.AddToContainer(
+					Container
+				);
 		}
 		
 		/*
@@ -158,34 +147,21 @@ namespace AssetSnap.Front.Components
 		*/
 		private void _SetupFolderListTable()
 		{
-			_FolderListMarginContainer = new();
-			_FolderListInnerContainer = new();
-			
-			_FolderListMarginContainer.AddThemeConstantOverride("margin_left", 15);
-			_FolderListMarginContainer.AddThemeConstantOverride("margin_right", 15);
-			_FolderListMarginContainer.AddThemeConstantOverride("margin_top", 0);
-			_FolderListMarginContainer.AddThemeConstantOverride("margin_bottom", 0);
+			Trait<Containerable>()
+				.SetName( "ListingBoxContainer" )
+				.SetMargin(15, "left")
+				.SetMargin(15, "right")
+				.SetMargin(0, "top")
+				.SetMargin(5, "bottom")
+				.Instantiate();
 
-			for( int i = 0; i < _GlobalExplorer.Settings.FolderCount; i++) 
-			{
-				string title = _GlobalExplorer.Settings.Folders[i];
-				List<string> Components = new()
-				{
-					"LibrariesListingEntry",
-				};
-				
-				if (GlobalExplorer.GetInstance().Components.HasAll( Components.ToArray() )) 
-				{
-					LibrariesListingEntry SingleEntry = GlobalExplorer.GetInstance().Components.Single<LibrariesListingEntry>(true);
-					
-					SingleEntry.title = title;
-					SingleEntry.Container = _FolderListInnerContainer;
-					SingleEntry.Initialize(); 
-				}
-			}
+			_SetupFolderListing();
 
-			_FolderListMarginContainer.AddChild(_FolderListInnerContainer);
-			Container.AddChild(_FolderListMarginContainer); 
+			Trait<Containerable>()
+				.Select(0)
+				.AddToContainer(
+					Container
+				);
 		}
 		
 		/*
@@ -217,65 +193,97 @@ namespace AssetSnap.Front.Components
 			{
 				return; 
 			}
-
-			_ClearList();
-			_SetupListTitle();
 			
 			if( _GlobalExplorer.Settings.FolderCount == 0 ) 
 			{
-				_SetupNoFoldersTable();
+				_SetupNoFolderLabel();
 				return;
 			}
 			
-			_SetupFolderListTable();
+			_SetupFolderListing();
 		}
-			
+		
 		/*
-		** Cleans up in references, fields and parameters.
-		** 
+		** Setups the table with folders
+		**
 		** @return void
 		*/
+		private void _SetupFolderListing()
+		{
+			Container container = Trait<Containerable>()
+				.Select(0)
+				.GetInnerContainer();
+				
+			Trait<Listable>()
+				.SetName("LibrariesListing")
+				.SetCount(_GlobalExplorer.Settings.FolderCount)
+				.SetComponent("AssetSnap.Front.Components.LibrariesListingEntry")
+				.SetDimensions(500, 0)
+				.Each(
+					(int index, BaseComponent component) =>
+					{
+						if (null != component && IsInstanceValid(component) && component is LibrariesListingEntry _component)
+						{
+							string title = _GlobalExplorer.Settings.Folders[index];
+							_component.title = title;
+							_component.Initialize();
+
+							AddChild(_component, true);
+							// _Entries.Add(_component);
+						}
+					}
+				)
+				.Instantiate()
+				.Select(0)
+				.AddToContainer(
+					container	
+				);
+		}
+		
+		/*
+		** Setups the label with no folders found.
+		**
+		** @return void
+		*/
+		private void _SetupNoFolderLabel()
+		{
+			Trait<Panelable>()
+				.SetName("NoFolderPanelContainer")
+				.Instantiate()
+				.Select(0)
+				.AddToContainer(
+					Trait<Containerable>()
+						.Select(0)
+						.GetInnerContainer()
+				);
+			
+			
+			Trait<Labelable>()
+				.SetName( "NotFoundText" )
+				.SetText(NotFoundText)
+				.SetAutoWrap( TextServer.AutowrapMode.Word )
+				.SetDimensions(500, 0)
+				.SetHorizontalSizeFlags(Control.SizeFlags.ShrinkBegin)
+				.SetVerticalSizeFlags(Control.SizeFlags.ShrinkBegin)
+				.Instantiate()
+				.Select(0)
+				.AddToContainer(
+					Trait<Panelable>()
+						.Select(0)
+						.GetNode()
+				);
+		}
+
 		public override void _ExitTree()
 		{
-			// foreach( var _object in _Instances ) 
+			// foreach( GodotObject _object in _Entries ) 
 			// {
-			// 	if( IsInstanceValid(_object) && _object is Node _Node ) 
+			// 	if( null != _object && IsInstanceValid(_object) && _object is Node _node ) 
 			// 	{
-			// 		_Node.QueueFree();
-			// 	} 
+			// 		GD.Print("Unloaded library listing entry: ", _node.Name);
+			// 		_node.QueueFree();
+			// 	}
 			// }
-			// _Instances = null; 
-			
-			if( IsInstanceValid(_TitleMarginContainer) ) 
-			{
-				_TitleMarginContainer.QueueFree();
-				_TitleMarginContainer = null;
-			}
-			
-			if( IsInstanceValid(_TitleInnerContainer) ) 
-			{
-				_TitleInnerContainer.QueueFree();
-				_TitleInnerContainer = null;
-			}
-			
-			if( IsInstanceValid(_Title) ) 
-			{
-				_Title.QueueFree();
-				_Title = null;
-			}
-
-			if( IsInstanceValid(_FolderListMarginContainer) ) 
-			{
-				_FolderListMarginContainer.QueueFree();
-				_FolderListMarginContainer = null;
-			} 
-			
-			if( IsInstanceValid(_FolderListInnerContainer) ) 
-			{
-				_FolderListInnerContainer.QueueFree();
-				_FolderListInnerContainer = null;
-			}
-
 			base._ExitTree();
 		}
 	}

@@ -25,7 +25,8 @@ namespace AssetSnap.Component
 {
 	using Godot;
 
-	public partial class LibraryComponent : BaseComponent
+	[Tool]
+	public partial class LibraryComponent : TraitableComponent
 	{
 		protected Library.Instance _Library;
 		
@@ -46,6 +47,8 @@ namespace AssetSnap.Component
 		** @return void
 		*/
 		public virtual void _OnLibraryChange(){}
+		
+		public virtual void Sync(){}
 		
 		/*
 		** Updates the current handle's spawn settings

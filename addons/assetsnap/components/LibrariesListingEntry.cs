@@ -22,29 +22,15 @@
 
 namespace AssetSnap.Front.Components
 {
+	using System;
 	using AssetSnap.Component;
 	using Godot;
 
-	public partial class LibrariesListingEntry : BaseComponent
+	[Tool]
+	public partial class LibrariesListingEntry : TraitableComponent
 	{
 		public string title;
-		
-		public PanelContainer _PanelContainer;
-		public MarginContainer _MarginContainer;
-		public HBoxContainer _OuterContainer;
-		public HBoxContainer _BaseContainer;
-		public HBoxContainer _ChoiceContainer;
-		public Label _Title;
-		public Button _RemoveButton;
-		public Label _ChoiceTitle;
-		public Button _Yes;
-		public Button _No;
-		
-		public Callable? RemoveButtonCallable;
-		public Callable? ConfirmRemoveButtonCallable;
-		public Callable? CancelRemoveButtonCallable;
 
-		
 		/*
 		** Constructor of the class
 		**  
@@ -53,116 +39,186 @@ namespace AssetSnap.Front.Components
 		public LibrariesListingEntry()
 		{
 			Name = "LibrariesListingEntry";
-			// _include = false;
+			//_include = false;
+		}
+
+		public override void _EnterTree()
+		{
+			base._EnterTree();
 		}
 
 		/*
 		** Initialization of the component
 		** 
 		** @return void
-		*/ 
+		*/
 		public override void Initialize()
 		{
-			_PanelContainer = new();
-			_MarginContainer = new();
-			_OuterContainer = new()
-			{
-				SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
-				SizeFlagsVertical = Control.SizeFlags.ExpandFill,
-			};
+			base.Initialize();
 			
-			_BaseContainer = new()
-			{
-				SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
-				SizeFlagsVertical = Control.SizeFlags.ExpandFill,
-			};
+			AddTrait(typeof(Containerable));
+			AddTrait(typeof(Panelable));
+			AddTrait(typeof(Labelable));
+			AddTrait(typeof(Buttonable));
+
+			// Callable _removeFolderCallable = Callable.From();
+			// Callable _yesRemoveFolderCallable = Callable.From();
+			// Callable _noRemoveFolderCallable = Callable.From();
 			
-			_ChoiceContainer = new()
+			Initiated = true;
+			
+			try 
 			{
-				Visible = false,
+				Trait<Panelable>()
+					.SetType(Panelable.PanelType.RoundedPanelContainer)
+					.SetName("EntryPanelContainer")
+					.SetMargin(2, "top")
+					.SetMargin(2, "bottom")
+					.Instantiate();
 				
-				SizeFlagsHorizontal = Control.SizeFlags.ShrinkCenter,
-				SizeFlagsVertical = Control.SizeFlags.ShrinkCenter,
-			};
-			
-			_Title = new()
-			{
-				ThemeTypeVariation = "HeaderSmall",
-				Text = title,
-				SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
-				SizeFlagsVertical = Control.SizeFlags.ExpandFill,
-			};
+				Trait<Containerable>()
+					.SetName("OuterContainer")
+					.SetHorizontalSizeFlags(Control.SizeFlags.ExpandFill)
+					.SetVerticalSizeFlags(Control.SizeFlags.ExpandFill)
+					.Instantiate();
+					
+				Trait<Containerable>()
+					.SetName("BaseContainer")
+					.SetHorizontalSizeFlags(Control.SizeFlags.ExpandFill)
+					.SetVerticalSizeFlags(Control.SizeFlags.ExpandFill)
+					.SetMargin(0, "left")
+					.SetMargin(15, "right")
+					.SetMargin(2, "top")
+					.SetMargin(2, "bottom")
+					.SetOrientation(Containerable.ContainerOrientation.Horizontal)
+					.Instantiate();
+						
+				Trait<Labelable>()
+					.SetName("EntryTitle")
+					.SetType(Labelable.TitleType.HeaderSmall)
+					.SetText(title)
+					.SetHorizontalSizeFlags(Control.SizeFlags.ExpandFill)
+					.SetVerticalSizeFlags(Control.SizeFlags.ExpandFill)
+					.Instantiate();
+					
+				Trait<Buttonable>()
+					.SetName("RemoveFolderButton")
+					.SetType(Buttonable.ButtonType.SmallDangerButton)
+					.SetText("Remove")
+					.SetTooltipText("Click to remove the library")
+					.SetAction( () => { this._OnRemove(); } )
+					.Instantiate();
+				
+				Trait<Containerable>()
+					.SetName("ChoiceContainer")
+					.SetHorizontalSizeFlags(Control.SizeFlags.ExpandFill)
+					.SetVerticalSizeFlags(Control.SizeFlags.ShrinkCenter)
+					.SetMargin(0, "left")
+					.SetMargin(15, "right")
+					.SetMargin(2, "top")
+					.SetMargin(2, "bottom")
+					.SetOrientation(Containerable.ContainerOrientation.Horizontal)
+					.Instantiate();
+					
+				Trait<Labelable>()
+					.SetName("ChoiceTitle")
+					.SetType(Labelable.TitleType.HeaderSmall)
+					.SetText("Are you sure you wish to continue?")
+					.SetHorizontalSizeFlags(Control.SizeFlags.ExpandFill)
+					.SetVerticalSizeFlags(Control.SizeFlags.ShrinkBegin)
+					.Instantiate();
+					
+				Trait<Buttonable>()
+					.SetName("YesRemoveFolder")
+					.SetType(Buttonable.ButtonType.SmallSuccesButton)
+					.SetText("Confirm")
+					.SetTooltipText("Click to remove the library")
+					.SetAction( () => { this._OnConfirm(); } )
+					.Instantiate();
+					
+				Trait<Buttonable>()
+					.SetName("NoRemoveFolder")
+					.SetType(Buttonable.ButtonType.SmallDefaultButton)
+					.SetText("Cancel")
+					.SetTooltipText("Cancel Removal")
+					.SetAction( () => { this._OnReject(); } )
+					.Instantiate();
+	
+				var container = Trait<Containerable>()
+					.Select(0)
+					.GetInnerContainer();
+									
+				var baseContainer = Trait<Containerable>()
+					.Select(1)
+					.GetInnerContainer();
+								
+				var choiceContainer = Trait<Containerable>()
+					.Select(2)
+					.SetVisible(false)
+					.GetInnerContainer();
 
-			_RemoveButton = new()
-			{
-				Name = "RemoveFolderButton",
-				ThemeTypeVariation = "RemoveButton",
-				Text = "Remove",
-				TooltipText = "Click to remove the library",
-				MouseDefaultCursorShape = Control.CursorShape.PointingHand
-			};
-			
-			_ChoiceTitle = new()
-			{
-				ThemeTypeVariation = "HeaderSmall",
-				Text = "Are you sure you wish to continue?",
-				SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
-				SizeFlagsVertical = Control.SizeFlags.ShrinkBegin,
-			};
-			
-			_Yes = new()
-			{
-				Name = "YesRemoveFolder",
-				ThemeTypeVariation = "ConfirmButton",
-				Text = "Confirm",
-				TooltipText = "Click to remove the library",
-				MouseDefaultCursorShape = Control.CursorShape.PointingHand
-			};
-			
-			_No = new() 
-			{
-				Name = "NoRemoveFolder",
-				ThemeTypeVariation = "RemoveButton",
-				Text = "Cancel",
-				TooltipText = "Cancel Removal",
-				MouseDefaultCursorShape = Control.CursorShape.PointingHand
-			};
-			
-			_MarginContainer.AddThemeConstantOverride("margin_left", 10);
-			_MarginContainer.AddThemeConstantOverride("margin_right", 10);
-			_MarginContainer.AddThemeConstantOverride("margin_top", 10);
-			_MarginContainer.AddThemeConstantOverride("margin_bottom", 10);
-			
-			RemoveButtonCallable = new Callable(this, "_OnRemove");
-			ConfirmRemoveButtonCallable = new Callable(this, "_OnConfirm");
-			CancelRemoveButtonCallable = new Callable(this, "_OnReject");
- 
-			_ChoiceContainer.AddChild(_ChoiceTitle);
-			_ChoiceContainer.AddChild(_Yes);
-			_ChoiceContainer.AddChild(_No);
-			_BaseContainer.AddChild(_Title);
-			_BaseContainer.AddChild(_RemoveButton);
-			_OuterContainer.AddChild(_ChoiceContainer);
-			_OuterContainer.AddChild(_BaseContainer);
-			
-			_MarginContainer.AddChild(_OuterContainer);
-			_PanelContainer.AddChild(_MarginContainer);
-			
-			_Container.AddChild(_PanelContainer);
+					
+				Trait<Labelable>()
+					.Select(1)
+					.AddToContainer(
+						choiceContainer
+					);
+						
+				Trait<Buttonable>()
+					.Select(2)
+					.AddToContainer(
+						choiceContainer
+					);
+					
+				Trait<Buttonable>()
+					.Select(1)
+					.AddToContainer(
+						choiceContainer
+					);
+				
+				Trait<Labelable>()
+					.Select(0)
+					.AddToContainer(
+						baseContainer
+					);
+					
+				Trait<Buttonable>()
+					.Select(0)
+					.AddToContainer(
+						baseContainer
+					);
+				
+				// Choice
+				Trait<Containerable>()
+					.Select(2)
+					.AddToContainer(
+						container
+					);
+					
+				// Base
+				Trait<Containerable>()
+					.Select(1)
+					.AddToContainer(
+						container
+					);
 
-			if( RemoveButtonCallable is Callable _callable ) 
-			{
-				_RemoveButton.Connect(Button.SignalName.Pressed, _callable);
+				Trait<Containerable>()
+					.Select(0)
+					.AddToContainer(
+						Trait<Panelable>()
+							.Select(0)
+							.GetNode()
+					);
+
+				Trait<Panelable>()
+					.Select(0)
+					.AddToContainer(
+						_Container
+					);
 			}
-			
-			if( ConfirmRemoveButtonCallable is Callable _ConfirmCallable ) 
-			{
-				_Yes.Connect(Button.SignalName.Pressed, _ConfirmCallable);
-			}
-			
-			if( CancelRemoveButtonCallable is Callable _CancelCallable ) 
-			{
-				_No.Connect(Button.SignalName.Pressed, _CancelCallable);
+			catch( Exception e ) 
+			{	
+				GD.PushWarning(e.Message);
 			}
 		}
 		
@@ -174,8 +230,13 @@ namespace AssetSnap.Front.Components
 		*/
 		private void _OnRemove()
 		{
-			_ChoiceContainer.Visible = true;
-			_BaseContainer.Visible = false;
+			Containerable baseContainer = Trait<Containerable>()
+				.Select(1);
+			baseContainer.Hide();
+
+			Containerable choiceContainer = Trait<Containerable>()
+				.Select(2);
+			choiceContainer.Show();
 		}
 		
 		/*
@@ -185,9 +246,14 @@ namespace AssetSnap.Front.Components
 		*/
 		private void _OnConfirm()
 		{
-			_ChoiceContainer.Visible = false;
-			_BaseContainer.Visible = true;
+			Containerable baseContainer = Trait<Containerable>()
+				.Select(1);
+			baseContainer.Show();
 
+			Containerable choiceContainer = Trait<Containerable>()
+				.Select(2);
+			choiceContainer.Hide();
+			
 			_GlobalExplorer.Settings.RemoveFolder(title);
 
 			if( null != _GlobalExplorer.Library ) 
@@ -195,7 +261,7 @@ namespace AssetSnap.Front.Components
 				_GlobalExplorer.Library.RemoveLibrary(title);
 				_GlobalExplorer.Library.Refresh(_GlobalExplorer.BottomDock);
 			}
-			
+
 			Godot.Collections.Array<Node> Children = _GlobalExplorer.BottomDock.Container.GetChildren();
 			
 			foreach( Node child in Children ) 
@@ -211,12 +277,9 @@ namespace AssetSnap.Front.Components
 							child.GetParent().RemoveChild(child);
 						}
 						
-						child.QueueFree(); 
-						
-						if( IsInstanceValid(child) ) 
-						{
-							FreeAllChildrenRecursively(child);
-						}				
+						// child.Free();
+
+						// FreeAllChildrenRecursively(child);
 					} 
 				}
 			}
@@ -260,100 +323,50 @@ namespace AssetSnap.Front.Components
 		*/
 		private void _OnReject()
 		{
-			_ChoiceContainer.Visible = false;
-			_BaseContainer.Visible = true;
+			Containerable baseContainer = Trait<Containerable>()
+				.Select(1);
+			baseContainer.Show();
+
+			Containerable choiceContainer = Trait<Containerable>()
+				.Select(2);
+			choiceContainer.Hide();
 		}
-		
-		/*
-		** Cleans up in references, fields and parameters.
-		** 
-		** @return void
-		*/
+
 		public override void _ExitTree()
 		{
-			if( IsInstanceValid(_RemoveButton) && RemoveButtonCallable is Callable _RemoveCallable ) 
-			{
-				if( _RemoveButton.IsConnected(Button.SignalName.Pressed, _RemoveCallable) ) 
-				{
-					_RemoveButton.Disconnect(Button.SignalName.Pressed, _RemoveCallable);
-				}
-			}
-			
-			if( IsInstanceValid(_Yes) && ConfirmRemoveButtonCallable is Callable _ConfirmCallable ) 
-			{
-				if( _Yes.IsConnected(Button.SignalName.Pressed, _ConfirmCallable) ) 
-				{
-					_Yes.Disconnect(Button.SignalName.Pressed, _ConfirmCallable);
-				}
-			}
-			
-			if( IsInstanceValid(_No) && CancelRemoveButtonCallable is Callable _CancelCallable ) 
-			{
-				if( _No.IsConnected(Button.SignalName.Pressed, _CancelCallable) ) 
-				{ 
-					_No.Disconnect(Button.SignalName.Pressed, _CancelCallable);
-				}
-			}
-				
-			if( IsInstanceValid(_Title) ) 
-			{
-				_Title.QueueFree();
-				_Title = null;
-			}
-				
-			if( IsInstanceValid(_RemoveButton) ) 
-			{
-				_RemoveButton.QueueFree();
-				_RemoveButton = null;
-			}
-				
-			if( IsInstanceValid(_ChoiceTitle) ) 
-			{
-				_ChoiceTitle.QueueFree();
-				_ChoiceTitle = null;
-			}
-				
-			if( IsInstanceValid(_Yes) ) 
-			{
-				_Yes.QueueFree();
-				_Yes = null;
-			}	
-				
-			if( IsInstanceValid(_No) ) 
-			{
-				_No.QueueFree();
-				_No = null;
-			}	
+			// Callable _removeFolderCallable = Callable.From(() => { this._OnRemove(); });
+			// Callable _yesRemoveFolderCallable = Callable.From(() => { this._OnConfirm(); });
+			// Callable _noRemoveFolderCallable = Callable.From(() => { this._OnReject(); });
+			// if( Trait<Buttonable>().Select(0).IsValid() ) 
+			// {
+			// 	GD.Print("Exiting now");
+			// 	GodotObject _object = Trait<Buttonable>()
+			// 		.Select(0)
+			// 		.GetNode();
 					
-			if( IsInstanceValid(_ChoiceContainer) ) 
-			{
-				_ChoiceContainer.QueueFree();
-				_ChoiceContainer = null;
-			}
+			// 	GodotObject _objectTwo = Trait<Buttonable>()
+			// 		.Select(1)
+			// 		.GetNode();
+					
+			// 	GodotObject _objectThree = Trait<Buttonable>()
+			// 		.Select(2)
+			// 		.GetNode();
+					
+			// 	if ( _object is Button button && button.IsConnected(Button.SignalName.Pressed, _removeFolderCallable))
+			// 	{
+			// 		button.Disconnect(Button.SignalName.Pressed, _removeFolderCallable); 
+			// 	}
 				
-			if( IsInstanceValid(_BaseContainer) ) 
-			{
-				_BaseContainer.QueueFree();
-				_BaseContainer = null;
-			}
+			// 	if ( _objectTwo is Button buttonTwo && buttonTwo.IsConnected(Button.SignalName.Pressed, _yesRemoveFolderCallable))
+			// 	{
+			// 		buttonTwo.Disconnect(Button.SignalName.Pressed, _yesRemoveFolderCallable); 
+			// 	}
 				
-			if( IsInstanceValid(_OuterContainer) ) 
-			{
-				_OuterContainer.QueueFree();
-				_OuterContainer = null;
-			}
-			
-			if( IsInstanceValid(_MarginContainer) ) 
-			{
-				_MarginContainer.QueueFree();
-				_MarginContainer = null; 
-			}
-			
-			if( IsInstanceValid(_PanelContainer) ) 
-			{  
-				_PanelContainer.QueueFree();
-				_PanelContainer = null;
-			}
+			// 	if ( _objectThree is Button buttonThree && buttonThree.IsConnected(Button.SignalName.Pressed, _noRemoveFolderCallable))
+			// 	{
+			// 		buttonThree.Disconnect(Button.SignalName.Pressed, _noRemoveFolderCallable); 
+			// 	}
+			// }
 			
 			base._ExitTree();
 		}

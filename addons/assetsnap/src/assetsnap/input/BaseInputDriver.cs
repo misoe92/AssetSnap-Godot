@@ -23,13 +23,24 @@
 namespace AssetSnap.Instance.Input
 {
 	using AssetSnap.Front.Nodes;
+	using AssetSnap.Static;
 	using Godot;
 	
 	public class BaseInputDriver 
 	{
+		/*
+		** Holds a reference to the current instance
+		*/
 		private static BaseInputDriver _Instance;
+		
+		/*
+		** Checks if Is Multi is currently enabled
+		*/
 		public bool IsMulti = false;
 		
+		/*
+		** Fetches an instance of the input driver
+		*/
 		public static BaseInputDriver GetInstance()
 		{
 			if( null == _Instance ) 
@@ -49,77 +60,17 @@ namespace AssetSnap.Instance.Input
 		*/
 		public virtual int _Input( Camera3D Camera, InputEvent Event) 
 		{
-			GlobalExplorer messageBus = GlobalExplorer.GetInstance();
-			
-			if( messageBus.CurrentLibrary == null ) 
+			if( false == ShouldListen() ) 
 			{
 				return (int)EditorPlugin.AfterGuiInput.Pass;
 			}
-			
-			if( Event is InputEventKey _KeyEvent ) 
-			{
-				if( IsKeyReset(_KeyEvent) ) 
-				{
-					// _Parent.CurrentLibrary.ClearAllPanelState();
-					// CoreHandles.GetInstance<CoreHandles>().ResetHandle();
-				}
-			}
-			if(Event is InputEventMouseButton _MouseButtonEvent)
-			{
-				if (HasMouseLeftPressed(_MouseButtonEvent))
-				{
-					MeshInstance3D ModelInstance = messageBus.Decal.GetMeshInstance();
-				
-					if (
-						CanMultiDrop() &&
-						ShiftInputPressed(_MouseButtonEvent) &&
-						AltInputPressed(_MouseButtonEvent) &&
-						ModelInstance is AssetSnap.Front.Nodes.AsMeshInstance3D
-					)
-					{
-						IsMulti = true;
-					}
-					else 
-					{
-						IsMulti = false;
-					}
-					
-					messageBus.Waypoints.Spawn(ModelInstance, messageBus.Decal.GetNode().Transform.Origin, ModelInstance.RotationDegrees, ModelInstance.Scale);
-					
-					if( false == ShouldFocusAsset() ) 
-					{
-						messageBus.CurrentLibrary._LibrarySettings._LSEditing.SetText("None");
-						messageBus.HandleNode = null;
-						messageBus.Model = null;
-					}
-				
-					if( CanMultiDrop() && ShiftInputPressed(_MouseButtonEvent) && AltInputPressed(_MouseButtonEvent) && ModelInstance is AssetSnap.Front.Nodes.AsMeshInstance3D AsModelInstance ) 
-					{
-						AssetSnap.Front.Nodes.AsMeshInstance3D Duplicate = new()
-						{
-							Name = AsModelInstance.Name,
-							Mesh = AsModelInstance.Mesh,
-							Transform = new Transform3D(Basis.Identity, new Vector3(0,0,0)),
-							Scale = AsModelInstance.Scale,
-							RotationDegrees = AsModelInstance.RotationDegrees,
-							Floating = true,
-							SpawnSettings = AsModelInstance.SpawnSettings,
-						};
 
-						Duplicate.SetLibraryName(AsModelInstance.GetLibraryName());
-						
-						messageBus.CurrentLibrary = Duplicate.GetLibrary();
-						messageBus.Model = Duplicate;
-						messageBus.HandleNode = Duplicate;
-					}
-					else 
-					{
-						messageBus.CurrentLibrary.ClearAllPanelState();
-						messageBus.CurrentLibrary = null;
-					}
-					
-					return (int)EditorPlugin.AfterGuiInput.Stop;
-				}
+			_ListenForReset( Event );
+			
+			int _result = _ListenForMouseButtons(Event);
+			if( _result != 0 ) 
+			{
+				return _result;
 			}
 			
 			return (int)EditorPlugin.AfterGuiInput.Pass; 
@@ -135,36 +86,125 @@ namespace AssetSnap.Instance.Input
 			GlobalExplorer.GetInstance()._ForceFocus = _model;
 		}
 		
-		public bool CanMultiDrop( )
-		{
-			GlobalExplorer _GlobalExplorer = GlobalExplorer.GetInstance();
-			return _GlobalExplorer.Settings.GetKey("allow_multi_drop").As<bool>();
-		}
-		
-		public bool ShiftInputPressed(InputEventMouseButton _MouseButtonEvent)
-		{
-			return _MouseButtonEvent.ShiftPressed;
-		}
-		
-		public bool AltInputPressed(InputEventMouseButton _MouseButtonEvent)
-		{
-			return _MouseButtonEvent.AltPressed;
-		}
 		/*
-		** Checks if a asset should be focused after placement
+		** Listens to for reset events
 		**
-		** @return bool
+		** @return void
 		*/
-		public bool ShouldFocusAsset()
+		private void _ListenForReset( InputEvent Event )
 		{
-			bool value = GlobalExplorer.GetInstance().Settings.GetKey("focus_placed_asset").As<bool>();
-			
-			if( value is bool valueBool ) 
+			if( Event is InputEventKey _KeyEvent ) 
 			{
-				return valueBool;
+				if( IsKeyReset(_KeyEvent) ) 
+				{
+					// _Parent.CurrentLibrary.ClearAllPanelState();
+					// CoreHandles.GetInstance<CoreHandles>().ResetHandle();
+				}
 			}
+		}
+		
+		/*
+		** Listens to mouse button events
+		**
+		** @return void
+		*/
+		private int _ListenForMouseButtons( InputEvent Event )
+		{
+			GlobalExplorer explorer = GlobalExplorer.GetInstance();
+			
+			if(Event is InputEventMouseButton _MouseButtonEvent)
+			{
+				if ( InputsStatic.HasMouseLeftPressed(_MouseButtonEvent) )
+				{
+					Node3D Node = explorer.GetHandle();
+				
+					if (
+						SettingsStatic.CanMultiDrop() &&
+						InputsStatic.ShiftInputPressed(_MouseButtonEvent) &&
+						InputsStatic.AltInputPressed(_MouseButtonEvent)
+					)
+					{
+						IsMulti = true;
+					}
+					else 
+					{
+						IsMulti = false;
+					}
+					
+					explorer.Waypoints.Spawn(Node, explorer.Decal.GetNode().Transform.Origin, Node.RotationDegrees, Node.Scale);
+					
+					if( false == SettingsStatic.ShouldFocusAsset() ) 
+					{
+						explorer.CurrentLibrary._LibrarySettings._LSEditing.SetText("None");
+						explorer.HandleNode = null;
+						explorer.Model = null;
+						explorer.States.EditingObject = null;
+					}
+				
+					if( SettingsStatic.CanMultiDrop() && InputsStatic.ShiftInputPressed(_MouseButtonEvent) && InputsStatic.AltInputPressed(_MouseButtonEvent) ) 
+					{
+						if( Node is AsMeshInstance3D meshInstance3D ) 
+						{
+							AssetSnap.Front.Nodes.AsMeshInstance3D Duplicate = new()
+							{
+								Name = Node.Name,
+								Mesh = meshInstance3D.Mesh,
+								Transform = new Transform3D(Basis.Identity, new Vector3(0,0,0)),
+								Scale = Node.Scale,
+								RotationDegrees = Node.RotationDegrees,
+								Floating = true,
+								SpawnSettings = meshInstance3D.SpawnSettings.Duplicate(true),
+							};
+					
+							Duplicate.SetLibraryName(meshInstance3D.GetLibraryName());
+							explorer.CurrentLibrary = Duplicate.GetLibrary();
+							explorer.Model = Duplicate;
+							explorer.HandleNode = Duplicate;
+							explorer.States.EditingObject = Duplicate;
+						}
+						
+						if( Node is AsGrouped3D grouped3D ) 
+						{
+							AsGrouped3D newGrouped3D = grouped3D.Duplicate() as AsGrouped3D;
+							newGrouped3D.GroupPath = grouped3D.GroupPath;
 
-			return false;
+							explorer.States.EditingObject = newGrouped3D;
+							explorer.States.GroupedObject = newGrouped3D;
+						}
+					}
+					else 
+					{
+						if( explorer.States.PlacingMode == GlobalStates.PlacingModeEnum.Model ) 
+						{
+							explorer.CurrentLibrary.ClearAllPanelState();
+							explorer.CurrentLibrary = null;
+							explorer.States.Group = null;
+							explorer.States.GroupedObject = null;
+						}
+						
+						if( explorer.States.PlacingMode == GlobalStates.PlacingModeEnum.Group ) 
+						{
+							explorer.CurrentLibrary = null;
+							explorer.States.PlacingMode = GlobalStates.PlacingModeEnum.Model;
+							explorer.States.Group = null;
+							explorer.States.GroupedObject = null;
+						}
+					}
+					
+					return (int)EditorPlugin.AfterGuiInput.Stop;
+				}
+			}
+			return (int)EditorPlugin.AfterGuiInput.Pass;
+		}
+		
+		/*
+		** Checks if input should be listened to.
+		*/
+		private bool ShouldListen()
+		{
+			return 
+				null != GlobalExplorer.GetInstance().CurrentLibrary ||
+				GlobalExplorer.GetInstance().States.PlacingMode == GlobalStates.PlacingModeEnum.Group;
 		}
 		
 		/*
@@ -176,28 +216,6 @@ namespace AssetSnap.Instance.Input
 		private bool IsKeyReset(InputEventKey _KeyEvent)
 		{
 			return _KeyEvent.Keycode == Key.Escape;
-		}
-		 
-		/*
-		** Checks if left mouse button has been pressed
-		**
-		** @param InputEventMouseButton _MouseButtonEvent
-		** @return bool
-		*/
-		private bool HasMouseLeftPressed(InputEventMouseButton _MouseButtonEvent)
-		{
-			return _MouseButtonEvent.ButtonIndex == MouseButton.Left && false == _MouseButtonEvent.Pressed;
-		}
-		
-		/*
-		** Checks if right mouse button has been pressed
-		**
-		** @param InputEventMouseButton _MouseButtonEvent
-		** @return bool
-		*/
-		private bool HasMouseRightPressed(InputEventMouseButton _MouseButtonEvent)
-		{
-			return _MouseButtonEvent.ButtonIndex == MouseButton.Right && false == _MouseButtonEvent.Pressed;
 		}
 	}
 }

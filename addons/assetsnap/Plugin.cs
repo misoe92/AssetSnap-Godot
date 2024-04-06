@@ -33,9 +33,15 @@ namespace AssetSnap
 	{
 		[Signal]
 		public delegate void SettingKeyChangedEventHandler();
-	
+		
+		[Signal]
+		public delegate void LibraryChangedEventHandler( string name );
+		
+		[Signal]
+		public delegate void StatesChangedEventHandler();
+
 		/** Internal data **/
-		private readonly double _Version = 0.1;
+		private readonly string _Version = "0.1.1";
 		private readonly string _Name = "Plugin";
 		protected Callable? UpdateHandleCallable;
 		private bool _initialized = false;
@@ -50,13 +56,11 @@ namespace AssetSnap
 		public NodeType[] NodeTypes = Array.Empty<NodeType>();
 
 		private static Plugin _Instance;
-
-		public Node CurrentScene;
 		
 		public static Plugin GetInstance()
 		{
 			return _Instance;
-		} 
+		}
 		
 		/*
 		** Initialization of our plugin
@@ -66,15 +70,16 @@ namespace AssetSnap
 		public override void _EnterTree() 
 		{
 			Name = "AssetSnapPlugin";
-			Plugin._Instance = this; 
+			Plugin._Instance = this;
 
 			if( null == GlobalExplorer.InitializeExplorer() ) 
 			{
 				GD.PushError("No explorer is available");
 				return;
 			}
-			
-			GlobalExplorer.GetInstance()._Plugin.SceneChanged += (scene) => { _OnSceneChanged(scene); };
+
+
+			Connect(SignalName.SceneChanged, Callable.From( (Node scene) => { _OnSceneChanged(scene); } ) );
 			
 			// UpdateHandleCallable = new(this, "UpdateHandle");
 			
@@ -90,6 +95,11 @@ namespace AssetSnap
 			_CoreEnter.InitializeCore();
 		}
 		
+		private void _OnSceneChanged(Node Scene)
+		{
+			GlobalExplorer.GetInstance().States.CurrentScene = Scene;
+		}
+		
 		/*
 		** Destruction of our plugin
 		**
@@ -97,6 +107,9 @@ namespace AssetSnap
 		*/ 
 		public override void _ExitTree()
 		{
+			// SceneChanged -= (scene) => { _OnSceneChanged(scene); };
+			// RemoveAutoloadSingleton("GlobalExplorer");
+
 			_CoreEnter = null;
 			_CoreInput = null;
 			_CoreProcess = null;
@@ -105,7 +118,7 @@ namespace AssetSnap
 			_Instance = null;
 			UpdateHandleCallable = null; 
 		} 
-
+		
 		/*
 		** Handling of communication with editor handles
 		** 
@@ -194,11 +207,6 @@ namespace AssetSnap
 			}
 		}
 		
-		private void _OnSceneChanged(Node Scene)
-		{
-			CurrentScene = Scene;
-		}
-		
 		public Callable UpdateCallable()
 		{
 			return (Callable)UpdateHandleCallable;
@@ -225,7 +233,7 @@ namespace AssetSnap
 		**
 		** @return double
 		*/
-		public double GetVersion()
+		public string GetVersion()
 		{
 			return _Version;
 		}
@@ -237,8 +245,9 @@ namespace AssetSnap
 		*/
 		public string GetVersionString()
 		{
-			return _Version.ToString().Split(",").Join(".");
+			return _Version;
 		}
+		
 	}
 }
 #endif

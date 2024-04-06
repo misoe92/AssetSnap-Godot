@@ -22,11 +22,11 @@
 
 namespace AssetSnap.Front.Components
 {
-	using System;
 	using System.Collections.Generic;
 	using AssetSnap.Component;
 	using Godot;
 
+	[Tool]
 	public partial class LibraryListing : LibraryComponent
 	{
 		private string _Folder;
@@ -54,7 +54,8 @@ namespace AssetSnap.Front.Components
 		public LibraryListing()
 		{
 			Name = "LibraryListing";
-			// _include = false; 
+
+			//_include = false; 
 		}
 		
 		/*
@@ -64,6 +65,12 @@ namespace AssetSnap.Front.Components
 		*/
 		public override void Initialize()
 		{
+			Containers = new();
+			Items = new();
+		
+			Initiated = true;
+			
+			
 			if( Container is VBoxContainer BoxContainer ) 
 			{
 				if( BoxContainer == null || Folder == null ) 
@@ -157,19 +164,23 @@ namespace AssetSnap.Front.Components
 					string file_name = System.IO.Path.GetFileName(fileName);
 
 					
-					bool IsSearching = Library._LibrarySearch.IsSearching();
-					bool SearchValid = Library._LibrarySearch.SearchValid(file_name);
-					
-					if( IsSearching && false == SearchValid)
+					if( null != Library._LibraryTopbar && null != Library._LibraryTopbar._LibrarySearch) 
 					{
-						continue;
+						bool IsSearching = Library._LibraryTopbar._LibrarySearch.IsSearching();
+						bool SearchValid = Library._LibraryTopbar._LibrarySearch.SearchValid(file_name);
+						
+						if( IsSearching && false == SearchValid)
+						{
+							continue;
+						}
 					}
+				
 
 					// Check if the file has a supported extension 
 					if ( IsValidExtension( extension ) )
 					{
 						LibraryListEntry SingleEntry = GlobalExplorer.GetInstance().Components.Single<LibraryListEntry>(true);
-						SingleEntry.Name = "Entry-" + ((rows + 1) * iteration);
+						SingleEntry.Name = "LibraryEntry-" + ((rows + 1) * iteration);
 						
 						SingleEntry.Container = CurrentBoxContainer;
 						SingleEntry.Folder = folderPath;
@@ -233,38 +244,37 @@ namespace AssetSnap.Front.Components
 		*/
 		public override void _ExitTree()
 		{
-			Items = null;
-			Containers = null;
+			// Items = null;
+			// Containers = null;
 			// if( Items != null)  
 			// {
-			// 	foreach( LibraryListEntry _item in Items ) 
+			// 	for( int i = 0;  i < Items.Count;  i++ ) 
 			// 	{
-			// 		if( IsInstanceValid(_item) ) 
+			// 		if( IsInstanceValid(Items[i]) ) 
 			// 		{
-			// 			// if( IsInstanceValid( item.GetParent() ) ) 
-			// 			// {
-			// 			// 	item.GetParent().RemoveChild(item);
-			// 			// }
+			// 			if( IsInstanceValid( Items[i].GetParent() ) ) 
+			// 			{
+			// 				Items[i].GetParent().RemoveChild(Items[i]);
+			// 			}
 						
-			// 			_item.QueueFree();
+			// 			Items[i].Free();
 			// 		}
 			// 	}
-
 			// 	Items = null;
 			// }
 			
 			// if( Containers != null ) 
 			// {
-			// 	foreach( HBoxContainer _container in Containers ) 
+			// 	for( int i = 0;  i < Containers.Count; i++  ) 
 			// 	{
-			// 		if( IsInstanceValid(_container) ) 
+			// 		if( IsInstanceValid(Containers[i]) ) 
 			// 		{
-			// 			// if( IsInstanceValid( item.GetParent() ) ) 
-			// 			// {
-			// 			// 	item.GetParent().RemoveChild(item);
-			// 			// }
+			// 			if( IsInstanceValid( Containers[i].GetParent() ) ) 
+			// 			{
+			// 				Containers[i].GetParent().RemoveChild(Containers[i]);
+			// 			}
 						
-			// 			_container.QueueFree();
+			// 			Containers[i].Free();
 			// 		}
 			// 	}
 	

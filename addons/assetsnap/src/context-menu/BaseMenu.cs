@@ -53,8 +53,8 @@ namespace AssetSnap.ContextMenu
 			_BoxContainer.AddChild(_Button);
 			_BoxContainer.AddChild(_PopupMenu);
 
-			_PopupMenu.IndexPressed += (pressed) => { _onDropdownItemSelected(); };
-			_Button.Pressed += () => { _TogglePopupMenu(); }; 
+			_Button.Connect(PopupMenu.SignalName.IndexPressed, Callable.From( () => { _onDropdownItemSelected(); } ) ); 
+			_Button.Connect(Button.SignalName.Pressed, Callable.From( () => { _TogglePopupMenu(); } ) ); 
 			
 			GlobalExplorer.GetInstance()._Plugin.AddControlToContainer(EditorPlugin.CustomControlContainer.SpatialEditorMenu, _BoxContainer ); 
 		}
@@ -105,8 +105,6 @@ namespace AssetSnap.ContextMenu
 		
 		public void _Exit()
 		{
-			_Button.Pressed -= () => { _TogglePopupMenu(); }; 
-			
 			if( EditorPlugin.IsInstanceValid(_Button) ) 
 			{
 				_Button.QueueFree();

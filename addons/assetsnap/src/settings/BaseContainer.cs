@@ -370,6 +370,16 @@ namespace AssetSnap.Settings
 		}
 		
 		/*
+		** Defines the input type of allow_group_builder
+		**
+		** @return string
+		*/
+		public string allow_group_builder_type()
+		{
+			return "CheckBox";
+		}
+		
+		/*
 		** Cleans the various references and fields of the class
 		**
 		** @return void

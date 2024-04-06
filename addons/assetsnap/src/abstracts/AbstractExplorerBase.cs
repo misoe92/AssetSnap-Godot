@@ -1,7 +1,8 @@
 namespace AssetSnap.Abstracts
 {
 	using AssetSnap.Front.Nodes;
-	
+	using Godot;
+
 	public abstract partial class AbstractExplorerBase
 	{
 		public enum ScrollState 
@@ -32,6 +33,24 @@ namespace AssetSnap.Abstracts
 		*/
 		public Front.Configs.SettingsConfig Settings { get => _Settings; } 
 		protected Front.Configs.SettingsConfig _Settings = null; 
+	
+		/*
+		** Handles spawn waypoints
+		*/
+		public Debug.Inspector Inspector { get => _Inspector; } 
+		protected Debug.Inspector _Inspector = null; 
+		
+		/*
+		** Handles spawn waypoints
+		*/
+		public Snap.Base Snap { get => _Snap; } 
+		protected Snap.Base _Snap = null; 
+		
+		/*
+		** Handles spawn waypoints
+		*/
+		public Snap.SnappableBase Snappable { get => _Snappable; } 
+		protected Snap.SnappableBase _Snappable = null; 
 		
 		/*
 		** Handles spawn waypoints
@@ -57,6 +76,14 @@ namespace AssetSnap.Abstracts
 		public Modifier.Base Modifiers { get => _Modifiers; } 
 		protected Modifier.Base _Modifiers = null; 
 		
+		/* 
+		** Handles spawn waypoints
+		*/
+		public GroupBuilder.Base GroupBuilder { get => _GroupBuilder; } 
+		protected GroupBuilder.Base _GroupBuilder = null; 
+		
+		public GroupBuilder.MainScreen GroupMainScreen { get; set; } 
+		
 		/*
 		** Handles spawn waypoints
 		*/
@@ -72,7 +99,7 @@ namespace AssetSnap.Abstracts
 		/*
 		** Decal handler
 		*/
-		public Decal.Base Decal { get => _Decal; } 
-		protected Decal.Base _Decal = null; 
+		public AssetSnap.Decal.Base Decal { get => _Decal; } 
+		protected AssetSnap.Decal.Base _Decal = null; 
 	}
 }

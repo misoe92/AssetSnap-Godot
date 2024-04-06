@@ -60,8 +60,13 @@ namespace AssetSnap
 					_BottomDock = new(),
 					_Decal = new(),
 					_Raycast = new(),
-					_Modifiers = new(),
+					_Modifiers = new(),  
 					_Library = new(),
+					_GroupBuilder = new(),
+					_Snap = new(),
+					_States = new(),
+					_Inspector = new(),
+					_Snappable = new(),
 				};
 			}
 			
@@ -81,6 +86,16 @@ namespace AssetSnap
 				{
 					return instance;
 				}
+			}
+			
+			return null;
+		}
+		
+		public Library.Instance GetLibraryByIndex( long index )
+		{
+			if( index > -1 && _Library.Libraries.Length > index && EditorPlugin.IsInstanceValid(_Library.Libraries[index]) ) 
+			{
+				return _Library.Libraries[index];
 			}
 			
 			return null;
@@ -109,7 +124,8 @@ namespace AssetSnap
 			{
 				CurrentLibrary.ClearActivePanelState(null);
 				CurrentLibrary._LibrarySettings._LSEditing.SetText("None");
-				
+
+				States.EditingObject = null;
 				HandleNode = null;
 				Model = null;
 				CurrentLibrary = null;
@@ -118,6 +134,7 @@ namespace AssetSnap
 			}
 		
 			EditorInterface.Singleton.EditNode(Node);
+			States.EditingObject = Node;
 			
 			if( Node is AsMeshInstance3D _instance ) 
 			{
@@ -128,6 +145,22 @@ namespace AssetSnap
 				CurrentLibrary = Library;
 				Library._LibrarySettings._LSEditing.SetText(Node.Name);
 								
+				if( InputDriver is DragAddInputDriver DraggableInputDriver ) 
+				{
+					DraggableInputDriver.CalculateObjectSize();
+				}
+			}
+			
+			if( Node is AsGrouped3D _Grouped3D ) 
+			{
+				States.PlacingMode = GlobalStates.PlacingModeEnum.Group;
+				
+				Transform3D transform = _Grouped3D.Transform;
+				transform.Origin = new Vector3(0, 0, 0);
+				_Grouped3D.Transform = transform;
+				
+				States.GroupedObject = _Grouped3D;
+				
 				if( InputDriver is DragAddInputDriver DraggableInputDriver ) 
 				{
 					DraggableInputDriver.CalculateObjectSize();
@@ -171,12 +204,12 @@ namespace AssetSnap
 			Type type = which.GetType();
 			FieldInfo[] fields = type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
 
-			Console.WriteLine($"Fields for class {type.Name}:");
+			GD.Print($"Fields for class {type.Name}:");
 
 			foreach (FieldInfo field in fields)
 			{
 				object value = field.GetValue(which);
-				Console.WriteLine($"{field.Name}: {value}");
+				GD.Print($"{field.Name}: {value}");
 			}
 		}
 		

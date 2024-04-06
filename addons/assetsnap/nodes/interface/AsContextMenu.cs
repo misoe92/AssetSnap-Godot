@@ -52,17 +52,38 @@ namespace AssetSnap.Front.Nodes
 
 		private string BelongsToSceneName = "";
 
-		private Callable ResizeAction;
-
 		public override void _EnterTree()
 		{
 			Name = "AsContextMenu";
-			ResizeAction = new Callable(this, "_OnResize");
 			
-			EditorInterface.Singleton.GetBaseControl().Connect(Control.SignalName.Resized, ResizeAction);
-			EditorInterface.Singleton.GetBaseControl().GetNode<Control>("@VBoxContainer@14/@HSplitContainer@17/@HSplitContainer@25/@VSplitContainer@27").Connect(Control.SignalName.Resized, ResizeAction);
-
 			base._EnterTree();
+		}
+		
+		public override void _Ready() 
+		{
+			 // block unloading with a strong handle
+			var handle = System.Runtime.InteropServices.GCHandle.Alloc(this); 
+			
+			Action ResizeAction = () => { _OnResize(); };
+			
+			EditorInterface.Singleton.GetBaseControl().Connect(Control.SignalName.Resized, Callable.From(ResizeAction));
+			EditorInterface.Singleton.GetBaseControl().GetNode<Control>("@VBoxContainer@14/@HSplitContainer@17/@HSplitContainer@25/@VSplitContainer@27").Connect(Control.SignalName.Resized, Callable.From(ResizeAction));
+
+			// register cleanup code to prevent unloading issues
+			System.Runtime.Loader.AssemblyLoadContext.GetLoadContext(System.Reflection.Assembly.GetExecutingAssembly()).Unloading += alc =>
+			{
+				GD.Print("Cleaning Context"); 
+				if( null != EditorInterface.Singleton.GetBaseControl() && EditorInterface.Singleton.GetBaseControl().IsConnected(Control.SignalName.Resized, Callable.From(ResizeAction)))
+				{
+					EditorInterface.Singleton.GetBaseControl().Disconnect(Control.SignalName.Resized, Callable.From(ResizeAction));
+				}
+				if( null != EditorInterface.Singleton.GetBaseControl() && EditorInterface.Singleton.GetBaseControl().GetNode<Control>("@VBoxContainer@14/@HSplitContainer@17/@HSplitContainer@25/@VSplitContainer@27").IsConnected(Control.SignalName.Resized, Callable.From(ResizeAction)))
+				{
+					EditorInterface.Singleton.GetBaseControl().GetNode<Control>("@VBoxContainer@14/@HSplitContainer@17/@HSplitContainer@25/@VSplitContainer@27").Disconnect(Control.SignalName.Resized, Callable.From(ResizeAction));
+				}
+
+				handle.Free();
+			};
 		}
 		
 		public override void _Input(InputEvent @Event) 
@@ -306,16 +327,6 @@ namespace AssetSnap.Front.Nodes
 
 		public override void _ExitTree()
 		{
-			if( EditorInterface.Singleton.GetBaseControl().IsConnected(Control.SignalName.Resized, ResizeAction) ) 
-			{
-				EditorInterface.Singleton.GetBaseControl().Disconnect(Control.SignalName.Resized, ResizeAction);
-			}
-			
-			if( EditorInterface.Singleton.GetBaseControl().GetNode<Control>("@VBoxContainer@14/@HSplitContainer@17/@HSplitContainer@25/@VSplitContainer@27").IsConnected(Control.SignalName.Resized, ResizeAction) ) 
-			{
-				EditorInterface.Singleton.GetBaseControl().GetNode<Control>("@VBoxContainer@14/@HSplitContainer@17/@HSplitContainer@25/@VSplitContainer@27").Disconnect(Control.SignalName.Resized, ResizeAction);
-			}
-	
 			base._ExitTree();
 		}
 	}

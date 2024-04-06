@@ -29,11 +29,11 @@ namespace AssetSnap.Library
 	[Tool]
 	public partial class Instance : Node
 	{
-		private GlobalExplorer _GlobalExplorer;
+		public int Index;
 		private string _Folder;
 		private string _FileName; 
+		private GlobalExplorer _GlobalExplorer;
 		private Godot.Collections.Array<AsLibraryPanelContainer> Panels = new();
-		
 		private TabContainer _Container;
 		private PanelContainer _PanelContainer;
 		private HBoxContainer _BoxContainerRight; 
@@ -43,10 +43,9 @@ namespace AssetSnap.Library
 			"LibraryBody",
 		};
 		
-		private readonly List<string> TitleComponents = new()
+		private readonly List<string> TopbarComponents = new()
 		{
-			"LibraryBody",
-			"LibrarySearch",
+			"LibraryTopbar",
 		};
 		
 		private readonly List<string> SettingsComponents = new()
@@ -96,8 +95,7 @@ namespace AssetSnap.Library
 
 		/** Components **/
 		public LibraryBody _LibraryBody;
-		public LibraryListTitle _LibraryListTitle;
-		public LibrarySearch _LibrarySearch;
+		public LibraryTopbar _LibraryTopbar;
 		public LibrarySettings _LibrarySettings;
 		public LibraryListing _LibraryListing;
 		
@@ -115,7 +113,6 @@ namespace AssetSnap.Library
 		public void Initialize()
 		{
 			_GlobalExplorer = GlobalExplorer.GetInstance();
-			_GlobalExplorer._Plugin.AddChild(this);
 			
 			_PanelContainer = new()
 			{
@@ -125,18 +122,21 @@ namespace AssetSnap.Library
 			_SetupLibraryBody();
 			if( HasLibraryBody() ) 
 			{
-				_SetupLibraryTitle(); 
-				_SetupLibrarySettings();
-				_SetupLibraryListing();
-				_Container.AddChild(_PanelContainer);
-				_PanelContainer.SetMeta("FolderPath", _Folder);
+				_SetupLibraryTopbar();
+				_SetupLibrarySettings(); 
+				_SetupLibraryListing(); 
 			}
 			else 
 			{
-				GD.PushWarning("Library body failed to build");	
+				GD.PushWarning("Library body failed to build"); 
 			}
+
+			_Container.AddChild(_PanelContainer);
+			_PanelContainer.SetMeta("FolderPath", _Folder); 
+
+			_GlobalExplorer._Plugin.Connect(Plugin.SignalName.LibraryChanged, Callable.From( ( string name ) => { _OnLibraryChanged( name ); }));
 		}
- 
+
 		/*
 		** Fetches the current panels
 		**
@@ -184,7 +184,6 @@ namespace AssetSnap.Library
 				{
 					_panel.SetState(false);			
 				}
-				
 			}
 		}
 		
@@ -246,32 +245,20 @@ namespace AssetSnap.Library
 		**
 		** @return void
 		*/
-		private void _SetupLibraryTitle()
+		private void _SetupLibraryTopbar()
 		{
 			Component.Base Components = _GlobalExplorer.Components;
 			
-			if ( Components.HasAll( TitleComponents.ToArray() )) 
+			if ( Components.HasAll( TopbarComponents.ToArray() )) 
 			{
-				_BoxContainerRight = new();
+				_LibraryTopbar = Components.Single<LibraryTopbar>(true);
 				
-				_LibraryListTitle = Components.Single<LibraryListTitle>(true);
-				_LibrarySearch = Components.Single<LibrarySearch>(true);
-				
-				if( HasLibraryTitle() ) 
+				if( HasLibraryTopbar() ) 
 				{
-					_LibraryListTitle.Container = _BoxContainerRight;
-					_LibraryListTitle.Library = this;
-					_LibraryListTitle.Initialize();
+					_LibraryTopbar.Container = _LibraryBody.GetRightInnerContainer();
+					_LibraryTopbar.Library = this;
+					_LibraryTopbar.Initialize();
 				}
-				
-				if( HasLibrarySearch() ) 
-				{
-					_LibrarySearch.Container = _BoxContainerRight;
-					_LibrarySearch.Library = this;
-					_LibrarySearch.Initialize();
-				}
-
-				_LibraryBody.GetRightInnerContainer().AddChild(_BoxContainerRight);
 			}
 		}
 		
@@ -315,6 +302,11 @@ namespace AssetSnap.Library
 					_LibraryListing.Library = this;
 					
 					_LibraryListing.Initialize();
+					
+					if( null != _LibraryTopbar ) 
+					{
+						_LibraryTopbar.ItemCount = GetPanels().Count;
+					}
 				}
 			}
 		}
@@ -330,9 +322,9 @@ namespace AssetSnap.Library
 		**
 		** @return bool
 		*/
-		private bool HasLibraryTitle()
+		private bool HasLibraryTopbar()
 		{
-			return null != _LibraryListTitle;
+			return null != _LibraryTopbar;
 		}
 				
 		/*
@@ -342,7 +334,7 @@ namespace AssetSnap.Library
 		*/
 		private bool HasLibrarySearch()
 		{
-			return null != _LibrarySearch;
+			return null != _LibraryTopbar._LibrarySearch;
 		}
 						
 		/*
@@ -395,45 +387,37 @@ namespace AssetSnap.Library
 
 			return OnlyFileName; 
 		} 
-		 
-		/*
-		** Cleans fields and other references
-		**
-		** @return void
-		*/ 
+		
+		private void _OnLibraryChanged( string name )
+		{
+			// GD.Print(GetName());
+			if( name == GetName() && null != _LibrarySettings ) 
+			{
+				// This is the library that was changed to.
+				// Update the values in the global states based on this library.
+				_LibrarySettings.Sync();
+			}
+		}
+		
+		public void Reset()
+		{
+			ClearAllPanelState();
+			_LibrarySettings.ClearAll();
+		}
+
 		public override void _ExitTree()
 		{
-			if( Panels != null)  
+			if( null != _PanelContainer && IsInstanceValid(_PanelContainer) ) 
 			{
-				for( int i = 0; i < Panels.Count; i++) 
-				{
-					GodotObject _object = Panels[i];
-					if( _object is AsLibraryPanelContainer item ) 
-					{
-						if( IsInstanceValid(item) ) 
-						{
-							// if( null != item.GetParent() ) 
-							// {
-							// 	item.GetParent().RemoveChild(item);
-							// }
-							
-							item.QueueFree();
-						} 
-					}
-				}
-	
-				Panels = null;
+				_PanelContainer.QueueFree();
 			}
-			
-			if( IsInstanceValid(_BoxContainerRight) ) 
+
+			if( null != _BoxContainerRight && IsInstanceValid(_BoxContainerRight) ) 
 			{
 				_BoxContainerRight.QueueFree();
 			}
-			
-			if( IsInstanceValid(_PanelContainer) ) 
-			{
-				_PanelContainer.QueueFree();
-			} 
+
+			base._ExitTree();
 		}
 	}
 }

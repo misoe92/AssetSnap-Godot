@@ -22,46 +22,19 @@
 
 namespace AssetSnap.Front.Components
 {
-	using System;
 	using AssetSnap.Component;
 	using Godot;
 
-	public partial class LSSnapToX : LibraryComponent
+	[Tool]
+	public partial class LSSnapToX : LSSnapComponent
 	{
 		private readonly string _Title = "Snap X";
 		private readonly string _CheckboxTitle = "Snap To X";
+		private readonly string _CheckboxTooltip = "Creates a plane in the 3D world that you object will snap to on the X Axis";
 		private readonly string _GlueTitle = "Use glue";
 		private readonly string _GlueTooltip = "Will glue the model to the X axis set here, which will only make it able to move on 2 vectors. (Y,Z)";
-		private float CurrentOpacity;
-		private bool Exited = false;
+		private readonly string _SpinBoxTooltip = "Sets the value on the X axis that the object will snap to";
 
-		private MarginContainer _MarginContainer;
-		private VBoxContainer _InnerContainer;
-		private	Label _Label;
-		private CheckBox _Checkbox;
-		private SpinBox _ValueSpinBox;
-		private MarginContainer _ValueMarginContainer;
-		private VBoxContainer _ValueContainer;
-		private CheckBox _GlueCheckbox;
-			
-		/** Boundary Box **/
-		private StaticBody3D _BoundaryBody;
-		private MeshInstance3D _BoundaryMeshInstance;
-		private BoxMesh _BoundaryBoxMesh;
-		private CollisionShape3D _BoundaryCollision;
-		private BoxShape3D _BoundaryCollisionBox;
-		private Shader _BoundaryGrid;
-		private ShaderMaterial _BoundaryMaterial;
-		
-		/** Callables **/
-		private Callable? _CheckboxCallable;
-		private Callable? _GlueCheckboxCallable;
-		private Callable? _SpinBoxCallable;
-		
-		public bool state = false;
-		public float SnapXValue = 0.0f;
-		public bool UsingGlue = false;
-		
 		/*
 		** Constructor of the component
 		** 
@@ -70,7 +43,9 @@ namespace AssetSnap.Front.Components
 		public LSSnapToX()
 		{
 			Name = "LSSnapToX";
-			// _include = false;
+			Angle = GlobalStates.SnapAngleEnums.X;
+			
+			//_include = false;
 		}
 		
 		/*
@@ -80,97 +55,35 @@ namespace AssetSnap.Front.Components
 		*/
 		public override void Initialize()
 		{
+			base.Initialize();
+			AddTrait(typeof(Checkable));
+			AddTrait(typeof(Spinboxable));
+
+			Initiated = true;
+			
 			if( Container is VBoxContainer BoxContainer ) 
 			{
 				_InitializeCheckBox(BoxContainer);
 				_InitializeGlue(BoxContainer);
 				_InitializeSpinBox(BoxContainer);
+					Plugin.GetInstance().StatesChanged += () => { MaybeUpdateValue(); };
 			}
-		
-			_InitializeSnapBoundary();
 		}
-		
-		/*
-		** Updates states of various of internal fields
-		** based on certain scenario
-		** 
-		** @return void
-		*/ 
-		public override void _Process(double delta)
+
+		public override void MaybeUpdateValue()
 		{
-			if( false == IsInstanceValid(_Checkbox) ) 
+			if(
+				false == IsValid()
+			) 
 			{
 				return;
-			}
-			
-			if( null == _GlobalExplorer || null == _GlobalExplorer._Plugin || null == _GlobalExplorer.Settings) 
-			{
-				return;
-			}
-			
-			if( _Checkbox != null && state && _Checkbox.ButtonPressed == false ) 
-			{
-				_Checkbox.ButtonPressed = true;
-			}
-			else if( _Checkbox != null && false == state && _Checkbox.ButtonPressed == true ) 
-			{
-				_Checkbox.ButtonPressed = false;
-			}
-			
-			if( _GlueCheckbox != null && UsingGlue && _GlueCheckbox.ButtonPressed == false ) 
-			{
-				_GlueCheckbox.ButtonPressed = true;
-			}
-			else if( _GlueCheckbox != null && false == UsingGlue && _GlueCheckbox.ButtonPressed == true ) 
-			{
-				_GlueCheckbox.ButtonPressed = false;
-			}
-			
-			if( _ValueMarginContainer != null ) 
-			{
-				if( state && false == _ValueMarginContainer.Visible ) 
-				{
-					_ValueMarginContainer.Visible = true;
-				}
-				else if( false == state && true == _ValueMarginContainer.Visible ) 
-				{
-					_ValueMarginContainer.Visible = false;
-				}
-			}
-			if( _GlueCheckbox != null ) 
-			{
-				if( state && false == _GlueCheckbox.Visible ) 
-				{
-					_GlueCheckbox.Visible = true;
-				}
-				else if( false == state && true == _GlueCheckbox.Visible ) 
-				{
-					_GlueCheckbox.Visible = false;
-				}
-			}
-		
-			float BoundaryOpacity = _GlobalExplorer.Settings.GetKey("boundary_box_opacity").As<float>();
-			if( BoundaryOpacity != CurrentOpacity ) 
-			{
-				UpdateOpacity(BoundaryOpacity);				
-			}
-			if( null == _BoundaryBody ) 
-			{
-				return;
-			}
-			
-			if( true == state && null == _BoundaryBody.GetParent() ) 
-			{
-				_GlobalExplorer._Plugin.AddChild(_BoundaryBody);
-			}
-			else if( false == state && null != _BoundaryBody.GetParent() ) 
-			{
-				_GlobalExplorer._Plugin.RemoveChild(_BoundaryBody);
 			}
 
-			Transform3D Trans = _BoundaryBody.Transform;
-			Trans.Origin.X = SnapXValue;
-			_BoundaryBody.Transform = Trans;
+			Trait<Spinboxable>()
+				.Select(0)
+				.SetValue(_GlobalExplorer.States.SnapToXValue);
+
+			base.MaybeUpdateValue();
 		}
 		
 		/*
@@ -181,35 +94,21 @@ namespace AssetSnap.Front.Components
 		*/
 		private void _InitializeCheckBox( VBoxContainer BoxContainer ) 
 		{
-			_MarginContainer = new();
-			_InnerContainer = new();
-			_CheckboxCallable = new(this, "_OnCheckboxPressed");
+			Callable _callable = Callable.From(() => { _OnCheckboxPressed(); });
 			
-			_Checkbox = new()
-			{
-				Text = _CheckboxTitle
-			};
-			
-			_Label = new()
-			{
-				ThemeTypeVariation = "HeaderSmall",
-				Text = _Title
-			};
-			
-			_MarginContainer.AddThemeConstantOverride("margin_left", 10); 
-			_MarginContainer.AddThemeConstantOverride("margin_right", 10);
-			_MarginContainer.AddThemeConstantOverride("margin_top", 2);
-			_MarginContainer.AddThemeConstantOverride("margin_bottom", 2);
-			
-			if( _CheckboxCallable is Callable _callable ) 
-			{
-				_Checkbox.Connect(CheckBox.SignalName.Pressed,_callable);
-			}
-			
-			_InnerContainer.AddChild(_Label);
-			_InnerContainer.AddChild(_Checkbox);
-			_MarginContainer.AddChild(_InnerContainer);
-			BoxContainer.AddChild(_MarginContainer);
+			Trait<Checkable>()
+				.SetName("SnapXGlueCheckbox")
+				.SetAction( _callable )
+				.SetDimensions(140, 20)
+				.SetMargin(10, "left")
+				.SetMargin(10, "right")
+				.SetMargin(2, "top")
+				.SetMargin(10, "bottom")
+				.SetText(_CheckboxTitle)
+				.SetTooltipText(_CheckboxTooltip)
+				.Instantiate()
+				.Select(0)
+				.AddToContainer( BoxContainer );
 		}
 		
 		
@@ -221,20 +120,21 @@ namespace AssetSnap.Front.Components
 		*/
 		private void _InitializeGlue( VBoxContainer BoxContainer ) 
 		{
-			_GlueCheckboxCallable = new(this, "_OnGlueCheckboxPressed");
+			Callable _callable = Callable.From(() => { _OnGlueCheckboxPressed(); });
 			
-			_GlueCheckbox = new()
-			{
-				Text = _GlueTitle,
-				TooltipText = _GlueTooltip,
-			};
-			
-			if( _GlueCheckboxCallable is Callable _callable) 
-			{
-				_GlueCheckbox.Connect(CheckBox.SignalName.Pressed,_callable);
-			}
-			
-			_InnerContainer.AddChild(_GlueCheckbox);
+			Trait<Checkable>()
+				.SetName("SnapXGlueCheckbox")
+				.SetAction( _callable )
+				.SetDimensions(140, 20)
+				.SetMargin(10, "left")
+				.SetMargin(10, "right")
+				.SetMargin(0, "top")
+				.SetMargin(2, "bottom")
+				.SetText(_GlueTitle)
+				.SetTooltipText(_GlueTooltip)
+				.Instantiate()
+				.Select(1)
+				.AddToContainer( BoxContainer );
 		}
 		
 		/*
@@ -245,171 +145,48 @@ namespace AssetSnap.Front.Components
 		*/
 		private void _InitializeSpinBox( VBoxContainer BoxContainer ) 
 		{
-			_ValueMarginContainer = new();
-			_ValueContainer = new();
+			Callable _callable = Callable.From((double value) => { _OnSpinBoxValueChange((float)value); });
 			
-			_SpinBoxCallable = new(this, "_OnSpinBoxValueChange");
-			
-			_ValueSpinBox = new() 
-			{
-				CustomMinimumSize = new Vector2(140, 20),
-				MinValue = -200,
-				Step = 0.01f
-			};
-			
-			_ValueMarginContainer.AddThemeConstantOverride("margin_left", 10); 
-			_ValueMarginContainer.AddThemeConstantOverride("margin_right", 10);
-			_ValueMarginContainer.AddThemeConstantOverride("margin_top", 2);
-			_ValueMarginContainer.AddThemeConstantOverride("margin_bottom", 2);
-			
-			if( _SpinBoxCallable is Callable _callable ) 
-			{
-				_ValueSpinBox.Connect(SpinBox.SignalName.ValueChanged,_callable);
-			}
-			
-			_ValueContainer.AddChild(_ValueSpinBox);
-			_ValueMarginContainer.AddChild(_ValueContainer);
-			BoxContainer.AddChild(_ValueMarginContainer);
-		}
-				
-		/*
-		** Initializing the snap boundary
-		** 
-		** @return void
-		*/
-		public void _InitializeSnapBoundary()
-		{
-			try 
-			{
-				if( null == _GlobalExplorer ) 
-				{
-					throw new Exception("Explorer not set");
-				}
-				
-				if( null == _GlobalExplorer.Settings ) 
-				{
-					throw new Exception("Settings not set");
-				}
-				
-				_BoundaryBody = new();
-				_BoundaryMeshInstance = new();
-				_BoundaryBoxMesh = new();
-				_BoundaryCollision = new();
-				_BoundaryCollisionBox = new();
-				
-				_BoundaryGrid = GD.Load<Shader>("res://addons/assetsnap/shaders/snap-grid.gdshader");
-				_BoundaryMaterial = new();
-
-				bool ShowSnapBoundary = _GlobalExplorer.Settings.GetKey("show_snap_boundary_box").As<bool>();
-				AddCollisionBox(_BoundaryBody);
-				if( true == ShowSnapBoundary ) 
-				{
-					AddBoundaryBox(_BoundaryBody);
-				}
-			}
-			catch(Exception e ) 
-			{
-				GD.PushError(e.Message);	
-			}
-		}
-				
-		/*
-		** Set the X axis on the given Vector3 value
-		** to that of our component value
-		** 
-		** @return Vector3
-		*/
-		public Vector3 ApplyGlue( Vector3 Origin )
-		{
-			Origin.X = SnapXValue;
-			return Origin;
+			Trait<Spinboxable>()
+				.SetName("SnapXValue")
+				.SetAction( _callable )
+				.SetDimensions(140, 20)
+				.SetMargin(10, "left")
+				.SetMargin(10, "right")
+				.SetMargin(0, "top")
+				.SetMargin(10, "bottom")
+				.SetStep(0.01f)
+				.SetMinValue(-200)
+				.SetPrefix("X Axis: ")
+				.SetTooltipText(_SpinBoxTooltip)
+				.Instantiate()
+				.Select(0)
+				.AddToContainer( BoxContainer );
 		}
 		
-		/*
-		** Checks if glue is being used
-		** 
-		** @return bool
-		*/
-		public bool IsUsingGlue()
-		{
-			return UsingGlue;
-		}
-	
-		/*
-		** Sets up the collision box
-		** 
-		** @return void
-		*/
-		private void AddCollisionBox( StaticBody3D to )
-		{
-			_BoundaryCollisionBox.Size = new Vector3(0.3f, 1000.0f, 1000.0f);
-			_BoundaryCollision.Shape = _BoundaryCollisionBox;
-			
-			to.AddChild(_BoundaryCollision); 
-		}
-		
-		/*
-		** Sets up the boundary box
-		** 
-		** @return void
-		*/
-		private void AddBoundaryBox( StaticBody3D to )
-		{
-			_BoundaryBoxMesh.Size = new Vector3(0.3f, 1000.0f, 1000.0f);
-
-			_BoundaryMaterial.Shader = _BoundaryGrid;
-			_BoundaryMaterial.SetShaderParameter("scale_0", 1024);
-			_BoundaryMaterial.SetShaderParameter("scale_1", 1024);
-			_BoundaryMaterial.SetShaderParameter("line_scale_0", 0.02f);
-			_BoundaryMaterial.SetShaderParameter("line_scale_1", 0.01f);
-			
-			float ShowSnapBoundary = _GlobalExplorer.Settings.GetKey("boundary_box_opacity").As<float>();
-			_BoundaryMaterial.SetShaderParameter("opacity", ShowSnapBoundary);
-			
-			_BoundaryMaterial.SetShaderParameter("color_0", new Color(Colors.Black.R, Colors.Black.G, Colors.Black.B, 0.1f));
-			_BoundaryMaterial.SetShaderParameter("color_1", new Color(Colors.White)); 
-			
-			_BoundaryBoxMesh.Material = _BoundaryMaterial;
-			_BoundaryMeshInstance.Mesh = _BoundaryBoxMesh;
-
-			to.AddChild(_BoundaryMeshInstance);
-		}
-			  
-		/*
-		** Updates the opacity of the boundary
-		** 
-		** @return void
-		*/
-		private void UpdateOpacity( float value )
-		{
-			if( _BoundaryMaterial != null) 
-			{
-				_BoundaryMaterial.SetShaderParameter("opacity", value);
-				CurrentOpacity = value;
-			}
-		}
-					  
 		/*
 		** Updates spawn settings and the internal
-		** value for snapping to the X Axis
+		** value for snapping to the Y Axis
 		** 
 		** @return void
 		*/
 		private void _OnCheckboxPressed()
 		{
-			state = !state;
-
-			if( state ) 
+			bool state = false;
+			if( false == IsSnapTo() ) 
 			{
-				UsingGlue = true;				
+				_GlobalExplorer.States.SnapToX = GlobalStates.LibraryStateEnum.Enabled;
+				_GlobalExplorer.States.SnapToXGlue = GlobalStates.LibraryStateEnum.Enabled;
+				state = true;
 			}
 			else 
 			{
-				UsingGlue = false;				
+				_GlobalExplorer.States.SnapToX = GlobalStates.LibraryStateEnum.Disabled;
+				_GlobalExplorer.States.SnapToXGlue = GlobalStates.LibraryStateEnum.Disabled;
 			}
-			
-			string key = "_LSSnapToX.state";
-			UpdateSpawnSettings(key, state);
+
+			UpdateSpawnSettings("SnapToX", state);
+			UpdateSpawnSettings("SnapToXGlue", state);
 		}
 		
 		/*
@@ -420,20 +197,19 @@ namespace AssetSnap.Front.Components
 		*/
 		private void _OnGlueCheckboxPressed()
 		{
-			UsingGlue = !UsingGlue;
-									
-			string key = "_LSSnapToX.UsingGlue";
-			UpdateSpawnSettings(key, UsingGlue);
-		}
+			bool state = false;
+			
+			if( false == IsSnapToGlue() ) 
+			{
+				_GlobalExplorer.States.SnapToXGlue = GlobalStates.LibraryStateEnum.Enabled;
+				state = true;
+			}
+			else 
+			{
+				_GlobalExplorer.States.SnapToXGlue = GlobalStates.LibraryStateEnum.Disabled;
+			}
 		
-		/*
-		** Checks if the component is active
-		** 
-		** @return bool
-		*/
-		public bool IsActive()
-		{
-			return state == true;
+			UpdateSpawnSettings("SnapToXGlue", state);
 		}
 		
 		/*
@@ -444,116 +220,28 @@ namespace AssetSnap.Front.Components
 		*/
 		private void _OnSpinBoxValueChange(float value)
 		{
-			SnapXValue = value;
+			_value = value;
+			_GlobalExplorer.States.SnapToXValue = value;
 						
-			string key = "_LSSnapToX.SnapXValue";
-			UpdateSpawnSettings(key, SnapXValue);
+			UpdateSpawnSettings("SnapXValue", value);
 		}
 		
 		/*
-		** Resets the component
-		** 
+		** Syncronizes it's value to a global
+		** central state controller
+		**
 		** @return void
 		*/
-		public void Reset()
+		public override void Sync() 
 		{
-			state = false;
-			UsingGlue = false;
-			SnapXValue = 0.0f;
-		}
-			
-		/*
-		** Cleans up in references, fields and parameters.
-		** 
-		** @return void
-		*/
-		public override void _ExitTree()
-		{
-			Exited = true;
-			
-			if( IsInstanceValid(_GlueCheckbox) && _GlueCheckbox != null && _GlueCheckboxCallable is Callable _callable ) 
+			if( IsValid() )
 			{
-				if( _GlueCheckbox.IsConnected(CheckBox.SignalName.Pressed, _callable)) 
-				{
-					_GlueCheckbox.Disconnect(CheckBox.SignalName.Pressed, _callable);
-				}
-			}
+				return;
+			} 
 			
-			if( IsInstanceValid(_ValueSpinBox) && _ValueSpinBox != null && _SpinBoxCallable is Callable _SpinCallable ) 
-			{
-				if( _ValueSpinBox.IsConnected(SpinBox.SignalName.ValueChanged, _SpinCallable)) 
-				{
-					_ValueSpinBox.Disconnect(SpinBox.SignalName.ValueChanged, _SpinCallable);
-				}
-			}
-			
-			if( IsInstanceValid(_Checkbox) && _Checkbox != null && _CheckboxCallable is Callable _BoxCallable ) 
-			{
-				if( _Checkbox.IsConnected(CheckBox.SignalName.Pressed, _BoxCallable)) 
-				{
-					_Checkbox.Disconnect(CheckBox.SignalName.Pressed, _BoxCallable);
-				}
-			}
-			
-			if( IsInstanceValid(_ValueSpinBox) ) 
-			{
-				_ValueSpinBox.QueueFree();
-				_ValueSpinBox = null;
-			}
-			
-			if( IsInstanceValid(_ValueContainer) ) 
-			{
-				_ValueContainer.QueueFree();
-				_ValueContainer = null;
-			}
-			
-			if( IsInstanceValid(_ValueMarginContainer) ) 
-			{
-				_ValueMarginContainer.QueueFree();
-				_ValueMarginContainer = null;
-			}
-			
-			if( IsInstanceValid(_GlueCheckbox) ) 
-			{
-				_GlueCheckbox.QueueFree();
-				_GlueCheckbox = null;
-			}
-			
-			if( IsInstanceValid(_Checkbox) ) 
-			{
-				_Checkbox.QueueFree();
-				_Checkbox = null;
-			}
-			
-			if( IsInstanceValid(_Label) ) 
-			{
-				_Label.QueueFree();
-				_Label = null;
-			}
-			
-			if( IsInstanceValid(_MarginContainer) ) 
-			{
-				_MarginContainer.QueueFree();
-				_MarginContainer = null;
-			}
-					
-			if( IsInstanceValid(_BoundaryCollision) ) 
-			{
-				_BoundaryCollision.QueueFree();
-				_BoundaryCollision = null;
-			}
-			
-			if( IsInstanceValid(_BoundaryMeshInstance) ) 
-			{
-				_BoundaryMeshInstance.QueueFree();
-				_BoundaryMeshInstance = null;
-			}
-			
-			if( IsInstanceValid(_BoundaryBody) ) 
-			{
-				_BoundaryBody.QueueFree();
-				_BoundaryBody = null;
-			}
+			_GlobalExplorer.States.SnapToX = Trait<Checkable>().Select(0).GetValue() ? GlobalStates.LibraryStateEnum.Enabled : GlobalStates.LibraryStateEnum.Disabled;
+			_GlobalExplorer.States.SnapToXGlue = Trait<Checkable>().Select(1).GetValue() ? GlobalStates.LibraryStateEnum.Enabled : GlobalStates.LibraryStateEnum.Disabled;
+			_GlobalExplorer.States.SnapToXValue = (float)Trait<Spinboxable>().GetValue();
 		}
 	}
 }

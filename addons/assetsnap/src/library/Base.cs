@@ -66,7 +66,7 @@ namespace AssetSnap.Library
 				for( int i = 0; i < _GlobalExplorer.Settings.FolderCount; i++)  
 				{
 					string Folder = Folders[i];
-					_GlobalExplorer.Library.New(_GlobalExplorer.BottomDock, Folder); 
+					_GlobalExplorer.Library.New(_GlobalExplorer.BottomDock, Folder, i); 
 				}
 			} 
 		}
@@ -78,7 +78,7 @@ namespace AssetSnap.Library
 		** @param string _Folder
 		** @return void
 		*/
-		public void New( BottomDock.Base Dock,  string _Folder )
+		public void New( BottomDock.Base Dock,  string _Folder, int index )
 		{
 			if( false == Is_GlobalExplorerValid() ) 
 			{
@@ -88,9 +88,12 @@ namespace AssetSnap.Library
 			Instance _Base = new()
 			{
 				Container = Dock.Container,
-				Folder = _Folder
+				Folder = _Folder,
+				Index = index,
 			};
 
+			AddChild(_Base);
+ 
 			_Base.Initialize(); 
 			
 			List<Instance> _LibrariesList = new(_Libraries)
@@ -135,7 +138,7 @@ namespace AssetSnap.Library
 					 
 					if( false == exist ) 
 					{
-						New(Dock, Folder);
+						New(Dock, Folder, i);
 					}
 				}
 			} 
@@ -145,8 +148,8 @@ namespace AssetSnap.Library
 				LibrariesListing _LibrariesListing = GetLibraryListing();
 				_LibrariesListing.ForceUpdate();
 			}
-
-			CallDeferred("RebindSettingsContainer");
+			
+			RebindSettingsContainer();
 		}
 		
 		/*
@@ -170,7 +173,11 @@ namespace AssetSnap.Library
 				if( Library.Folder == FolderPath ) 
 				{
 					list.Remove(Library);
-					// Library.GetParent().RemoveChild(Library);
+					
+					if( null != Library.GetParent() && IsInstanceValid(Library.GetParent()) ) 
+					{
+						Library.GetParent().RemoveChild(Library);
+					}
 					Library.QueueFree();
 				}
 			}
@@ -228,8 +235,21 @@ namespace AssetSnap.Library
 
 		public override void _ExitTree()
 		{
-			_GlobalExplorer = null;
+			for( int i = 0; i < _Libraries.Length; i++ ) 
+			{
+				if( null != _Libraries[i] && IsInstanceValid( _Libraries[i] ) )
+				{
+					if( null != _Libraries[i].GetParent() && IsInstanceValid(_Libraries[i].GetParent())) 
+					{
+						_Libraries[i].GetParent().RemoveChild(_Libraries[i]);
+					}
+					
+					_Libraries[i].QueueFree();
+				} 
+			}
+			
 			_Libraries = Array.Empty<Instance>();
+			_GlobalExplorer = null;
 			_Instance = null; 
 
 			base._ExitTree();

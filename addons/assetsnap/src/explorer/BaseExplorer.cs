@@ -30,6 +30,12 @@ namespace AssetSnap
 	[Tool]
 	public partial class BaseExplorer : AbstractExplorerBase
 	{
+		public GlobalStates States {
+			get => _States;
+		}
+		
+		protected GlobalStates _States = null;
+		
 		/*
 		** Counter that keeps check on our total delta time 
 		*/

@@ -25,26 +25,21 @@ namespace AssetSnap.Front.Components
 	using AssetSnap.Component;
 	using Godot;
 
-	public partial class Introduction : BaseComponent
+	[Tool]
+	public partial class Introduction : TraitableComponent
 	{
 		private readonly string TitleText = "AssetSnap";
 		private readonly string DescriptionText = "Add folders to start, when an folder has been added a tab with the folder name will appear, Then go to the folder tab and browse your assets and place them. \n\nIf you wish to remove a library all you will have to do is click the red button on the right. In the same column as the library you wish to remove.";
-		private MarginContainer _TitleContainer;
-		private HBoxContainer _TitleInnerContainer;
-		private Label _Title;
-		private Label _Version;
-		private MarginContainer _DescriptionContainer;
-		private Label _Description;
 		
 		/*
 		** Constructor of the class
 		** 
 		** @return void
 		*/ 
-		public Introduction()
+		public Introduction() : base()
 		{
 			Name = "Introduction";
-			// _include = false; 
+			//_include = false; 
 		}
 		
 		/*
@@ -58,99 +53,27 @@ namespace AssetSnap.Front.Components
 			{
 				return;
 			}
-			 
-			_SetupMainTitle();
-			_SetupMainDescription();
-		}
-		
-		/*
-		** Sets up the introduction title
-		** 
-		** @return void
-		*/
-		private void _SetupMainTitle()
-		{
-			_TitleContainer = new();
-			_TitleInnerContainer = new();
-			_Title = new();
-			_Version = new();
 			
-			_TitleContainer.AddThemeConstantOverride("margin_left", 15);
-			_TitleContainer.AddThemeConstantOverride("margin_right", 15);
-			_TitleContainer.AddThemeConstantOverride("margin_top", 10);
-			_TitleContainer.AddThemeConstantOverride("margin_bottom", 0);
-
-			_Title.ThemeTypeVariation = "HeaderLarge"; 
-			_Title.Text = TitleText;
-
-			_Version.Text = _GlobalExplorer._Plugin.GetVersionString();
+			base.Initialize();
 			
-			_TitleInnerContainer.AddChild(_Title);
-			_TitleInnerContainer.AddChild(_Version);
-			_TitleContainer.AddChild(_TitleInnerContainer);
+			AddTrait(typeof(Titleable));
+			AddTrait(typeof(Descriptionable)); 
 			
-			Container.AddChild(_TitleContainer);
-		}
-		
-		/*
-		** Sets up the introduction description
-		** 
-		** @return void
-		*/
-		private void _SetupMainDescription()
-		{
-			_DescriptionContainer = new();
-			_Description = new();
+			Initiated = true;
 			
-			_DescriptionContainer.AddThemeConstantOverride("margin_left", 15);
-			_DescriptionContainer.AddThemeConstantOverride("margin_right", 15);
-			_DescriptionContainer.AddThemeConstantOverride("margin_top", 5);
-			_DescriptionContainer.AddThemeConstantOverride("margin_bottom", 5);
-
-			_Description.Text = DescriptionText;
-			_Description.AutowrapMode = TextServer.AutowrapMode.Word;
-			
-			_DescriptionContainer.AddChild(_Description);
-			Container.AddChild(_DescriptionContainer);
-		}
-			
-		/*
-		** Cleans up in references, fields and parameters.
-		** 
-		** @return void
-		*/
-		public override void _ExitTree()
-		{
-			
-			if( IsInstanceValid(_Title) ) 
-			{
-				_Title.QueueFree();
-				_Title = null;
-			}
-			
-			if( IsInstanceValid(_Description) ) 
-			{
-				_Description.QueueFree();
-				_Description = null;
-			}
-			
-			if( IsInstanceValid(_TitleInnerContainer) ) 
-			{
-				_TitleInnerContainer.QueueFree();
-				_TitleInnerContainer = null;
-			}
-			
-			if( IsInstanceValid(_TitleContainer) ) 
-			{
-				_TitleContainer.QueueFree();
-				_TitleContainer = null;
-			}
-
-			if( IsInstanceValid(_DescriptionContainer) ) 
-			{
-				_DescriptionContainer.QueueFree();
-				_DescriptionContainer = null;
-			} 
+			Trait<Titleable>()
+				.SetName( "IntroductionTitle" ) 
+				.SetType( Titleable.TitleType.HeaderLarge)
+				.SetTitle( TitleText )
+				.SetMinorTitle(_GlobalExplorer._Plugin.GetVersionString())
+				.Initialize()
+				.AddToContainer( Container );  
+			  
+			Trait<Descriptionable>()
+				.SetName( "IntroductionDescription" )
+				.SetTitle( DescriptionText )
+				.Initialize() 
+				.AddToContainer( Container );  
 		}
 	}
 }

@@ -19,7 +19,7 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-
+#if TOOLS
 namespace AssetSnap.Front.Components
 {
 	using System;
@@ -27,17 +27,16 @@ namespace AssetSnap.Front.Components
 	using System.Reflection;
 	using AssetSnap.Component;
 	using Godot;
-
+	
+	[Tool]
 	public partial class LibrarySettings : LibraryComponent
 	{
 		private ScrollContainer _ScrollContainer;
 		private VBoxContainer _BoxContainer;
 		private Label _SnapTitle;
-		
 		public LSSnapObject _LSSnapObject;
 		public LSEditing _LSEditing;
 		public LSSnapLayer _LSSnapLayer;
-		public LSCollisionTitle _LSCollisionTitle;
 		public LSSimpleSphereCollision _LSSimpleSphereCollision;
 		public LSConvexPolygonCollision _LSConvexPolygonCollision;
 		public LSConcaveCollision _LSConcaveCollision;
@@ -46,7 +45,8 @@ namespace AssetSnap.Front.Components
 		public LSSnapToHeight _LSSnapToHeight;
 		public LSSnapToX _LSSnapToX;
 		public LSSnapToZ _LSSnapToZ;
-
+		public LSOptimizedPlacement _LSOptimizedPlacement;
+		public LSSimplePlacement _LSSimplePlacement;
 			
 		/*
 		** Component constructor
@@ -56,7 +56,7 @@ namespace AssetSnap.Front.Components
 		public LibrarySettings()
 		{
 			Name = "LibrarySettings";
-			// _include = false;
+			//_include = false;
 		} 
 			
 		/*
@@ -66,29 +66,80 @@ namespace AssetSnap.Front.Components
 		*/
 		public override void Initialize()
 		{
+			base.Initialize();
+			AddTrait(typeof(Containerable));
+			AddTrait(typeof(Labelable));
+			AddTrait(typeof(ScrollContainerable));
+			AddTrait(typeof(Dropdownable));
+			Initiated = true;
+			
 			if( Container is VBoxContainer OuterContainer ) 
 			{
-				_ScrollContainer = new()
-				{
-					SizeFlagsVertical = Control.SizeFlags.ExpandFill,
-					SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
-				};
+				Trait<Containerable>()
+					.SetName("LibrarySettingsMain")
+					.SetVerticalSizeFlags(Control.SizeFlags.ExpandFill)
+					.SetMargin(5, "right")
+					.SetMargin(5, "left")
+					.Instantiate();
+					
+				Trait<Dropdownable>()
+					.SetName("Placing Modes")
+					.SetDefaultValue("Placing Modes")
+					.Instantiate(0);
+					
+				Trait<Dropdownable>()
+					.SetName("Object Snapping")
+					.SetDefaultValue("Object Snapping")
+					.Instantiate(1);
+					
+				Trait<Dropdownable>()
+					.SetName("Plane Snapping")
+					.SetPadding(5, "top")
+					.SetDefaultValue("Plane Snapping")
+					.Instantiate(2);
+					
+				Trait<Dropdownable>()
+					.SetName("Collisions")
+					.SetDefaultValue("Collisions")
+					.Instantiate(3);
+			
+				Trait<Labelable>()
+					.SetName("LibrarySettingsTitle")
+					.SetText("Library Controls")
+					.SetType(Labelable.TitleType.HeaderMedium)
+					.SetMargin(6, "top")
+					.SetMargin(7, "bottom")
+					.SetMargin(10, "right")
+					.SetMargin(10, "left")
+					.Instantiate();
+					
+				Trait<ScrollContainerable>()
+					.SetName("LibrarySettingsScroll")
+					.SetVerticalSizeFlags(Control.SizeFlags.ExpandFill)
+					.Instantiate();	
 				
-				_BoxContainer = new()
-				{
-					SizeFlagsVertical = Control.SizeFlags.ExpandFill,
-					SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
-				};
+				Trait<Containerable>()
+					.SetName("LibrarySettingsInner")
+					.SetMargin(5)
+					.SetVerticalSizeFlags(Control.SizeFlags.ExpandFill)
+					.Instantiate();
 
-				_SnapTitle = new()
-				{
-					ThemeTypeVariation = "HeaderMedium",
-					Text = "Object Snapping",
-				};
+				Container container = Trait<Containerable>()
+					.Select(0)
+					.GetInnerContainer();
 
-				_BoxContainer.AddChild(_SnapTitle);
-				_ScrollContainer.AddChild(_BoxContainer);
-				OuterContainer.AddChild(_ScrollContainer);
+				Container scrollContainerInner = Trait<ScrollContainerable>()
+					.Select(0)
+					.GetInnerContainer();
+
+				Container componentContainer = Trait<Containerable>()
+					.Select(1)
+					.GetInnerContainer();
+					
+				Trait<Labelable>()
+					.Select(0)
+					.AddToContainer(container); 
+					
 				
 				List<string> Components = new()
 				{
@@ -100,7 +151,8 @@ namespace AssetSnap.Front.Components
 					"LSSnapToHeight",
 					"LSSnapToX",
 					"LSSnapToZ",
-					"LSCollisionTitle",
+					"LSSimplePlacement",
+					"LSOptimizedPlacement",
 					"LSSimpleSphereCollision",
 					"LSConvexPolygonCollision",
 					"LSConcaveCollision"
@@ -108,103 +160,226 @@ namespace AssetSnap.Front.Components
 				
 				if (GlobalExplorer.GetInstance().Components.HasAll( Components.ToArray() )) 
 				{
-					_LSSnapObject = GlobalExplorer.GetInstance().Components.Single<LSSnapObject>(true);
-					_LSSnapLayer = GlobalExplorer.GetInstance().Components.Single<LSSnapLayer>(true);
 					_LSEditing = GlobalExplorer.GetInstance().Components.Single<LSEditing>(true);
+					_LSSimplePlacement = GlobalExplorer.GetInstance().Components.Single<LSSimplePlacement>(true);
+					_LSOptimizedPlacement = GlobalExplorer.GetInstance().Components.Single<LSOptimizedPlacement>(true);
+					
+					_LSSnapLayer = GlobalExplorer.GetInstance().Components.Single<LSSnapLayer>(true);
+					_LSSnapObject = GlobalExplorer.GetInstance().Components.Single<LSSnapObject>(true);
 					_LSSnapOffsetX = GlobalExplorer.GetInstance().Components.Single<LSSnapOffsetX>(true);
 					_LSSnapOffsetZ = GlobalExplorer.GetInstance().Components.Single<LSSnapOffsetZ>(true);
+				
 					_LSSnapToHeight = GlobalExplorer.GetInstance().Components.Single<LSSnapToHeight>(true);
 					_LSSnapToX = GlobalExplorer.GetInstance().Components.Single<LSSnapToX>(true);
 					_LSSnapToZ = GlobalExplorer.GetInstance().Components.Single<LSSnapToZ>(true);
-					_LSCollisionTitle = GlobalExplorer.GetInstance().Components.Single<LSCollisionTitle>(true);
+				
 					_LSSimpleSphereCollision = GlobalExplorer.GetInstance().Components.Single<LSSimpleSphereCollision>(true);
 					_LSConvexPolygonCollision = GlobalExplorer.GetInstance().Components.Single<LSConvexPolygonCollision>(true);
 					_LSConcaveCollision = GlobalExplorer.GetInstance().Components.Single<LSConcaveCollision>(true);
 					
 					if( _LSEditing != null ) 
 					{
-						_LSEditing.Container = _BoxContainer;
+						_LSEditing.Container = container;
 						_LSEditing.Library = Library;
 						_LSEditing.Initialize();
 					}
 					
+					Trait<Dropdownable>()
+						.Select(0)
+						.AddToContainer(componentContainer);
+						
+					if( _LSSimplePlacement != null ) 
+					{
+						_LSSimplePlacement.Container = Trait<Dropdownable>()
+							.Select(0)
+							.GetInnerContainer();
+							
+						_LSSimplePlacement.Library = Library;
+						_LSSimplePlacement.Initialize();
+					}
+					
+					if( _LSOptimizedPlacement != null ) 
+					{
+						_LSOptimizedPlacement.Container = Trait<Dropdownable>()
+							.Select(0)
+							.GetInnerContainer();
+							
+						_LSOptimizedPlacement.Library = Library;
+						_LSOptimizedPlacement.Initialize();
+					}
+
+					Trait<Dropdownable>()
+						.Select(1)
+						.AddToContainer(componentContainer);
+					
 					if( _LSSnapLayer != null ) 
 					{
-						_LSSnapLayer.Container = _BoxContainer;
+						_LSSnapLayer.Container = Trait<Dropdownable>()
+							.Select(1)
+							.GetInnerContainer();
+							
 						_LSSnapLayer.Library = Library;
 						_LSSnapLayer.Initialize();
 					}
 					
 					if( _LSSnapObject != null ) 
 					{
-						_LSSnapObject.Container = _BoxContainer;
+						_LSSnapObject.Container = Trait<Dropdownable>()
+							.Select(1)
+							.GetInnerContainer();
+							
 						_LSSnapObject.Library = Library;
 						_LSSnapObject.Initialize();
-					}
+					} 
 					
 					if( _LSSnapOffsetX != null ) 
 					{
-						_LSSnapOffsetX.Container = _BoxContainer;
+						_LSSnapOffsetX.Container = Trait<Dropdownable>()
+							.Select(1)
+							.GetInnerContainer();
+							
 						_LSSnapOffsetX.Library = Library;
 						_LSSnapOffsetX.Initialize();
 					}
 					
 					if( _LSSnapOffsetZ != null ) 
 					{
-						_LSSnapOffsetZ.Container = _BoxContainer;
+						_LSSnapOffsetZ.Container = Trait<Dropdownable>()
+							.Select(1)
+							.GetInnerContainer();
+							
 						_LSSnapOffsetZ.Library = Library;
 						_LSSnapOffsetZ.Initialize();
 					}
 					
+					Trait<Dropdownable>()
+						.Select(2)
+						.AddToContainer(componentContainer);
+						
 					if( _LSSnapToHeight != null ) 
 					{
-						_LSSnapToHeight.Container = _BoxContainer;
+						_LSSnapToHeight.Container = Trait<Dropdownable>()
+							.Select(2)
+							.GetInnerContainer();
+							
 						_LSSnapToHeight.Library = Library;
 						_LSSnapToHeight.Initialize();
 					}
 					
 					if( _LSSnapToX != null ) 
 					{
-						_LSSnapToX.Container = _BoxContainer;
+						_LSSnapToX.Container = Trait<Dropdownable>()
+							.Select(2)
+							.GetInnerContainer();
+							
 						_LSSnapToX.Library = Library;
 						_LSSnapToX.Initialize();
 					}
 					
 					if( _LSSnapToZ != null ) 
 					{
-						_LSSnapToZ.Container = _BoxContainer;
+						_LSSnapToZ.Container = Trait<Dropdownable>()
+							.Select(2)
+							.GetInnerContainer();
+							
 						_LSSnapToZ.Library = Library;
 						_LSSnapToZ.Initialize();
 					}
-					
-					if( _LSCollisionTitle != null )
-					{
-						_LSCollisionTitle.Container = _BoxContainer;
-						_LSCollisionTitle.Library = Library;
-						_LSCollisionTitle.Initialize();
-					}
-					
+							
+					Trait<Dropdownable>()
+						.Select(3)
+						.AddToContainer(componentContainer);
+						
 					if( _LSSimpleSphereCollision != null )
 					{
-						_LSSimpleSphereCollision.Container = _BoxContainer;
+						_LSSimpleSphereCollision.Container = Trait<Dropdownable>()
+							.Select(3)
+							.GetInnerContainer();
+
 						_LSSimpleSphereCollision.Library = Library;
 						_LSSimpleSphereCollision.Initialize();
 					}
 					
 					if( _LSConvexPolygonCollision != null ) 
 					{
-						_LSConvexPolygonCollision.Container = _BoxContainer;
+						_LSConvexPolygonCollision.Container = Trait<Dropdownable>()
+							.Select(3)
+							.GetInnerContainer();
+							
 						_LSConvexPolygonCollision.Library = Library;
 						_LSConvexPolygonCollision.Initialize();
 					}
 					
 					if( _LSConcaveCollision != null )
 					{
-						_LSConcaveCollision.Container = _BoxContainer;
+						_LSConcaveCollision.Container = Trait<Dropdownable>()
+							.Select(3)
+							.GetInnerContainer();
+							
 						_LSConcaveCollision.Library = Library;
 						_LSConcaveCollision.Initialize();
 					}
 				}
+				
+				Trait<Containerable>()
+					.Select(1)
+					.AddToContainer(scrollContainerInner);
+					
+				Trait<ScrollContainerable>()
+					.Select(0)
+					.AddToContainer(container);
+					
+				Trait<Containerable>()
+					.Select(0)
+					.AddToContainer(OuterContainer);
+			}
+		}
+		
+		public override void Sync()
+		{
+			if( null != _LSSnapObject && IsInstanceValid(_LSSnapObject)) 
+			{
+				_LSSnapObject.Sync();
+			}
+			if( null != _LSEditing && IsInstanceValid(_LSEditing)) 
+			{
+				_LSEditing.Sync();
+			}
+			if( null != _LSSnapLayer && IsInstanceValid(_LSSnapLayer)) 
+			{
+				_LSSnapLayer.Sync();
+			}
+			if( null != _LSSnapOffsetX && IsInstanceValid(_LSSnapOffsetX)) 
+			{
+				_LSSnapOffsetX.Sync();
+			}
+			if( null != _LSSnapOffsetZ && IsInstanceValid(_LSSnapOffsetZ)) 
+			{
+				_LSSnapOffsetZ.Sync();
+			}
+			if( null != _LSSnapToHeight && IsInstanceValid(_LSSnapToHeight)) 
+			{
+				_LSSnapToHeight.Sync();
+			}
+			if( null != _LSSnapToX && IsInstanceValid(_LSSnapToX))
+			{
+				_LSSnapToX.Sync();
+			}
+			if( null != _LSSnapToZ && IsInstanceValid(_LSSnapToZ)) 
+			{
+				_LSSnapToZ.Sync();
+			}
+			if( null != _LSSimpleSphereCollision && IsInstanceValid(_LSSimpleSphereCollision)) 
+			{
+				_LSSimpleSphereCollision.Sync();
+			}
+			if( null != _LSConvexPolygonCollision && IsInstanceValid(_LSConvexPolygonCollision)) 
+			{
+				_LSConvexPolygonCollision.Sync();
+			}
+			if( null != _LSConcaveCollision && IsInstanceValid(_LSConcaveCollision)) 
+			{
+				_LSConcaveCollision.Sync();
 			}
 		}
 			
@@ -223,6 +398,8 @@ namespace AssetSnap.Front.Components
 				object value = field.GetValue(this);
 				return (BaseComponent)value;
 			}
+
+			GD.PushWarning("Field not found: ", key);
 			
 			return default(BaseComponent);
 		}
@@ -234,51 +411,51 @@ namespace AssetSnap.Front.Components
 		*/
 		public void ClearAll()
 		{
-			if( IsInstanceValid(_LSSnapObject)) 
+			if( null != _LSSnapObject && IsInstanceValid(_LSSnapObject)) 
 			{
 				_LSSnapObject.Reset();
 			}
-			if( IsInstanceValid(_LSSnapLayer)) 
+			if( null != _LSSnapObject && IsInstanceValid(_LSSnapLayer)) 
 			{
 				_LSSnapLayer.Reset();
 			}
 			
-			if( IsInstanceValid(_LSSnapOffsetX)) 
+			if( null != _LSSnapObject && IsInstanceValid(_LSSnapOffsetX)) 
 			{
 				_LSSnapOffsetX.Reset();
 			}
 			
-			if( IsInstanceValid(_LSSnapOffsetZ)) 
+			if( null != _LSSnapObject && IsInstanceValid(_LSSnapOffsetZ)) 
 			{
 				_LSSnapOffsetZ.Reset();
 			}
 			
-			if( IsInstanceValid(_LSSnapToHeight)) 
+			if( null != _LSSnapObject && IsInstanceValid(_LSSnapToHeight)) 
 			{
 				_LSSnapToHeight.Reset(); 
 			}
 			
-			if( IsInstanceValid(_LSSnapToX)) 
+			if( null != _LSSnapObject && IsInstanceValid(_LSSnapToX)) 
 			{
 				_LSSnapToX.Reset();
 			}
 			
-			if( IsInstanceValid(_LSSnapToZ)) 
+			if( null != _LSSnapObject && IsInstanceValid(_LSSnapToZ)) 
 			{
 				_LSSnapToZ.Reset();
 			}
 			
-			if( IsInstanceValid(_LSSimpleSphereCollision)) 
+			if( null != _LSSnapObject && IsInstanceValid(_LSSimpleSphereCollision)) 
 			{
 				_LSSimpleSphereCollision.Reset();
 			}
 			
-			if( IsInstanceValid(_LSConvexPolygonCollision)) 
+			if( null != _LSSnapObject && IsInstanceValid(_LSConvexPolygonCollision)) 
 			{
 				_LSConvexPolygonCollision.Reset();
 			}
 			
-			if( IsInstanceValid(_LSConcaveCollision)) 
+			if( null != _LSSnapObject && IsInstanceValid(_LSConcaveCollision)) 
 			{
 				_LSConcaveCollision.Reset();
 			}
@@ -295,31 +472,64 @@ namespace AssetSnap.Front.Components
 
 			return fieldInfo != null;
 		}
-		
-		/*
-		** Cleans up in references, fields and parameters.
-		** 
-		** @return void
-		*/
+
 		public override void _ExitTree()
 		{
-			if( IsInstanceValid(_SnapTitle) ) 
-			{
-				_SnapTitle.QueueFree();
-				_SnapTitle = null;
-			}
+			// if(null != _LSSnapObject && IsInstanceValid(_LSSnapObject)) 
+			// {
+			// 	_LSSnapObject.Free();
+			// }
+			// if(null != _LSEditing && IsInstanceValid(_LSEditing)) 
+			// {
+			// 	_LSEditing.Free();
+			// }
+			// if(null != _LSSnapLayer && IsInstanceValid(_LSSnapLayer)) 
+			// {
+			// 	_LSSnapLayer.Free();
+			// }
+			// if(null != _LSSimpleSphereCollision && IsInstanceValid(_LSSimpleSphereCollision)) 
+			// {
+			// 	_LSSimpleSphereCollision.Free();
+			// }
+			// if(null != _LSConvexPolygonCollision && IsInstanceValid(_LSConvexPolygonCollision)) 
+			// {
+			// 	_LSConvexPolygonCollision.Free();
+			// }
+			// if(null != _LSConcaveCollision && IsInstanceValid(_LSConcaveCollision)) 
+			// {
+			// 	_LSConcaveCollision.Free();
+			// }
+			// if(null != _LSSnapOffsetX && IsInstanceValid(_LSSnapOffsetX)) 
+			// {
+			// 	_LSSnapOffsetX.Free();
+			// }
+			// if(null != _LSSnapOffsetZ && IsInstanceValid(_LSSnapOffsetZ)) 
+			// {
+			// 	_LSSnapOffsetZ.Free();
+			// }
+			// if(null != _LSSnapToHeight && IsInstanceValid(_LSSnapToHeight)) 
+			// {
+			// 	_LSSnapToHeight.Free();
+			// }
+			// if(null != _LSSnapToX && IsInstanceValid(_LSSnapToX)) 
+			// {
+			// 	_LSSnapToX.Free();
+			// }
+			// if(null != _LSSnapToZ && IsInstanceValid(_LSSnapToZ)) 
+			// {
+			// 	_LSSnapToZ.Free();
+			// }
+			// if(null != _LSOptimizedPlacement && IsInstanceValid(_LSOptimizedPlacement)) 
+			// {
+			// 	_LSOptimizedPlacement.Free();
+			// }
+			// if(null != _LSSimplePlacement && IsInstanceValid(_LSSimplePlacement)) 
+			// {
+			// 	_LSSimplePlacement.Free();
+			// }
 			
-			if( IsInstanceValid(_BoxContainer) ) 
-			{
-				_BoxContainer.QueueFree();
-				_BoxContainer = null;
-			}
-			
-			if( IsInstanceValid(_ScrollContainer) ) 
-			{
-				_ScrollContainer.QueueFree();
-				_ScrollContainer = null;
-			}
+			base._ExitTree();
 		}
 	}
 }
+#endif

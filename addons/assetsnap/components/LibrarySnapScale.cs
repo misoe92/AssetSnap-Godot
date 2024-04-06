@@ -26,6 +26,7 @@ namespace AssetSnap.Front.Components
 	using AssetSnap.Component;
 	using AssetSnap.Front.Nodes;
 
+	[Tool]
 	public partial class LibrarySnapScale : LibraryComponent
 	{ 
 		private float SnapHeight;
@@ -41,7 +42,7 @@ namespace AssetSnap.Front.Components
 		public LibrarySnapScale()
 		{
 			Name = "LibrarySnapScale";
-			// _include = false; 
+			//_include = false; 
 		}
 		
 		/*

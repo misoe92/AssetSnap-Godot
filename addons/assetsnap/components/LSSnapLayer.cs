@@ -25,18 +25,12 @@ namespace AssetSnap.Front.Components
 	using AssetSnap.Component;
 	using Godot;
 
+	[Tool]
 	public partial class LSSnapLayer : LibraryComponent
 	{
 		private readonly string _Title = "Snap layer";
-		public int value = 0;
-		private bool Exited = false;
-		
-		private MarginContainer _MarginContainer;
-		private	VBoxContainer _InnerContainer;
-		private	Label _Label;
-		private	SpinBox _SpinBox;
-		private Callable? _SpinBoxCallable;
-			
+		private readonly string _Tooltip = "Defines which layer the object placed will be placed on, only objects on the same layer snaps to each other.";
+
 		/*
 		** Component constructor
 		**  
@@ -45,9 +39,9 @@ namespace AssetSnap.Front.Components
 		public LSSnapLayer()
 		{
 			Name = "LSSnapLayer";
-			// _include = false;
+			//_include = false;
 		}
-		
+		 
 		/*
 		** Initializes the component
 		** 
@@ -55,42 +49,37 @@ namespace AssetSnap.Front.Components
 		*/
 		public override void Initialize()
 		{
-			if( Container is VBoxContainer BoxContainer ) 
-			{
-				_MarginContainer = new();
-				_InnerContainer = new();
+			base.Initialize();
+			AddTrait(typeof(Spinboxable));
 
-				_SpinBoxCallable = new(this, "_OnSpinBoxValueChange");
+			Callable _callable = Callable.From((double value) => { _OnSpinBoxValueChange((int)value); });
+			
+			Initiated = true;
+			
+			Trait<Spinboxable>()
+				.SetName("SnapLayerSpinBox")
+				.SetAction(_callable)
+				.SetStep(1)
+				.SetPrefix(_Title + ": ")
+				.SetMinValue(0)
+				.SetDimensions(140, 20)
+				.SetMargin(10, "left")
+				.SetMargin(10, "right")
+				.SetMargin(5, "top")
+				.SetMargin(7, "bottom")
+				.SetTooltipText(_Tooltip)
+				.Instantiate()
+				.Select(0)
+				.AddToContainer( Container );
 				
-				_SpinBox = new()
-				{
-					CustomMinimumSize = new Vector2(140, 20),
-					MinValue = 0,
-					Step = 1,
-				};
-				
-				_Label = new()
-				{
-					ThemeTypeVariation = "HeaderSmall",
-					Text = _Title
-				};
-				
-				_MarginContainer.AddThemeConstantOverride("margin_left", 10); 
-				_MarginContainer.AddThemeConstantOverride("margin_right", 10);
-				_MarginContainer.AddThemeConstantOverride("margin_top", 2);
-				_MarginContainer.AddThemeConstantOverride("margin_bottom", 2);
-				
-				if( _SpinBoxCallable is Callable _callable ) 
-				{
-					_SpinBox.Connect(SpinBox.SignalName.ValueChanged,_callable);
-				}
-				
-				_InnerContainer.AddChild(_Label); 
-				_InnerContainer.AddChild(_SpinBox); 
-				_MarginContainer.AddChild(_InnerContainer);
-				
-				BoxContainer.AddChild(_MarginContainer);
-			}
+			Plugin.GetInstance().StatesChanged += () => { MaybeUpdateValue(); };
+		}
+		
+		private void MaybeUpdateValue()
+		{
+			Trait<Spinboxable>()
+				.Select(0)
+				.SetValue(_GlobalExplorer.States.SnapLayer);
 		}
 		
 		/*
@@ -99,12 +88,10 @@ namespace AssetSnap.Front.Components
 		** 
 		** @return void
 		*/
-		private void _OnSpinBoxValueChange( int _value )
+		private void _OnSpinBoxValueChange( int value )
 		{
-			value = _value;
-												
-			string key = "_LSSnapLayer.value";
-			UpdateSpawnSettings(key, value);
+			_GlobalExplorer.States.SnapLayer = value;						
+			UpdateSpawnSettings("SnapLayer", value);
 		}
 		
 		/*
@@ -114,49 +101,41 @@ namespace AssetSnap.Front.Components
 		*/
 		public void Reset()
 		{
-			value = 0;
+			_GlobalExplorer.States.SnapLayer = 0;
+		}
+		
+		public bool IsValid()
+		{
+			return
+				null != _GlobalExplorer &&
+				null != _GlobalExplorer.States &&
+				false != Initiated &&
+				null != Trait<Spinboxable>() &&
+				false != HasTrait<Spinboxable>() &&
+				IsInstanceValid( Trait<Spinboxable>() );
 		}
 		
 		/*
-		** Cleans up in references, fields and parameters.
-		** 
+		** Syncronizes it's value to a global
+		** central state controller
+		**
 		** @return void
 		*/
+		public override void Sync() 
+		{
+			if( false == IsValid() ) 
+			{
+				return;
+			}
+			
+			_GlobalExplorer.States.SnapLayer = (int)Trait<Spinboxable>().GetValue();
+		}
+		
 		public override void _ExitTree()
 		{
-			Exited = true;
+			Initiated = false;
 			
-			if( IsInstanceValid(_SpinBox) && _SpinBox != null && _SpinBoxCallable is Callable _callable ) 
-			{
-				if(  _SpinBox.IsConnected(SpinBox.SignalName.ValueChanged, _callable)) 
-				{
-					_SpinBox.Disconnect(SpinBox.SignalName.ValueChanged, _callable);
-				}
-			}
-	
-			if( IsInstanceValid(_SpinBox) ) 
-			{
-				_SpinBox.QueueFree();
-				_SpinBox = null;
-			}
-			
-			if( IsInstanceValid(_Label) ) 
-			{
-				_Label.QueueFree();
-				_Label = null;
-			}
-			
-			if( IsInstanceValid(_InnerContainer) ) 
-			{
-				_InnerContainer.QueueFree();
-				_InnerContainer = null;
-			}
-			
-			if( IsInstanceValid(_MarginContainer) ) 
-			{
-				_MarginContainer.QueueFree();
-				_MarginContainer = null;
-			}
+			base._ExitTree();
 		}
 	}
 }

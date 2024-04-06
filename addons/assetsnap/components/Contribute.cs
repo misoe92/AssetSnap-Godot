@@ -25,7 +25,8 @@ namespace AssetSnap.Front.Components
 	using AssetSnap.Component;
 	using Godot;
 
-	public partial class Contribute : BaseComponent
+	[Tool]
+	public partial class Contribute : TraitableComponent
 	{
 		private readonly string TitleText = "Contributions";
 		private readonly string DescriptionText = "Below is a list over the people who have actively contributed to the development of the plugin.";
@@ -37,11 +38,6 @@ namespace AssetSnap.Front.Components
 		private ScrollContainer _ContributorsScrollr;
 		private MarginContainer _ContributorsContainer;
 		private VBoxContainer _ContributorsInnerContainer;
-		private MarginContainer _TitleContainer;
-		private HBoxContainer _TitleInnerContainer;
-		private Label _Title;
-		private MarginContainer _DescriptionContainer;
-		private Label _Description;
 			
 		/*
 		** Class constructor
@@ -67,59 +63,27 @@ namespace AssetSnap.Front.Components
 			{
 				return;
 			}
+			
+			base.Initialize();
+			
+			AddTrait(typeof(Titleable));
+			AddTrait(typeof(Descriptionable));
+			Initiated = true;
+			
+			Trait<Titleable>()
+				.SetName( "ContributeTitle" )
+				.SetType( Titleable.TitleType.HeaderLarge)
+				.SetTitle( TitleText )
+				.Initialize()
+				.AddToContainer( Container );
 			 
-			_SetupMainTitle();
-			_SetupMainDescription();
-
+			Trait<Descriptionable>()
+				.SetName( "ContributeDescription" )
+				.SetTitle( DescriptionText )
+				.Initialize()
+				.AddToContainer( Container );
+				
 			_SetupContributors();
-		}
-		
-		/*
-		** Sets up the contribution title
-		** 
-		** @return void
-		*/
-		private void _SetupMainTitle()
-		{
-			_TitleContainer = new();
-			_TitleInnerContainer = new();
-			_Title = new();
-			
-			_TitleContainer.AddThemeConstantOverride("margin_left", 15);
-			_TitleContainer.AddThemeConstantOverride("margin_right", 15);
-			_TitleContainer.AddThemeConstantOverride("margin_top", 10);
-			_TitleContainer.AddThemeConstantOverride("margin_bottom", 0);
-
-			_Title.ThemeTypeVariation = "HeaderLarge";
-			_Title.Text = TitleText;
-
-			
-			_TitleInnerContainer.AddChild(_Title);
-			_TitleContainer.AddChild(_TitleInnerContainer);
-			
-			Container.AddChild(_TitleContainer);
-		}
-		
-		/*
-		** Sets up the contribution description
-		** 
-		** @return void
-		*/
-		private void _SetupMainDescription()
-		{
-			_DescriptionContainer = new();
-			_Description = new();
-			
-			_DescriptionContainer.AddThemeConstantOverride("margin_left", 15);
-			_DescriptionContainer.AddThemeConstantOverride("margin_right", 15);
-			_DescriptionContainer.AddThemeConstantOverride("margin_top", 5);
-			_DescriptionContainer.AddThemeConstantOverride("margin_bottom", 5);
-
-			_Description.Text = DescriptionText;
-			_Description.AutowrapMode = TextServer.AutowrapMode.Word;
-			
-			_DescriptionContainer.AddChild(_Description);
-			Container.AddChild(_DescriptionContainer);
 		}
 		
 		/*
@@ -163,7 +127,7 @@ namespace AssetSnap.Front.Components
 		** @return void
 		*/
 		public override void _ExitTree()
-		{
+		{			
 			if( IsInstanceValid(_ContributorsInnerContainer) ) 
 			{
 				_ContributorsInnerContainer.QueueFree();
@@ -179,34 +143,8 @@ namespace AssetSnap.Front.Components
 				_ContributorsContainer.QueueFree();
 				_ContributorsContainer = null;
 			}
-			if( IsInstanceValid(_Title) ) 
-			{
-				_Title.QueueFree();
-				_Title = null;
-			}
-			if( IsInstanceValid(_Description) ) 
-			{
-				_Description.QueueFree();
-				_Description = null;
-			}
-			
-			if( IsInstanceValid(_TitleInnerContainer) ) 
-			{
-				_TitleInnerContainer.QueueFree();
-				_TitleInnerContainer = null;
-			}
-			
-			if( IsInstanceValid(_TitleContainer) ) 
-			{
-				_TitleContainer.QueueFree();
-				_TitleContainer = null;
-			}
-
-			if( IsInstanceValid(_DescriptionContainer) ) 
-			{
-				_DescriptionContainer.QueueFree();
-				_DescriptionContainer = null;
-			} 
+				
+			base._ExitTree();
 		}
 	}
 }

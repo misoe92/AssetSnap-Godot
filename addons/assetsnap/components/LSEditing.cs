@@ -44,7 +44,7 @@ namespace AssetSnap.Front.Components
 		public LSEditing()
 		{
 			Name = "LSEditing";
-			// _include = false;
+			//_include = false;
 		}
 		
 		/*
@@ -54,6 +54,9 @@ namespace AssetSnap.Front.Components
 		*/
 		public override void Initialize()
 		{
+			Initiated = true;
+			
+			
 			if( Container is VBoxContainer BoxContainer ) 
 			{
 				_MarginContainer = new();
@@ -116,6 +119,12 @@ namespace AssetSnap.Front.Components
 		public void SetText( string text ) 
 		{
 			_LabelEditing.Text = PrepareModelName(text);
+			_GlobalExplorer.States.EditingTitle = PrepareModelName(text);
+		}
+
+		public override void Sync() 
+		{
+			_GlobalExplorer.States.EditingTitle = PrepareModelName(_LabelEditing.Text);
 		}
 
 		/*

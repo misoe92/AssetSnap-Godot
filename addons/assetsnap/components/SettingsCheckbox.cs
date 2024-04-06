@@ -26,6 +26,7 @@ namespace AssetSnap.Front.Components
 	using AssetSnap.Static;
 	using Godot;
 
+	[Tool]
 	public partial class SettingsCheckbox : BaseComponent
 	{
 		private string _key;
@@ -66,7 +67,7 @@ namespace AssetSnap.Front.Components
 		public SettingsCheckbox()
 		{
 			Name = "SettingsCheckbox";
-			// _include = false;
+			//_include = false;
 		}
 		
 		/*
@@ -200,14 +201,23 @@ namespace AssetSnap.Front.Components
 				
 				if (description != null)
 				{
+					MarginContainer DescriptionMarginContainer = new()
+					{
+						SizeFlagsVertical = Control.SizeFlags.ShrinkBegin,
+						SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
+						CustomMinimumSize = new Vector2I(0, 70),
+					};
+					
 					DescriptionLabel = new()
 					{
 						Name = "SettingDescription",
 						Text = description,
-						AutowrapMode = TextServer.AutowrapMode.Word
+						AutowrapMode = TextServer.AutowrapMode.Word,
+						SizeFlagsVertical = Control.SizeFlags.ShrinkBegin,
 					};
 
-					InnerContainer.AddChild(DescriptionLabel);
+					DescriptionMarginContainer.AddChild(DescriptionLabel);
+					InnerContainer.AddChild(DescriptionMarginContainer);
 				}
 			}
 		}

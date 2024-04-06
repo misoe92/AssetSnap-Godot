@@ -20,8 +20,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using System.Collections.Generic;
-using AssetSnap.Front.Configs;
+using AssetSnap.Front.Nodes;
+using Godot;
 
 namespace AssetSnap.Core 
 {
@@ -36,20 +36,23 @@ namespace AssetSnap.Core
 		{	 
 			/** Initialize custom node types **/  
 			new ASNode.Types.AsGroupType().Initialize();
+			new ASNode.Types.AsGroupedType().Initialize();
 			new ASNode.Types.AsArrayModifierType().Initialize();
 			new ASNode.Types.AsScatterModifierType().Initialize();
 			new ASNode.Types.AsStaticBodyType().Initialize();
 			new ASNode.Types.AsListSelectType().Initialize();
 			new ASNode.Types.AsMeshInstanceType().Initialize();
 			new ASNode.Types.AsMultiMeshInstanceType().Initialize();
+			new ASNode.Types.AsOptimizedMultiMeshGroupType().Initialize();
 			new ASNode.Types.AsMultiMeshType().Initialize();
-
+			
 			// Adding base components to the tree
 			_GlobalExplorer._Plugin.AddChild(_GlobalExplorer.Settings);
 			_GlobalExplorer._Plugin.AddChild(_GlobalExplorer.Waypoints);
 			_GlobalExplorer._Plugin.AddChild(_GlobalExplorer.Components);
 			_GlobalExplorer._Plugin.AddChild(_GlobalExplorer.ContextMenu);
 			_GlobalExplorer._Plugin.AddChild(_GlobalExplorer.BottomDock);
+			_GlobalExplorer._Plugin.AddChild(_GlobalExplorer.Inspector);
  
 			_GlobalExplorer._Plugin.AddChild(_GlobalExplorer.Decal);
 			_GlobalExplorer._Plugin.AddChild(_GlobalExplorer.Raycast);
@@ -57,23 +60,36 @@ namespace AssetSnap.Core
 			_GlobalExplorer._Plugin.AddChild(_GlobalExplorer.Library); 
 			_GlobalExplorer._Plugin.AddChild(_GlobalExplorer.Modifiers);
  
+			_GlobalExplorer._Plugin.AddChild(_GlobalExplorer.GroupBuilder);
+ 
 			/** Initialize **/  
 			_GlobalExplorer.Settings.Initialize();
 			_GlobalExplorer.Waypoints.Initialize();
-			_GlobalExplorer.Components.Initialize();  
+			_GlobalExplorer.Components.Initialize();
 			_GlobalExplorer.BottomDock.Initialize();  
-			_GlobalExplorer.ContextMenu.Initialize();
+			_GlobalExplorer.ContextMenu.Initialize(); 
+			
+			_GlobalExplorer.Snap.Initialize();
 			 
-			_GlobalExplorer.Decal.Initialize();
+			_GlobalExplorer.Decal.Initialize();  
 			_GlobalExplorer.Raycast.Initialize();  
-
-			_GlobalExplorer.Library.Initialize(); 
-
+			
+			// Finalize Group builder container  
+			_GlobalExplorer.GroupBuilder.Initialize();
+			_GlobalExplorer.GroupBuilder.InitializeContainer();  
+			_GlobalExplorer.BottomDock.Add(_GlobalExplorer.GroupBuilder.Container); 
+			
+			_GlobalExplorer.Library.Initialize();
+ 
+			_GlobalExplorer.Inspector.Initialize();
+	
+			_GlobalExplorer.Inspector.AddToDock();
+			
 			// Finalize settings container 
 			_GlobalExplorer.Settings.InitializeContainer();  
 			_GlobalExplorer.BottomDock.Add(_GlobalExplorer.Settings.Container); 
-
-			_GlobalExplorer.BottomDock.AddToBottomPanel();
+			
+			_GlobalExplorer.BottomDock.AddToBottomPanel(); 
 		}
 	}
 }

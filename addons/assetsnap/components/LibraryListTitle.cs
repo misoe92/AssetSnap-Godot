@@ -25,6 +25,7 @@ namespace AssetSnap.Front.Components
 	using AssetSnap.Component;
 	using Godot;
 
+	[Tool]
 	public partial class LibraryListTitle : LibraryComponent
 	{
 		private readonly string Title = "Library List";
@@ -33,7 +34,7 @@ namespace AssetSnap.Front.Components
 		public LibraryListTitle()
 		{
 			Name = "LibraryListTitle";
-			// _include = false;
+			//_include = false;
 		}
 		
 		/*
@@ -43,32 +44,23 @@ namespace AssetSnap.Front.Components
 		*/ 
 		public override void Initialize()
 		{
-			if( Container is HBoxContainer BoxContainer ) 
-			{
-				_Label = new()
-				{
-					ThemeTypeVariation = "HeaderMedium",
-					Text = Title,
-					SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
-					SizeFlagsVertical = Control.SizeFlags.ShrinkCenter
-				};
-				
-				BoxContainer.AddChild(_Label);
-			}
-		}
+			base.Initialize();
+			AddTrait(typeof(Labelable));
+			Initiated = true;
 			
-		/*
-		** Cleans up in references, fields and parameters.
-		** 
-		** @return void
-		*/
-		public override void _ExitTree()
-		{
-			if( IsInstanceValid(_Label) ) 
-			{
-				_Label.QueueFree();
-				_Label = null;
-			}
+			Trait<Labelable>()
+				.SetName("LibraryListTitle")
+				.SetText(Title)
+				.SetType(Labelable.TitleType.HeaderMedium)
+				.SetMargin(7, "top")
+				.SetMargin(0, "bottom")	
+				.SetMargin(5, "right")
+				.SetMargin(5, "left")
+				.SetHorizontalSizeFlags(Control.SizeFlags.ExpandFill)
+				.SetVerticalSizeFlags(Control.SizeFlags.ShrinkCenter)
+				.Instantiate()
+				.Select(0)
+				.AddToContainer(Container);
 		}
 	}
 }

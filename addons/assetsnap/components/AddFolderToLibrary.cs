@@ -25,30 +25,26 @@ namespace AssetSnap.Front.Components
 	using Godot;
 	using AssetSnap.Component;
 
-	public partial class AddFolderToLibrary : BaseComponent
+	[Tool]
+	public partial class AddFolderToLibrary : TraitableComponent
 	{
 		private readonly string TitleText = "General actions";
-		private Callable? _ButtonPressed;
-		private MarginContainer _TitleContainer;
-		private HBoxContainer _InnerContainer;
-		private Label _Title;
-		private MarginContainer _ButtonContainer;
-		private Button _Button;
-		private FileDialog fileDialog;
-			
-		/*
+		// private FileDialog fileDialog;
+
+		/* 
 		** Class Constructor
 		** 
 		** @return void  
 		*/ 
 		public AddFolderToLibrary()
-		{
+		{ 
 			Name = "AddFolderToLibrary";
+			
 			/* Debugging Purpose */ 
-			// _include = false; 
+			// _include = false;  
 			/* -- */ 
 		}
-
+		
 		/* 
 		** Initializes component
 		** 
@@ -57,74 +53,34 @@ namespace AssetSnap.Front.Components
 		public override void Initialize()
 		{
 			if( Container == null ) 
-			{
+			{ 
 				return;
 			}
-			
-			_ButtonPressed = new Callable(this, "_OnButtonPressed");
-			_SetupTitle();
-			_SetupButton();
-		}
-		
-		/*
-		** Setup title container and label
-		** 
-		** @return void
-		*/
-		private void _SetupTitle()
-		{
-			_TitleContainer = new();
-			_InnerContainer = new();
-			_Title = new();
-			
-			_TitleContainer.AddThemeConstantOverride("margin_left", 15);
-			_TitleContainer.AddThemeConstantOverride("margin_right", 15);
-			_TitleContainer.AddThemeConstantOverride("margin_top", 0);
-			_TitleContainer.AddThemeConstantOverride("margin_bottom", 0);
 
-			_Title.ThemeTypeVariation = "HeaderMedium"; 
-			_Title.Text = TitleText;
-
-			_InnerContainer.AddChild(_Title);
-			_TitleContainer.AddChild(_InnerContainer);
+			base.Initialize();
 			
-			Container.AddChild(_TitleContainer);
-		}
-		
-		/*
-		** Setup add library button + it's container
-		** 
-		** @return void
-		*/
-		private void _SetupButton()
-		{
-			_ButtonContainer = new()
-			{
-				SizeFlagsVertical = Control.SizeFlags.ShrinkCenter,
-				SizeFlagsHorizontal = Control.SizeFlags.ShrinkBegin,
-			};
-
-			_Button = new()
-			{
-				Name = "AddFolderButton",
-				Text = "Add Library"
-			};
+			AddTrait(typeof(Titleable));
+			AddTrait(typeof(Buttonable));
 			
-			_ButtonContainer.AddThemeConstantOverride("margin_left", 20);
-			_ButtonContainer.AddThemeConstantOverride("margin_right", 20);
-			_ButtonContainer.AddThemeConstantOverride("margin_top", 0);
-			_ButtonContainer.AddThemeConstantOverride("margin_bottom", 24);
+			Callable _callable = Callable.From(() => { _OnButtonPressed(); }); 
 			
-			_Button.MouseDefaultCursorShape = Godot.Control.CursorShape.PointingHand;
-			
-			if( _ButtonPressed is Callable callable ) 
-			{
-				_Button.Connect("pressed", callable);
-			}
-
-			_ButtonContainer.AddChild(_Button);
-			
-			Container.AddChild(_ButtonContainer);
+			Initiated = true; 
+			 
+			Trait<Titleable>()
+				.SetName("AddFolderButtonTitle")
+				.SetType( Titleable.TitleType.HeaderMedium)
+				.SetTitle( TitleText )
+				.SetMargin(0, "bottom")
+				.Initialize() 
+				.AddToContainer( Container ); 
+				
+			Trait<Buttonable>()
+				.SetName("AddFolderButton")
+				.SetText("Add Library")
+				.SetType( Buttonable.ButtonType.ActionButton )
+				.SetAction( () => { _OnButtonPressed(); } )
+				.Instantiate()
+				.AddToContainer( Container );
 		}
 		
 		/*
@@ -134,7 +90,7 @@ namespace AssetSnap.Front.Components
 		** @param string FolderPath
 		** @return async<void>
 		*/
-		private void _OnFolderSelected( string FolderPath )
+		private void _OnFolderSelected( string FolderPath, FileDialog fileDialog )
 		{
 			_GlobalExplorer.Settings.AddFolder(FolderPath);
 			
@@ -143,11 +99,11 @@ namespace AssetSnap.Front.Components
 				_GlobalExplorer.Library.Refresh(_GlobalExplorer.BottomDock);
 			}
 
-			fileDialog.DirSelected -= _OnFolderSelected;
-			fileDialog.QueueFree();
-			fileDialog = null; 
+			// fileDialog.DirSelected -= _OnFolderSelected;
+			// fileDialog.QueueFree();
+			// fileDialog = null; 
 		}
-		
+
 		/* 
 		** Handles the button pressed event 
 		** of the button
@@ -157,60 +113,17 @@ namespace AssetSnap.Front.Components
 		private void _OnButtonPressed()
 		{
 			// Create a FileDialog instance
-			fileDialog = new FileDialog();
+			FileDialog fileDialog = new FileDialog();
 			_GlobalExplorer._Plugin.AddChild(fileDialog);
 
 			// Set the dialog mode to "OpenDir" for folder selection
 			fileDialog.FileMode = FileDialog.FileModeEnum.OpenDir;
 			// Connect the "dir_selected" signal to another Callable function
-			fileDialog.DirSelected += _OnFolderSelected;
+			fileDialog.DirSelected += (string FolderPath) => { _OnFolderSelected(FolderPath,fileDialog); };
 			fileDialog.MinSize = new Vector2I(768, 768);
 			// Show the file dialog
 			fileDialog.PopupCentered();
 		}
-			
-		/*
-		** Cleans up in references, fields and parameters.
-		** 
-		** @return void
-		*/
-		public override void _ExitTree()
-		{
-			if( IsInstanceValid(_Button) ) 
-			{
-				if( _ButtonPressed is Callable callable ) 
-				{
-					_Button.Disconnect("pressed", callable);
-				}
-				
-				_ButtonPressed = null;
-				_Button.QueueFree();
-				_Button = null;
-			}
-			
-			if( IsInstanceValid(_Title) ) 
-			{
-				_Title.QueueFree();
-				_Title = null;
-			}
-
-			if( IsInstanceValid(_ButtonContainer) ) 
-			{
-				_ButtonContainer.QueueFree();
-				_ButtonContainer = null;
-			} 
-			
-			if( IsInstanceValid(_TitleContainer) ) 
-			{
-				_TitleContainer.QueueFree();
-				_TitleContainer = null;
-			}
-			
-			if( IsInstanceValid(_InnerContainer) ) 
-			{
-				_InnerContainer.QueueFree();
-				_InnerContainer = null;
-			}
-		}
+		
 	}
 }

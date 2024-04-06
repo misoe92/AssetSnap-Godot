@@ -24,15 +24,16 @@
 namespace AssetSnap.Waypoint
 {
 	using System;
+	using System.Collections.Generic;
 	using AssetSnap.Front.Nodes;
-	using AssetSnap.Library;
+	using AssetSnap.Static;
 	using Godot;
 	
 	public partial class Base : Node
 	{
 		private GlobalExplorer _GlobalExplorer;
 		private Node _ParentContainer;
-		private WaypointList _WaypointList;
+		public WaypointList WaypointList;
 		public float SnapDistance = 1.0f;
 		
 		public Node3D WorkingNode;
@@ -44,7 +45,7 @@ namespace AssetSnap.Waypoint
 		
 		public void Initialize()
 		{
-			_WaypointList = new();
+			WaypointList = new();
 			_GlobalExplorer = GlobalExplorer.GetInstance();
 		}
 
@@ -61,58 +62,320 @@ namespace AssetSnap.Waypoint
 		public void Spawn(Node3D ModelInstance, Vector3 Origin, Vector3 Rotation, Vector3 Scale)
 		{
 			Node3D _model = new();
-			try 
+			Node3D model = new();
+			try
 			{
-				if( ModelInstance.HasMeta("AsModel") ) 
+				if (ModelInstance is AsMeshInstance3D _meshInstance)
 				{
-					_model.QueueFree();
 					_model = ModelInstance as AssetSnap.Front.Nodes.AsMeshInstance3D;
 					_model.Name = ModelInstance.Name;
-					
-					if( _model is AsMeshInstance3D _meshInstance ) 
-					{
-						_meshInstance.Floating = true;
-					}
+					_meshInstance.Floating = true;
 				}
-				else if ( ModelInstance.HasMeta("AsGroup") ) 
+				else if (ModelInstance is AsGrouped3D)
+				{
+					_model.QueueFree();
+					_model = ModelInstance as AsGrouped3D;
+				}
+				else if (ModelInstance is AsGroup3D)
 				{
 					_model.QueueFree();
 					_model = ModelInstance as AsGroup3D;
 				}
-				
-				if( null == _model ) 
+
+				if (null == _model)
 				{
 					return;
-				} 
-				 
-				if( _model is AssetSnap.Front.Nodes.AsMeshInstance3D meshInstance3D ) 
-				{
-					meshInstance3D.SetLibraryName( GlobalExplorer.GetInstance().CurrentLibrary.GetName() );
 				}
 
-				_SpawnNode( _model );
-				_ConfigureNode( _model, Origin, Rotation, Scale );
-				
-				if( _ShouldAddCollision() && _model is AssetSnap.Front.Nodes.AsMeshInstance3D ) 
+				if (_model is AssetSnap.Front.Nodes.AsMeshInstance3D meshInstance3D)
 				{
-					_model = _AddCollisions(_model);
+					meshInstance3D.SetLibraryName(GlobalExplorer.GetInstance().CurrentLibrary.GetName());
 				}
-				
-				// Focus the selected node in the editor
-				// EditorInterface.Singleton.GetSelection().Clear();
-				if( _GlobalExplorer.InputDriver.ShouldFocusAsset() && false == _GlobalExplorer.InputDriver.IsMulti ) 
+
+				model = _model.Duplicate() as Node3D;
+
+				if( IsSimpleMode() )
 				{
-					_GlobalExplorer.Model = null;
-					_GlobalExplorer.HandleNode = null;
-					_GlobalExplorer.InputDriver.FocusAsset(_model);	
+					SimpleSpawn(model, Origin, Rotation, Scale);
 				}
+				else if( IsOptimizedMode() ) 
+				{
+					OptimizedSpawn(model, Origin, Rotation, Scale);
+				}
+
 			}
-			catch( Exception e ) 
+			catch (Exception e)
 			{
 				GD.PushError(e);
 			}
 
-			WorkingNode = _model;
+			WorkingNode = model;
+			if (IsInstanceValid(_model))
+			{
+				if (IsInstanceValid(_model.GetParent()))
+				{
+					_model.GetParent().RemoveChild(_model);
+				}
+
+				_model.QueueFree();
+			}
+		}
+		
+		private bool IsSimpleMode()
+		{
+			return GlobalExplorer.GetInstance().States.PlacingType == GlobalStates.PlacingTypeEnum.Simple;
+		}
+		
+		private bool IsOptimizedMode()
+		{
+			return GlobalExplorer.GetInstance().States.PlacingType == GlobalStates.PlacingTypeEnum.Optimized;
+		}
+		
+		private void SimpleSpawn(Node3D model, Vector3 Origin, Vector3 Rotation, Vector3 Scale)
+		{
+			_SpawnNode( model );
+			_ConfigureNode( model, Origin, Rotation, Scale );
+			
+			if( SettingsStatic.ShouldAddCollision() && model is AssetSnap.Front.Nodes.AsMeshInstance3D ) 
+			{
+				model = _AddCollisions(model);
+			}
+			else if ( SettingsStatic.ShouldAddCollision() && model is AsGrouped3D asGrouped3D )
+			{
+				asGrouped3D.Update();
+			}
+			
+			// Focus the selected node in the editor
+			// EditorInterface.Singleton.GetSelection().Clear();
+			if( SettingsStatic.ShouldFocusAsset() && false == _GlobalExplorer.InputDriver.IsMulti ) 
+			{
+				_GlobalExplorer.Model = null;
+				_GlobalExplorer.HandleNode = null;
+				_GlobalExplorer.States.EditingObject = null;
+				_GlobalExplorer.States.GroupedObject = null;
+				_GlobalExplorer.InputDriver.FocusAsset(model);	
+			}	
+		}
+		
+		private void OptimizedSpawn(Node3D model, Vector3 Origin, Vector3 Rotation, Vector3 Scale)
+		{
+			if( model is AsMeshInstance3D meshInstance3D ) 
+			{
+				int InstanceId = _OptimizedSpawn(meshInstance3D, Origin, Rotation, Scale);
+
+				GlobalExplorer.GetInstance().States.EditingObject = null;
+				AddMultiCollisions(
+					new List<Vector3>() { Origin },
+					new List<Vector3>() { Scale },
+					new List<Vector3>() { Rotation },
+					new Godot.Collections.Array<Mesh>() { meshInstance3D.Mesh },
+					meshInstance3D
+				);
+				// GlobalExplorer.GetInstance().States. = null;
+				meshInstance3D.Free();
+			}
+
+			if (model is AsGrouped3D grouped3D)
+			{
+				Godot.Collections.Array<Godot.Collections.Dictionary<string, Variant>> ChildOptions = grouped3D.ChildOptions;
+				Node InitialChild = grouped3D.GetChild(0);
+				grouped3D.OptimizedSpawn = true;
+				List<Vector3> positions = new List<Vector3>();
+				List<Vector3> rotations = new List<Vector3>();
+				List<Vector3> scales = new List<Vector3>();
+				Godot.Collections.Array<Mesh> meshes = new Godot.Collections.Array<Mesh>();
+				
+				foreach( Node3D child in grouped3D.GetChildren() )
+				{
+					if( InitialChild is AsStaticBody3D )
+					{
+						// With collisions
+						AsMeshInstance3D asMeshInstance3D = child.GetChild(0) as AsMeshInstance3D;
+						int InstanceId = _OptimizedSpawn(asMeshInstance3D, Origin + child.Transform.Origin, asMeshInstance3D.RotationDegrees, asMeshInstance3D.Scale);
+						positions.Add(child.Transform.Origin);
+						meshes.Add(asMeshInstance3D.Mesh);
+						rotations.Add(asMeshInstance3D.RotationDegrees);
+						scales.Add(asMeshInstance3D.Scale);
+					}
+					else if( InitialChild is AsMeshInstance3D) 
+					{
+						AsMeshInstance3D asMeshInstance3D = child as AsMeshInstance3D;
+						// Without collisions
+						int InstanceId = _OptimizedSpawn(asMeshInstance3D, Origin + asMeshInstance3D.Transform.Origin, asMeshInstance3D.RotationDegrees, asMeshInstance3D.Scale);
+						
+						positions.Add(asMeshInstance3D.Transform.Origin);
+						meshes.Add(asMeshInstance3D.Mesh);
+						rotations.Add(asMeshInstance3D.RotationDegrees);
+						scales.Add(asMeshInstance3D.Scale);
+
+						grouped3D.AddConnection(InstanceId, GlobalExplorer.GetInstance().States.OptimizedGroups[asMeshInstance3D.Mesh], asMeshInstance3D.Mesh );
+					}
+				}
+				
+				grouped3D.Clear();
+				_SpawnNode(grouped3D);
+				_ConfigureNode( grouped3D, Origin, Rotation, Scale );
+								
+				if( SettingsStatic.ShouldAddCollision() ) 
+				{
+					grouped3D.AddMultiCollisions( positions, scales, rotations, meshes, grouped3D, ChildOptions );	
+				}
+				
+				// Focus the selected node in the editor
+				// EditorInterface.Singleton.GetSelection().Clear();
+				if( SettingsStatic.ShouldFocusAsset() && false == _GlobalExplorer.InputDriver.IsMulti ) 
+				{
+					_GlobalExplorer.Model = null;
+					_GlobalExplorer.HandleNode = null;
+					_GlobalExplorer.States.EditingObject = null;
+					_GlobalExplorer.States.GroupedObject = null;
+					_GlobalExplorer.InputDriver.FocusAsset(model);	
+				}		
+			}
+		}
+		
+		public void AddMultiCollisions(List<Vector3> _Positions, List<Vector3> _Scales, List<Vector3> _Rotations, Godot.Collections.Array<Mesh> _Meshes, AsMeshInstance3D meshInstance3D )
+		{
+			Node _SceneRoot = GlobalExplorer.GetInstance()._Plugin.GetTree().EditedSceneRoot;
+
+			for (int i = 0; i < _Positions.Count; i++)
+			{
+				Vector3 _Pos = _Positions[i];
+				Transform3D _Trans = Transform3D.Identity;
+				_Trans.Origin = new Vector3(_Pos.X, _Pos.Y, _Pos.Z);
+				AsStaticBody3D _Body = new()
+				{
+					Transform = _Trans,
+					UsingMultiMesh = true,
+					Mesh = _Meshes[i],
+					MeshName = _Meshes[i].ResourceName,
+					InstanceTransform = _Trans,
+					InstanceScale = _Scales[i],
+					InstanceRotation = _Rotations[i],
+				};
+
+				_SpawnNode(_Body);
+				_Body.Owner = _SceneRoot;
+
+				int typeState = 0;
+				int argState = 0;
+
+				bool IsChildConvex = meshInstance3D.HasSetting("ConvexCollision") ? meshInstance3D.GetSetting("ConvexCollision").As<bool>() : false;
+				bool IsChildConvexClean = meshInstance3D.HasSetting("ConvexClean") ? meshInstance3D.GetSetting("ConvexClean").As<bool>() : false;
+				bool IsChildConvexSimplify = meshInstance3D.HasSetting("ConvexSimplify") ? meshInstance3D.GetSetting("ConvexSimplify").As<bool>() : false;
+				bool IsChildConcave = meshInstance3D.HasSetting("ConcaveCollision") ? meshInstance3D.GetSetting("ConcaveCollision").As<bool>() : false;
+				bool IsChildSphere = meshInstance3D.HasSetting("SphereCollision") ? meshInstance3D.GetSetting("SphereCollision").As<bool>() : false;
+
+				if (
+					GlobalStates.LibraryStateEnum.Enabled == GlobalExplorer.GetInstance().States.ConvexCollision &&
+					false == IsChildConvex &&
+					false == IsChildConcave &&
+					false == IsChildSphere ||
+					true == IsChildConvex	
+				) 
+				{
+					typeState = 1;
+					
+					if(
+						GlobalStates.LibraryStateEnum.Enabled == GlobalExplorer.GetInstance().States.ConvexClean &&
+						GlobalStates.LibraryStateEnum.Disabled == GlobalExplorer.GetInstance().States.ConvexSimplify &&
+						false == IsChildConvex ||
+						true == IsChildConvexClean &&
+						true == IsChildConvexSimplify
+					) 
+					{
+						argState = 1;	
+					}
+					else if( 
+						GlobalStates.LibraryStateEnum.Disabled == GlobalExplorer.GetInstance().States.ConvexClean &&
+						GlobalStates.LibraryStateEnum.Enabled == GlobalExplorer.GetInstance().States.ConvexSimplify &&
+						false == IsChildConvex ||
+						false == IsChildConvexClean &&
+						true == IsChildConvexSimplify
+					) 
+					{
+						argState = 2;	
+					}
+					else if( 
+						GlobalStates.LibraryStateEnum.Enabled == GlobalExplorer.GetInstance().States.ConvexClean &&
+						GlobalStates.LibraryStateEnum.Enabled == GlobalExplorer.GetInstance().States.ConvexSimplify &&
+						false == IsChildConvex ||
+						true == IsChildConvexClean &&
+						true == IsChildConvexSimplify
+					) 
+					{
+						argState = 3;	
+					}
+				}
+				else if( 
+					GlobalStates.LibraryStateEnum.Enabled == GlobalExplorer.GetInstance().States.ConcaveCollision &&
+					false == IsChildConvex &&
+					false == IsChildConcave &&
+					false == IsChildSphere ||
+					true == IsChildConcave	
+				) 
+				{
+					typeState = 2;
+				}
+				else if(
+					GlobalStates.LibraryStateEnum.Enabled == GlobalExplorer.GetInstance().States.SphereCollision &&
+					false == IsChildConvex &&
+					false == IsChildConcave &&
+					false == IsChildSphere ||
+					true == IsChildSphere	
+				) 
+				{
+					typeState = 3;
+				}
+
+				_Body.Initialize(typeState, argState);
+			}
+		}
+		
+		private int _OptimizedSpawn( AsMeshInstance3D meshInstance3D, Vector3 Origin, Vector3 Rotation, Vector3 Scale)
+		{
+			int InstanceId = 0;
+			Transform3D transform = meshInstance3D.GlobalTransform;
+			Mesh mesh = meshInstance3D.Mesh;
+			transform.Scaled(Scale);
+			// Convert the rotation from degrees to radians
+			float rotationRadiansX = Mathf.DegToRad(Rotation.X);
+			float rotationRadiansY = Mathf.DegToRad(Rotation.Y);
+			float rotationRadiansZ = Mathf.DegToRad(Rotation.Z);
+
+			// Create a rotation basis around each axis
+			Basis rotationBasisX = Basis.Identity.Rotated(Vector3.Right, rotationRadiansX);
+			Basis rotationBasisY = Basis.Identity.Rotated(Vector3.Up, rotationRadiansY);
+			Basis rotationBasisZ = Basis.Identity.Rotated(Vector3.Forward, rotationRadiansZ);
+
+			// Combine the rotation around each axis
+			Basis finalRotation = rotationBasisX * rotationBasisY * rotationBasisZ;
+
+			// Assuming you have a transform called transform
+			transform.Basis = finalRotation;
+			transform.Origin = Origin;
+			
+			if( GlobalExplorer.GetInstance().States.OptimizedGroups.ContainsKey( mesh ) ) 
+			{
+				// Already has a group
+				InstanceId = GlobalExplorer.GetInstance().States.OptimizedGroups[mesh].AddToBuffer(transform);
+				GlobalExplorer.GetInstance().States.OptimizedGroups[mesh].Update();
+			}
+			else 
+			{
+				// Create our optimized multi mesh group
+				AsOptimizedMultiMeshGroup3D group = new()
+				{
+					Name = "AsMultimesh-" + meshInstance3D.Name,
+					Object = mesh,
+				};
+				
+				_SpawnNode( group );
+				InstanceId = group.AddToBuffer(transform);
+				GlobalExplorer.GetInstance().States.OptimizedGroups[mesh].Update();
+			}
+
+			return InstanceId;
 		}
 		
 		/*
@@ -125,9 +388,14 @@ namespace AssetSnap.Waypoint
 		*/
 		public void Remove(MeshInstance3D ModelInstance, Vector3 Origin)
 		{
+			if( null == WaypointList ) 
+			{
+				return;
+			}
+			
 			if( IsInstanceValid( ModelInstance ) ) 
 			{
-				_WaypointList.Remove(ModelInstance, Origin);
+				WaypointList.Remove(ModelInstance, Origin);
 			}
 		}
 		
@@ -142,7 +410,12 @@ namespace AssetSnap.Waypoint
 		*/
 		public void Register( Node3D node, Vector3 Origin, Vector3 Rot, Vector3 Scale ) 
 		{
-			_WaypointList.Add(node, Origin, Rot, Scale);
+			if( null == WaypointList ) 
+			{
+				return;
+			}
+			
+			WaypointList.Add(node, Origin, Rot, Scale);
 		}
 
 		/*
@@ -153,7 +426,12 @@ namespace AssetSnap.Waypoint
 		*/
 		public bool Has( Node3D node ) 
 		{
-			return _WaypointList.Has(node);
+			if( null == WaypointList ) 
+			{
+				return false;
+			}
+			
+			return WaypointList.Has(node);
 		}
 		/*
 		** Updates the scale value on a waypoint
@@ -165,7 +443,12 @@ namespace AssetSnap.Waypoint
 		*/
 		public void UpdateScaleOnPoint(Vector3 Origin, Vector3 Scale)
 		{
-			_WaypointList.Update("Scale", Scale, Origin);
+			if( null == WaypointList ) 
+			{
+				return;
+			}
+			
+			WaypointList.Update("Scale", Scale, Origin);
 		}
 		
 		/*
@@ -180,204 +463,20 @@ namespace AssetSnap.Waypoint
 		}
 		
 		/*
-		** Returns snap coordinates based on a given
-		** vector 3 coordinate set and a snap layer.
-		**
-		** @param Vector3 Coordinates
-		** @param int Layer
-		** @return Vector3
-		*/
-		public Vector3 Snap(Vector3 Coordinates, int Layer = 0)
-		{
-			if( false == _HasAnyWaypoints() ) 
-			{
-				return Vector3.Zero;
-			}
-			
-			bool SnapToX = IsSnapX();
-			bool SnapToZ = IsSnapZ();
-			
-			float ObjectSnapOffsetX = 0.0f;
-			float ObjectSnapOffsetZ = 0.0f;
-			
-			if( HasObjectSnapOffsetX() ) 
-			{
-				ObjectSnapOffsetX = GetObjectSnapOffsetX();
-			}
-			
-			if( HasObjectSnapOffsetZ() ) 
-			{
-				ObjectSnapOffsetZ = GetObjectSnapOffsetZ();
-			}
-			
-			Vector3 snappedCoordinates = Coordinates;
-			
-			_WaypointList.Each(
-				( BaseWaypoint Point ) =>
-				{
-					AsMeshInstance3D model = Point.GetModel() as AssetSnap.Front.Nodes.AsMeshInstance3D;
-					Aabb AABB = Point.GetAabb();
-
-					Vector3 MeshSize = AABB.Size * ( Point.GetScale() * new Vector3(0.75f, 0.75f, 0.75f));
-					Vector3 spawnPointGlobal = Point.GetModel().GlobalTransform.Origin;
-
-					int SnapLayer = model.GetSetting<int>("_LSSnapLayer.value"); 
-					if( SnapLayer != Layer ) 
-					{
-						return;
-					}
-					
-					if (!SnapToX &&
-						(Coordinates.X > spawnPointGlobal.X - ( MeshSize.X / 2)) &&
-						(Coordinates.X < spawnPointGlobal.X + ( MeshSize.X / 2)) &&
-						(
-							(Coordinates.Z > spawnPointGlobal.Z - ( MeshSize.Z / 2) - SnapDistance) &&
-							(Coordinates.Z < spawnPointGlobal.Z + ( MeshSize.Z / 2) + SnapDistance)
-						)
-					)
-					{
-						if(Coordinates.Z - spawnPointGlobal.Z < (MeshSize.Z / 2)) 
-						{
-							snappedCoordinates.Z = spawnPointGlobal.Z - MeshSize.Z;
-							if( ObjectSnapOffsetZ != 0 ) 
-							{
-								snappedCoordinates.Z -= ObjectSnapOffsetZ;
-							}
-						}
-						else 
-						{
-							snappedCoordinates.Z = spawnPointGlobal.Z + MeshSize.Z;
-							if( ObjectSnapOffsetZ != 0 ) 
-							{
-								snappedCoordinates.Z += ObjectSnapOffsetZ;
-							}
-						}
-						snappedCoordinates.X = spawnPointGlobal.X;
-						
-						return;
-					}
-
-					// Check if the coordinates are within the snap distance on the X-axis
-					if (!SnapToZ &&
-						(Coordinates.Z > spawnPointGlobal.Z - ( MeshSize.Z / 2)) &&
-						(Coordinates.Z < spawnPointGlobal.Z + ( MeshSize.Z / 2)) &&
-						(
-							(Coordinates.X > spawnPointGlobal.X - ( MeshSize.X / 2) - SnapDistance) &&
-							(Coordinates.X < spawnPointGlobal.X + ( MeshSize.X / 2) + SnapDistance)
-						)
-					)
-					{
-						if(Coordinates.X - spawnPointGlobal.X < (MeshSize.X / 2)) 
-						{
-							snappedCoordinates.X = spawnPointGlobal.X - MeshSize.X;
-							
-							if( ObjectSnapOffsetX != 0 ) 
-							{
-								snappedCoordinates.X -= ObjectSnapOffsetX;
-							}
-						}
-						else 
-						{
-							snappedCoordinates.X = spawnPointGlobal.X + MeshSize.X;
-							
-							if( ObjectSnapOffsetX != 0 ) 
-							{
-								snappedCoordinates.X += ObjectSnapOffsetX;
-							}
-						}
-						
-						snappedCoordinates.Z = spawnPointGlobal.Z;
-						return;
-					}
-				}
-			);
-			
-			return snappedCoordinates;
-		}
-		
-		/*
-		** Checks whether or not the model can
-		** snap to another model
-		**
-		** @param Vector3 Coordinates
-		** @param int Layer
-		** @return bool
-		*/
-		public bool CanSnap(Vector3 Coordinates, int Layer = 0)
-		{
-			if( false == _HasAnyWaypoints() ) 
-			{
-				GD.Print("Houston, We got a problem.");
-				return false;
-			}
-
-			bool Snapping = false;
-			bool SnapToX = IsSnapX();
-			bool SnapToZ = IsSnapZ();
-
-			_WaypointList.Each(
-				( BaseWaypoint Point ) =>
-				{
-					AsMeshInstance3D model = Point.GetModel() as AssetSnap.Front.Nodes.AsMeshInstance3D;
-					Aabb AABB = Point.GetAabb();
-
-					Vector3 MeshSize = AABB.Size * ( Point.GetScale() * new Vector3(0.75f, 0.75f, 0.75f));
-					Vector3 spawnPointGlobal = Point.GetModel().GlobalTransform.Origin;
-
-					int SnapLayer = model.GetSetting<int>("_LSSnapLayer.value");
-					if( SnapLayer != Layer ) 
-					{
-						return;
-					}
-										
-					// Check if the coordinates are within the snap distance on the X-axis
-					if (!SnapToX &&
-						(Coordinates.X > spawnPointGlobal.X - ( MeshSize.X / 2)) &&
-						(Coordinates.X < spawnPointGlobal.X + ( MeshSize.X / 2)) &&
-						(
-							(Coordinates.Z > spawnPointGlobal.Z - ( MeshSize.Z / 2) - SnapDistance) &&
-							(Coordinates.Z < spawnPointGlobal.Z + ( MeshSize.Z / 2) + SnapDistance)
-						)
-					)
-					{
-						Snapping = true;
-						return;
-					}
-
-					// Check if the coordinates are within the snap distance on the X-axis
-					if (!SnapToZ &&
-						(Coordinates.Z > spawnPointGlobal.Z - ( MeshSize.Z / 2)) &&
-						(Coordinates.Z < spawnPointGlobal.Z + ( MeshSize.Z / 2)) &&
-						(
-							(Coordinates.X > spawnPointGlobal.X - ( MeshSize.X / 2) - SnapDistance) &&
-							(Coordinates.X < spawnPointGlobal.X + ( MeshSize.X / 2) + SnapDistance)
-						)
-					)
-					{
-						Snapping = true;
-						return;
-					}
-				}
-			);
-
-			return Snapping;
-		}
-		
-		/*
 		** Spawns the node
 		**
 		** @param Node3D _model
 		** @return void
 		*/
 		private void _SpawnNode( Node3D _model)
-		{			
+		{						
 			if( _model.GetParent() != null ) 
 			{
 				_model.GetParent().RemoveChild(_model);
 			}
 			
 			SceneTree Tree = _GlobalExplorer._Plugin.GetTree();
-			if (_ShouldPushToScene())
+			if (SettingsStatic.ShouldPushToScene())
 			{
 				if( _ParentContainer != null ) 
 				{ 
@@ -400,6 +499,14 @@ namespace AssetSnap.Waypoint
 						GD.PushWarning("Tree not found");
 					}
 				}
+
+				if( 0 != _model.GetChildCount() ) 
+				{
+					for( int i = 0; i < _model.GetChildCount(); i++ ) 
+					{
+						_model.GetChild(i).Owner = Tree.EditedSceneRoot;
+					}
+				}
 			}
 			else 
 			{
@@ -413,7 +520,7 @@ namespace AssetSnap.Waypoint
 				}
 			}
 
-			if( _model is AssetSnap.Front.Nodes.AsMeshInstance3D asMeshInstance3D && true == asMeshInstance3D.Floating && false == _ShouldAddCollision() ) 
+			if( _model is AssetSnap.Front.Nodes.AsMeshInstance3D asMeshInstance3D && true == asMeshInstance3D.Floating && false == SettingsStatic.ShouldAddCollision() ) 
 			{
 				// AssetSnap.ASNode.MeshInstance.SpawnSettings SpawnSettings = asMeshInstance3D.SpawnSettings;
 				// SpawnSettings.Update();
@@ -449,7 +556,7 @@ namespace AssetSnap.Waypoint
 		** @param Node3D _model
 		** @return void
 		*/
-		private Node3D _AddCollisions(Node3D _model)
+		private Node3D _AddCollisions(Node3D _model, Node3D _ParentContainer = null)
 		{
 			try 
 			{
@@ -485,7 +592,7 @@ namespace AssetSnap.Waypoint
 					InstanceSpawnSettings = model.SpawnSettings,
 				};
 
-				if (_ShouldPushToScene())
+				if (SettingsStatic.ShouldPushToScene())
 				{
 					if( _ParentContainer != null ) 
 					{
@@ -535,161 +642,13 @@ namespace AssetSnap.Waypoint
 		}
 		
 		/*
-		** Fetches the snap offset on the x axis
-		**
-		** @return float
-		*/
-		private float GetObjectSnapOffsetX()
-		{			
-			if( null == _GlobalExplorer ) 
-			{
-				return 0.0f;
-			}
-
-			Instance CurrentLibrary = _GlobalExplorer.CurrentLibrary;
-
-			return CurrentLibrary._LibrarySettings._LSSnapOffsetX.GetValue();
-		}
-			
-		/*
-		** Fetches the snap offset on the z axis
-		**
-		** @return float
-		*/
-		private float GetObjectSnapOffsetZ()
-		{		
-			if( null == _GlobalExplorer ) 
-			{
-				return 0.0f;
-			}
-
-			Instance CurrentLibrary = _GlobalExplorer.CurrentLibrary;
-
-			return CurrentLibrary._LibrarySettings._LSSnapOffsetZ.GetValue();
-		}
-		
-		/*
-		** Checks if object snap offset on the x axis
-		** is enabled
-		**
-		** @return bool
-		*/
-		private bool HasObjectSnapOffsetX()
-		{			
-			if( null == _GlobalExplorer ) 
-			{
-				return false;
-			}
-
-			Instance CurrentLibrary = _GlobalExplorer.CurrentLibrary;
-			
-			if( 0.0f == CurrentLibrary._LibrarySettings._LSSnapOffsetX.GetValue() ) 
-			{
-				return false;
-			}
-
-			return true;
-		}
-		
-		/*
-		** Checks if object snap offset on the z axis
-		** is enabled
-		**
-		** @return bool
-		*/
-		private bool HasObjectSnapOffsetZ()
-		{	
-			if( null == _GlobalExplorer ) 
-			{
-				return false;
-			}
-
-			Instance CurrentLibrary = _GlobalExplorer.CurrentLibrary;
-			
-			if( 0.0f == CurrentLibrary._LibrarySettings._LSSnapOffsetZ.GetValue() ) 
-			{
-				return false;
-			}
-
-			return true;
-		}
-		
-		/*
 		** Checks if any waypoints is available
 		**
 		** @return bool
 		*/
-		private bool _HasAnyWaypoints() 
+		public bool HasAnyWaypoints() 
 		{
-			return false == _WaypointList.IsEmpty();
-		}
-		
-		/*
-		** Checks if any snapping is enabled on the x
-		** axis
-		**
-		** @return bool
-		*/
-		private bool IsSnapX()
-		{
-			if( null == _GlobalExplorer ) 
-			{
-				return false;
-			}
-
-			Instance CurrentLibrary = _GlobalExplorer.CurrentLibrary;
-			
-			if( false == CurrentLibrary._LibrarySettings._LSSnapToX.IsActive() ) 
-			{
-				return false;
-			}
-
-			return true;
-		}
-		
-		/*
-		** Checks if any snapping is enabled on the z
-		** axis
-		**
-		** @return bool
-		*/
-		private bool IsSnapZ()
-		{		
-			if( null == _GlobalExplorer ) 
-			{
-				return false;
-			}
-
-			Instance CurrentLibrary = _GlobalExplorer.CurrentLibrary;
-			
-			if( false == CurrentLibrary._LibrarySettings._LSSnapToZ.IsActive() ) 
-			{
-				return false;
-			}
-
-			return true;
-		}
-		
-		/*
-		** Checks if collisions should be added
-		**
-		** @return bool
-		*/
-		private bool _ShouldAddCollision()
-		{
-			bool AddCollisions = _GlobalExplorer.Settings.GetKey("add_collisions").As<bool>();
-			return AddCollisions;
-		}
-		
-		/*
-		** Checks if new children should be pushed to the current scene
-		**
-		** @return bool
-		*/
-		private bool _ShouldPushToScene()
-		{
-			bool PushToScene = _GlobalExplorer.Settings.GetKey("push_to_scene").As<bool>();
-			return PushToScene;
+			return false == WaypointList.IsEmpty();
 		}
 	}
 }

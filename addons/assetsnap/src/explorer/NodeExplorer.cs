@@ -31,6 +31,8 @@ namespace AssetSnap
 	{
 		protected AssetSnap.Front.Nodes.AsMeshInstance3D _Model;
 		protected Node _HandleNode;
+		protected GroupResource _Group;
+		protected AsGrouped3D _GroupedObject;
 		protected Library.Instance _CurrentLibrary;
 		protected Callable? UpdateHandleCallable;
 		
@@ -103,7 +105,39 @@ namespace AssetSnap
 		{
 			get => Model.IsPlaced();
 		}
-
+		
+		/*
+		** Current selected group from the group builder
+		*/
+		public GroupResource Group 
+		{
+			get => _Group;
+			set
+			{
+				_Group = value;
+			}
+		}
+		
+		/*
+		** Current selected group from the group builder
+		*/
+		public AsGrouped3D GroupedObject 
+		{
+			get => _GroupedObject;
+			set
+			{
+				_GroupedObject = value;
+			}
+		}
+		
+		/*
+		** Whether or not a group is active
+		*/
+		public bool HasGroup
+		{
+			get => Group != null;
+		}
+				
 		public NodeExplorer()
 		{
 			// UpdateHandleCallable = new(this, "UpdateHandle");
@@ -174,18 +208,14 @@ namespace AssetSnap
 		*/
 		public Node3D GetHandle()
 		{
-			Node3D Handle = HandleNode as Node3D;
-			if (Handle == null)
+			if( States.PlacingMode == GlobalStates.PlacingModeEnum.Model ) 
 			{
-				Handle = Model;
-			}
-			
-			if (Handle == null)
-			{
+				Node3D Handle = States.EditingObject;
 				return Handle;
 			}
-
-			return Handle;
+			
+			// Else group mode
+			return States.GroupedObject;
 		}
 		
 		/*

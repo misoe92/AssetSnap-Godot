@@ -26,6 +26,7 @@ namespace AssetSnap.Front.Components
 	using AssetSnap.Component;
 	using AssetSnap.Front.Nodes;
 
+	[Tool]
 	public partial class LibrarySnapRotate : LibraryComponent
 	{
 		public bool value = false;
@@ -39,7 +40,7 @@ namespace AssetSnap.Front.Components
 		public LibrarySnapRotate()
 		{
 			Name = "LibrarySnapRotate";
-			// _include = false;  
+			//_include = false;  
 		}
 		
 		/*

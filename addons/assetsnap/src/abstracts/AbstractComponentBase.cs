@@ -1,9 +1,8 @@
 namespace AssetSnap.Abstracts
 {
-	using AssetSnap.Front.Configs;
-	using AssetSnap.Instance.Input;
-    using Godot;
+	using Godot;
 
+	[Tool]
 	public abstract partial class AbstractComponentBase : Node 
 	{
 		protected GlobalExplorer _GlobalExplorer;

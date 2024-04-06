@@ -22,11 +22,11 @@
 
 namespace AssetSnap.Front.Components
 {
-	using System.Collections.Generic;
 	using AssetSnap.Component;
 	using AssetSnap.Front.Nodes;
 	using Godot;
 
+	[Tool]
 	public partial class LibrarySearch : LibraryComponent
 	{
 		private readonly string Title = "Search Library";
@@ -52,7 +52,7 @@ namespace AssetSnap.Front.Components
 		public LibrarySearch()
 		{
 			Name = "LibrarySearch";
-			// _include = false;
+			//_include = false;
 		}
 		
 		/*
@@ -62,36 +62,57 @@ namespace AssetSnap.Front.Components
 		*/
 		public override void Initialize()
 		{
-			if( Container is HBoxContainer BoxContainer ) 
+			base.Initialize();
+			AddTrait(typeof(Containerable));
+			AddTrait(typeof(Buttonable));
+			Initiated = true;
+
+			Trait<Containerable>()
+				.SetName("SearchContainer")
+				.SetMargin(4, "top")
+				.SetOrientation(Containerable.ContainerOrientation.Horizontal)
+				.SetInnerOrientation(Containerable.ContainerOrientation.Horizontal)
+				.Instantiate();
+			
+			_SearchInput = new()
 			{
-				_MarginContainer = new();
-				_InnerContainer = new();
-				_SearchInput = new();
-				_Label = new()
-				{
-					ThemeTypeVariation = "HeaderSmall",
-					Text = Title
-				};
+				SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
+				PlaceholderText = Title
+			};
+		
+			SearchCallable = new Callable(this, "_OnSearchQuery");
 
-				SearchCallable = new Callable(this, "_OnSearchQuery");
-				
-				_MarginContainer.AddThemeConstantOverride("margin_left", 5);
-				_MarginContainer.AddThemeConstantOverride("margin_right", 5);
-				_MarginContainer.AddThemeConstantOverride("margin_top", 0);
-				_MarginContainer.AddThemeConstantOverride("margin_bottom", 0);
-
-				if( SearchCallable is Callable _callable ) 
-				{
-					_SearchInput.Connect(LineEdit.SignalName.TextChanged, _callable);
-				}
-				
-				_InnerContainer.AddChild(_Label);
-				_InnerContainer.AddChild(_SearchInput);
-				
-				_MarginContainer.AddChild(_InnerContainer);
-				
-				BoxContainer.AddChild(_MarginContainer);
+			if( SearchCallable is Callable _callable ) 
+			{
+				_SearchInput.Connect(LineEdit.SignalName.TextChanged, _callable);
 			}
+
+			Trait<Buttonable>()
+				.SetName("SearchClearQuery")
+				.SetType(Buttonable.ButtonType.SmallFlatButton)
+				.SetText("")
+				.SetTooltipText("Clears your current search query")
+				.SetVisible(false)
+				.SetIcon(GD.Load<Texture2D>("res://addons/assetsnap/assets/icons/x.svg"))
+				.SetAction(() => { _ClearCurrentQuery(); } )
+				.Instantiate();
+			
+			Trait<Containerable>()
+				.Select(0)
+				.GetInnerContainer()
+				.AddChild(_SearchInput);
+
+			Trait<Buttonable>()
+				.Select(0)
+				.AddToContainer(
+					Trait<Containerable>()
+						.Select(0)
+						.GetInnerContainer()
+				);
+
+			Trait<Containerable>()
+				.Select(0)
+				.AddToContainer(Container);
 		}
 
 		/*
@@ -103,9 +124,38 @@ namespace AssetSnap.Front.Components
 		*/
 		public override void _Process(double delta) 
 		{
-			if( _Searching == false ) 
+			if(
+				_Searching == false ||
+				null == Trait<Buttonable>() ||
+				null == Trait<Buttonable>().Select(0)
+			) 
 			{
 				return;
+			}
+			
+			if(
+				value != "" &&
+				null != Trait<Buttonable>() &&
+				false == Trait<Buttonable>()
+					.Select(0)
+					.IsVisible()
+			) 
+			{
+				Trait<Buttonable>()
+					.Select(0)
+					.SetVisible(true);
+			}
+			else if(
+				value == "" &&
+				null != Trait<Buttonable>() &&
+				true == Trait<Buttonable>()
+					.Select(0)
+					.IsVisible()
+			)
+			{
+				Trait<Buttonable>()
+					.Select(0)
+					.SetVisible(false);
 			}
 
 			if(value != LastValue) 
@@ -166,6 +216,12 @@ namespace AssetSnap.Front.Components
 			return text.ToLower().Contains(value.ToLower());
 		}
 	
+		private void _ClearCurrentQuery()
+		{
+			_SearchInput.Clear();
+			value = "";
+		}
+	
 		/*
 		** Cleans up in references, fields and parameters.
 		** 
@@ -193,18 +249,6 @@ namespace AssetSnap.Front.Components
 				_Label.QueueFree();
 				_Label = null;
 			} 
-			
-			if( IsInstanceValid(_InnerContainer) ) 
-			{
-				_InnerContainer.QueueFree();
-				_InnerContainer = null;
-			}
-			
-			if( IsInstanceValid(_MarginContainer) ) 
-			{
-				_MarginContainer.QueueFree();
-				_MarginContainer = null;
-			}
 		}
 	}
 }

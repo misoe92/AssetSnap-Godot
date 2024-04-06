@@ -27,7 +27,8 @@ namespace AssetSnap.Front.Components
 	using AssetSnap.Static;
 	using Godot;
 
-	public partial class SettingsSpinBox : SettingsComponent
+	[Tool]
+	public partial class SettingsSpinBox : BaseComponent
 	{
 		private float _value = 0.0f;
 		private string _key;
@@ -67,7 +68,7 @@ namespace AssetSnap.Front.Components
 		public SettingsSpinBox()
 		{
 			Name = "SettingsSpinBox";
-			// _include = false;   
+			//_include = false;   
 		}
 		
 		/*
@@ -79,7 +80,10 @@ namespace AssetSnap.Front.Components
 		{
 			string title = GetTitle( key );
 			string description = GetDescription( key );
-			OuterContainer = new();
+			OuterContainer = new()
+			{
+				Size = new Vector2I(0, 100)
+			};
 			InnerContainer = new();
 			ValueChanged = new Callable(this, "UpdateKey");
 
@@ -179,13 +183,23 @@ namespace AssetSnap.Front.Components
 				
 				if (description != null)
 				{
-					DescriptionLabel = new()
+					MarginContainer DescriptionMarginContainer = new()
 					{
-						Text = description,
-						AutowrapMode = TextServer.AutowrapMode.Word
+						SizeFlagsVertical = Control.SizeFlags.ShrinkBegin,
+						SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
+						CustomMinimumSize = new Vector2I(0, 70),
 					};
 					
-					InnerContainer.AddChild(DescriptionLabel);
+					DescriptionLabel = new()
+					{
+						Name = "SettingDescription",
+						Text = description,
+						AutowrapMode = TextServer.AutowrapMode.Word,
+						SizeFlagsVertical = Control.SizeFlags.ShrinkBegin,
+					};
+
+					DescriptionMarginContainer.AddChild(DescriptionLabel);
+					InnerContainer.AddChild(DescriptionMarginContainer);
 				}
 			}
 		}
@@ -250,8 +264,8 @@ namespace AssetSnap.Front.Components
 				TitleLabel.QueueFree();
 				TitleLabel = null;
 			}
-			
-			if( IsInstanceValid(_Element) ) 
+			 
+			if( IsInstanceValid(_Element) )
 			{
 				_Element.QueueFree();
 				_Element = null;

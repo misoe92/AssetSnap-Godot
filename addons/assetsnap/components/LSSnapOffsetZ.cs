@@ -25,19 +25,24 @@ namespace AssetSnap.Front.Components
 	using AssetSnap.Component;
 	using Godot;
 
-	public partial class LSSnapOffsetZ : LibraryComponent
+	[Tool]
+	public partial class LSSnapOffsetZ : LSObjectComponent
 	{
-		private readonly string _Title = "Object Snap Offset Z";
-		private bool Exited = false;
+		public float value 
+		{
+			get => IsValid() ? (float)Trait<Spinboxable>().Select(0).GetValue() : 0;
+			set 
+			{
+				if( IsValid() ) 
+				{
+					Trait<Spinboxable>().Select(0).SetValue(value);
+				}
+			}
+		}
 		
-		private MarginContainer _MarginContainer;
-		private	VBoxContainer _InnerContainer;
-		private	Label _Label;
-		private	SpinBox _SpinBox;
-		private Callable? _SpinBoxCallable;
-		
-		public float value = 0.0f;
-		
+		private readonly string _Title = "Offset Z: ";
+		private readonly string _Tooltip = "Offsets the Z axis when snapping to object, enabling for precise operations.";
+
 		/*
 		** Constructor of the component
 		** 
@@ -46,7 +51,7 @@ namespace AssetSnap.Front.Components
 		public LSSnapOffsetZ()
 		{
 			Name = "LSSnapOffsetZ";
-			// _include = false;
+			//_include = false;
 		}
 		
 		/*
@@ -56,94 +61,76 @@ namespace AssetSnap.Front.Components
 		*/
 		public override void Initialize()
 		{
-			if( Container is VBoxContainer BoxContainer ) 
-			{
-				_MarginContainer = new();
-				_InnerContainer = new();
-				_SpinBoxCallable = new(this, "_OnSpinBoxValueChange");
+			base.Initialize();
+			AddTrait(typeof(Spinboxable));
+
+			Callable _callable = Callable.From((double value) => { _OnSpinBoxValueChange((float)value); });
+			
+			Initiated = true;
+			
+			Trait<Spinboxable>()
+				.SetName("SnapObjectOffsetZ")
+				.SetAction(_callable)
+				.SetStep(0.01f)
+				.SetPrefix(_Title + ": ")
+				.SetMinValue(-200)
+				.SetDimensions(140, 20)
+				.SetMargin(10, "left")
+				.SetMargin(10, "right")
+				.SetMargin(0, "top")
+				.SetMargin(10, "bottom")
+				.SetTooltipText(_Tooltip)
+				.Instantiate()
+				.Select(0)
+				.AddToContainer( Container );
 				
-				_Label = new()
-				{
-					ThemeTypeVariation = "HeaderSmall",
-					Text = _Title
-				};
-				
-				_SpinBox = new()
-				{
-					CustomMinimumSize = new Vector2(140, 20),
-					MinValue = -200,
-					Step = 0.01f
-				};
-				
-				_MarginContainer.AddThemeConstantOverride("margin_left", 10); 
-				_MarginContainer.AddThemeConstantOverride("margin_right", 10);
-				_MarginContainer.AddThemeConstantOverride("margin_top", 2);
-				_MarginContainer.AddThemeConstantOverride("margin_bottom", 2);
-				
-				if( _SpinBoxCallable is Callable _callable ) 
-				{
-					_SpinBox.Connect(SpinBox.SignalName.ValueChanged,_callable);
-				}
-				
-				_InnerContainer.AddChild(_Label);
-				_InnerContainer.AddChild(_SpinBox);
-				_MarginContainer.AddChild(_InnerContainer);
-				
-				BoxContainer.AddChild(_MarginContainer);
-			}
+			Plugin.GetInstance().StatesChanged += () => { MaybeUpdateValue(); };
 		}
 		
-		/*
-		** Handles visibility of the component
-		** based on whether object snapping
-		** is enabled or not
-		** 
-		** @return void
-		*/	
-		public override void _Process(double delta)
+		private void MaybeUpdateValue()
 		{
-			if( false == IsInstanceValid(_Label) ) 
-			{
-				return;
-			}
-
-			if( _GlobalExplorer == null || _GlobalExplorer._Plugin == null ) 
+			if( false == IsValid() ) 
 			{
 				return;
 			}
 			
-			if( Library == null ) 
+			if( IsSnapToObject() && false == IsVisible()) 
+			{
+				SetVisible(true);
+			}
+			else if( false == IsSnapToObject() && true == IsVisible())
+			{
+				SetVisible(false);
+			}
+			
+			Trait<Spinboxable>()
+				.Select(0)
+				.SetValue(_GlobalExplorer.States.SnapToObjectOffsetZValue);
+		}
+		
+		public override void SetVisible(bool state) 
+		{
+			if( false == IsValid() ) 
 			{
 				return;
 			}
-
-			LibrarySettings _Settings = Library._LibrarySettings;
 			
-			if( _Settings == null ) 
+			Trait<Spinboxable>()
+				.Select(0)
+				.SetVisible( state );
+		}
+		
+		public override bool IsVisible() 
+		{
+			if( false == IsValid() ) 
 			{
-				GD.PushWarning("Settings is null");
-				return;
-			}
-
-			LSSnapObject _SnapObject = Library._LibrarySettings._LSSnapObject;
-			
-			if( _SnapObject == null ) 
-			{
-				GD.PushWarning("Snapobject is null");
-				return;
+				return false;
 			}
 			
-			bool SnapToObject = _SnapObject.IsActive();
-			
-			if( SnapToObject && false == _MarginContainer.Visible) 
-			{
-				_MarginContainer.Visible = true;
-			}
-			else if( false == SnapToObject && true == _MarginContainer.Visible)
-			{
-				_MarginContainer.Visible = false;
-			}
-		}	
+			return Trait<Spinboxable>()
+				.Select(0)
+				.IsVisible();
+		}
 		
 		/*
 		** Updates the spawn settings of the
@@ -152,12 +139,10 @@ namespace AssetSnap.Front.Components
 		** 
 		** @return void
 		*/	
-		private void _OnSpinBoxValueChange(float _value)
+		private void _OnSpinBoxValueChange(float value)
 		{
-			value = _value;
-									
-			string key = "_LSSnapOffsetX.value";
-			UpdateSpawnSettings(key, value);
+			_GlobalExplorer.States.SnapToObjectOffsetZValue = value;	
+			UpdateSpawnSettings("SnapToObjectOffsetZValue", value);
 		}
 		
 		/*
@@ -168,7 +153,7 @@ namespace AssetSnap.Front.Components
 		*/	
 		public float GetValue()
 		{
-			return value;
+			return _GlobalExplorer.States.SnapToObjectOffsetZValue;
 		}
 			
 		/*
@@ -178,49 +163,34 @@ namespace AssetSnap.Front.Components
 		*/	
 		public void Reset()
 		{
-			value = 0.0f;
+			_GlobalExplorer.States.SnapToObjectOffsetZValue = 0.0f;
 		}
-			
+		
+		public bool IsValid()
+		{
+			return
+				null != _GlobalExplorer &&
+				null != _GlobalExplorer.States &&
+				false != Initiated &&
+				null != Trait<Spinboxable>() &&
+				false != HasTrait<Spinboxable>() &&
+				IsInstanceValid( Trait<Spinboxable>() );
+		}
+		
 		/*
-		** Cleans up in references, fields and parameters.
-		** 
+		** Syncronizes it's value to a global
+		** central state controller
+		**
 		** @return void
 		*/
-		public override void _ExitTree()
+		public override void Sync() 
 		{
-			Exited = true;
-			
-			if( IsInstanceValid(_SpinBox) && _SpinBox != null && _SpinBoxCallable is Callable _callable ) 
+			if( false == IsValid() ) 
 			{
-				if(  _SpinBox.IsConnected(SpinBox.SignalName.ValueChanged, _callable)) 
-				{
-					_SpinBox.Disconnect(SpinBox.SignalName.ValueChanged, _callable);
-				}
-			}
-	
-			if( IsInstanceValid(_SpinBox) ) 
-			{
-				_SpinBox.QueueFree();
-				_SpinBox = null;
+				return;
 			}
 			
-			if( IsInstanceValid(_Label) ) 
-			{
-				_Label.QueueFree();
-				_Label = null;
-			}
-			
-			if( IsInstanceValid(_InnerContainer) ) 
-			{
-				_InnerContainer.QueueFree();
-				_InnerContainer = null;
-			}
-			
-			if( IsInstanceValid(_MarginContainer) ) 
-			{
-				_MarginContainer.QueueFree();
-				_MarginContainer = null;
-			}
+			_GlobalExplorer.States.SnapToObjectOffsetXValue = (float)Trait<Spinboxable>().Select(0).GetValue();
 		}
 	}
 }

@@ -22,23 +22,12 @@
 
 namespace AssetSnap.Front.Components
 {
-	using System;
 	using AssetSnap.Component;
 	using Godot;
 
+	[Tool]
 	public partial class LibraryBody : LibraryComponent
 	{
-		private	HBoxContainer _MainContainer;
-		
-		private VBoxContainer LeftContainer;
-		private MarginContainer LeftMarginContainer;
-		private VBoxContainer LeftInnerContainer;
-		
-		private VBoxContainer RightContainer;
-		private MarginContainer RightMarginContainer;
-		private VBoxContainer RightInnerContainer;
-		
-		
 		/*
 		** Constructor of component
 		** 
@@ -47,7 +36,7 @@ namespace AssetSnap.Front.Components
 		public LibraryBody()
 		{
 			Name = "LibraryBody";
-			// _include = false;
+			//_include = false;
 		}
 		
 		/*
@@ -57,93 +46,36 @@ namespace AssetSnap.Front.Components
 		*/
 		public override void Initialize()
 		{
+			base.Initialize();
+			AddTrait(typeof(Containerable));
+			Initiated = true;
+			
 			if( Container is PanelContainer PanelContainer ) 
 			{
-				_MainContainer = new()
-				{
-					Name = "MainContainer",
-					SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
-					SizeFlagsVertical = Control.SizeFlags.ExpandFill,
-				};
-				
-				_SetupLeftSide();
-				_SetupRightSide();
+				Trait<Containerable>()
+					.SetName("MainLibraryContainer")
+					.SetMargin(5)
+					.SetLayout(Containerable.ContainerLayout.TwoColumns)
+					.SetHorizontalSizeFlags(Control.SizeFlags.ExpandFill)
+					.SetVerticalSizeFlags(Control.SizeFlags.ExpandFill)
+					.Instantiate()
+					.Select(0)
+					.AddToContainer( PanelContainer );
 
-				PanelContainer.AddChild(_MainContainer);
+				Container container = Trait<Containerable>()
+					.Select(0)
+					.GetInnerContainer(0);
+					
+				Container containerTwo = Trait<Containerable>()
+					.Select(0)
+					.GetInnerContainer(1);
+
+				container.SizeFlagsHorizontal = Control.SizeFlags.ShrinkBegin;
+				container.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
+				container.CustomMinimumSize = new Vector2(225,0);
 			}
 		}
 			
-		/*
-		** Set's up the left side of the container body
-		** 
-		** @return void
-		*/
-		public void _SetupLeftSide()
-		{
-			LeftContainer = new()
-			{
-				Name = "LeftContainer",
-				SizeFlagsHorizontal = 0,
-				SizeFlagsVertical = Control.SizeFlags.ExpandFill,
-				CustomMinimumSize = new Vector2(200, 0)
-			};
-			LeftMarginContainer = new()
-			{
-				SizeFlagsHorizontal = Control.SizeFlags.ExpandFill, 
-				SizeFlagsVertical = Control.SizeFlags.ExpandFill,
-			};
-			LeftInnerContainer = new()
-			{
-				SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
-				SizeFlagsVertical = Control.SizeFlags.ExpandFill,
-			};
-			
-			LeftMarginContainer.AddThemeConstantOverride("margin_left", 5);
-			LeftMarginContainer.AddThemeConstantOverride("margin_right", 5);
-			LeftMarginContainer.AddThemeConstantOverride("margin_top", 5);
-			LeftMarginContainer.AddThemeConstantOverride("margin_bottom", 5);
-
-			LeftMarginContainer.AddChild(LeftInnerContainer);
-			LeftContainer.AddChild(LeftMarginContainer);
-			_MainContainer.AddChild(LeftContainer);
-		}
-		
-			
-		/*
-		** Set's up the right side of the container body
-		** 
-		** @return void
-		*/
-		public void _SetupRightSide()
-		{
-			RightContainer = new()
-			{
-				Name = "RightContainer",
-				SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
-				SizeFlagsVertical = Control.SizeFlags.ExpandFill,
-			};
-			
-			RightMarginContainer = new()
-			{
-				SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
-				SizeFlagsVertical = Control.SizeFlags.ExpandFill,
-			};
-			RightInnerContainer = new()
-			{
-				SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
-				SizeFlagsVertical = Control.SizeFlags.ExpandFill,
-			};
-			
-			RightMarginContainer.AddThemeConstantOverride("margin_left", 5);
-			RightMarginContainer.AddThemeConstantOverride("margin_right", 5);
-			RightMarginContainer.AddThemeConstantOverride("margin_top", 5);
-			RightMarginContainer.AddThemeConstantOverride("margin_bottom", 5);
-			
-			RightMarginContainer.AddChild(RightInnerContainer);
-			RightContainer.AddChild(RightMarginContainer);
-			_MainContainer.AddChild(RightContainer);
-		}
-		
 		/*
 		** Fetches the left inner container
 		**
@@ -151,7 +83,9 @@ namespace AssetSnap.Front.Components
 		*/
 		public VBoxContainer GetLeftInnerContainer() 
 		{
-			return LeftInnerContainer;
+			return Trait<Containerable>()
+					.Select(0)
+					.GetInnerContainer(0) as VBoxContainer;
 		}
 		
 		/*
@@ -161,58 +95,9 @@ namespace AssetSnap.Front.Components
 		*/
 		public VBoxContainer GetRightInnerContainer() 
 		{
-			return RightInnerContainer;
-		}
-			
-		/*
-		** Cleans up in references, fields and parameters.
-		** 
-		** @return void
-		*/
-		public override void _ExitTree()
-		{
-			if( IsInstanceValid(RightInnerContainer) ) 
-			{
-				RightInnerContainer.QueueFree();
-				RightInnerContainer = null;
-			}
-			
-			if( IsInstanceValid(RightMarginContainer) ) 
-			{
-				RightMarginContainer.QueueFree();
-				RightMarginContainer = null;
-			}
-			
-			if( IsInstanceValid(RightContainer) ) 
-			{
-				RightContainer.QueueFree();
-				RightContainer = null;
-			}
-
-			if( IsInstanceValid(LeftInnerContainer) ) 
-			{
-				LeftInnerContainer.QueueFree();
-				LeftInnerContainer = null;
-			} 
-			
-			if( IsInstanceValid(LeftMarginContainer) ) 
-			{
-				LeftMarginContainer.QueueFree();
-				LeftMarginContainer = null;
-			}
-			
-			if( IsInstanceValid(LeftContainer) ) 
-			{
-				LeftContainer.QueueFree();
-				LeftContainer = null;
-			}
-			
-			if( IsInstanceValid(_MainContainer) ) 
-			{
-				// _MainContainer.GetParent().RemoveChild(_MainContainer);
-				_MainContainer.QueueFree(); 
-				_MainContainer = null;
-			}
-		}
+			return Trait<Containerable>()
+					.Select(0)
+					.GetInnerContainer(1) as VBoxContainer;
+		} 
 	}
 }

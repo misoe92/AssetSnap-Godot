@@ -25,20 +25,27 @@ namespace AssetSnap.Front.Components
 	using AssetSnap.Component;
 	using Godot;
 
-	public partial class LSSnapObject : LibraryComponent
+	[Tool]
+	public partial class LSSnapObject : LSObjectComponent
 	{
+		public bool state 
+		{
+			get => GetState();
+			set 
+			{
+				if(
+					IsValid()
+				) 
+				{
+					Trait<Checkable>().SetValue(value);
+				}
+			}
+		}
+		
 		private readonly string _Title = "Snap Object";
 		private readonly string _CheckboxTitle = "Snap to objects";
-		private bool Exited = false;
-		
-		private MarginContainer _MarginContainer;
-		private VBoxContainer _InnerContainer;
-		private	Label _Label;
-		private CheckBox _Checkbox;
-		private Callable? _CheckboxCallable;
-		
-		public bool state = false;
-		
+		private readonly string _CheckboxTooltip = "When enabled the object you spawn will snap to other objects close by";
+
 		/*
 		** Constructor for the component
 		** 
@@ -47,7 +54,19 @@ namespace AssetSnap.Front.Components
 		public LSSnapObject()
 		{
 			Name = "LSSnapObject";
-			// _include = false;
+			//_include = false;
+		}
+		
+		public bool GetState()
+		{
+			if(
+				false == IsValid()
+			) 
+			{
+				return false;
+			}
+			
+			return HasTrait<Checkable>() && false != Trait<Checkable>().IsValid() && false != Trait<Checkable>().Select(0).IsValid() ? Trait<Checkable>().Select(0).GetValue() : false;	
 		}
 		
 		/*
@@ -57,38 +76,34 @@ namespace AssetSnap.Front.Components
 		*/	
 		public override void Initialize()
 		{
+			base.Initialize();
+			AddTrait(typeof(Checkable)); 
+
+			Callable _callable = Callable.From(() => { _OnCheckboxPressed(); });
+			
+			Initiated = true;
+			
 			if( Container is VBoxContainer BoxContainer ) 
 			{
-				_MarginContainer = new();
-				_InnerContainer = new();
-					
-				_Label = new()
-				{
-					ThemeTypeVariation = "HeaderSmall",
-					Text = _Title
-				};
-				
-				_Checkbox = new()
-				{
-					Text = _CheckboxTitle
-				};
-				
-				_CheckboxCallable = new(this, "_OnCheckboxPressed");
-				
-				_MarginContainer.AddThemeConstantOverride("margin_left", 10); 
-				_MarginContainer.AddThemeConstantOverride("margin_right", 10);
-				_MarginContainer.AddThemeConstantOverride("margin_top", 2);
-				_MarginContainer.AddThemeConstantOverride("margin_bottom", 2);
-				
-				if( _CheckboxCallable is Callable _callable ) 
-				{
-					_Checkbox.Connect(CheckBox.SignalName.Pressed,_callable);
-				}
-				
-				_InnerContainer.AddChild(_Label);
-				_InnerContainer.AddChild(_Checkbox);
-				_MarginContainer.AddChild(_InnerContainer);
-				BoxContainer.AddChild(_MarginContainer);
+				Trait<Checkable>()
+					.SetName("SnapObjectCheckbox")
+					.SetAction( _callable )
+					.SetDimensions(140, 20)
+					.SetMargin(10, "left")
+					.SetMargin(10, "right")
+					.SetMargin(2, "top")
+					.SetMargin(10, "bottom")
+					.SetText(_CheckboxTitle)
+					.SetTooltipText(_CheckboxTooltip)
+					.Instantiate()
+					.Select(0)
+					.AddToContainer( BoxContainer );
+		
+				Plugin.GetInstance().StatesChanged += () => { MaybeUpdateValue(); };
+			}
+			else
+			{
+				GD.PushWarning("Invalid container @ LSSnapobject");
 			}
 		}
 		
@@ -98,25 +113,22 @@ namespace AssetSnap.Front.Components
 		** 
 		** @return void
 		*/	
-		public override void _Process(double delta)
+		public void MaybeUpdateValue()
 		{
-			if( false == IsInstanceValid(_Checkbox) ) 
+			if( 
+				false == IsValid()
+			) 
 			{
 				return;
 			}
 			
-			if( _GlobalExplorer == null || _GlobalExplorer._Plugin == null ) 
+			if( IsSnapToObject() && false == IsCheckboxChecked() ) 
 			{
-				return;
+				state = true;
 			}
-			
-			if( _Checkbox != null && state && _Checkbox.ButtonPressed == false ) 
+			else if( false == IsSnapToObject() && true == IsCheckboxChecked() ) 
 			{
-				_Checkbox.ButtonPressed = true;
-			}
-			else if( _Checkbox != null && false == state && _Checkbox.ButtonPressed == true ) 
-			{
-				_Checkbox.ButtonPressed = false;
+				state = false;
 			}
 		}
 		
@@ -128,18 +140,31 @@ namespace AssetSnap.Front.Components
 		*/	
 		private void _OnCheckboxPressed()
 		{
-			state = !state;
+			bool state = false;
+			
+			if( false == IsSnapToObject() ) 
+			{
+				_GlobalExplorer.States.SnapToObject = GlobalStates.LibraryStateEnum.Enabled;
+				
+				Trait<Checkable>()
+					.Select(0)
+					.SetMargin(0, "bottom");
+					
+				state = true;
+			}
+			else 
+			{
+				Trait<Checkable>()
+					.Select(0)
+					.SetMargin(10, "bottom");
+					
+				_GlobalExplorer.States.SnapToObject = GlobalStates.LibraryStateEnum.Disabled;
+			}
 									
-			string key = "_LSSnapObject.state";
-			UpdateSpawnSettings(key, state);
+			UpdateSpawnSettings("SnapToObject", state);
 		}
 		
-		/*
-		** Checks if the component is active
-		** 
-		** @return bool
-		*/	
-		public bool IsActive() 
+		private bool IsCheckboxChecked()
 		{
 			return state == true;
 		}
@@ -151,38 +176,30 @@ namespace AssetSnap.Front.Components
 		*/	
 		public void Reset()
 		{
+			_GlobalExplorer.States.SnapToObject = GlobalStates.LibraryStateEnum.Disabled;
 			state = false;
-			
 		}
-			
+		
+		public bool IsValid()
+		{
+			return
+				null != _GlobalExplorer &&
+				null != _GlobalExplorer.States &&
+				false != Initiated &&
+				null != Trait<Checkable>() &&
+				false != HasTrait<Checkable>() &&
+				IsInstanceValid( Trait<Checkable>() );
+		}
+		
 		/*
-		** Cleans up in references, fields and parameters.
-		** 
+		** Syncronizes it's value to a global
+		** central state controller
+		**
 		** @return void
 		*/
-		public override void _ExitTree()
+		public override void Sync() 
 		{
-			Exited = true;
-							
-			if( IsInstanceValid(_Checkbox) && _Checkbox != null && _CheckboxCallable is Callable _callable ) 
-			{
-				if( _Checkbox.IsConnected(CheckBox.SignalName.Pressed, _callable)) 
-				{
-					_Checkbox.Disconnect(CheckBox.SignalName.Pressed,_callable);
-				}
-			}
-			
-			if( IsInstanceValid(_Checkbox) ) 
-			{
-				_Checkbox.QueueFree();
-				_Checkbox = null;
-			}
-			
-			if( IsInstanceValid(_MarginContainer) ) 
-			{
-				_MarginContainer.QueueFree();
-				_MarginContainer = null;
-			}
+			_GlobalExplorer.States.SnapToObject = state ? GlobalStates.LibraryStateEnum.Enabled : GlobalStates.LibraryStateEnum.Disabled;
 		}
 	}
 }

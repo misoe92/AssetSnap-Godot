@@ -65,6 +65,8 @@ public partial class AsLibraryPanelContainer : PanelContainer
 		Connect(PanelContainer.SignalName.GuiInput, new Callable(this, "_ForwardGuiInput"));
 		Connect(Control.SignalName.MouseEntered, new Callable(this, "_OnMouseEntered"));
 		Connect(Control.SignalName.MouseExited, new Callable(this, "_OnMouseExited"));
+		
+		GlobalExplorer.GetInstance()._Plugin.Connect(Plugin.SignalName.LibraryChanged, Callable.From( (string name) => { _OnLibraryChange(name); } ) ); 
 	}
 	
 	/*
@@ -110,37 +112,37 @@ public partial class AsLibraryPanelContainer : PanelContainer
 					return;
 				}
 				
-				_Mesh = (Mesh)_Ressource;
-
-				var FileNameSplit = _FileName.Split("\\");
-				
-				_Instance = new()
-				{
-					Floating = true,
-					Mesh = _Mesh,
-					Name = FileNameSplit[ FileNameSplit.Length - 1 ],
-					SpawnSettings = new(),
-					LibraryName = Library.GetName(),
-				};
-
-				explorer.Library.Reset();
-				
-				explorer.SetFocusToNode(_Instance);
-
 				Library.ClearActivePanelState(this);
 				SetState(true);
+				
+				Library._LibrarySettings._LSSnapToHeight.SetState(true);
+				Library._LibrarySettings._LSSnapToHeight.Sync();
 
-				explorer.CurrentLibrary._LibrarySettings._LSSnapToHeight.state = true;
-				explorer.CurrentLibrary._LibrarySettings._LSSnapToHeight.UsingGlue = true;
-
+				PrepareMeshInstance();
+				
+				explorer.SetFocusToNode(_Instance);
 				explorer.CurrentLibrary._LibrarySettings.UpdateSpawnSettings("_LSSnapToHeight.state", true);
 				explorer.CurrentLibrary._LibrarySettings.UpdateSpawnSettings("_LSSnapToHeight.UsingGlue", true);
+				explorer.States.GroupedObject = null;
+				explorer.States.Group = null;
 			}
 			else if( false == _buttonEvent.Pressed && _buttonEvent.ButtonIndex == MouseButton.Left && _Active == true) 
 			{
 				explorer.SetFocusToNode(null);
 				SetState(false);
 			}
+			else if (false == _buttonEvent.Pressed && _buttonEvent.ButtonIndex == MouseButton.Right)
+			{
+				explorer.GroupBuilder.ShowMenu(_buttonEvent.GlobalPosition, _Path);
+			}
+		}
+	}
+	
+	private void _OnLibraryChange( string LibraryName )
+	{
+		if( IsActive() && Library.GetName() == LibraryName ) 
+		{
+			GlobalExplorer.GetInstance().SetFocusToNode(_Instance);
 		}
 	}
 			
@@ -196,6 +198,20 @@ public partial class AsLibraryPanelContainer : PanelContainer
 		return false;
 	}
 	
+	private void PrepareMeshInstance()
+	{
+		_Mesh = (Mesh)_Ressource;
+		var FileNameSplit = _FileName.Split("\\");
+		_Instance = new()
+		{
+			Floating = true,
+			Mesh = _Mesh,
+			Name = FileNameSplit[ FileNameSplit.Length - 1 ],
+			SpawnSettings = new(),
+			LibraryName = Library.GetName(),
+		};
+	}
+	
 	/*
 	** Handles mouse enter of the
 	** hover functionality
@@ -238,7 +254,12 @@ public partial class AsLibraryPanelContainer : PanelContainer
 		_Active = false;
 		_Library = null;
 		_Mesh = null;
-		_Ressource = null;	
+		_Ressource = null;
+		
+		if(null != GlobalExplorer.GetInstance() && null != GlobalExplorer.GetInstance()._Plugin && GlobalExplorer.GetInstance()._Plugin.IsConnected(Plugin.SignalName.LibraryChanged, Callable.From( (string name) => { _OnLibraryChange(name); } ) )) 
+		{
+			GlobalExplorer.GetInstance()._Plugin.Disconnect(Plugin.SignalName.LibraryChanged, Callable.From( (string name) => { _OnLibraryChange(name); } ) ); 
+		}
 		
 		if( IsConnected(PanelContainer.SignalName.GuiInput, new Callable(this, "_ForwardGuiInput"))) 
 		{
@@ -255,7 +276,7 @@ public partial class AsLibraryPanelContainer : PanelContainer
 
 		if( IsInstanceValid(_Instance) ) 
 		{ 
-			_Instance.Free();
+			_Instance.QueueFree();
 		}
 	}
 }

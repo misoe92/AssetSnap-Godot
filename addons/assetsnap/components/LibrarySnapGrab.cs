@@ -25,14 +25,14 @@ namespace AssetSnap.Front.Components
 	using Godot;
 	using AssetSnap.Component;
 	using AssetSnap.Front.Nodes;
-	using AssetSnap.Instance.Input;
 
+	[Tool]
 	public partial class LibrarySnapGrab : LibraryComponent
 	{
 		public LibrarySnapGrab()
 		{
 			Name = "LibrarySnapGrab";
-			// _include = false;  
+			//_include = false;  
 		}
 	
 		/*
@@ -50,8 +50,7 @@ namespace AssetSnap.Front.Components
 			
 			if(
 				null == _GlobalExplorer ||
-				false == EditorPlugin.IsInstanceValid( _GlobalExplorer.Model )  &&
-				false == EditorPlugin.IsInstanceValid( _GlobalExplorer.HandleNode )
+				false == EditorPlugin.IsInstanceValid( _GlobalExplorer.GetHandle() )
 			) 
 			{ 
 				return;
@@ -60,46 +59,62 @@ namespace AssetSnap.Front.Components
 			if( @event is InputEventKey keyEvent && keyEvent.Keycode == Key.A && Input.IsKeyPressed(Key.Shift) && Input.IsKeyPressed(Key.Alt) && keyEvent.IsPressed() == false) 
 			{
 				// Grab the currently chosen node.
-				Node _Node = _GlobalExplorer.Model;
-				if( null == _Node ) 
-				{
-					_Node = _GlobalExplorer.HandleNode;
-				}
+				Node _Node = _GlobalExplorer.GetHandle();
+				Node Parent = null;
+				Library.Instance CurrentLibrary = null;
 				
-				if( _Node is not AsMeshInstance3D ) 
+				if( _Node is not AsMeshInstance3D && _Node is not AsGrouped3D ) 
 				{
 					return;
 				}
 
-				AsMeshInstance3D _MeshInstance3D = _Node as AsMeshInstance3D;
-
-				var CurrentLibrary = _GlobalExplorer.GetLibraryByName( _MeshInstance3D.GetLibraryName() );
-				if( null == CurrentLibrary ) 
+				if( _Node is AsMeshInstance3D _MeshInstance3D ) 
 				{
-					GD.PushWarning("No library");
-					return;
-				}
-				
-				Node Parent = _MeshInstance3D.GetParent();
-				if( null != Parent ) 
-				{
-					Parent.RemoveChild(_MeshInstance3D);
-				}
-				else 
-				{
-					GD.PushWarning("No Parent");
-					return;
-				}
-
-				_GlobalExplorer.SetFocusToNode(_MeshInstance3D);
-
-				if ( null != Parent && Parent is AsStaticBody3D ) 
-				{
-					if( null != Parent.GetParent() ) 
+					CurrentLibrary = _GlobalExplorer.GetLibraryByName( _MeshInstance3D.GetLibraryName() );
+					if( null == CurrentLibrary ) 
 					{
-						Parent.GetParent().RemoveChild(Parent);
+						GD.PushWarning("No library");
+						return;
+					}
+					
+					Parent = _MeshInstance3D.GetParent();
+					if( null != Parent ) 
+					{
+						Parent.RemoveChild(_MeshInstance3D);
+					}
+					else 
+					{
+						GD.PushWarning("No Parent");
+						return;
+					}
+
+					_GlobalExplorer.SetFocusToNode(_MeshInstance3D);
+
+					if ( null != Parent && Parent is AsStaticBody3D ) 
+					{
+						if( null != Parent.GetParent() ) 
+						{
+							Parent.GetParent().RemoveChild(Parent);
+						}
 					}
 				}
+				
+				if( _Node is AsGrouped3D _Grouped3D )
+				{
+					AsGrouped3D newGroup3D = _Grouped3D.Duplicate() as AsGrouped3D;
+					Parent = _Grouped3D.GetParent();
+					if( null != Parent ) 
+					{
+						Parent.RemoveChild(_Grouped3D);
+					}
+					else 
+					{
+						GD.PushWarning("No Parent");
+						return;
+					}
+					
+					_GlobalExplorer.SetFocusToNode(newGroup3D);
+				} 
 			}
 		}
 		

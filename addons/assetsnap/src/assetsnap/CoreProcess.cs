@@ -25,6 +25,7 @@ namespace AssetSnap.Core
 	using AssetSnap.Component;
 	using AssetSnap.Front.Components;
 	using AssetSnap.Front.Nodes;
+	using AssetSnap.Static;
 	using Godot;
 	
 	public class CoreProcess : Core 
@@ -41,10 +42,18 @@ namespace AssetSnap.Core
 			{
 				return;
 			}
+
+			_GlobalExplorer.Snap.Tick(delta);
+			
+			if( null != _GlobalExplorer.GroupBuilder ) 
+			{
+				Vector2 mouseGlobalPosition = _GlobalExplorer._Plugin.GetViewport().GetMousePosition();
+				_GlobalExplorer.GroupBuilder.MaybeHideMenu(mouseGlobalPosition);	
+			}		
 			
 			_GlobalExplorer.DeltaTime += (float)delta;
 			
-			if( null != _GlobalExplorer._ForceFocus ) 
+			if( null != _GlobalExplorer._ForceFocus && EditorPlugin.IsInstanceValid( _GlobalExplorer._ForceFocus )) 
 			{
 				if( EditorInterface.Singleton.GetInspector().GetEditedObject() != _GlobalExplorer._ForceFocus ) 
 				{
@@ -59,29 +68,31 @@ namespace AssetSnap.Core
 					_GlobalExplorer._Forced = 0;
 				}
 			}
-			
+			else if(null != _GlobalExplorer._ForceFocus && false == EditorPlugin.IsInstanceValid( _GlobalExplorer._ForceFocus )) 
+			{
+				GD.PushWarning("Invalid focus object");
+				_GlobalExplorer._ForceFocus = null;
+				_GlobalExplorer._Forced = 0;
+			}
+
 			if(
-				null != _GlobalExplorer._Plugin &&
-				null != _GlobalExplorer._Plugin.CurrentScene &&
-				null != _GlobalExplorer.HandleNode &&
-				null != _GlobalExplorer.HandleNode.Owner &&
-				_GlobalExplorer._Plugin.CurrentScene != _GlobalExplorer.HandleNode.Owner
+				ShouldHideContextMenu()
 			) 
 			{
 				_GlobalExplorer.ContextMenu.Hide();
 			}
 			else if (
-				null != _GlobalExplorer._Plugin &&
-				null != _GlobalExplorer._Plugin.CurrentScene &&
-				null != _GlobalExplorer.HandleNode &&
-				null != _GlobalExplorer.HandleNode.Owner &&
-				_GlobalExplorer._Plugin.CurrentScene == _GlobalExplorer.HandleNode.Owner &&
-				_GlobalExplorer.ContextMenu.IsHidden())
+				ShouldShowContextMenu()
+			)
 			{
 				_GlobalExplorer.ContextMenu.Show();
 			}
 
-			if( false == HasRayProjections() || false == HasLibrary()) 
+			if(
+				false == HasRayProjections() ||
+				( false == HasLibrary() && false == HandleIsGroup() ) ||
+				( false == HasHandle() && false == HandleIsGroup() )
+			) 
 			{
 				if( HasDecal() ) 
 				{
@@ -90,23 +101,98 @@ namespace AssetSnap.Core
 
 				return;
 			}
-
-			if( false == HasHandle() ) 
-			{
-				if( HasDecal() ) 
-				{
-					_GlobalExplorer.Decal.Hide();
-				} 
-				
-				return;
-			}
-
+	
 			// Checks if current handle is a model
-			if( HasDecal() && HandleIsModel() ) 
+			if( HasDecal() && HandleIsGroup() ) 
+			{
+				// If so we handle model specific operations
+				ProcessGroupHandle();
+			}
+			// Checks if current handle is a model
+			else if( HasDecal() && HandleIsModel() && false == HandleIsGroup() ) 
 			{
 				// If so we handle model specific operations
 				ProcessModelHandle();
 			}
+		}
+		
+		private bool ShouldHideContextMenu()
+		{
+			if( null == _GlobalExplorer || true == _GlobalExplorer.ContextMenu.IsHidden() ) 
+			{
+				return false;
+			}
+			
+			if(
+				null == _GlobalExplorer.States.CurrentScene ||
+				true == _GlobalExplorer.GroupMainScreen.Visible
+			) 
+			{
+				return true;
+			}
+			
+			if( null == _GlobalExplorer.GetHandle() ) 
+			{
+				return true;
+			}
+			
+			Node3D Handle = _GlobalExplorer.GetHandle();
+			
+			if( Handle is AsMeshInstance3D meshInstance3D ) 
+			{
+				if( meshInstance3D.Floating == false ) 
+				{
+					return _GlobalExplorer.States.CurrentScene != _GlobalExplorer.States.EditingObject.Owner;
+				}
+				else
+				{
+					return false;
+				}
+			}
+			
+			return false;
+		}
+		
+		private bool ShouldShowContextMenu()
+		{
+			if( null == _GlobalExplorer || false == _GlobalExplorer.ContextMenu.IsHidden() ) 
+			{
+				return false;
+			}
+			
+			if(
+				null == _GlobalExplorer.States.CurrentScene ||
+				null != _GlobalExplorer.GroupMainScreen && 
+				true == _GlobalExplorer.GroupMainScreen.Visible
+			) 
+			{
+				return false;
+			}
+			
+			if( null != _GlobalExplorer.GroupedObject ) 
+			{
+				return true;
+			}
+			
+			if( null == _GlobalExplorer.GetHandle() ) 
+			{
+				return false;
+			}
+
+			Node3D Handle = _GlobalExplorer.GetHandle();
+			
+			if( Handle is AsMeshInstance3D meshInstance3D ) 
+			{
+				if( meshInstance3D.Floating == false ) 
+				{
+					return _GlobalExplorer.States.CurrentScene == _GlobalExplorer.GetHandle().Owner;
+				}
+				else
+				{
+					return true;
+				}
+			}
+			return true;
 		}
 		
 		/*
@@ -173,6 +259,64 @@ namespace AssetSnap.Core
 			}
 		}
 		
+		private void ProcessGroupHandle()
+		{
+			// Checks if our decal is hidden
+			if( _GlobalExplorer.Decal.IsHidden() ) 
+			{
+				// If it is we show it
+				_GlobalExplorer.Decal.Show();
+			}
+			
+			// Checks if current mouse is event is motion
+			if( MouseEventIsMove() && _GlobalExplorer.HasProjectNormal() && _GlobalExplorer.HasProjectOrigin() )
+			{
+				ConfigureRayCast();
+				Transform3D ItemTransform = new(Basis.Identity, Vector3.Up);
+				
+				// Checks if raycast did collide
+				if( RaycastDidCollide() ) 
+				{
+					_GlobalExplorer.PositionDraw = _GlobalExplorer.Raycast.GetNode().GetCollisionPoint();
+					ItemTransform.Origin = _GlobalExplorer.GetPositionDrawn();
+					// Checks if the object can and should snap to another object
+					ItemTransform.Origin = HandleObjectSnap(ItemTransform.Origin);
+					
+					// Checks if glue is used and applies it
+					if( _GlobalExplorer.States.SnapToHeight == GlobalStates.LibraryStateEnum.Enabled ) 
+					{
+						ItemTransform.Origin.Y = _GlobalExplorer.States.SnapToHeightValue;
+					}
+					
+					if( _GlobalExplorer.States.SnapToX == GlobalStates.LibraryStateEnum.Enabled ) 
+					{
+						ItemTransform.Origin.X = _GlobalExplorer.States.SnapToXValue;
+					}
+					
+					if( _GlobalExplorer.States.SnapToZ == GlobalStates.LibraryStateEnum.Enabled ) 
+					{
+						ItemTransform.Origin.Z = _GlobalExplorer.States.SnapToZValue;
+					}
+					
+					// Updates decal preview
+					if( EditorPlugin.IsInstanceValid(_GlobalExplorer.Decal)) 
+					{
+						_GlobalExplorer.Decal._UpdateDecalPreview(true);						
+					}
+				}
+				else  
+				{
+					// Use mouse position and hard set height to 0
+					ItemTransform.Origin = new Vector3(0, 0.25f, 0);
+					_GlobalExplorer.Decal.Hide();
+				}
+				
+				// Sets transform and resets the current mouse input
+				_GlobalExplorer._CurrentMouseInput = EventMouse.EventNone;
+				_GlobalExplorer.Decal.SetTransform(ItemTransform);
+			}
+		}
+		
 		/*
 		** Checks if object snapping should occur, and if so
 		** it then applies the snapping to the Vector3 value
@@ -190,9 +334,23 @@ namespace AssetSnap.Core
 				if( HasLibrarySettings() && Handle is AssetSnap.Front.Nodes.AsMeshInstance3D asMeshInstance3D) 
 				{
 					int SnapLayer = asMeshInstance3D.GetSetting<int>("_LSSnapLayer.value");
-					if ( ShouldSnap() && _GlobalExplorer.Waypoints.CanSnap(Origin,SnapLayer)) 
+					if ( ShouldSnap() && SnapStatic.CanSnap(Origin,SnapLayer)) 
 					{
-						Origin = _GlobalExplorer.Waypoints.Snap(Origin, SnapLayer);
+						Origin = SnapStatic.Snap(Origin, asMeshInstance3D.GetAabb(), SnapLayer);
+					}
+				}
+			}
+			else if( GlobalExplorer.GetInstance().States.PlacingMode == GlobalStates.PlacingModeEnum.Group ) 
+			{
+				// Snap group style
+				Node Handle = GetHandle();
+				
+				if( Handle is AsGrouped3D asGrouped3D ) 
+				{
+					Aabb aabb = asGrouped3D.GetAabb();
+					if ( ShouldSnap() && SnapStatic.CanSnap(Origin,asGrouped3D.SnapLayer)) 
+					{
+						Origin = SnapStatic.Snap(Origin, aabb, asGrouped3D.SnapLayer);
 					}
 				}
 			}
@@ -308,7 +466,12 @@ namespace AssetSnap.Core
 		*/
 		private bool HandleIsModel()
 		{
-			return _GlobalExplorer.GetHandle() is MeshInstance3D;
+			return _GlobalExplorer.GetHandle() is MeshInstance3D && _GlobalExplorer.States.PlacingMode == GlobalStates.PlacingModeEnum.Model;
+		}
+		
+		private bool HandleIsGroup()
+		{
+			return _GlobalExplorer.GetHandle() is AsGrouped3D && _GlobalExplorer.States.PlacingMode == GlobalStates.PlacingModeEnum.Group;
 		}
 		
 		/*
@@ -332,17 +495,17 @@ namespace AssetSnap.Core
 		{
 			if( Object is LSSnapToHeight _objectHeight ) 
 			{
-				return HasLibrary() && _objectHeight.IsUsingGlue();
+				return HasLibrary() && _objectHeight.IsSnapToGlue();
 			}
 			
 			if( Object is LSSnapToX _objectX ) 
 			{
-				return HasLibrary() && _objectX.IsUsingGlue();
+				return HasLibrary() && _objectX.IsSnapToGlue();
 			}
 
 			if( Object is LSSnapToZ _objectZ ) 
 			{
-				return HasLibrary() && _objectZ.IsUsingGlue();
+				return HasLibrary() && _objectZ.IsSnapToGlue();
 			}
 			
 			return false;
@@ -355,16 +518,7 @@ namespace AssetSnap.Core
 		*/
 		private bool ShouldSnap()
 		{
-			LibrarySettings _LibrarySettings = GetLibrarySettings();
-			
-			if( null == _LibrarySettings ) 
-			{
-				return false;
-			}
-			
-			bool SnapToObject = _LibrarySettings._LSSnapObject.IsActive();
-
-			return SnapToObject;
+			return _GlobalExplorer.States.SnapToObject == GlobalStates.LibraryStateEnum.Enabled;
 		}
 		
 		/*

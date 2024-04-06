@@ -46,6 +46,9 @@ namespace AssetSnap.Front.Nodes
 		public Transform3D InstanceTransform { get; set; }
 		
 		[Export]
+		public Node InstanceOwner { get; set; }
+		
+		[Export]
 		public Vector3 InstanceRotation { get; set; }
 		
 		[Export]
@@ -67,7 +70,7 @@ namespace AssetSnap.Front.Nodes
 			return GetParent() != null;
 		}
 
-		public void Initialize(int TypeState = 0, int ArgState = 0)
+		public void Initialize(int TypeState = -1, int ArgState = -1)
 		{
 			try 
 			{
@@ -103,48 +106,50 @@ namespace AssetSnap.Front.Nodes
 					};
 	
 					AddChild(_Instance);
-					_Instance.Owner = Tree.EditedSceneRoot;
+					_Instance.Owner = null != InstanceOwner ? InstanceOwner : Tree.EditedSceneRoot;
 					_Instance.SetIsFloating(false);
 				}
 
-				var CurrentLibrary = _GlobalExplorer.GetLibraryByName(InstanceLibrary);
-				if( CurrentLibrary != null ) 
+				if( _GlobalExplorer.States.ConvexCollision == GlobalStates.LibraryStateEnum.Enabled && TypeState == -1 || TypeState == 1) 
 				{
-					LSConvexPolygonCollision ConvexComponent = CurrentLibrary._LibrarySettings._LSConvexPolygonCollision;
-					bool IsConvexCollision = ConvexComponent.IsActive();
+					int state = 0;
 					
-					LSConcaveCollision ConcaveComponent = CurrentLibrary._LibrarySettings._LSConcaveCollision;
-					bool IsConcaveCollision = ConcaveComponent.IsActive();
+					if(
+						_GlobalExplorer.States.ConvexClean == GlobalStates.LibraryStateEnum.Enabled && TypeState == -1 &&
+						_GlobalExplorer.States.ConvexSimplify == GlobalStates.LibraryStateEnum.Disabled && TypeState == -1 ||
+						ArgState == 1
+					) 
+					{
+						state = 1;
+					} 
 					
-					if( IsConvexCollision || TypeState == 1) 
+					if(
+						_GlobalExplorer.States.ConvexClean == GlobalStates.LibraryStateEnum.Disabled && TypeState == -1 &&
+						_GlobalExplorer.States.ConvexSimplify == GlobalStates.LibraryStateEnum.Enabled && TypeState == -1 ||
+						ArgState == 2
+					) 
 					{
-						int state = 0;
-						
-						if( ConvexComponent.ShouldClean() && false == ConvexComponent.ShouldSimplify() || ArgState == 1) 
-						{
-							state = 1;
-						} 
-						
-						if( false == ConvexComponent.ShouldClean() && ConvexComponent.ShouldSimplify() || ArgState == 2 ) 
-						{
-							state = 2;
-						} 
-						
-						if(ConvexComponent.ShouldClean() && ConvexComponent.ShouldSimplify() || ArgState == 3 ) 
-						{
-							state = 3;
-						} 
-						
-						_ConvexCollisions(Mesh, this, Tree, state);	
-					}
-					else if( IsConcaveCollision || TypeState == 2 ) 
+						state = 2;
+					} 
+					
+					if(
+						_GlobalExplorer.States.ConvexClean == GlobalStates.LibraryStateEnum.Enabled && TypeState == -1 &&
+						_GlobalExplorer.States.ConvexSimplify == GlobalStates.LibraryStateEnum.Enabled && TypeState == -1 ||
+						ArgState == 3
+					) 
 					{
-						_ConcaveCollisions(Mesh, this, Tree);	
-					}
-					else 
-					{
-						_SimpleCollisions(Mesh, this, Tree, TypeState == 3 );	
-					}
+						state = 3;
+					} 
+					
+					_ConvexCollisions(Mesh, this, Tree, state);	
+				}
+				else if( _GlobalExplorer.States.ConcaveCollision == GlobalStates.LibraryStateEnum.Enabled && TypeState == -1 || TypeState == 2 ) 
+				{
+					_ConcaveCollisions(Mesh, this, Tree);	
+				}
+				else 
+				{
+					_SimpleCollisions(Mesh, this, Tree, TypeState == 3 );	
 				}
 			}
 			catch(Exception e ) 
@@ -191,44 +196,49 @@ namespace AssetSnap.Front.Nodes
 			}
  
 			SceneTree Tree = _GlobalExplorer._Plugin.GetTree();
-			var CurrentLibrary = _GlobalExplorer.GetLibraryByName(InstanceLibrary);
-			if( CurrentLibrary != null ) 
+			if( _GlobalExplorer.States.ConvexCollision == GlobalStates.LibraryStateEnum.Enabled && TypeState == 0 || TypeState == 1) 
 			{
-				LSConvexPolygonCollision ConvexComponent = CurrentLibrary._LibrarySettings._LSConvexPolygonCollision;
-				bool IsConvexCollision = ConvexComponent.IsActive();
+				int state = 0;
 				
-				LSConcaveCollision ConcaveComponent = CurrentLibrary._LibrarySettings._LSConcaveCollision;
-				bool IsConcaveCollision = ConcaveComponent.IsActive();
+				if(
+					_GlobalExplorer.States.ConvexClean == GlobalStates.LibraryStateEnum.Enabled &&
+					_GlobalExplorer.States.ConvexSimplify == GlobalStates.LibraryStateEnum.Disabled &&
+					ArgState == 0 ||
+					ArgState == 1
+				) 
+				{
+					state = 1;
+				} 
 				
-				if( IsConvexCollision || TypeState == 1) 
+				if(
+					_GlobalExplorer.States.ConvexClean == GlobalStates.LibraryStateEnum.Disabled &&
+					_GlobalExplorer.States.ConvexSimplify == GlobalStates.LibraryStateEnum.Enabled &&
+					ArgState == 0  ||
+					ArgState == 2
+				) 
 				{
-					int state = 0;
-					
-					if( ConvexComponent.ShouldClean() && false == ConvexComponent.ShouldSimplify() || ArgState == 1 ) 
-					{
-						state = 1;
-					} 
-					
-					if( false == ConvexComponent.ShouldClean() && ConvexComponent.ShouldSimplify() || ArgState == 2 ) 
-					{
-						state = 2;
-					} 
-					
-					if(ConvexComponent.ShouldClean() && ConvexComponent.ShouldSimplify() || ArgState == 3 ) 
-					{
-						state = 3;
-					} 
-					
-					_ConvexCollisions(Mesh, this, Tree, state);	
-				}
-				else if( IsConcaveCollision || TypeState == 2 ) 
+					state = 2;
+				} 
+				
+				if(
+					_GlobalExplorer.States.ConvexClean == GlobalStates.LibraryStateEnum.Enabled &&
+					_GlobalExplorer.States.ConvexSimplify == GlobalStates.LibraryStateEnum.Enabled &&
+					ArgState == 0  ||
+					ArgState == 3
+				) 
 				{
-					_ConcaveCollisions(Mesh, this, Tree);	
-				}
-				else 
-				{
-					_SimpleCollisions(Mesh, this, Tree, TypeState == 3 );	
-				}
+					state = 3;
+				} 
+				
+				_ConvexCollisions(Mesh, this, Tree, state);	
+			}
+			else if( _GlobalExplorer.States.ConcaveCollision == GlobalStates.LibraryStateEnum.Enabled && TypeState == 0 || TypeState == 2 ) 
+			{
+				_ConcaveCollisions(Mesh, this, Tree);	
+			}
+			else 
+			{
+				_SimpleCollisions(Mesh, this, Tree, TypeState == 3 );	
 			}
 		}
 			
@@ -245,12 +255,9 @@ namespace AssetSnap.Front.Nodes
 				
 				Aabb _aabb = model.GetAabb();
 			
-				var CurrentLibrary = _GlobalExplorer.GetLibraryByName(InstanceLibrary);
-				LSSimpleSphereCollision ConcaveComponent = CurrentLibrary._LibrarySettings._LSSimpleSphereCollision;
-				
 				if( IsSphere == false ) 
 				{
-					IsSphere = ConcaveComponent.IsActive();
+					IsSphere = _GlobalExplorer.States.SphereCollision == GlobalStates.LibraryStateEnum.Enabled;
 				}
 				
 				Shape3D _Shape = new BoxShape3D()
@@ -281,7 +288,7 @@ namespace AssetSnap.Front.Nodes
 				_Collision.SetMeta("AsCollision", true);
 					
 				_Body.AddChild(_Collision, true);
-				_Collision.Owner = Tree.EditedSceneRoot;
+				_Collision.Owner = null != InstanceOwner ? InstanceOwner : Tree.EditedSceneRoot;
 			}
 			catch( Exception e ) 
 			{
@@ -328,7 +335,7 @@ namespace AssetSnap.Front.Nodes
 			_Collision.SetMeta("AsCollision", true);
 	
 			_Body.AddChild(_Collision, true);
-			_Collision.Owner = Tree.EditedSceneRoot;
+			_Collision.Owner = null != InstanceOwner ? InstanceOwner : Tree.EditedSceneRoot;
 		}
 		
 		private void _ConcaveCollisions(Mesh model, StaticBody3D _Body, SceneTree Tree)
@@ -349,7 +356,7 @@ namespace AssetSnap.Front.Nodes
 			_Collision.SetMeta("AsCollision", true);
 				
 			_Body.AddChild(_Collision, true);
-			_Collision.Owner = Tree.EditedSceneRoot;
+			_Collision.Owner = null != InstanceOwner ? InstanceOwner : Tree.EditedSceneRoot;
 		}
 
 		public override void _ExitTree()

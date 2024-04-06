@@ -91,8 +91,12 @@ namespace AssetSnap.Component
 				}
 				else  
 				{
-					if( instance is Node _node ) 
+					if( instance is Node _node && IsInstanceValid(_node)) 
 					{
+						if( null != _node.GetParent() && IsInstanceValid( _node.GetParent() ))
+						{
+							_node.GetParent().RemoveChild(_node);
+						}
 						_node.QueueFree();
 					}
 				} 
@@ -199,6 +203,44 @@ namespace AssetSnap.Component
 		}
 		
 		/*
+		** Fetches an instance of a single object
+		** and returns it to the querier.
+		**
+		** @param bool unique[false]
+		** @return T - Can be various of types depending on the component
+		*/
+		public BaseComponent Single( string key, bool unique = false )
+		{
+			string[] keyArr = key.Split(".");
+			string keyName = keyArr[keyArr.Length - 1];
+			
+			if( false == Has(keyName) ) 
+			{
+				return null;
+			}
+
+			BaseComponent component = _Components[keyName];
+			
+			if( unique ) 
+			{
+				Type classType = Type.GetType(key);
+				component = Activator.CreateInstance(classType) as BaseComponent;
+				
+				_Instances.Add(component);
+			}
+
+			if (component is BaseComponent typedComponent)
+			{
+				return typedComponent;
+			}
+			else
+			{
+				// Handle the case where conversion is not possible
+				return null;
+			}
+		}
+		
+		/*
 		** Checks if the given key has a component
 		**
 		** @param string key
@@ -212,6 +254,18 @@ namespace AssetSnap.Component
 			}
 			
 			return true;
+		}
+		
+		public void End( string key ) 
+		{
+			if( false == Has( key ) ) 
+			{
+				return;
+			}
+
+			RemoveChild(_Components[key]);
+			_Components[key] = new();
+			AddChild(_Components[key]);
 		}
 		
 		/*
@@ -243,27 +297,27 @@ namespace AssetSnap.Component
 		
 		public override void _ExitTree()
 		{
-			if (_Instances != null && _Instances.Count != 0)
-			{
-				foreach( BaseComponent _component in _Instances ) 
-				{
-					if( EditorPlugin.IsInstanceValid( _component ) ) 
-					{
-						_component.QueueFree();
-					}
-				}
-			}
+			// if (_Instances != null && _Instances.Count != 0)
+			// {
+			// 	foreach( BaseComponent _component in _Instances ) 
+			// 	{
+			// 		if( EditorPlugin.IsInstanceValid( _component ) )  
+			// 		{
+			// 			_component.Free();
+			// 		}
+			// 	}
+			// }
 			
-			if( _Components != null && _Components.Count != 0 ) 
-			{
-				foreach( (string key, BaseComponent _component) in _Components ) 
-				{
-					if( EditorPlugin.IsInstanceValid( _component ) ) 
-					{
-						_component.QueueFree();
-					} 
-				} 
-			} 
+			// if( _Components != null && _Components.Count != 0 ) 
+			// {
+			// 	foreach( (string key, BaseComponent _component) in _Components ) 
+			// 	{
+			// 		if( EditorPlugin.IsInstanceValid( _component ) ) 
+			// 		{
+			// 			_component.QueueFree();
+			// 		} 
+			// 	} 
+			// }  
 
 			// _Instances = null; 
 			// _Components = null; 

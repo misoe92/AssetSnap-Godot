@@ -715,7 +715,7 @@ public partial class AsGroup3D : Node3D
 		}
 	}
 	
-	protected void ClearCurrentChildren()
+	public void ClearCurrentChildren()
 	{
 		foreach( Node child in GetChildren())
 		{

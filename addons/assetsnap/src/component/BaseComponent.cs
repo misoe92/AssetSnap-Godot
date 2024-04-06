@@ -27,7 +27,7 @@ namespace AssetSnap.Component
 	using System.Reflection;
 	using AssetSnap.Abstracts;
 	using Godot;
-	
+	[Tool]
 	public partial class BaseComponent : AbstractComponentBase
 	{
 		/* Debugging Purpose */
@@ -46,11 +46,13 @@ namespace AssetSnap.Component
 			}
 		}
 
-		public BaseComponent()
+		public override void _EnterTree()
 		{
-			 _GlobalExplorer = GlobalExplorer.GetInstance();
+			_GlobalExplorer = GlobalExplorer.GetInstance();
+		 
+			base._EnterTree();
 		}
-		
+
 		/*
 		** Virtual method for entering
 		** Ensures that there is always a enter method
@@ -128,6 +130,7 @@ namespace AssetSnap.Component
 		{
 			Type type = GetType();
 			FieldInfo field = type.GetField(key);
+			PropertyInfo property = type.GetProperty(key);
 			
 			if (field != null)
 			{
@@ -139,13 +142,27 @@ namespace AssetSnap.Component
 				}
 				else
 				{
-					Console.WriteLine($"Cannot set property '{key}' with value of type '{value.GetType().Name}' in class '{type.Name}'.");
+					GD.PushWarning($"Cannot set field '{key}' with value of type '{value.GetType().Name}' in class '{type.Name}'.");
+				}
+			}
+			else if( property != null ) 
+			{
+				object convertedValue = ConvertVariantToFieldType(value, property.PropertyType);
+				if (convertedValue != null)
+				{
+					property.SetValue(this, convertedValue);
+					return true;
+				}
+				else
+				{
+					GD.PushWarning($"Cannot set property '{key}' with value of type '{value.GetType().Name}' in class '{type.Name}'.");
 				}
 			}
 			else
 			{
-				Console.WriteLine($"Property '{key}' not found or not writable in class '{type.Name}'.");
+				GD.PushWarning($"Property or field with name '{key}' not found or not writable in class '{type.Name}'.");
 			}
+			
 			return false;
 		}
 		
@@ -183,14 +200,13 @@ namespace AssetSnap.Component
 		*/
 		public override void _ExitTree()
 		{
-			if( IsInstanceValid(_Container) ) 
-			{
-				_Container.QueueFree();
-			}
-			
+			// if( IsInstanceValid(_Container) ) 
+			// {
+			// 	_Container.QueueFree();
+			// }
 			_Container = null;
 			_GlobalExplorer = null;
-			// Disposed = true;
+			// Disposed = true; 
 		}
 	}
 }
