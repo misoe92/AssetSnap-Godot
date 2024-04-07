@@ -57,6 +57,7 @@ namespace AssetSnap.Component
 			{"bottom", 10},
 		};
 		private string Title = "";
+		private string Suffix = "";
 		private TitleType Type = TitleType.HeaderMedium;
 		private TextServer.AutowrapMode AutowrapMode = TextServer.AutowrapMode.Off;
 		private HorizontalAlignment _HorizontalAlignment;
@@ -202,6 +203,19 @@ namespace AssetSnap.Component
 			{
 				labelNode.Text =text;
 			}
+			
+			return this;
+		}
+		
+		/*
+		** Sets the text of the current button
+		**
+		** @param string text
+		** @return Labelable
+		*/
+		public Labelable SetSuffix( string text ) 
+		{
+			Suffix = text;
 			
 			return this;
 		}
@@ -391,6 +405,8 @@ namespace AssetSnap.Component
 			WorkingNode = null;
 			_BoxContainer = null;
 			_MarginContainer = null;
+			Title = "";
+			Suffix = "";
 		}
 		
 		
