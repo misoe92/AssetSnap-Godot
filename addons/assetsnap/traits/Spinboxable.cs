@@ -22,18 +22,13 @@
 
 #if TOOLS
 using System.Collections.Generic;
+using AssetSnap.Trait;
 using Godot;
 namespace AssetSnap.Component
 {
 	[Tool]
-	public partial class Spinboxable : Trait.Base
+	public partial class Spinboxable : ContainerTrait
 	{
-		/*
-		** Public
-		*/
-		public MarginContainer _marginContainer;
-		public VBoxContainer _innerContainer;
-		
 		/*
 		** Private
 		*/
@@ -55,27 +50,10 @@ namespace AssetSnap.Component
 		**
 		** @return Spinboxable
 		*/
-		public Spinboxable Instantiate()
+		public override Spinboxable Instantiate()
 		{
 			base._Instantiate( GetType().ToString() );
-
-			_marginContainer = new()
-			{
-				Name ="SpinBoxMargin",
-				SizeFlagsHorizontal = SizeFlagsHorizontal,
-				SizeFlagsVertical = SizeFlagsVertical
-			};
-			_innerContainer = new()
-			{
-				Name ="SpinBoxBoxContainer",
-				SizeFlagsHorizontal = SizeFlagsHorizontal,
-				SizeFlagsVertical = SizeFlagsVertical
-			};
-				
-			foreach( (string side, int value ) in Margin ) 
-			{
-				_marginContainer.AddThemeConstantOverride("margin_" + side, value);
-			}
+			base.Instantiate();
 			
 			SpinBox WorkingInput = new()
 			{
@@ -119,11 +97,8 @@ namespace AssetSnap.Component
 
 			Nodes.Add(WorkingInput);
 			_Actions.Add(_Action);
-			
-			WorkingNode = WorkingInput;
 
-			_innerContainer.AddChild(WorkingInput);
-			_marginContainer.AddChild(_innerContainer);
+			GetInnerContainer(0).AddChild(WorkingInput);
 
 			Reset();
 			
@@ -137,22 +112,16 @@ namespace AssetSnap.Component
 		** @param int index
 		** @return Spinboxable
 		*/
-		public Spinboxable Select(int index)
+		public override Spinboxable Select(int index)
 		{
 			base._Select(index);
 			
 			if( IsInstanceValid(WorkingNode) && WorkingNode is SpinBox InputNode )
 			{
 				_Action = _Actions[index];
-				
-				if( IsInstanceValid(InputNode.GetParent()) ) 
-				{
-					_innerContainer = InputNode.GetParent() as VBoxContainer;
-					if( IsInstanceValid(_innerContainer.GetParent()) ) 
-					{
-						_marginContainer = _innerContainer.GetParent() as MarginContainer;
-					}
-				}
+
+				_MarginContainer = WorkingNode.GetParent().GetParent().GetParent().GetParent().GetParent() as MarginContainer;
+				_InnerContainer = WorkingNode.GetParent().GetParent() as Container;
 			}
 
 			return this;
@@ -165,7 +134,7 @@ namespace AssetSnap.Component
 		** @param string name
 		** @return Spinboxable
 		*/
-		public Spinboxable SelectByName( string name ) 
+		public override Spinboxable SelectByName( string name ) 
 		{
 			foreach( Button button in Nodes ) 
 			{
@@ -188,7 +157,7 @@ namespace AssetSnap.Component
 		*/
 		public void AddToContainer( Node Container )
 		{
-			_AddToContainer(Container, _marginContainer);
+			_AddToContainer(Container, _MarginContainer);
 		}
 		
 		/*
@@ -297,16 +266,9 @@ namespace AssetSnap.Component
 		** @param bool state
 		** @return Spinboxable
 		*/
-		public Spinboxable SetVisible(bool state)
+		public override Spinboxable SetVisible(bool state)
 		{
-			if( null != _marginContainer && IsInstanceValid( _marginContainer ) )  
-			{
-				_marginContainer.Visible = state;
-			}
-			else 
-			{
-				Visible = state;
-			}
+			base.SetVisible(state);
 
 			return this;
 		}
@@ -374,19 +336,9 @@ namespace AssetSnap.Component
 		** @param string side
 		** @return Spinboxable
 		*/
-		public Spinboxable SetMargin( int value, string side = "" ) 
+		public override Spinboxable SetMargin( int value, string side = "" ) 
 		{
-			if( side == "" ) 
-			{
-				Margin["top"] = value;
-				Margin["bottom"] = value;
-				Margin["left"] = value;
-				Margin["right"] = value;
-			}
-			else 
-			{
-				Margin[side] = value;
-			}
+			base.SetMargin(value, side);
 			
 			return this;
 		}
@@ -411,25 +363,6 @@ namespace AssetSnap.Component
 		}
 		
 		/*
-		** Booleans
-		*/
-		
-		/*
-		** Checks if the current spinbox is visible
-		**
-		** @return bool
-		*/
-		public bool IsVisible()
-		{
-			if (null != _marginContainer && IsInstanceValid(_marginContainer))
-			{
-				return _marginContainer.Visible;
-			}
-			
-			return false;
-		}
-		
-		/*
 		** Private methods
 		*/
 		
@@ -439,7 +372,7 @@ namespace AssetSnap.Component
 		**
 		** @return void
 		*/
-		private Spinboxable Reset()
+		protected override void Reset()
 		{
 			Size = Vector2.Zero;
 			CustomMinimumSize = Vector2.Zero;
@@ -452,10 +385,8 @@ namespace AssetSnap.Component
 			
 			WorkingNode = null;
 			_Action = null;
-			_marginContainer = null;
-			_innerContainer = null;
-			
-			return this;
+
+			base.Reset();
 		}
 		
 		/*
