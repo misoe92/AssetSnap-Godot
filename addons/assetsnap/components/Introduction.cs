@@ -65,8 +65,7 @@ namespace AssetSnap.Front.Components
 				.SetName("IntroductionTitle")
 				.SetType(Labelable.TitleType.HeaderLarge)
 				.SetText(TitleText)
-				.SetSuffix(_GlobalExplorer._Plugin.GetVersionString())
-				.SetAutoWrap(TextServer.AutowrapMode.Word)
+				.SetSuffix("V." + _GlobalExplorer._Plugin.GetVersionString())
 				.Instantiate();
 
 			Trait<Labelable>()
