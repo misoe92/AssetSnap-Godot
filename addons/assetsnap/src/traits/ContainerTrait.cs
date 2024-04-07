@@ -56,7 +56,6 @@ namespace AssetSnap.Trait
 		/*
 		** Protected
 		*/
-	
 		protected ContainerLayout Layout = ContainerLayout.OneColumn;
 		protected ContainerOrientation Orientation = ContainerOrientation.Vertical;
 		protected ContainerOrientation InnerOrientation = ContainerOrientation.Horizontal;
