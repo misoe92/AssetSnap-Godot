@@ -28,27 +28,40 @@ namespace AssetSnap.Component
 	[Tool]
 	public partial class Checkable : Trait.Base
 	{
+		/*
+		** Public
+		*/
+		public MarginContainer _marginContainer;
+		public VBoxContainer _innerContainer;
+		
+		/*
+		** Private
+		*/
+		private Control.SizeFlags SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+		private Control.SizeFlags SizeFlagsVertical = Control.SizeFlags.ShrinkBegin;
 		private List<Callable?> _Actions = new();
 		private Callable? _Action;
 		private Vector2 Size;
 		private Vector2 CustomMinimumSize;
-
+		
 		private string Text = "";
 		private string TooltipText = "";
-
 		private bool ButtonPressed = false;
 		
-		private Control.SizeFlags SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
-		private Control.SizeFlags SizeFlagsVertical = Control.SizeFlags.ShrinkBegin;
-
-		public MarginContainer _marginContainer;
-
-		public VBoxContainer _innerContainer;
+		/*
+		** Public methods
+		*/
 		
+		/*
+		** Instantiate an instance of the trait
+		**
+		** @return Checkable
+		*/
 		public Checkable Instantiate()
 		{
 			base._Instantiate( GetType().ToString() );
 
+			// Setup the containers
 			_marginContainer = new()
 			{
 				Name="CheckboxMarginContainer",
@@ -69,6 +82,7 @@ namespace AssetSnap.Component
 				_marginContainer.AddThemeConstantOverride("margin_" + side, value);
 			}
 
+			// Setup the checkbox
 			CheckBox WorkingInput = new()
 			{
 				Name = Name,
@@ -89,28 +103,35 @@ namespace AssetSnap.Component
 				WorkingInput.Size = Size;
 			}
 
+			// Setup node structure
+			_innerContainer.AddChild(WorkingInput);
+			_marginContainer.AddChild(_innerContainer);
+			
+			// Connect the button to it's action
 			if( _Action is Callable _callable ) 
 			{
 				WorkingInput.Connect(CheckBox.SignalName.Pressed, _callable);
 			}
-
-			_innerContainer.AddChild(WorkingInput);
-			_marginContainer.AddChild(_innerContainer);
-			WorkingNode = WorkingInput;
 			
-			Nodes.Add(WorkingNode);
+			// Add the button to the nodes array			
+			Nodes.Add(WorkingInput);
+			
+			// Add the action to the actions array			
 			_Actions.Add(_Action);
 			
+			// Clear the trait
 			Reset();
 			
 			return this;
 		}
 		
-		public bool HasNodes()
-		{
-			return null != Nodes && Nodes.Count != 0;
-		}
-		
+		/*
+		** Selects an placed checkbox in the
+		** nodes array by index
+		**
+		** @param int index
+		** @return Checkable
+		*/
 		public Checkable Select(int index)
 		{
 			base._Select(index);
@@ -143,6 +164,13 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
+		/*
+		** Selects an placed checkbox in the
+		** nodes array by name
+		**
+		** @param string name
+		** @return Checkable
+		*/
 		public Checkable SelectByName( string name ) 
 		{
 			foreach( Button button in Nodes ) 
@@ -157,37 +185,28 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		public override bool IsValid()
+		/*
+		** Adds the currently chosen button
+		** to a specified container
+		**
+		** @param Node Container
+		** @return void
+		*/
+		public void AddToContainer( Node Container )
 		{
-			return base.IsValid();
-		}
-
-		public bool IsVisible()
-		{
-			if (null != _marginContainer && IsInstanceValid(_marginContainer))
-			{
-				return _marginContainer.Visible;
-			}
-			else 
-			{
-				return false;
-			}
+			_AddToContainer(Container, _marginContainer);
 		}
 		
-		public Checkable SetHorizontalSizeFlags(Control.SizeFlags flag)
-		{
-			SizeFlagsHorizontal = flag;
-
-			return this;
-		}
+		/*
+		** Setter Methods
+		*/
 		
-		public Checkable SetVerticalSizeFlags(Control.SizeFlags flag)
-		{
-			SizeFlagsVertical = flag;
-
-			return this;
-		}
-		
+		/*
+		** Sets the name of the current checkbox
+		**
+		** @param string text
+		** @return Checkable
+		*/
 		public Checkable SetName( string text ) 
 		{
 			base._SetName(text);
@@ -195,6 +214,12 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
+		/*
+		** Sets the text of the current checkbox
+		**
+		** @param string text
+		** @return Checkable
+		*/
 		public Checkable SetText( string text ) 
 		{
 			Text = text;
@@ -202,6 +227,12 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
+		/*
+		** Sets the tooltip text of the current checkbox
+		**
+		** @param string text
+		** @return Checkable
+		*/
 		public Checkable SetTooltipText( string text ) 
 		{
 			TooltipText = text;
@@ -209,12 +240,33 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		public Checkable SetAction( Callable action ) 
+		/*
+		** Sets the value of the current checkbox
+		**
+		** @param bool value
+		** @return Checkable
+		*/
+		public Checkable SetValue( bool value )
 		{
-			_Action = action;			
+			if( IsInstanceValid( WorkingNode ) && WorkingNode is CheckBox WorkingInput) 
+			{
+				WorkingInput.ButtonPressed = value;
+			}
+			else 
+			{
+				ButtonPressed = value;
+			}
+
 			return this;
 		}
-				
+		
+		/*
+		** Sets the visibility state of the
+		** currently chosen checkbox
+		**
+		** @param bool state
+		** @return Checkable
+		*/
 		public Checkable SetVisible( bool state ) 
 		{
 			if( null != _marginContainer && IsInstanceValid( _marginContainer ) )  
@@ -229,15 +281,55 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		public Checkable SetDimensions( int width, int height )
+		/*
+		** Sets the horizontal size flag, which controls the x
+		** axis, and how it should act.
+		**
+		** @param Control.SizeFlags flag
+		** @return Checkable
+		*/
+		public Checkable SetHorizontalSizeFlags(Control.SizeFlags flag)
 		{
-			CustomMinimumSize = new Vector2( width, height);
-			Size = new Vector2( width, height);
+			SizeFlagsHorizontal = flag;
 
 			return this;
 		}
 		
+		/*
+		** Sets the vertical size flag, which controls the y
+		** axis, and how it should act.
+		**
+		** @param Control.SizeFlags flag
+		** @return Checkable
+		*/
+		public Checkable SetVerticalSizeFlags(Control.SizeFlags flag)
+		{
+			SizeFlagsVertical = flag;
+
+			return this;
+		}
 		
+		/*
+		** Sets the callable for the
+		** currently chosen checkbox
+		**
+		** @param Callable action
+		** @return Checkable
+		*/
+		public Checkable SetAction( Callable action ) 
+		{
+			_Action = action;			
+			return this;
+		}
+		
+		/*
+		** Sets margin values for 
+		** the currently chosen checkbox
+		**
+		** @param int value
+		** @param string side
+		** @return Checkable
+		*/
 		public Checkable SetMargin( int value, string side = "" ) 
 		{
 			if( side == "" ) 
@@ -260,6 +352,31 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
+		/*
+		** Sets the dimensions for the checkbox
+		**
+		** @param int width
+		** @param int height
+		** @return Checkable
+		*/
+		public Checkable SetDimensions( int width, int height )
+		{
+			CustomMinimumSize = new Vector2( width, height);
+			Size = new Vector2( width, height);
+
+			return this;
+		}
+		
+		/*
+		** Getter Methods
+		*/
+		
+		/*
+		** Fetches the value of
+		** the current checkbox
+		**
+		** @return bool
+		*/
 		public bool GetValue()
 		{
 			if( IsInstanceValid( WorkingNode ) && WorkingNode is CheckBox WorkingInput) 
@@ -271,43 +388,47 @@ namespace AssetSnap.Component
 			return false;
 		}
 		
-		public Checkable SetValue( bool value )
+		/*
+		** Booleans
+		*/
+		
+		/*
+		** Checks if any nodes exists
+		**
+		** @return bool
+		*/
+		public bool HasNodes()
 		{
-			if( IsInstanceValid( WorkingNode ) && WorkingNode is CheckBox WorkingInput) 
+			return null != Nodes && Nodes.Count != 0;
+		}
+		
+		/*
+		** Checks if the current checkbox is visible
+		**
+		** @return bool
+		*/
+		public bool IsVisible()
+		{
+			if (null != _marginContainer && IsInstanceValid(_marginContainer))
 			{
-				WorkingInput.ButtonPressed = value;
+				return _marginContainer.Visible;
 			}
 			else 
 			{
-				ButtonPressed = value;
-			}
-
-			return this;
-		}
-		
-		public void AddToContainer( Node Container )
-		{
-			if( null != WorkingNode ) 
-			{
-				// Single placement
-				Container.AddChild(_marginContainer);
-			}
-			else 
-			{
-				// Multi placement
-				for( int i = 0; i<Nodes.Count;i++ )
-				{
-					Select(i);
-					Container.AddChild(_marginContainer);
-				}
+				return false;
 			}
 		}
 		
-		public void FreeAction( Callable callable ) 
-		{
-			WorkingNode.Disconnect(CheckBox.SignalName.Pressed, callable);
-		}
+		/*
+		** Private
+		*/
 		
+		/*
+		** Resets the trait to
+		** a cleared state
+		**
+		** @return void
+		*/
 		private void Reset()
 		{
 			WorkingNode = null;
@@ -316,6 +437,9 @@ namespace AssetSnap.Component
 			_Action = null; 
 		}
 		
+		/*
+		** Cleanup
+		*/
 		public override void _ExitTree()
 		{
 			Nodes = new();
