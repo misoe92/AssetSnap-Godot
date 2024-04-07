@@ -37,12 +37,8 @@ namespace AssetSnap.Component
 		/*
 		** Private
 		*/
-		private Control.SizeFlags SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
-		private Control.SizeFlags SizeFlagsVertical = Control.SizeFlags.ShrinkBegin;
 		private List<Callable?> _Actions = new();
 		private Callable? _Action;
-		private Vector2 Size;
-		private Vector2 CustomMinimumSize;
 		private string _Prefix = "";
 		private string TooltipText = "";
 		private float _Step = 1;
@@ -335,11 +331,10 @@ namespace AssetSnap.Component
 		** @param int height
 		** @return Spinboxable
 		*/
-		public Spinboxable SetDimensions( int width, int height )
+		public override Spinboxable SetDimensions( int width, int height )
 		{
-			CustomMinimumSize = new Vector2( width, height);
-			Size = new Vector2( width, height);
-
+			base.SetDimensions(width,height);
+			
 			return this;
 		}
 				
@@ -350,9 +345,9 @@ namespace AssetSnap.Component
 		** @param Control.SizeFlags flag
 		** @return Spinboxable
 		*/
-		public Spinboxable SetHorizontalSizeFlags(Control.SizeFlags flag)
+		public override Spinboxable SetHorizontalSizeFlags(Control.SizeFlags flag)
 		{
-			SizeFlagsHorizontal = flag;
+			base.SetHorizontalSizeFlags(flag);
 
 			return this;
 		}
@@ -364,9 +359,9 @@ namespace AssetSnap.Component
 		** @param Control.SizeFlags flag
 		** @return Spinboxable
 		*/
-		public Spinboxable SetVerticalSizeFlags(Control.SizeFlags flag)
+		public override Spinboxable SetVerticalSizeFlags(Control.SizeFlags flag)
 		{
-			SizeFlagsVertical = flag;
+			base.SetVerticalSizeFlags(flag);
 
 			return this;
 		}
