@@ -53,20 +53,20 @@ namespace AssetSnap.Front.Components
 		{
 			base.Initialize();
 			AddTrait(typeof(Containerable));
-			AddTrait(typeof(Marginable));
 			AddTrait(typeof(Panelable));
-			AddTrait(typeof(Titleable));
 			AddTrait(typeof(Listable));
 			AddTrait(typeof(Labelable));
 			Initiated = true;
 			
 			CurrentFolderCount = _GlobalExplorer.Settings.FolderCount;
 
-			Trait<Titleable>()
+			Trait<Labelable>()
+				.SetMargin(0, "bottom")
 				.SetName( "ListingTitle" )
-				.SetType( Titleable.TitleType.HeaderLarge)
-				.SetTitle( TitleText )
-				.Initialize() 
+				.SetType( Labelable.TitleType.HeaderLarge)
+				.SetText( TitleText )
+				.Instantiate()
+				.Select(0)
 				.AddToContainer( Container ) ;
 			 
 			_SetupListTable(); 
