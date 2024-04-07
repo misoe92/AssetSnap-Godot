@@ -21,107 +21,67 @@
 // SOFTWARE.
 
 #if TOOLS
-using System;
+using AssetSnap.Trait;
 using Godot;
 
 namespace AssetSnap.Component
 {
 	[Tool]
-	public partial class ScrollContainerable : Trait.Base
+	public partial class ScrollContainerable : ContainerTrait
 	{
-		/*
-		** Enums
-		*/
-		public enum ContainerOrientation 
-		{
-			Horizontal,
-			Vertical,
-		};
-		
-		/*
-		** Public
-		*/
-		private HBoxContainer _InnerContainer;
-		private MarginContainer _PaddingContainer;
-		
-		/*
-		** Private
-		*/
-		private Control.SizeFlags SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
-		private Control.SizeFlags SizeFlagsVertical = Control.SizeFlags.ShrinkBegin;
-		public ContainerOrientation Orientation = ContainerOrientation.Vertical;
-		
 		/*
 		** Public methods
 		*/
+		public VBoxContainer _ScrollInnerContainer;
+		public MarginContainer _ScrollPaddingContainer;
 		
 		/*
 		** Instantiate an instance of the trait
 		**
 		** @return ScrollContainerable
 		*/	
-		public ScrollContainerable Instantiate()
+		public override ScrollContainerable Instantiate()
 		{
-			try 
+			UsePaddingContainer = false;
+			base._Instantiate( GetType().ToString() );
+			base.Instantiate();
+			
+			ScrollContainer _WorkingNode = new()
 			{
-				base._Instantiate( GetType().ToString() );
-				
-				ScrollContainer _WorkingNode = new()
-				{
-					Name="Scroll",
-					SizeFlagsVertical = Control.SizeFlags.ExpandFill,
-					SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
-				};
-				
-				_PaddingContainer = new()
-				{
-					Name="ScrollPadding",
-					SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
-					SizeFlagsVertical = Control.SizeFlags.ExpandFill,
-				};
-
-				_InnerContainer = new()
-				{
-					Name="ScrollInner",
-					SizeFlagsVertical = Control.SizeFlags.ExpandFill,
-					SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
-				};
-				
-				foreach( (string side, int value ) in Padding ) 
-				{
-					_PaddingContainer.AddThemeConstantOverride("margin_" + side, value);
-				}
-
-				_PaddingContainer.AddChild(_InnerContainer);
-				_WorkingNode.AddChild(_PaddingContainer);
-
-				Nodes.Add(_WorkingNode);
-				WorkingNode = _WorkingNode;
-
-				Reset();
-			}
-			catch(Exception e) 
+				Name="Scroll",
+				SizeFlagsVertical = Control.SizeFlags.ExpandFill,
+				SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
+			};
+			
+			_ScrollPaddingContainer = new()
 			{
-				GD.PushError(e.Message);
+				Name="ScrollPadding",
+				SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
+				SizeFlagsVertical = Control.SizeFlags.ExpandFill,
+			};
+
+			_ScrollInnerContainer = new()
+			{
+				Name="ScrollInner",
+				SizeFlagsVertical = Control.SizeFlags.ExpandFill,
+				SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
+			};
+			
+			foreach( (string side, int value ) in Padding ) 
+			{
+				_ScrollPaddingContainer.AddThemeConstantOverride("margin_" + side, value);
 			}
+
+			_ScrollPaddingContainer.AddChild(_ScrollInnerContainer);
+			_WorkingNode.AddChild(_ScrollPaddingContainer);
+			GetInnerContainer(0).AddChild(_WorkingNode);
+			
+			Nodes.Add(_WorkingNode);
+			WorkingNode = _WorkingNode;
+
+			Reset();
 			
 			return this;
-		}
-		
-		public void Show()
-		{
-			if( WorkingNode is Control ControlNode ) 
-			{
-				ControlNode.Visible = true;
-			}
-		}
-		
-		public void Hide()
-		{
-			if( WorkingNode is Control ControlNode ) 
-			{
-				ControlNode.Visible = false;
-			}
 		}
 		
 		/*
@@ -131,26 +91,18 @@ namespace AssetSnap.Component
 		** @param int index
 		** @return ScrollContainerable
 		*/
-		public ScrollContainerable Select(int index)
+		public override ScrollContainerable Select(int index)
 		{
 			base._Select(index);
-			
-			if( EditorPlugin.IsInstanceValid(WorkingNode) && EditorPlugin.IsInstanceValid(WorkingNode.GetChild(0)) ) 
+		
+			if( null != WorkingNode ) 
 			{
-				_PaddingContainer = WorkingNode.GetChild(0) as MarginContainer;
-			}
-			else 
-			{
-				GD.PushError("PaddingContainer is invalid");
+				_InnerContainer = WorkingNode.GetParent().GetParent() as Container;
 			}
 			
-			if( EditorPlugin.IsInstanceValid(_PaddingContainer) && EditorPlugin.IsInstanceValid(_PaddingContainer.GetChild(0)) ) 
+			if( null != WorkingNode ) 
 			{
-				_InnerContainer = _PaddingContainer.GetChild(0) as HBoxContainer;
-			}
-			else 
-			{
-				GD.PushError("InnerContainer is invalid");
+				_MarginContainer = WorkingNode.GetParent().GetParent().GetParent().GetParent().GetParent() as MarginContainer;
 			}
 			
 			return this;
@@ -163,7 +115,7 @@ namespace AssetSnap.Component
 		** @param string name
 		** @return ScrollContainerable
 		*/
-		public ScrollContainerable SelectByName( string name ) 
+		public override ScrollContainerable SelectByName( string name ) 
 		{
 			foreach( Container container in Nodes ) 
 			{
@@ -186,7 +138,7 @@ namespace AssetSnap.Component
 		*/
 		public void AddToContainer( Node Container ) 
 		{
-			base._AddToContainer(Container, WorkingNode);
+			base._AddToContainer(Container, _MarginContainer);
 		}
 		
 		/*
@@ -213,16 +165,9 @@ namespace AssetSnap.Component
 		** @param bool state
 		** @return ScrollContainerable
 		*/
-		public ScrollContainerable SetVisible( bool state ) 
+		public override ScrollContainerable SetVisible( bool state ) 
 		{
-			if( EditorPlugin.IsInstanceValid(WorkingNode) && WorkingNode is Control controlNode)  
-			{
-				controlNode.Visible = state;
-			}
-			else 
-			{
-				GD.PushError("MarginContainer is invalid");
-			}
+			base.SetVisible(state);
 
 			return this;
 		}
@@ -234,9 +179,9 @@ namespace AssetSnap.Component
 		** @param Control.SizeFlags flag
 		** @return ScrollContainerable
 		*/
-		public ScrollContainerable SetHorizontalSizeFlags(Control.SizeFlags flag)
+		public override ScrollContainerable SetHorizontalSizeFlags(Control.SizeFlags flag)
 		{
-			SizeFlagsHorizontal = flag;
+			base.SetHorizontalSizeFlags(flag);
 
 			return this;
 		}
@@ -248,9 +193,9 @@ namespace AssetSnap.Component
 		** @param Control.SizeFlags flag
 		** @return ScrollContainerable
 		*/
-		public ScrollContainerable SetVerticalSizeFlags(Control.SizeFlags flag)
+		public override ScrollContainerable SetVerticalSizeFlags(Control.SizeFlags flag)
 		{
-			SizeFlagsVertical = flag;
+			base.SetVerticalSizeFlags(flag);
 
 			return this;
 		}
@@ -261,9 +206,10 @@ namespace AssetSnap.Component
 		** @param ContainerOrientation orientation
 		** @return ScrollContainerable
 		*/
-		public ScrollContainerable SetOrientation(ContainerOrientation orientation) 
+		public override ScrollContainerable SetOrientation(ContainerOrientation orientation) 
 		{
-			Orientation = orientation;
+			base.SetOrientation(orientation);
+
 			return this;
 		}
 		
@@ -275,14 +221,12 @@ namespace AssetSnap.Component
 		** @param string side
 		** @return ScrollContainerable
 		*/
-		public ScrollContainerable SetMargin( int value, string side = "" ) 
+		public override ScrollContainerable SetMargin( int value, string side = "" ) 
 		{
-			_SetMargin(value, side);
+			base.SetMargin(value, side);
 			
 			return this;
 		}
-		
-		
 		
 		/*
 		** Getter Methods
@@ -293,12 +237,12 @@ namespace AssetSnap.Component
 		**
 		** @return Container
 		*/
-		public Container GetInnerContainer()
+		public Container GetScrollContainer()
 		{
 			if( null != WorkingNode ) 
 			{
 				// Single placement
-				return _InnerContainer as Container;
+				return _ScrollInnerContainer as Container;
 			}
 
 			return null;
@@ -314,12 +258,12 @@ namespace AssetSnap.Component
 		**
 		** @return void
 		*/
-		private void Reset()
+		protected override void Reset()
 		{
 			WorkingNode = null;
-			_InnerContainer = null;
-			_PaddingContainer = null;
 			Orientation = ContainerOrientation.Vertical;
+
+			base.Reset();
 		}
 
 		/*

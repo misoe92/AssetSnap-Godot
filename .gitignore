@@ -1,6 +1,7 @@
 # Godot 4+ specific ignores
 .vscode/
 .godot/
+groups/
 *.godot
 icon.svg
 icon.svg.import

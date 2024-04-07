@@ -22,27 +22,18 @@
 
 #if TOOLS
 using System.Collections.Generic;
+using AssetSnap.Trait;
 using Godot;
 namespace AssetSnap.Component
 {
 	[Tool]
-	public partial class Checkable : Trait.Base
+	public partial class Checkable : ContainerTrait
 	{
-		/*
-		** Public
-		*/
-		public MarginContainer _marginContainer;
-		public VBoxContainer _innerContainer;
-		
 		/*
 		** Private
 		*/
-		private Control.SizeFlags SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
-		private Control.SizeFlags SizeFlagsVertical = Control.SizeFlags.ShrinkBegin;
 		private List<Callable?> _Actions = new();
 		private Callable? _Action;
-		private Vector2 Size;
-		private Vector2 CustomMinimumSize;
 		
 		private string Text = "";
 		private string TooltipText = "";
@@ -57,31 +48,11 @@ namespace AssetSnap.Component
 		**
 		** @return Checkable
 		*/
-		public Checkable Instantiate()
+		public override Checkable Instantiate()
 		{
 			base._Instantiate( GetType().ToString() );
-
-			// Setup the containers
-			_marginContainer = new()
-			{
-				Name="CheckboxMarginContainer",
-				Visible = Visible,
-				SizeFlagsHorizontal = SizeFlagsHorizontal,
-				SizeFlagsVertical = SizeFlagsVertical
-			};
+			base.Instantiate();
 			
-			_innerContainer = new()
-			{
-				Name="CheckboxBoxContainer",
-				SizeFlagsHorizontal = SizeFlagsHorizontal,
-				SizeFlagsVertical = SizeFlagsVertical
-			};
-				
-			foreach( (string side, int value ) in Margin ) 
-			{
-				_marginContainer.AddThemeConstantOverride("margin_" + side, value);
-			}
-
 			// Setup the checkbox
 			CheckBox WorkingInput = new()
 			{
@@ -104,8 +75,7 @@ namespace AssetSnap.Component
 			}
 
 			// Setup node structure
-			_innerContainer.AddChild(WorkingInput);
-			_marginContainer.AddChild(_innerContainer);
+			base.GetInnerContainer(0).AddChild(WorkingInput);
 			
 			// Connect the button to it's action
 			if( _Action is Callable _callable ) 
@@ -132,7 +102,7 @@ namespace AssetSnap.Component
 		** @param int index
 		** @return Checkable
 		*/
-		public Checkable Select(int index)
+		public override Checkable Select(int index)
 		{
 			base._Select(index);
 			
@@ -153,11 +123,8 @@ namespace AssetSnap.Component
 				
 				if( IsInstanceValid( InputNode.GetParent() ) ) 
 				{
-					_innerContainer = InputNode.GetParent() as VBoxContainer;
-					if( IsInstanceValid( _innerContainer.GetParent() ) ) 
-					{
-						_marginContainer = _innerContainer.GetParent() as MarginContainer;
-					}
+					_InnerContainer = InputNode.GetParent().GetParent() as Container;
+					_MarginContainer = InputNode.GetParent().GetParent().GetParent().GetParent().GetParent() as MarginContainer;
 				}
 			}
 			
@@ -171,7 +138,7 @@ namespace AssetSnap.Component
 		** @param string name
 		** @return Checkable
 		*/
-		public Checkable SelectByName( string name ) 
+		public override Checkable SelectByName( string name ) 
 		{
 			foreach( Button button in Nodes ) 
 			{
@@ -194,7 +161,7 @@ namespace AssetSnap.Component
 		*/
 		public void AddToContainer( Node Container )
 		{
-			_AddToContainer(Container, _marginContainer);
+			_AddToContainer(Container, _MarginContainer);
 		}
 		
 		/*
@@ -267,16 +234,9 @@ namespace AssetSnap.Component
 		** @param bool state
 		** @return Checkable
 		*/
-		public Checkable SetVisible( bool state ) 
+		public override Checkable SetVisible( bool state ) 
 		{
-			if( null != _marginContainer && IsInstanceValid( _marginContainer ) )  
-			{
-				_marginContainer.Visible = state;
-			}
-			else 
-			{
-				Visible = state;
-			}
+			base.SetVisible(state);
 
 			return this;
 		}
@@ -288,9 +248,9 @@ namespace AssetSnap.Component
 		** @param Control.SizeFlags flag
 		** @return Checkable
 		*/
-		public Checkable SetHorizontalSizeFlags(Control.SizeFlags flag)
+		public override Checkable SetHorizontalSizeFlags(Control.SizeFlags flag)
 		{
-			SizeFlagsHorizontal = flag;
+			base.SetHorizontalSizeFlags(flag); 
 
 			return this;
 		}
@@ -302,9 +262,9 @@ namespace AssetSnap.Component
 		** @param Control.SizeFlags flag
 		** @return Checkable
 		*/
-		public Checkable SetVerticalSizeFlags(Control.SizeFlags flag)
+		public override Checkable SetVerticalSizeFlags(Control.SizeFlags flag)
 		{
-			SizeFlagsVertical = flag;
+			base.SetVerticalSizeFlags(flag); 
 
 			return this;
 		}
@@ -330,25 +290,9 @@ namespace AssetSnap.Component
 		** @param string side
 		** @return Checkable
 		*/
-		public Checkable SetMargin( int value, string side = "" ) 
+		public override Checkable SetMargin( int value, string side = "" ) 
 		{
-			if( side == "" ) 
-			{
-				Margin["top"] = value;
-				Margin["bottom"] = value;
-				Margin["left"] = value;
-				Margin["right"] = value;
-			}
-			else 
-			{
-				Margin[side] = value;
-			}
-			
-			if( null != _marginContainer)  
-			{
-				_marginContainer.AddThemeConstantOverride("margin_" + side, value);
-			}
-			
+			base.SetMargin(value, side);
 			return this;
 		}
 		
@@ -359,10 +303,9 @@ namespace AssetSnap.Component
 		** @param int height
 		** @return Checkable
 		*/
-		public Checkable SetDimensions( int width, int height )
+		public override Checkable SetDimensions( int width, int height )
 		{
-			CustomMinimumSize = new Vector2( width, height);
-			Size = new Vector2( width, height);
+			base.SetDimensions(width, height);
 
 			return this;
 		}
@@ -403,23 +346,6 @@ namespace AssetSnap.Component
 		}
 		
 		/*
-		** Checks if the current checkbox is visible
-		**
-		** @return bool
-		*/
-		public bool IsVisible()
-		{
-			if (null != _marginContainer && IsInstanceValid(_marginContainer))
-			{
-				return _marginContainer.Visible;
-			}
-			else 
-			{
-				return false;
-			}
-		}
-		
-		/*
 		** Private
 		*/
 		
@@ -429,12 +355,12 @@ namespace AssetSnap.Component
 		**
 		** @return void
 		*/
-		private void Reset()
+		protected override void Reset()
 		{
 			WorkingNode = null;
-			_marginContainer = null;
-			_innerContainer = null;
-			_Action = null; 
+			_Action = null;
+
+			base.Reset();
 		}
 		
 		/*

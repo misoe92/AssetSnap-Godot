@@ -22,11 +22,12 @@
 
 #if TOOLS
 using AssetSnap.Front.Nodes;
+using AssetSnap.Trait;
 using Godot;
 namespace AssetSnap.Component
 {
 	[Tool]
-	public partial class Dropdownable : Trait.Base
+	public partial class Dropdownable : ContainerTrait
 	{
 		/*
 		** Enums
@@ -46,7 +47,6 @@ namespace AssetSnap.Component
 		/*
 		** Public
 		*/
-		public MarginContainer _MarginContainer;
 		public PanelContainer panelContainer;
 		public MarginContainer _PanelPaddingContainer;
 		public VBoxContainer panelInnerContainer;
@@ -70,18 +70,9 @@ namespace AssetSnap.Component
 		*/
 		public Dropdownable Instantiate(int i)
 		{
+			UsePaddingContainer = false;
 			base._Instantiate( GetType().ToString() );
-			
-			// Setup the container layout
-			_MarginContainer = new() 
-			{
-				Name = "DropdownMarginPanel",
-			};
-			
-			foreach( (string side, int value ) in Margin ) 
-			{
-				_MarginContainer.AddThemeConstantOverride("margin_" + side, value);
-			}
+			base.Instantiate();
 			
 			panelContainer = new()
 			{
@@ -138,10 +129,10 @@ namespace AssetSnap.Component
 			panelInnerContainer.AddChild(SelectedBlock);
 			panelInnerContainer.AddChild(_PanelPaddingContainer);
 			panelContainer.AddChild(panelInnerContainer);
-			_MarginContainer.AddChild(panelContainer);
+			base.GetInnerContainer(0).AddChild(panelContainer);
 
 			// Add the node to the nodes array
-			Nodes.Add(panelContainer);
+			Nodes.Insert(i, panelContainer);
  
 			// Clear the trait
 			Reset();
@@ -156,13 +147,13 @@ namespace AssetSnap.Component
 		** @param int index
 		** @return Dropdownable
 		*/
-		public Dropdownable Select(int index)
+		public override Dropdownable Select(int index)
 		{
 			base._Select(index);
 
 			if( null != WorkingNode ) 
 			{
-				_MarginContainer = WorkingNode.GetParent() as MarginContainer;
+				_MarginContainer = WorkingNode.GetParent().GetParent().GetParent().GetParent().GetParent() as MarginContainer;
 				panelInnerContainer = WorkingNode.GetChild(0) as VBoxContainer;
 				SelectedBlock = panelInnerContainer.GetChild(0) as DropdownButton; 
 				_PanelPaddingContainer = panelInnerContainer.GetChild(1) as MarginContainer;
@@ -179,9 +170,9 @@ namespace AssetSnap.Component
 		** @param string name
 		** @return Dropdownable
 		*/
-		public Dropdownable SelectByName(string name)
+		public override Dropdownable SelectByName(string name)
 		{
-			base._SelectByName(name);
+			base.SelectByName(name);
 
 			return this;
 		}
@@ -208,7 +199,7 @@ namespace AssetSnap.Component
 		*/
 		public void AddToContainer( Node Container ) 
 		{
-			base._AddToContainer(Container, _MarginContainer);
+			base._AddToContainer(Container, _MarginContainer, 0);
 		}
 		
 		/*
@@ -263,9 +254,9 @@ namespace AssetSnap.Component
 		** @param string side
 		** @return Dropdownable
 		*/
-		public Dropdownable SetMargin( int value, string side = "" ) 
+		public override Dropdownable SetMargin( int value, string side = "" ) 
 		{
-			_SetMargin(value, side);
+			base.SetMargin(value, side);
 			
 			return this;
 		}
@@ -278,9 +269,9 @@ namespace AssetSnap.Component
 		** @param string side
 		** @return Dropdownable
 		*/
-		public Dropdownable SetPadding( int value, string side = "" ) 
+		public override Dropdownable SetPadding( int value, string side = "" ) 
 		{
-			_SetPadding(value, side);
+			base.SetPadding(value, side);
 			
 			return this;
 		}
@@ -294,7 +285,7 @@ namespace AssetSnap.Component
 		**
 		** @return Container
 		*/
-		public Container GetInnerContainer()
+		public Container GetDropdownContainer()
 		{
 			return ItemsInnerContainer;
 		}
@@ -309,7 +300,7 @@ namespace AssetSnap.Component
 		**
 		** @return void
 		*/
-		private void Reset()
+		protected override void Reset()
 		{
 			WorkingNode = null;
 			panelContainer = null;
@@ -317,6 +308,8 @@ namespace AssetSnap.Component
 			SelectedBlock = null;
 			ItemsInnerContainer = null;
 			_PanelPaddingContainer = null;
+
+			base.Reset();
 		}
 		
 		/*

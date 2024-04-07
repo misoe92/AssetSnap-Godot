@@ -53,20 +53,20 @@ namespace AssetSnap.Front.Components
 		{
 			base.Initialize();
 			AddTrait(typeof(Containerable));
-			AddTrait(typeof(Marginable));
 			AddTrait(typeof(Panelable));
-			AddTrait(typeof(Titleable));
 			AddTrait(typeof(Listable));
 			AddTrait(typeof(Labelable));
 			Initiated = true;
 			
 			CurrentFolderCount = _GlobalExplorer.Settings.FolderCount;
 
-			Trait<Titleable>()
+			Trait<Labelable>()
+				.SetMargin(0, "bottom")
 				.SetName( "ListingTitle" )
-				.SetType( Titleable.TitleType.HeaderLarge)
-				.SetTitle( TitleText )
-				.Initialize() 
+				.SetType( Labelable.TitleType.HeaderLarge)
+				.SetText( TitleText )
+				.Instantiate()
+				.Select(0)
 				.AddToContainer( Container ) ;
 			 
 			_SetupListTable(); 
@@ -302,6 +302,7 @@ namespace AssetSnap.Front.Components
 			
 			Trait<Labelable>()
 				.SetName( "NotFoundText" )
+				.SetType(Labelable.TitleType.TextMedium)
 				.SetText(NotFoundText)
 				.SetAutoWrap( TextServer.AutowrapMode.Word )
 				.SetDimensions(500, 0)
@@ -318,14 +319,6 @@ namespace AssetSnap.Front.Components
 
 		public override void _ExitTree()
 		{
-			// foreach( GodotObject _object in _Entries ) 
-			// {
-			// 	if( null != _object && IsInstanceValid(_object) && _object is Node _node ) 
-			// 	{
-			// 		GD.Print("Unloaded library listing entry: ", _node.Name);
-			// 		_node.QueueFree();
-			// 	}
-			// }
 			base._ExitTree();
 		}
 	}

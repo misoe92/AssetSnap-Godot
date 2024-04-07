@@ -66,22 +66,32 @@ namespace AssetSnap.Front.Components
 			
 			base.Initialize();
 			
-			AddTrait(typeof(Titleable));
-			AddTrait(typeof(Descriptionable));
+			AddTrait(typeof(Labelable));
 			Initiated = true;
 			
-			Trait<Titleable>()
+			Trait<Labelable>()
+				.SetMargin(0, "bottom")
 				.SetName( "ContributeTitle" )
-				.SetType( Titleable.TitleType.HeaderLarge)
-				.SetTitle( TitleText )
-				.Initialize()
-				.AddToContainer( Container );
+				.SetType( Labelable.TitleType.HeaderLarge)
+				.SetText( TitleText )
+				.SetAutoWrap(TextServer.AutowrapMode.Word)
+				.Instantiate();
 			 
-			Trait<Descriptionable>()
+			Trait<Labelable>()
+				.SetMargin(0, "bottom")
 				.SetName( "ContributeDescription" )
-				.SetTitle( DescriptionText )
-				.Initialize()
-				.AddToContainer( Container );
+				.SetType( Labelable.TitleType.TextMedium)
+				.SetAutoWrap(TextServer.AutowrapMode.Word)
+				.SetText( DescriptionText )
+				.Instantiate();
+				
+			Trait<Labelable>()
+				.Select(0) 
+				.AddToContainer( Container );  
+				
+			Trait<Labelable>()
+				.Select(1) 
+				.AddToContainer( Container ); 
 				
 			_SetupContributors();
 		}

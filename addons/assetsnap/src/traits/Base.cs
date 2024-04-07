@@ -23,17 +23,19 @@
 #if TOOLS
 namespace AssetSnap.Trait
 {
-	using System;
 	using Godot;
 	
 	[Tool]
 	public partial class Base : Node
 	{
-		/** Defines if a select statement has failed **/
-		protected bool _select = true;
-		public bool disposed = false;
-
-		public Godot.Collections.Dictionary<string, int> Margin = new()
+		/*
+		** Public
+		*/
+		
+		/*
+		** protected
+		*/
+		protected Godot.Collections.Dictionary<string, int> Margin = new()
 		{
 			{"left", 0},
 			{"right", 0},
@@ -41,22 +43,31 @@ namespace AssetSnap.Trait
 			{"bottom", 0},
 		};
 		
-		public Godot.Collections.Dictionary<string, int> Padding = new()
+		protected Godot.Collections.Dictionary<string, int> Padding = new()
 		{
 			{"left", 0},
 			{"right", 0},
 			{"top", 0},
 			{"bottom", 0},
 		};
-
+		protected Control.SizeFlags SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+		protected Control.SizeFlags SizeFlagsVertical = Control.SizeFlags.ShrinkBegin;
 		protected Godot.Collections.Array<GodotObject> Nodes = new();
-
-		public bool Visible = true;
-
+		protected Vector2 CustomMinimumSize = Vector2.Zero;
+		protected Vector2 Size = Vector2.Zero;
+		protected bool _select = true;
+		protected bool disposed = false;
+		protected bool Visible = true;
 		protected Node WorkingNode;
-		
-		public string TypeString = "";
-	
+		protected string TypeString = "";
+
+		/*
+		** Checks if trait name is set
+		** and sets the type string
+		**
+		** @param string typeString
+		** @return void
+		*/
 		public void _Instantiate( string typeString )
 		{
 			if( Name == "" ) 
@@ -67,6 +78,14 @@ namespace AssetSnap.Trait
 			TypeString = typeString;
 		}
 		
+		/*
+		** Adds the trait to a given container
+		**
+		** @param Node Container
+		** @param Node Node
+		** @param int? index
+		** @return void
+		*/
 		protected void _AddToContainer( Node Container, Node Node, int? index = null )
 		{
 			if( null == Node ) 
@@ -114,57 +133,14 @@ namespace AssetSnap.Trait
 			}
 		}
 		
-		public virtual bool IsValid()
-		{
-			return _select != false && disposed != true;
-		}
-		
-		public bool ContainsIndex( int index ) 
-		{
-			return Nodes.Count >= index;
-		}
-		
-		public virtual void _SetMargin( int value, string side ) 
-		{
-			if( side == "" ) 
-			{
-				Margin["top"] = value;
-				Margin["bottom"] = value;
-				Margin["left"] = value;
-				Margin["right"] = value;
-			}
-			else 
-			{
-				Margin[side] = value;
-				
-			}
-		}
-		
-		public virtual void _SetPadding( int value, string side ) 
-		{
-			if( side == "" ) 
-			{
-				Padding["top"] = value;
-				Padding["bottom"] = value;
-				Padding["left"] = value;
-				Padding["right"] = value;
-			}
-			else 
-			{
-				Padding[side] = value;
-			}
-		}
-		
-		public virtual void _SetVisible( bool visible ) 
-		{
-			Visible = visible;
-		}
-		
-		public virtual void _SetName( string text ) 
-		{
-			Name = text;
-		}
-		
+			
+		/*
+		** Selects an existing instance of
+		** the trait
+		**
+		** @param int index
+		** @return void
+		*/
 		public virtual void _Select( int index ) 
 		{
 			_select = true;
@@ -184,7 +160,7 @@ namespace AssetSnap.Trait
 				return;
 			}
 
-			if (false == IndexWithinBounds(index))
+			if (false == ContainsIndex(index))
 			{
 				_select = false;
 				return;
@@ -210,6 +186,13 @@ namespace AssetSnap.Trait
 			return;
 		}
 		
+		/*
+		** Selects an existing instance of
+		** the trait based on name
+		**
+		** @param string name
+		** @return void
+		*/
 		public virtual void _SelectByName( string name ) 
 		{
 			foreach( Label label in Nodes ) 
@@ -222,11 +205,128 @@ namespace AssetSnap.Trait
 			}
 		}
 		
-		public bool IsDisposed()
+		/*
+		** Setter methods
+		*/
+		
+		/*
+		** Sets margin of the trait
+		**
+		** @param int value
+		** @param string side
+		** @return void
+		*/
+		public virtual void _SetMargin( int value, string side ) 
 		{
-			return disposed;
+			if( side == "" ) 
+			{
+				Margin["top"] = value;
+				Margin["bottom"] = value;
+				Margin["left"] = value;
+				Margin["right"] = value;
+			}
+			else 
+			{
+				Margin[side] = value;
+				
+			}
 		}
 		
+		/*
+		** Sets padding of the trait
+		**
+		** @param int value
+		** @param string side
+		** @return void
+		*/
+		public virtual void _SetPadding( int value, string side ) 
+		{
+			if( side == "" ) 
+			{
+				Padding["top"] = value;
+				Padding["bottom"] = value;
+				Padding["left"] = value;
+				Padding["right"] = value;
+			}
+			else 
+			{
+				Padding[side] = value;
+			}
+		}
+		
+		/*
+		** Sets visible state of the trait
+		**
+		** @param bool visible
+		** @return void
+		*/
+		public virtual void _SetVisible( bool visible ) 
+		{
+			Visible = visible;
+		}
+		
+		/*
+		** Sets the name of the trait
+		**
+		** @param string text
+		** @return void
+		*/
+		public virtual void _SetName( string text ) 
+		{
+			Name = text;
+		}
+		
+		/*
+		** Sets the size of the container
+		**
+		** @param int width
+		** @param int height
+		** @return Containerable
+		*/
+		public virtual Base SetDimensions( int width, int height )
+		{
+			CustomMinimumSize = new Vector2( width, height);
+			Size = new Vector2( width, height);
+
+			return this;
+		}
+		
+		/*
+		** Sets the horizontal size flag, which controls the x
+		** axis, and how it should act.
+		**
+		** @param Control.SizeFlags flag
+		** @return Containerable
+		*/
+		public virtual Base SetHorizontalSizeFlags(Control.SizeFlags flag)
+		{
+			SizeFlagsHorizontal = flag;
+			return this;
+		}
+		
+		/*
+		** Sets the horizontal size flag, which controls the y
+		** axis, and how it should act.
+		**
+		** @param Control.SizeFlags flag
+		** @return Containerable
+		*/
+		public virtual Base SetVerticalSizeFlags(Control.SizeFlags flag)
+		{
+			SizeFlagsVertical = flag;
+			return this;
+		}
+	
+		
+		/*
+		** Getter Methods
+		*/
+		
+		/*
+		** Gets node and type casts it
+		**
+		** return T
+		*/
 		public T GetNode<T>()
 		{
 			if( null != WorkingNode ) 
@@ -243,6 +343,11 @@ namespace AssetSnap.Trait
 			return default(T);
 		}
 		
+		/*
+		** Gets node and returns it as Node
+		**
+		** return Node
+		*/
 		public virtual Node GetNode()
 		{
 			if( null != WorkingNode ) 
@@ -253,24 +358,68 @@ namespace AssetSnap.Trait
 			return null;
 		}
 		
-		private bool IndexWithinBounds( int index ) 
+		/*
+		** Boolean
+		*/
+		
+		/*
+		** Checks if the trait select was a succes
+		**
+		** @return bool
+		*/
+		public virtual bool IsValid()
 		{
-			return 
-				index < Nodes.Count &&
-				index >= 0;
+			return _select != false && IsDisposed() != true;
 		}
 		
+		/*
+		** Checks if the trait has been disposed
+		**
+		** @return bool
+		*/
+		public bool IsDisposed()
+		{
+			return disposed;
+		}
+		
+		/*
+		** Checks if the nodes array
+		** contains an specified index
+		**
+		** @return bool
+		*/
+		public bool ContainsIndex( int index ) 
+		{
+			return Nodes.Count >= index;
+		}
+		
+		/*
+		** Checks if the nodes array
+		** is empty or null
+		**
+		** @return bool
+		*/
 		private bool HasNodeEntries()
 		{
 			return null != Nodes &&
 				Nodes.Count != 0;
 		}
 		
+		/*
+		** Checks if a type string is present
+		**
+		** @return bool
+		*/
 		private bool HasTypeString()
 		{
 			return null != TypeString && "" != TypeString;
 		}
 
+		/*
+		** Cleanup
+		**
+		** @return void
+		*/
 		public override void _ExitTree()
 		{
 			disposed = true;

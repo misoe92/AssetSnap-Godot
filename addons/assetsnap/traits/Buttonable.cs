@@ -69,9 +69,8 @@ namespace AssetSnap.Component
 			{"top", 0},
 			{"bottom", 25},
 		};
-		
-		private Control.SizeFlags SizeFlagsHorizontal = Control.SizeFlags.ShrinkBegin;
-		private Control.SizeFlags SizeFlagsVertical = Control.SizeFlags.ShrinkCenter;
+		private new Control.SizeFlags SizeFlagsHorizontal = Control.SizeFlags.ShrinkBegin;
+		private new Control.SizeFlags SizeFlagsVertical = Control.SizeFlags.ShrinkCenter;
 		private ButtonType WorkingButtonType = ButtonType.DefaultButton;
 		private Control.CursorShape DefaultCursorShape = Control.CursorShape.PointingHand;
 		private Texture2D Icon;
@@ -250,9 +249,9 @@ namespace AssetSnap.Component
 		** @param Control.SizeFlags flag
 		** @return Buttonable
 		*/
-		public Buttonable SetHorizontalSizeFlags(Control.SizeFlags flag)
+		public override Buttonable SetHorizontalSizeFlags(Control.SizeFlags flag)
 		{
-			SizeFlagsHorizontal = flag;
+			base.SetHorizontalSizeFlags(flag);
 
 			return this;
 		}
@@ -264,9 +263,9 @@ namespace AssetSnap.Component
 		** @param Control.SizeFlags flag
 		** @return Buttonable
 		*/
-		public Buttonable SetVerticalSizeFlags(Control.SizeFlags flag)
+		public override Buttonable SetVerticalSizeFlags(Control.SizeFlags flag)
 		{
-			SizeFlagsVertical = flag;
+			base.SetVerticalSizeFlags(flag);
 
 			return this;
 		}

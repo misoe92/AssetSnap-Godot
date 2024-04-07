@@ -22,38 +22,19 @@
 
 #if TOOLS
 using System;
+using AssetSnap.Trait;
 using Godot;
 
 namespace AssetSnap.Component
 {
 	[Tool]
-	public partial class Thumbnaileable : Trait.Base
+	public partial class Thumbnaileable : ContainerTrait
 	{
-		/*
-		** Enums
-		*/
-		public enum ContainerOrientation 
-		{
-			Horizontal,
-			Vertical,
-		};
-		
-		/*
-		** Public
-		*/
-		public VBoxContainer _InnerContainer;
-		public MarginContainer _MarginContainer;
-		
 		/*
 		** Private
 		*/
-		private Control.SizeFlags SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
-		private Control.SizeFlags SizeFlagsVertical = Control.SizeFlags.ShrinkBegin;
 		private TextureRect.ExpandModeEnum ExpandMode = TextureRect.ExpandModeEnum.KeepSize;
 		private TextureRect.StretchModeEnum StretchMode = TextureRect.StretchModeEnum.Keep;
-		private ContainerOrientation Orientation = ContainerOrientation.Vertical;
-		private Vector2 CustomMinimumSize;
-		private Vector2 Size;
 		private string FilePath;
 		
 		/*
@@ -65,58 +46,26 @@ namespace AssetSnap.Component
 		**
 		** @return Thumbnaileable
 		*/	
-		public Thumbnaileable Instantiate()
+		public override Thumbnaileable Instantiate()
 		{
-			try 
+			base._Instantiate( GetType().ToString() );
+			base.Instantiate();
+			
+			AsModelViewerRect _TextureRect = new()
 			{
-				base._Instantiate( GetType().ToString() );
-	
-				// Margin Container 
-				// VBox
-				// Texture
-				_MarginContainer = new()
-				{
-					Name = Name + "-Margin",
-					CustomMinimumSize = CustomMinimumSize,
-					SizeFlagsVertical = SizeFlagsVertical,
-					SizeFlagsHorizontal = SizeFlagsHorizontal
-				};
-				
-				foreach( (string side, int value ) in Margin ) 
-				{
-					_MarginContainer.AddThemeConstantOverride("margin_" + side, value);
-				}
-				
-				_InnerContainer = new()
-				{
-					Name = Name + "-Inner",
-					CustomMinimumSize = CustomMinimumSize,
-					SizeFlagsVertical = SizeFlagsVertical,
-					SizeFlagsHorizontal = SizeFlagsHorizontal
-				};
-				
-				AsModelViewerRect _TextureRect = new()
-				{
-					Name = Name + "-Preview",
-					ExpandMode = ExpandMode,
-					StretchMode = StretchMode
-				};
-				
-				var mesh_preview = EditorInterface.Singleton.GetResourcePreviewer();
-				mesh_preview.QueueResourcePreview(FilePath, _TextureRect, "_MeshPreviewReady", _TextureRect);
-				
-				_InnerContainer.AddChild(_TextureRect);
-				_MarginContainer.AddChild(_InnerContainer);
+				Name = Name + "-Preview",
+				ExpandMode = ExpandMode,
+				StretchMode = StretchMode
+			};
+			
+			var mesh_preview = EditorInterface.Singleton.GetResourcePreviewer();
+			mesh_preview.QueueResourcePreview(FilePath, _TextureRect, "_MeshPreviewReady", _TextureRect);
+			
+			GetInnerContainer(0).AddChild(_TextureRect);
 
-				Nodes.Add(_TextureRect);
-				WorkingNode = _TextureRect;
+			Nodes.Add(_TextureRect);
 
-				Reset();
-			}
-			catch(Exception e) 
-			{
-				GD.PushError(e.Message);
-			}
+			Reset();
 			
 			return this;
 		}
@@ -128,26 +77,14 @@ namespace AssetSnap.Component
 		** @param int index
 		** @return Thumbnaileable
 		*/
-		public Thumbnaileable Select(int index)
+		public override Thumbnaileable Select(int index)
 		{
 			base._Select(index);
 			
-			if( EditorPlugin.IsInstanceValid(WorkingNode) && EditorPlugin.IsInstanceValid(WorkingNode.GetParent()) ) 
+			if( EditorPlugin.IsInstanceValid(WorkingNode) ) 
 			{
-				_InnerContainer = WorkingNode.GetParent() as VBoxContainer;
-			}
-			else 
-			{
-				GD.PushError("Inner Container is invalid");
-			}
-			
-			if( EditorPlugin.IsInstanceValid(_InnerContainer) && EditorPlugin.IsInstanceValid(_InnerContainer.GetParent()) ) 
-			{
-				_MarginContainer = _InnerContainer.GetParent() as MarginContainer;
-			}
-			else 
-			{
-				GD.PushError("Margin Container is invalid");
+				_InnerContainer = WorkingNode.GetParent().GetParent() as Container;
+				_MarginContainer = WorkingNode.GetParent().GetParent().GetParent().GetParent().GetParent() as MarginContainer;
 			}
 			
 			return this;
@@ -160,7 +97,7 @@ namespace AssetSnap.Component
 		** @param string name
 		** @return Thumbnaileable
 		*/
-		public Thumbnaileable SelectByName( string name ) 
+		public override Thumbnaileable SelectByName( string name ) 
 		{
 			foreach( Container container in Nodes ) 
 			{
@@ -172,32 +109,6 @@ namespace AssetSnap.Component
 			}
 
 			return this;
-		}
-		
-		/*
-		** Show the current thumbnail
-		**
-		** @return void
-		*/
-		public void Show()
-		{
-			if( _MarginContainer is Control ControlNode ) 
-			{
-				ControlNode.Visible = true;
-			}
-		}
-		
-		/*
-		** Hides the current thumbnail
-		**
-		** @return void
-		*/
-		public void Hide()
-		{
-			if( _MarginContainer is Control ControlNode ) 
-			{
-				ControlNode.Visible = false;
-			}
 		}
 		
 		/*
@@ -249,16 +160,9 @@ namespace AssetSnap.Component
 		** @param bool state
 		** @return Thumbnaileable
 		*/
-		public Thumbnaileable SetVisible( bool state ) 
+		public override Thumbnaileable SetVisible( bool state ) 
 		{
-			if( EditorPlugin.IsInstanceValid(_MarginContainer) && _MarginContainer is Control controlNode)  
-			{
-				controlNode.Visible = state;
-			}
-			else 
-			{
-				GD.PushError("MarginContainer is invalid");
-			}
+			base.SetVisible(state);
 
 			return this;
 		}
@@ -270,11 +174,10 @@ namespace AssetSnap.Component
 		** @param int height
 		** @return Thumbnaileable
 		*/
-		public Thumbnaileable SetDimensions( int width, int height )
+		public override Thumbnaileable SetDimensions( int width, int height )
 		{
-			CustomMinimumSize = new Vector2( width, height);
-			Size = new Vector2( width, height);
-
+			base.SetDimensions(width, height);
+			
 			return this;
 		}
 		
@@ -311,9 +214,9 @@ namespace AssetSnap.Component
 		** @param Control.SizeFlags flag
 		** @return Thumbnaileable
 		*/
-		public Thumbnaileable SetHorizontalSizeFlags(Control.SizeFlags flag)
+		public override Thumbnaileable SetHorizontalSizeFlags(Control.SizeFlags flag)
 		{
-			SizeFlagsHorizontal = flag;
+			base.SetHorizontalSizeFlags(flag);
 
 			return this;
 		}
@@ -325,9 +228,9 @@ namespace AssetSnap.Component
 		** @param Control.SizeFlags flag
 		** @return Thumbnaileable
 		*/
-		public Thumbnaileable SetVerticalSizeFlags(Control.SizeFlags flag)
+		public override Thumbnaileable SetVerticalSizeFlags(Control.SizeFlags flag)
 		{
-			SizeFlagsVertical = flag;
+			base.SetVerticalSizeFlags(flag);
 
 			return this;
 		}
@@ -338,9 +241,10 @@ namespace AssetSnap.Component
 		** @param ContainerOrientation orientation
 		** @return Thumbnaileable
 		*/
-		public Thumbnaileable SetOrientation(ContainerOrientation orientation) 
+		public override Thumbnaileable SetOrientation(ContainerOrientation orientation) 
 		{
-			Orientation = orientation;
+			base.SetOrientation(orientation);
+
 			return this;
 		}
 		
@@ -352,33 +256,13 @@ namespace AssetSnap.Component
 		** @param string side
 		** @return Thumbnaileable
 		*/
-		public Thumbnaileable SetMargin( int value, string side = "" ) 
+		public override Thumbnaileable SetMargin( int value, string side = "" ) 
 		{
-			_SetMargin(value, side);
+			base.SetMargin(value, side);
 			
 			return this;
 		}
-		
-		/*
-		** Getter Methods
-		*/
-		
-		/*
-		** Retrieves the inner container of the thumbnail
-		**
-		** @return Container
-		*/
-		public Container GetInnerContainer()
-		{
-			if( null != WorkingNode ) 
-			{
-				// Single placement
-				return _InnerContainer as Container;
-			}
 
-			return null;
-		}
-		
 		/*
 		** Private Methods
 		*/
@@ -389,11 +273,11 @@ namespace AssetSnap.Component
 		**
 		** @return void
 		*/
-		private void Reset()
+		protected override void Reset()
 		{
 			WorkingNode = null;
-			_InnerContainer = null;
-			_MarginContainer = null;
+
+			base.Reset();
 		}
 
 		/*
