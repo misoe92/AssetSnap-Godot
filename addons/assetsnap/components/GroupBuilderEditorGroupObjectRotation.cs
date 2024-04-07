@@ -104,7 +104,6 @@ namespace AssetSnap.Front.Components
 				.Instantiate();
 				
 			Trait<Spinboxable>()
-				.Reset()
 				.SetName("GroupObjectsRotationYValue")
 				.SetValue(Parent.Rotation.Y)
 				.SetStep(0.1f)
@@ -128,7 +127,6 @@ namespace AssetSnap.Front.Components
 				.Instantiate();
 				
 			Trait<Spinboxable>()
-				.Reset()
 				.SetName("GroupObjectsRotationZValue")
 				.SetValue(Parent.Rotation.Z)
 				.SetStep(0.1f)

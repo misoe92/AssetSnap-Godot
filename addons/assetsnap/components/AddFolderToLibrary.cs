@@ -59,20 +59,28 @@ namespace AssetSnap.Front.Components
 
 			base.Initialize();
 			
-			AddTrait(typeof(Titleable));
+			AddTrait(typeof(Containerable));
+			AddTrait(typeof(Labelable));
 			AddTrait(typeof(Buttonable));
 			
-			Callable _callable = Callable.From(() => { _OnButtonPressed(); }); 
+			Initiated = true;
 			
-			Initiated = true; 
+			Trait<Containerable>()
+				.SetInnerOrientation(Containerable.ContainerOrientation.Horizontal)
+				.SetOrientation(Containerable.ContainerOrientation.Vertical)
+				.SetMargin(20, "left")
+				.Instantiate();
 			 
-			Trait<Titleable>()
+			Trait<Labelable>()
 				.SetName("AddFolderButtonTitle")
-				.SetType( Titleable.TitleType.HeaderMedium)
-				.SetTitle( TitleText )
+				.SetType( Labelable.TitleType.HeaderMedium)
+				.SetText( TitleText )
 				.SetMargin(0, "bottom")
-				.Initialize() 
-				.AddToContainer( Container ); 
+				.Instantiate() 
+				.Select(0)
+				.AddToContainer( 
+					Container
+				); 
 				
 			Trait<Buttonable>()
 				.SetName("AddFolderButton")
@@ -80,7 +88,18 @@ namespace AssetSnap.Front.Components
 				.SetType( Buttonable.ButtonType.ActionButton )
 				.SetAction( () => { _OnButtonPressed(); } )
 				.Instantiate()
-				.AddToContainer( Container );
+				.Select(0)
+				.AddToContainer( 
+					Trait<Containerable>()
+						.Select(0)
+						.GetInnerContainer()
+				 );
+
+			Trait<Containerable>()
+				.Select(0)
+				.AddToContainer(
+					Container
+				);
 		}
 		
 		/*

@@ -81,7 +81,6 @@ namespace AssetSnap.Front.Components
 				.Instantiate();
 
 			Trait<Spinboxable>()
-				.Reset()
 				.SetName("GroupObjectsScaleXValue")
 				.SetValue(Parent.Scale.X)
 				.SetStep(0.1f)
@@ -105,7 +104,6 @@ namespace AssetSnap.Front.Components
 				.Instantiate();
 				
 			Trait<Spinboxable>()
-				.Reset()
 				.SetName("GroupObjectsScaleYValue")
 				.SetValue(Parent.Scale.Y)
 				.SetStep(0.1f)
@@ -129,7 +127,6 @@ namespace AssetSnap.Front.Components
 				.Instantiate();
 
 			Trait<Spinboxable>()
-				.Reset()
 				.SetName("GroupObjectsScaleZValue")
 				.SetValue(Parent.Scale.Z)
 				.SetStep(0.1f)

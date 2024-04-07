@@ -29,33 +29,42 @@ namespace AssetSnap.Component
 	[Tool]
 	public partial class ScrollContainerable : Trait.Base
 	{
-		
+		/*
+		** Enums
+		*/
 		public enum ContainerOrientation 
 		{
 			Horizontal,
 			Vertical,
 		};
 		
-		private Control.SizeFlags SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
-		private Control.SizeFlags SizeFlagsVertical = Control.SizeFlags.ShrinkBegin;
-		
-		public ContainerOrientation Orientation = ContainerOrientation.Vertical;
-		
+		/*
+		** Public
+		*/
 		private HBoxContainer _InnerContainer;
-		
 		private MarginContainer _PaddingContainer;
 		
+		/*
+		** Private
+		*/
+		private Control.SizeFlags SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+		private Control.SizeFlags SizeFlagsVertical = Control.SizeFlags.ShrinkBegin;
+		public ContainerOrientation Orientation = ContainerOrientation.Vertical;
+		
+		/*
+		** Public methods
+		*/
+		
+		/*
+		** Instantiate an instance of the trait
+		**
+		** @return ScrollContainerable
+		*/	
 		public ScrollContainerable Instantiate()
 		{
 			try 
 			{
 				base._Instantiate( GetType().ToString() );
-	
-				// Margin Container 
-				// VBox
-				// Padding(Margin) Container
-				// HBox
-				// Inner HBox / VBox
 				
 				ScrollContainer _WorkingNode = new()
 				{
@@ -115,54 +124,13 @@ namespace AssetSnap.Component
 			}
 		}
 		
-		public ScrollContainerable SetMargin( int value, string side = "" ) 
-		{
-			_SetMargin(value, side);
-			
-			return this;
-		}
-		
-		public ScrollContainerable SetName( string text ) 
-		{
-			base._SetName(text);
-			
-			return this;
-		}
-		
-		public ScrollContainerable SetHorizontalSizeFlags(Control.SizeFlags flag)
-		{
-			SizeFlagsHorizontal = flag;
-
-			return this;
-		}
-		
-		public ScrollContainerable SetVerticalSizeFlags(Control.SizeFlags flag)
-		{
-			SizeFlagsVertical = flag;
-
-			return this;
-		}
-		
-		public ScrollContainerable SetOrientation(ContainerOrientation orientation) 
-		{
-			Orientation = orientation;
-			return this;
-		}
-		
-		public ScrollContainerable SetVisible( bool state ) 
-		{
-			if( EditorPlugin.IsInstanceValid(WorkingNode) && WorkingNode is Control controlNode)  
-			{
-				controlNode.Visible = state;
-			}
-			else 
-			{
-				GD.PushError("MarginContainer is invalid");
-			}
-
-			return this;
-		}
-		
+		/*
+		** Selects an placed scroll container
+		** in the nodes array by index
+		**
+		** @param int index
+		** @return ScrollContainerable
+		*/
 		public ScrollContainerable Select(int index)
 		{
 			base._Select(index);
@@ -188,6 +156,13 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
+		/*
+		** Selects an placed scroll container
+		** in the nodes array by name
+		**
+		** @param string name
+		** @return ScrollContainerable
+		*/
 		public ScrollContainerable SelectByName( string name ) 
 		{
 			foreach( Container container in Nodes ) 
@@ -202,21 +177,143 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		public Container GetInnerContainer( int index = 0)
+		/*
+		** Adds the currently chosen scroll
+		** container to a specified container
+		**
+		** @param Node Container
+		** @return void
+		*/
+		public void AddToContainer( Node Container ) 
+		{
+			base._AddToContainer(Container, WorkingNode);
+		}
+		
+		/*
+		** Setter Methods
+		*/
+		
+		/*
+		** Sets the name of the current scroll container
+		**
+		** @param string text
+		** @return ScrollContainerable
+		*/
+		public ScrollContainerable SetName( string text ) 
+		{
+			base._SetName(text);
+			
+			return this;
+		}
+		
+		/*
+		** Sets the visibility state of the
+		** currently chosen scroll container
+		**
+		** @param bool state
+		** @return ScrollContainerable
+		*/
+		public ScrollContainerable SetVisible( bool state ) 
+		{
+			if( EditorPlugin.IsInstanceValid(WorkingNode) && WorkingNode is Control controlNode)  
+			{
+				controlNode.Visible = state;
+			}
+			else 
+			{
+				GD.PushError("MarginContainer is invalid");
+			}
+
+			return this;
+		}
+		
+		/*
+		** Sets the horizontal size flag, which controls the x
+		** axis, and how it should act.
+		**
+		** @param Control.SizeFlags flag
+		** @return ScrollContainerable
+		*/
+		public ScrollContainerable SetHorizontalSizeFlags(Control.SizeFlags flag)
+		{
+			SizeFlagsHorizontal = flag;
+
+			return this;
+		}
+		
+		/*
+		** Sets the horizontal size flag, which controls the y
+		** axis, and how it should act.
+		**
+		** @param Control.SizeFlags flag
+		** @return ScrollContainerable
+		*/
+		public ScrollContainerable SetVerticalSizeFlags(Control.SizeFlags flag)
+		{
+			SizeFlagsVertical = flag;
+
+			return this;
+		}
+		
+		/*
+		** Sets the orientation of the scroll container
+		**
+		** @param ContainerOrientation orientation
+		** @return ScrollContainerable
+		*/
+		public ScrollContainerable SetOrientation(ContainerOrientation orientation) 
+		{
+			Orientation = orientation;
+			return this;
+		}
+		
+		/*
+		** Sets margin values for 
+		** the currently chosen scroll container
+		**
+		** @param int value
+		** @param string side
+		** @return ScrollContainerable
+		*/
+		public ScrollContainerable SetMargin( int value, string side = "" ) 
+		{
+			_SetMargin(value, side);
+			
+			return this;
+		}
+		
+		
+		
+		/*
+		** Getter Methods
+		*/
+		
+		/*
+		** Returns the inner container
+		**
+		** @return Container
+		*/
+		public Container GetInnerContainer()
 		{
 			if( null != WorkingNode ) 
 			{
 				// Single placement
 				return _InnerContainer as Container;
 			}
-			else 
-			{
-				GD.PushWarning("Invalid inner container");
-			}
 
 			return null;
 		}
 		
+		/*
+		** Private Methods
+		*/
+		
+		/*
+		** Resets the trait to
+		** a cleared state
+		**
+		** @return void
+		*/
 		private void Reset()
 		{
 			WorkingNode = null;
@@ -225,11 +322,9 @@ namespace AssetSnap.Component
 			Orientation = ContainerOrientation.Vertical;
 		}
 
-		public void AddToContainer( Node Container ) 
-		{
-			base._AddToContainer(Container, WorkingNode);
-		}
-		
+		/*
+		** Cleanup
+		*/
 		public override void _ExitTree()
 		{
 			if( EditorPlugin.IsInstanceValid(WorkingNode) ) 

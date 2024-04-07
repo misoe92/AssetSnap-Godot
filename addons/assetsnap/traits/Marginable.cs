@@ -28,17 +28,28 @@ namespace AssetSnap.Component
 	[Tool]
 	public partial class Marginable : Trait.Base
 	{
-		public new Godot.Collections.Dictionary<string, int> Margin = new()
+		/*
+		** Private
+		*/
+		private new Godot.Collections.Dictionary<string, int> Margin = new()
 		{
 			{"left", 20},
 			{"right", 20},
 			{"top", 0},
 			{"bottom", 25},
 		};
-		
 		private Control.SizeFlags SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
 		private Control.SizeFlags SizeFlagsVertical = Control.SizeFlags.ShrinkBegin;
 		
+		/*
+		** Public methods
+		*/
+		
+		/*
+		** Instantiate an instance of the trait
+		**
+		** @return Marginable
+		*/	
 		public Marginable Instantiate()
 		{
 			base._Instantiate( GetType().ToString() );
@@ -61,34 +72,13 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		public Marginable SetName( string text ) 
-		{
-			base._SetName(text);
-			
-			return this;
-		}
-		
-		public Marginable SetVisible( bool state ) 
-		{
-			base._SetVisible(state);
-			
-			return this;
-		}
-		
-		public Marginable SetHorizontalSizeFlags(Control.SizeFlags flag)
-		{
-			SizeFlagsHorizontal = flag;
-
-			return this;
-		}
-		
-		public Marginable SetVerticalSizeFlags(Control.SizeFlags flag)
-		{
-			SizeFlagsVertical = flag;
-
-			return this;
-		}
-		
+		/*
+		** Selects an placed margin container
+		** in the nodes array by index
+		**
+		** @param int index
+		** @return Marginable
+		*/
 		public Marginable Select(int index)
 		{
 			base._Select(index);
@@ -96,6 +86,13 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
+		/*
+		** Selects an placed margin container
+		** in the nodes array by name
+		**
+		** @param string name
+		** @return Marginable
+		*/
 		public Marginable SelectByName(string name)
 		{
 			base._SelectByName(name);
@@ -103,6 +100,85 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
+		/*
+		** Adds the currently chosen margin
+		** container to a specified container
+		**
+		** @param Node Container
+		** @return void
+		*/
+		public void AddToContainer( Node Container ) 
+		{
+			base._AddToContainer(Container, WorkingNode);
+		}
+		
+		/*
+		** Setter Methods
+		*/
+		
+		/*
+		** Sets the name of the current margin container
+		**
+		** @param string text
+		** @return Marginable
+		*/
+		public Marginable SetName( string text ) 
+		{
+			base._SetName(text);
+			
+			return this;
+		}
+		
+		/*
+		** Sets the visibility state of the
+		** currently chosen margin container
+		**
+		** @param bool state
+		** @return Marginable
+		*/
+		public Marginable SetVisible( bool state ) 
+		{
+			base._SetVisible(state);
+			
+			return this;
+		}
+		
+		/*
+		** Sets the horizontal size flag, which controls the x
+		** axis, and how it should act.
+		**
+		** @param Control.SizeFlags flag
+		** @return Marginable
+		*/
+		public Marginable SetHorizontalSizeFlags(Control.SizeFlags flag)
+		{
+			SizeFlagsHorizontal = flag;
+
+			return this;
+		}
+		
+		/*
+		** Sets the horizontal size flag, which controls the y
+		** axis, and how it should act.
+		**
+		** @param Control.SizeFlags flag
+		** @return Marginable
+		*/
+		public Marginable SetVerticalSizeFlags(Control.SizeFlags flag)
+		{
+			SizeFlagsVertical = flag;
+
+			return this;
+		}
+		
+		/*
+		** Sets margin values for the
+		** currently chosen margin container
+		**
+		** @param int value
+		** @param string side
+		** @return Marginable
+		*/
 		public Marginable SetMargin( int value, string side = "" ) 
 		{
 			_SetMargin(value, side);
@@ -110,6 +186,15 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
+		/*
+		** Getter methods
+		*/
+		
+		/*
+		** Fetches the margin container node
+		**
+		** @return MarginContainer
+		*/
 		public override MarginContainer GetNode() 
 		{
 			Node _node = base.GetNode();
@@ -117,11 +202,16 @@ namespace AssetSnap.Component
 			return _node as MarginContainer;
 		}
 		
-		public void AddToContainer( Node Container ) 
-		{
-			base._AddToContainer(Container, WorkingNode);
-		}
+		/*
+		** Private
+		*/
 		
+		/*
+		** Resets the trait to
+		** a cleared state
+		**
+		** @return void
+		*/
 		private void Reset()
 		{
 			WorkingNode = null;

@@ -29,6 +29,9 @@ namespace AssetSnap.Component
 	[Tool]
 	public partial class Containerable : Trait.Base
 	{
+		/*
+		** Enums
+		*/
 		public enum ContainerLayout 
 		{
 			OneColumn,
@@ -43,24 +46,33 @@ namespace AssetSnap.Component
 			Vertical,
 		};
 		
+		/*
+		** Public
+		*/
+		public MarginContainer _MarginContainer;
+		public Container _InnerContainer;
+		public MarginContainer _PaddingContainer;
+		
+		/*
+		** Private
+		*/
 		private Control.SizeFlags SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
 		private Control.SizeFlags SizeFlagsVertical = Control.SizeFlags.ShrinkBegin;
-		
-		public ContainerLayout Layout = ContainerLayout.OneColumn;
-		
-		public ContainerOrientation Orientation = ContainerOrientation.Vertical;
-		
-		public ContainerOrientation InnerOrientation = ContainerOrientation.Horizontal;
-		
-		private MarginContainer _MarginContainer;
-		
-		private Container _InnerContainer;
-		
-		private MarginContainer _PaddingContainer;
-		
+		private ContainerLayout Layout = ContainerLayout.OneColumn;
+		private ContainerOrientation Orientation = ContainerOrientation.Vertical;
+		private ContainerOrientation InnerOrientation = ContainerOrientation.Horizontal;
 		private Vector2 CustomMinimumSize = Vector2.Zero;
 		private Vector2 Size = Vector2.Zero;
 		
+		/*
+		** Public methods
+		*/
+		
+		/*
+		** Instantiate an instance of the trait
+		**
+		** @return Containerable
+		*/	
 		public Containerable Instantiate()
 		{
 			try 
@@ -68,12 +80,6 @@ namespace AssetSnap.Component
 				base._Instantiate( GetType().ToString() );
 				int ColumnCount = (int)Layout + 1;
 	
-				// Margin Container 
-				// VBox
-				// Padding(Margin) Container
-				// HBox
-				// Inner HBox / VBox
-				
 				_MarginContainer = new()
 				{
 					Name = "ContainerMargin",
@@ -160,16 +166,233 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
+		/*
+		** Shows the current container
+		**
+		** @return void
+		*/
 		public void Show()
 		{
 			_MarginContainer.Visible = true;
 		}
 		
+		/*
+		** Hides the current container
+		**
+		** @return void
+		*/
 		public void Hide()
 		{
 			_MarginContainer.Visible = false;
 		}
 		
+		/*
+		** Selects an placed container in the
+		** nodes array by index
+		**
+		** @param int index
+		** @return Containerable
+		*/
+		public Containerable Select(int index)
+		{
+			base._Select(index);
+			
+			if( EditorPlugin.IsInstanceValid(WorkingNode) && EditorPlugin.IsInstanceValid(WorkingNode.GetParent()) ) 
+			{
+				_MarginContainer = WorkingNode.GetParent() as MarginContainer;
+			}
+			
+			if( EditorPlugin.IsInstanceValid(WorkingNode) && EditorPlugin.IsInstanceValid(WorkingNode.GetChild(0)) ) 
+			{
+				_PaddingContainer = WorkingNode.GetChild(0) as MarginContainer;
+			}
+			
+			if( EditorPlugin.IsInstanceValid(_PaddingContainer) && EditorPlugin.IsInstanceValid(_PaddingContainer.GetChild(0)) ) 
+			{
+				_InnerContainer = _PaddingContainer.GetChild(0) as Container;
+			}
+			
+			return this;
+		}
+		
+		/*
+		** Selects an placed container in the
+		** nodes array by name
+		**
+		** @param string name
+		** @return Containerable
+		*/
+		public Containerable SelectByName( string name ) 
+		{
+			foreach( Container container in Nodes ) 
+			{
+				if( container.Name == name ) 
+				{
+					WorkingNode = container;
+					break;
+				}
+			}
+
+			return this;
+		}
+		
+		/*
+		** Adds the currently chosen container
+		** to a specified container
+		**
+		** @param Node Container
+		** @param int|null index
+		** @return void
+		*/
+		public void AddToContainer( Node Container, int? index = null ) 
+		{
+			base._AddToContainer(Container, _MarginContainer, index);
+		}
+		
+		/*
+		** Setter Methods
+		*/
+		
+		/*
+		** Sets the name of the current container
+		**
+		** @param string text
+		** @return Containerable
+		*/
+		public Containerable SetName( string text ) 
+		{
+			base._SetName(text);
+			
+			return this;
+		}
+		
+		/*
+		** Sets the layout of the container
+		**
+		** @param ContainerLayout layout
+		** @return Containerable
+		*/
+		public Containerable SetLayout( ContainerLayout layout ) 
+		{
+			Layout = layout;
+			
+			return this;
+		}
+		
+		/*
+		** Sets the visibility state of the
+		** currently chosen container
+		**
+		** @param bool state
+		** @return Containerable
+		*/
+		public Containerable SetVisible( bool state ) 
+		{
+			Visible = state;
+			
+			if( EditorPlugin.IsInstanceValid(_MarginContainer))  
+			{
+				_MarginContainer.Visible = state;
+			}
+
+			return this;
+		}
+		
+		/*
+		** Toggles the visibility state of the
+		** currently chosen container
+		**
+		** @return Containerable
+		*/
+		public Containerable ToggleVisible() 
+		{
+			if( EditorPlugin.IsInstanceValid(_MarginContainer))  
+			{
+				_MarginContainer.Visible = !_MarginContainer.Visible;
+			}
+			else 
+			{
+				GD.PushError("MarginContainer is invalid");
+			}
+
+			return this;
+		}
+		
+		/*
+		** Sets the size of the container
+		**
+		** @param int width
+		** @param int height
+		** @return Containerable
+		*/
+		public Containerable SetDimensions( int width, int height )
+		{
+			CustomMinimumSize = new Vector2( width, height);
+			Size = new Vector2( width, height);
+
+			return this;
+		}
+		
+		/*
+		** Sets the orientation of the container
+		**
+		** @param ContainerOrientation orientation
+		** @return Containerable
+		*/
+		public Containerable SetOrientation(ContainerOrientation orientation) 
+		{
+			Orientation = orientation;
+			return this;
+		}
+		
+		/*
+		** Sets the inner orientation of the container
+		**
+		** @param ContainerOrientation orientation
+		** @return Containerable
+		*/
+		public Containerable SetInnerOrientation(ContainerOrientation orientation) 
+		{
+			InnerOrientation = orientation;
+			return this;
+		}
+		
+		/*
+		** Sets the horizontal size flag, which controls the x
+		** axis, and how it should act.
+		**
+		** @param Control.SizeFlags flag
+		** @return Containerable
+		*/
+		public Containerable SetHorizontalSizeFlags(Control.SizeFlags flag)
+		{
+			SizeFlagsHorizontal = flag;
+
+			return this;
+		}
+		
+		/*
+		** Sets the horizontal size flag, which controls the y
+		** axis, and how it should act.
+		**
+		** @param Control.SizeFlags flag
+		** @return Containerable
+		*/
+		public Containerable SetVerticalSizeFlags(Control.SizeFlags flag)
+		{
+			SizeFlagsVertical = flag;
+
+			return this;
+		}
+		
+		/*
+		** Sets margin values for 
+		** the currently chosen container
+		**
+		** @param int value
+		** @param string side
+		** @return Containerable
+		*/
 		public Containerable SetMargin( int value, string side = "" ) 
 		{
 			_SetMargin(value, side);
@@ -195,6 +418,14 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
+		/*
+		** Sets padding values for 
+		** the currently chosen container
+		**
+		** @param int value
+		** @param string side
+		** @return Containerable
+		*/
 		public Containerable SetPadding( int value, string side = "" ) 
 		{
 			_SetPadding(value, side);
@@ -220,142 +451,16 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		public Containerable SetName( string text ) 
-		{
-			base._SetName(text);
-			
-			return this;
-		}
+		/*
+		** Getter Methods
+		*/
 		
-		public Containerable SetLayout( ContainerLayout layout ) 
-		{
-			Layout = layout;
-			
-			return this;
-		}
-		
-		public Containerable SetDimensions( int width, int height )
-		{
-			CustomMinimumSize = new Vector2( width, height);
-			Size = new Vector2( width, height);
-
-			return this;
-		}
-		
-		public Containerable SetHorizontalSizeFlags(Control.SizeFlags flag)
-		{
-			SizeFlagsHorizontal = flag;
-
-			return this;
-		}
-		
-		public Containerable SetVerticalSizeFlags(Control.SizeFlags flag)
-		{
-			SizeFlagsVertical = flag;
-
-			return this;
-		}
-		
-		public Containerable SetOrientation(ContainerOrientation orientation) 
-		{
-			Orientation = orientation;
-			return this;
-		}
-		
-		public Containerable SetInnerOrientation(ContainerOrientation orientation) 
-		{
-			InnerOrientation = orientation;
-			return this;
-		}
-		
-		public Containerable SetVisible( bool state ) 
-		{
-			Visible = state;
-			
-			if( EditorPlugin.IsInstanceValid(_MarginContainer))  
-			{
-				_MarginContainer.Visible = state;
-			}
-
-			return this;
-		}
-		
-		public Containerable ToggleVisible() 
-		{
-			if( EditorPlugin.IsInstanceValid(_MarginContainer))  
-			{
-				_MarginContainer.Visible = !_MarginContainer.Visible;
-			}
-			else 
-			{
-				GD.PushError("MarginContainer is invalid");
-			}
-
-			return this;
-		}
-		
-		public bool IsVisible() 
-		{
-			if( EditorPlugin.IsInstanceValid(_MarginContainer))  
-			{
-				return _MarginContainer.Visible == true;
-			}
-			else 
-			{
-				GD.PushError("MarginContainer is invalid");
-			}
-
-			return false;
-		}
-		
-		public Containerable Select(int index)
-		{
-			base._Select(index);
-			
-			if( EditorPlugin.IsInstanceValid(WorkingNode) && EditorPlugin.IsInstanceValid(WorkingNode.GetParent()) ) 
-			{
-				_MarginContainer = WorkingNode.GetParent() as MarginContainer;
-			}
-			else 
-			{
-				GD.PushError("MarginContainer is invalid");
-			}
-			
-			if( EditorPlugin.IsInstanceValid(WorkingNode) && EditorPlugin.IsInstanceValid(WorkingNode.GetChild(0)) ) 
-			{
-				_PaddingContainer = WorkingNode.GetChild(0) as MarginContainer;
-			}
-			else 
-			{
-				GD.PushError("PaddingContainer is invalid");
-			}
-			
-			if( EditorPlugin.IsInstanceValid(_PaddingContainer) && EditorPlugin.IsInstanceValid(_PaddingContainer.GetChild(0)) ) 
-			{
-				_InnerContainer = _PaddingContainer.GetChild(0) as Container;
-			}
-			else 
-			{
-				GD.PushError("InnerContainer is invalid");
-			}
-			
-			return this;
-		}
-		
-		public Containerable SelectByName( string name ) 
-		{
-			foreach( Container container in Nodes ) 
-			{
-				if( container.Name == name ) 
-				{
-					WorkingNode = container;
-					break;
-				}
-			}
-
-			return this;
-		}
-		
+		/*
+		** Returns the outer container
+		** of the container layout
+		**
+		** @return Container
+		*/
 		public Container GetOuterContainer()
 		{
 			if( null != WorkingNode && null != _InnerContainer) 
@@ -371,6 +476,13 @@ namespace AssetSnap.Component
 			return null;
 		}
 		
+		/*
+		** Returns a inner container
+		** depending on a specified index
+		**
+		** @param int(0) index
+		** @return Container
+		*/
 		public Container GetInnerContainer( int index = 0)
 		{
 			if( null != WorkingNode && null != _InnerContainer.GetChild( index )) 
@@ -386,6 +498,39 @@ namespace AssetSnap.Component
 			return null;
 		}
 		
+		/*
+		** Booleans
+		*/
+		
+		/*
+		** Checks if the container is visible
+		**
+		** @return bool
+		*/
+		public bool IsVisible() 
+		{
+			if( EditorPlugin.IsInstanceValid(_MarginContainer))  
+			{
+				return _MarginContainer.Visible == true;
+			}
+			else 
+			{
+				GD.PushError("MarginContainer is invalid");
+			}
+
+			return false;
+		}
+		
+		/*
+		** Private
+		*/
+		
+		/*
+		** Resets the trait to
+		** a cleared state
+		**
+		** @return void
+		*/
 		private void Reset()
 		{
 			WorkingNode = null;
@@ -399,12 +544,9 @@ namespace AssetSnap.Component
 			CustomMinimumSize = Vector2.Zero;
 		}
 
-		public void AddToContainer( Node Container, int? index = null ) 
-		{
-			base._AddToContainer(Container, _MarginContainer, index);
-		}
-		
-		
+		/*
+		** Cleanup
+		*/
 		public override void _ExitTree()
 		{
 			if( null != _InnerContainer && EditorPlugin.IsInstanceValid( _InnerContainer ) ) 

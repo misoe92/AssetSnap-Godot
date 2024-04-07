@@ -22,7 +22,6 @@
 
 #if TOOLS
 using System;
-using System.IO;
 using Godot;
 
 namespace AssetSnap.Component
@@ -30,27 +29,42 @@ namespace AssetSnap.Component
 	[Tool]
 	public partial class Thumbnaileable : Trait.Base
 	{
-		
+		/*
+		** Enums
+		*/
 		public enum ContainerOrientation 
 		{
 			Horizontal,
 			Vertical,
 		};
 		
+		/*
+		** Public
+		*/
+		public VBoxContainer _InnerContainer;
+		public MarginContainer _MarginContainer;
+		
+		/*
+		** Private
+		*/
 		private Control.SizeFlags SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
 		private Control.SizeFlags SizeFlagsVertical = Control.SizeFlags.ShrinkBegin;
 		private TextureRect.ExpandModeEnum ExpandMode = TextureRect.ExpandModeEnum.KeepSize;
 		private TextureRect.StretchModeEnum StretchMode = TextureRect.StretchModeEnum.Keep;
-		public ContainerOrientation Orientation = ContainerOrientation.Vertical;
-		
-		private VBoxContainer _InnerContainer;
-		
-		private MarginContainer _MarginContainer;
-
-		private string FilePath;
+		private ContainerOrientation Orientation = ContainerOrientation.Vertical;
 		private Vector2 CustomMinimumSize;
 		private Vector2 Size;
+		private string FilePath;
 		
+		/*
+		** Public methods
+		*/
+		
+		/*
+		** Instantiate an instance of the trait
+		**
+		** @return Thumbnaileable
+		*/	
 		public Thumbnaileable Instantiate()
 		{
 			try 
@@ -107,99 +121,13 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		public void Show()
-		{
-			if( _MarginContainer is Control ControlNode ) 
-			{
-				ControlNode.Visible = true;
-			}
-		}
-		
-		public void Hide()
-		{
-			if( _MarginContainer is Control ControlNode ) 
-			{
-				ControlNode.Visible = false;
-			}
-		}
-		
-		public Thumbnaileable SetMargin( int value, string side = "" ) 
-		{
-			_SetMargin(value, side);
-			
-			return this;
-		}
-		
-		public Thumbnaileable SetName( string text ) 
-		{
-			base._SetName(text);
-			
-			return this;
-		}
-		
-		public Thumbnaileable SetFilePath( string path ) 
-		{
-			FilePath = path;
-			
-			return this;
-		}
-		
-		public Thumbnaileable SetDimensions( int width, int height )
-		{
-			CustomMinimumSize = new Vector2( width, height);
-			Size = new Vector2( width, height);
-
-			return this;
-		}
-		
-		public Thumbnaileable SetExpandMode(TextureRect.ExpandModeEnum mode )
-		{
-			ExpandMode = mode;
-			
-			return this;
-		}
-		
-		public Thumbnaileable SetStretchMode( TextureRect.StretchModeEnum mode )
-		{
-			StretchMode = mode;
-
-			return this;
-		}
-		
-		public Thumbnaileable SetHorizontalSizeFlags(Control.SizeFlags flag)
-		{
-			SizeFlagsHorizontal = flag;
-
-			return this;
-		}
-		
-		public Thumbnaileable SetVerticalSizeFlags(Control.SizeFlags flag)
-		{
-			SizeFlagsVertical = flag;
-
-			return this;
-		}
-		
-		public Thumbnaileable SetOrientation(ContainerOrientation orientation) 
-		{
-			Orientation = orientation;
-			return this;
-		}
-		
-		public Thumbnaileable SetVisible( bool state ) 
-		{
-			if( EditorPlugin.IsInstanceValid(_MarginContainer) && _MarginContainer is Control controlNode)  
-			{
-				controlNode.Visible = state;
-			}
-			else 
-			{
-				GD.PushError("MarginContainer is invalid");
-			}
-
-			return this;
-		}
-		
+		/*
+		** Selects an placed thumbnail in the
+		** nodes array by index
+		**
+		** @param int index
+		** @return Thumbnaileable
+		*/
 		public Thumbnaileable Select(int index)
 		{
 			base._Select(index);
@@ -225,6 +153,13 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
+		/*
+		** Selects an placed thumbnail in the
+		** nodes array by name
+		**
+		** @param string name
+		** @return Thumbnaileable
+		*/
 		public Thumbnaileable SelectByName( string name ) 
 		{
 			foreach( Container container in Nodes ) 
@@ -239,21 +174,221 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		public Container GetInnerContainer( int index = 0)
+		/*
+		** Show the current thumbnail
+		**
+		** @return void
+		*/
+		public void Show()
+		{
+			if( _MarginContainer is Control ControlNode ) 
+			{
+				ControlNode.Visible = true;
+			}
+		}
+		
+		/*
+		** Hides the current thumbnail
+		**
+		** @return void
+		*/
+		public void Hide()
+		{
+			if( _MarginContainer is Control ControlNode ) 
+			{
+				ControlNode.Visible = false;
+			}
+		}
+		
+		/*
+		** Adds the currently chosen thumbnail
+		** to a specified container
+		**
+		** @param Node Container
+		** @return void
+		*/
+		public void AddToContainer( Node Container ) 
+		{
+			base._AddToContainer(Container, _MarginContainer);
+		}
+		
+		/*
+		** Setter Methods
+		*/
+		
+		/*
+		** Sets the name of the current button
+		**
+		** @param string text
+		** @return Buttonable
+		*/
+		public Thumbnaileable SetName( string text ) 
+		{
+			base._SetName(text);
+			
+			return this;
+		}
+		
+		/*
+		** Sets the file path of the current thumbnail
+		**
+		** @param string path
+		** @return Thumbnaileable
+		*/
+		public Thumbnaileable SetFilePath( string path ) 
+		{
+			FilePath = path;
+			
+			return this;
+		}
+		
+		/*
+		** Sets the visibility state of the
+		** currently chosen thumbnail
+		**
+		** @param bool state
+		** @return Thumbnaileable
+		*/
+		public Thumbnaileable SetVisible( bool state ) 
+		{
+			if( EditorPlugin.IsInstanceValid(_MarginContainer) && _MarginContainer is Control controlNode)  
+			{
+				controlNode.Visible = state;
+			}
+			else 
+			{
+				GD.PushError("MarginContainer is invalid");
+			}
+
+			return this;
+		}
+		
+		/*
+		** Sets the dimensions of the current thumbnail
+		**
+		** @param int width
+		** @param int height
+		** @return Thumbnaileable
+		*/
+		public Thumbnaileable SetDimensions( int width, int height )
+		{
+			CustomMinimumSize = new Vector2( width, height);
+			Size = new Vector2( width, height);
+
+			return this;
+		}
+		
+		/*
+		** Sets the expand mode of the texture rect
+		**
+		** @param TextureRect.ExpandModeEnum mode
+		** @return Thumbnaileable
+		*/
+		public Thumbnaileable SetExpandMode(TextureRect.ExpandModeEnum mode )
+		{
+			ExpandMode = mode;
+			
+			return this;
+		}
+		
+		/*
+		** Sets the stretch mode of the texture rect
+		**
+		** @param TextureRect.StretchModeEnum mode
+		** @return Thumbnaileable
+		*/
+		public Thumbnaileable SetStretchMode( TextureRect.StretchModeEnum mode )
+		{
+			StretchMode = mode;
+
+			return this;
+		}
+		
+		/*
+		** Sets the horizontal size flag, which controls the x
+		** axis, and how it should act.
+		**
+		** @param Control.SizeFlags flag
+		** @return Thumbnaileable
+		*/
+		public Thumbnaileable SetHorizontalSizeFlags(Control.SizeFlags flag)
+		{
+			SizeFlagsHorizontal = flag;
+
+			return this;
+		}
+		
+		/*
+		** Sets the horizontal size flag, which controls the y
+		** axis, and how it should act.
+		**
+		** @param Control.SizeFlags flag
+		** @return Thumbnaileable
+		*/
+		public Thumbnaileable SetVerticalSizeFlags(Control.SizeFlags flag)
+		{
+			SizeFlagsVertical = flag;
+
+			return this;
+		}
+		
+		/*
+		** Sets the orientation of the container
+		**
+		** @param ContainerOrientation orientation
+		** @return Thumbnaileable
+		*/
+		public Thumbnaileable SetOrientation(ContainerOrientation orientation) 
+		{
+			Orientation = orientation;
+			return this;
+		}
+		
+		/*
+		** Sets margin values for 
+		** the currently chosen thumbnail
+		**
+		** @param int value
+		** @param string side
+		** @return Thumbnaileable
+		*/
+		public Thumbnaileable SetMargin( int value, string side = "" ) 
+		{
+			_SetMargin(value, side);
+			
+			return this;
+		}
+		
+		/*
+		** Getter Methods
+		*/
+		
+		/*
+		** Retrieves the inner container of the thumbnail
+		**
+		** @return Container
+		*/
+		public Container GetInnerContainer()
 		{
 			if( null != WorkingNode ) 
 			{
 				// Single placement
 				return _InnerContainer as Container;
 			}
-			else 
-			{
-				GD.PushWarning("Invalid inner container");
-			}
 
 			return null;
 		}
 		
+		/*
+		** Private Methods
+		*/
+		
+		/*
+		** Resets the trait to
+		** a cleared state
+		**
+		** @return void
+		*/
 		private void Reset()
 		{
 			WorkingNode = null;
@@ -261,11 +396,9 @@ namespace AssetSnap.Component
 			_MarginContainer = null;
 		}
 
-		public void AddToContainer( Node Container ) 
-		{
-			base._AddToContainer(Container, _MarginContainer);
-		}
-		
+		/*
+		** Cleanup
+		*/
 		public override void _ExitTree()
 		{
 			if( EditorPlugin.IsInstanceValid(WorkingNode) ) 

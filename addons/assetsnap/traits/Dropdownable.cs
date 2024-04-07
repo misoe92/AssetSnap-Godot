@@ -28,18 +28,24 @@ namespace AssetSnap.Component
 	[Tool]
 	public partial class Dropdownable : Trait.Base
 	{
+		/*
+		** Enums
+		*/
 		public enum DropdownState
 		{
 			Hidden,
 			Shown
 		};
 
+		/*
+		** Exports
+		*/
 		[Export]
 		public Godot.Collections.Array<Button> Items = new();
 
-		public string DefaultValue = "";
-		public string PrefixLabel = "";
-
+		/*
+		** Public
+		*/
 		public MarginContainer _MarginContainer;
 		public PanelContainer panelContainer;
 		public MarginContainer _PanelPaddingContainer;
@@ -47,10 +53,26 @@ namespace AssetSnap.Component
 		public DropdownButton SelectedBlock;
 		public VBoxContainer ItemsInnerContainer;
 
+		/*
+		** Private
+		*/
+		private string DefaultValue = "";
+		private string PrefixLabel = "";
+		
+		/*
+		** Public methods
+		*/
+		
+		/*
+		** Instantiate an instance of the trait
+		**
+		** @return Dropdownable
+		*/
 		public Dropdownable Instantiate(int i)
 		{
 			base._Instantiate( GetType().ToString() );
 			
+			// Setup the container layout
 			_MarginContainer = new() 
 			{
 				Name = "DropdownMarginPanel",
@@ -78,6 +100,7 @@ namespace AssetSnap.Component
 				_PanelPaddingContainer.AddThemeConstantOverride("margin_" + side, value);
 			}
 			
+			// Setup the dropdown
 			panelInnerContainer = new()
 			{
 				Name = "DropdownPanelContainer",
@@ -103,9 +126,6 @@ namespace AssetSnap.Component
 				SelectedBlock.Text = "None";
 			}
 
-			// Action action = () => { _OnToggleVisibility(i); };
-			// SelectedBlock.Pressed += action;
-			
 			ItemsInnerContainer = new()
 			{
 				Name = "DropdownInnerContainer",
@@ -113,23 +133,29 @@ namespace AssetSnap.Component
 
 			WorkingNode = panelContainer; 
 
+			// Setup the layout
 			_PanelPaddingContainer.AddChild(ItemsInnerContainer);
 			panelInnerContainer.AddChild(SelectedBlock);
 			panelInnerContainer.AddChild(_PanelPaddingContainer);
 			panelContainer.AddChild(panelInnerContainer);
 			_MarginContainer.AddChild(panelContainer);
 
-			// Callable _callable = Callable.From(() => { _OnToggleVisibility(i); });
-			// SelectedBlock.Connect( Button.SignalName.Pressed, _callable );
-			
-			Nodes.Add(WorkingNode);
-			// _Actions.Add(action);
+			// Add the node to the nodes array
+			Nodes.Add(panelContainer);
  
+			// Clear the trait
 			Reset();
 
 			return this;
 		}
 		
+		/*
+		** Selects an placed button in the
+		** nodes array by index
+		**
+		** @param int index
+		** @return Dropdownable
+		*/
 		public Dropdownable Select(int index)
 		{
 			base._Select(index);
@@ -146,6 +172,13 @@ namespace AssetSnap.Component
 			return this; 
 		}
 		
+		/*
+		** Selects an placed button in the
+		** nodes array by name
+		**
+		** @param string name
+		** @return Dropdownable
+		*/
 		public Dropdownable SelectByName(string name)
 		{
 			base._SelectByName(name);
@@ -153,6 +186,12 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
+		/*
+		** Adds an button node to the dropdown
+		**
+		** @param Button button
+		** @return Dropdownable
+		*/
 		public Dropdownable AddItem( Button button )
 		{
 			Items.Add(button);
@@ -160,27 +199,28 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		public Dropdownable SetMargin( int value, string side = "" ) 
+		/*
+		** Adds the currently chosen dropdown
+		** to a specified container
+		**
+		** @param Node Container
+		** @return void
+		*/
+		public void AddToContainer( Node Container ) 
 		{
-			_SetMargin(value, side);
-			
-			return this;
+			base._AddToContainer(Container, _MarginContainer);
 		}
 		
-		public Dropdownable SetPadding( int value, string side = "" ) 
-		{
-			_SetPadding(value, side);
-			
-			return this;
-		}
+		/*
+		** Setter Methods
+		*/
 		
-		public Dropdownable SetPrefix( string text ) 
-		{
-			PrefixLabel = text;
-
-			return this;
-		}
-			
+		/*
+		** Sets a name for the current dropdown
+		**
+		** @param string text
+		** @return Dropdownable
+		*/
 		public Dropdownable SetName( string text ) 
 		{
 			base._SetName(text);
@@ -188,23 +228,87 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
+		/*
+		** Sets a prefix for the current dropdown
+		**
+		** @param string text
+		** @return Dropdownable
+		*/
+		public Dropdownable SetPrefix( string text ) 
+		{
+			PrefixLabel = text;
+
+			return this;
+		}
+		
+		/*
+		** Sets the default value for
+		** the dropdown
+		**
+		** @param string value
+		** @return Dropdownable
+		*/
 		public Dropdownable SetDefaultValue(string value) 
 		{
 			DefaultValue = value;
 			
 			return this;
 		}
-			
-		public void AddToContainer( Node Container ) 
+		
+		/*
+		** Sets margin values for 
+		** the currently chosen dropdown
+		**
+		** @param int value
+		** @param string side
+		** @return Dropdownable
+		*/
+		public Dropdownable SetMargin( int value, string side = "" ) 
 		{
-			base._AddToContainer(Container, _MarginContainer);
+			_SetMargin(value, side);
+			
+			return this;
 		}
 		
+		/*
+		** Sets padding values for 
+		** the currently chosen dropdown
+		**
+		** @param int value
+		** @param string side
+		** @return Dropdownable
+		*/
+		public Dropdownable SetPadding( int value, string side = "" ) 
+		{
+			_SetPadding(value, side);
+			
+			return this;
+		}
+		
+		/*
+		** Getter Methods
+		*/
+		
+		/*
+		** Returns the inner container
+		**
+		** @return Container
+		*/
 		public Container GetInnerContainer()
 		{
 			return ItemsInnerContainer;
 		}
 				
+		/*
+		** Private
+		*/
+		
+		/*
+		** Resets the trait to
+		** a cleared state
+		**
+		** @return void
+		*/
 		private void Reset()
 		{
 			WorkingNode = null;
@@ -215,6 +319,9 @@ namespace AssetSnap.Component
 			_PanelPaddingContainer = null;
 		}
 		
+		/*
+		** Cleanup
+		*/
 		public void ExitTree()
 		{
 			Items = null;
