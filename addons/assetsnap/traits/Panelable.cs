@@ -127,6 +127,19 @@ namespace AssetSnap.Component
 		public Panelable Select(int index)
 		{
 			base._Select(index);
+			
+			if( _select ) 
+			{
+				if( IsInstanceValid( WorkingNode.GetParent() ) && WorkingNode.GetParent() is MarginContainer marginContainer )
+				{
+					_MarginContainer = marginContainer;	
+				}
+				
+				if( IsInstanceValid( WorkingNode.GetChild(0) ) && WorkingNode.GetChild(0) is MarginContainer paddingContainer )
+				{
+					_PaddingContainer = paddingContainer;	
+				}
+			}
 
 			return this;
 		}
@@ -161,7 +174,7 @@ namespace AssetSnap.Component
 		*/
 		public void AddToContainer( Node Container )
 		{
-			base._AddToContainer(Container, WorkingNode);
+			base._AddToContainer(Container, _MarginContainer);
 		}
 		
 		/*
