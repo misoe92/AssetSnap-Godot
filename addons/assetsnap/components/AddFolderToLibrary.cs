@@ -69,6 +69,7 @@ namespace AssetSnap.Front.Components
 				.SetInnerOrientation(Containerable.ContainerOrientation.Horizontal)
 				.SetOrientation(Containerable.ContainerOrientation.Vertical)
 				.SetMargin(20, "left")
+				.SetMargin(20, "bottom")
 				.Instantiate();
 			 
 			Trait<Labelable>()
