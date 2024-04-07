@@ -21,12 +21,13 @@
 // SOFTWARE.
 
 #if TOOLS
+using AssetSnap.Trait;
 using Godot;
 
 namespace AssetSnap.Component
 {
 	[Tool]
-	public partial class Labelable : Trait.Base
+	public partial class Labelable : ContainerTrait
 	{
 		/*
 		** Enums
@@ -43,63 +44,48 @@ namespace AssetSnap.Component
 		/*
 		** Public
 		*/
-		public MarginContainer _MarginContainer;
-		public HBoxContainer _BoxContainer;
 		
 		/*
-		** Private
+		** Protected
 		*/
-		private new Godot.Collections.Dictionary<string, int> Margin = new()
-		{
-			{"left", 15},
-			{"right", 15},
-			{"top", 10},
-			{"bottom", 10},
-		};
-		private string Title = "";
-		private string Suffix = "";
-		private TitleType Type = TitleType.HeaderMedium;
-		private TextServer.AutowrapMode AutowrapMode = TextServer.AutowrapMode.Off;
-		private HorizontalAlignment _HorizontalAlignment;
+		protected string Title = "";
+		protected string Suffix = "";
+		protected TitleType Type = TitleType.HeaderMedium;
+		protected TextServer.AutowrapMode AutowrapMode = TextServer.AutowrapMode.Off;
+		protected HorizontalAlignment _HorizontalAlignment;
 		
 		/*
 		** Public methods
 		*/
+		
+		public Labelable()
+		{
+			Margin = new()
+			{
+				{"left", 15},
+				{"right", 15},
+				{"top", 10},
+				{"bottom", 10},
+			};
+		}
 		
 		/*
 		** Instantiate an instance of the trait
 		**
 		** @return Labelable
 		*/	
-		public Labelable Instantiate()
+		public override Labelable Instantiate()
 		{
 			base._Instantiate( GetType().ToString() );
+			base.Instantiate();
 			
 			if( Title == "" ) 
 			{
 				GD.PushWarning("Title not found");
 				return this;
 			}
-
-			_MarginContainer = new()
-			{
-				Name = "LabelMargin",
-				SizeFlagsHorizontal = SizeFlagsHorizontal,
-				SizeFlagsVertical = SizeFlagsVertical,
-			};
-			_BoxContainer = new()
-			{
-				Name = "LabelBox",
-				SizeFlagsHorizontal = SizeFlagsHorizontal,
-				SizeFlagsVertical = SizeFlagsVertical,
-			};
 			
-			foreach( (string side, int value ) in Margin ) 
-			{
-				_MarginContainer.AddThemeConstantOverride("margin_" + side, value);
-			}
-			
-			Label _WorkingNode = new() 
+			Label Label = new() 
 			{
 				Name = Name,	
 				Text = Title,
@@ -112,11 +98,10 @@ namespace AssetSnap.Component
 				HorizontalAlignment = _HorizontalAlignment
 			};
 			
-			_BoxContainer.AddChild(_WorkingNode);	
-			_MarginContainer.AddChild(_BoxContainer);
+			GetInnerContainer(0)
+				.AddChild(Label);	
 
-			Nodes.Add(_WorkingNode);
-			WorkingNode = _WorkingNode;
+			Nodes.Add(Label);
 
 			Reset();
 			
@@ -130,17 +115,14 @@ namespace AssetSnap.Component
 		** @param int index
 		** @return Labelable
 		*/
-		public Labelable Select(int index)
+		public override Labelable Select(int index)
 		{
 			base._Select(index);
 
-			if( null != WorkingNode ) 
+			if( null != WorkingNode && EditorPlugin.IsInstanceValid(WorkingNode)) 
 			{
-				_BoxContainer = WorkingNode.GetParent() as HBoxContainer;
-				if( EditorPlugin.IsInstanceValid(_BoxContainer) )
-				{
-					_MarginContainer = _BoxContainer.GetParent() as MarginContainer;		
-				}
+				_InnerContainer = WorkingNode.GetParent().GetParent() as Container;		
+				_MarginContainer = WorkingNode.GetParent().GetParent().GetParent().GetParent().GetParent() as MarginContainer;		
 			}
 
 			return this;
@@ -153,7 +135,7 @@ namespace AssetSnap.Component
 		** @param string name
 		** @return Labelable
 		*/
-		public Labelable SelectByName(string name)
+		public override Labelable SelectByName(string name)
 		{
 			base._SelectByName(name);
 
@@ -316,32 +298,9 @@ namespace AssetSnap.Component
 		** @param string side
 		** @return Labelable
 		*/
-		public Labelable SetMargin( int value, string side = "" ) 
+		public override Labelable SetMargin( int value, string side = "" ) 
 		{
-			if( side == "" ) 
-			{
-				Margin["top"] = value;
-				Margin["bottom"] = value;
-				Margin["left"] = value;
-				Margin["right"] = value;
-				
-				if( null != WorkingNode ) 
-				{
-					foreach( (string marginSide, int marginValue ) in Margin ) 
-					{
-						_MarginContainer.AddThemeConstantOverride("margin_" + marginSide, marginValue);
-					}
-				}
-			}
-			else 
-			{
-				Margin[side] = value;
-				
-				if( null != WorkingNode ) 
-				{
-					_MarginContainer.AddThemeConstantOverride("margin_" + side, value);
-				}
-			}
+			base.SetMargin( value, side );
 			
 			return this;
 		}
@@ -364,11 +323,11 @@ namespace AssetSnap.Component
 		** Fetches the inner container
 		** of the label
 		**
-		** @return HBoxContainer
+		** @return Container
 		*/
-		public HBoxContainer GetInnerContainer()
+		public Container GetInnerContainer()
 		{
-			return _BoxContainer;
+			return base.GetInnerContainer(0);
 		}
 		
 		/*
@@ -378,7 +337,7 @@ namespace AssetSnap.Component
 		/*
 		** Checks if the label is valid
 		**
-		** @return HBoxContainer
+		** @return bool
 		*/
 		public override bool IsValid()
 		{
@@ -400,13 +359,21 @@ namespace AssetSnap.Component
 		**
 		** @return void
 		*/
-		private void Reset()
+		protected override void Reset()
 		{
 			WorkingNode = null;
-			_BoxContainer = null;
-			_MarginContainer = null;
 			Title = "";
 			Suffix = "";
+
+			base.Reset();
+			
+			Margin = new()
+			{
+				{"left", 15},
+				{"right", 15},
+				{"top", 10},
+				{"bottom", 10},
+			};
 		}
 		
 		
@@ -418,16 +385,6 @@ namespace AssetSnap.Component
 			if( EditorPlugin.IsInstanceValid(WorkingNode) ) 
 			{
 				WorkingNode.QueueFree();
-			}
-			
-			if( EditorPlugin.IsInstanceValid(_BoxContainer) ) 
-			{
-				_BoxContainer.QueueFree();
-			}
-			
-			if( EditorPlugin.IsInstanceValid(_MarginContainer) ) 
-			{
-				_MarginContainer.QueueFree();
 			}
 		}
 	}
