@@ -25,16 +25,18 @@ namespace AssetSnap.Settings
 	using System.Collections.Generic;
 	using AssetSnap.Front.Components;
 	using AssetSnap.Front.Configs;
-    using AssetSnap.States;
-    using Godot;
+	using AssetSnap.States;
+	using Godot;
 
 	public partial class BaseContainer : PanelContainer
 	{
 		private ScrollContainer _ScrollContainer;
+		private MarginContainer _MarginContainer;
 		private HBoxContainer _HBoxContainer;
 		private VBoxContainer SubContainerOne;
 		private VBoxContainer SubContainerTwo;
 		private VBoxContainer SubContainerThree;
+		private VBoxContainer SubContainerFour;
 
 		/*
 		** Initializes the settings container
@@ -52,6 +54,17 @@ namespace AssetSnap.Settings
 				SizeFlagsVertical = Control.SizeFlags.ExpandFill,
 				SizeFlagsHorizontal = Control.SizeFlags.ExpandFill
 			};
+
+			_MarginContainer = new()
+			{
+				SizeFlagsVertical = Control.SizeFlags.ExpandFill,
+				SizeFlagsHorizontal = Control.SizeFlags.ExpandFill
+			};
+
+			_MarginContainer.AddThemeConstantOverride("margin_top", 5);
+			_MarginContainer.AddThemeConstantOverride("margin_left", 5);
+			_MarginContainer.AddThemeConstantOverride("margin_right", 5);
+			_MarginContainer.AddThemeConstantOverride("margin_bottom", 5);
 			
 			_HBoxContainer = new()
 			{
@@ -61,31 +74,36 @@ namespace AssetSnap.Settings
 
 			SubContainerOne = new()
 			{
-				Size = new Vector2(200, 0),
 				SizeFlagsVertical = Control.SizeFlags.ShrinkBegin,
 				SizeFlagsHorizontal = Control.SizeFlags.ExpandFill
 			};
 			
 			SubContainerTwo = new()
 			{
-				Size = new Vector2(200, 0),
 				SizeFlagsVertical = Control.SizeFlags.ShrinkBegin,
 				SizeFlagsHorizontal = Control.SizeFlags.ExpandFill
 			};
 			
 			SubContainerThree = new()
 			{
-				Size = new Vector2(200, 0),
 				SizeFlagsVertical = Control.SizeFlags.ShrinkBegin,
 				SizeFlagsHorizontal = Control.SizeFlags.ExpandFill
 			};
 
+			SubContainerFour = new()
+			{
+				SizeFlagsVertical = Control.SizeFlags.ShrinkBegin,
+				SizeFlagsHorizontal = Control.SizeFlags.ExpandFill
+			};
+			
 			RenderTypes();
 			
 			_HBoxContainer.AddChild(SubContainerOne);
 			_HBoxContainer.AddChild(SubContainerTwo);
 			_HBoxContainer.AddChild(SubContainerThree);
-			_ScrollContainer.AddChild(_HBoxContainer);
+			_HBoxContainer.AddChild(SubContainerFour);
+			_MarginContainer.AddChild(_HBoxContainer);
+			_ScrollContainer.AddChild(_MarginContainer);
 			AddChild(_ScrollContainer);
 			StatesUtils.SetLoad("Settings", true);
 		}
@@ -130,6 +148,11 @@ namespace AssetSnap.Settings
 			if( Iteration == 2 )
 			{
 				EntryContainer = SubContainerThree; 
+			}
+			
+			if( Iteration == 3 )
+			{
+				EntryContainer = SubContainerFour; 
 			}
 
 			return EntryContainer;
@@ -180,7 +203,7 @@ namespace AssetSnap.Settings
 				}
 	
 				Iteration += 1; 
-				if( Iteration > 2 )
+				if( Iteration > 3 )
 				{
 					Iteration = 0;
 				}
