@@ -105,7 +105,6 @@ namespace AssetSnap.Front.Components
 				.Instantiate();
 				
 			Trait<Spinboxable>()
-				.Reset()
 				.SetName("GroupObjectsOriginYValue")
 				.SetValue(Parent.Origin.Y)
 				.SetStep(0.1f)
@@ -129,7 +128,6 @@ namespace AssetSnap.Front.Components
 				.Instantiate();
 				
 			Trait<Spinboxable>()
-				.Reset()
 				.SetName("GroupObjectsOriginZValue")
 				.SetValue(Parent.Origin.Z)
 				.SetStep(0.1f)
