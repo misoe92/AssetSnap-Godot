@@ -24,6 +24,7 @@ namespace AssetSnap.Library
 {
 	using System;
 	using System.Collections.Generic;
+	using AssetSnap.Explorer;
 	using AssetSnap.Front.Components;
 	using Godot;
 	
@@ -80,7 +81,7 @@ namespace AssetSnap.Library
 		*/
 		public void New( BottomDock.Base Dock,  string _Folder, int index )
 		{
-			if( false == Is_GlobalExplorerValid() ) 
+			if( false == IsGlobalExplorerValid() ) 
 			{
 				return;
 			}
@@ -111,19 +112,20 @@ namespace AssetSnap.Library
 		*/
 		public void Refresh(BottomDock.Base Dock)
 		{
-			if( false == Is_GlobalExplorerValid() ) 
+			if( false == IsGlobalExplorerValid() ) 
 			{
 				return;
 			}
 			
 			// Resets current settings
-			_GlobalExplorer.Settings.Reset();
+			ExplorerUtils.Get().Settings.Reset();
+			MaybeRemoveGroupBuilder();
 
 			if( HasFolders() ) 
 			{
-				string[] Folders = _GlobalExplorer.Settings.Folders;
+				string[] Folders = ExplorerUtils.Get().Settings.Folders;
 				
-				for( int i = 0; i < _GlobalExplorer.Settings.FolderCount; i++) 
+				for( int i = 0; i < ExplorerUtils.Get().Settings.FolderCount; i++) 
 				{
 					string Folder = Folders[i];
 					bool exist = false;
@@ -160,8 +162,19 @@ namespace AssetSnap.Library
 		private void RebindSettingsContainer()
 		{
 			_GlobalExplorer.Settings.InitializeContainer();
-			_GlobalExplorer.Settings.Container.Name = "Settings";
-			_GlobalExplorer.BottomDock.Add(_GlobalExplorer.Settings.Container);
+			if( IsInstanceValid(_GlobalExplorer.Settings.Container)) 
+			{
+				_GlobalExplorer.Settings.Container.Name = "Settings";
+				_GlobalExplorer.BottomDock.Add(_GlobalExplorer.Settings.Container);
+			}
+		}
+		
+		private void MaybeRemoveGroupBuilder()
+		{
+			if( ExplorerUtils.Get().Settings.FolderCount == 0 ) 
+			{
+				ExplorerUtils.Get().GroupBuilder.ClearContainer();
+			}
 		}
 		
 		public void RemoveLibrary( string FolderPath )
@@ -228,9 +241,9 @@ namespace AssetSnap.Library
 		**
 		** @return bool
 		*/
-		private bool Is_GlobalExplorerValid()
+		private bool IsGlobalExplorerValid()
 		{
-			return null != _GlobalExplorer && null != _GlobalExplorer.Settings;
+			return ExplorerUtils.IsValid();
 		}
 
 		public override void _ExitTree()

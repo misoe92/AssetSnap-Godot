@@ -141,15 +141,14 @@ namespace AssetSnap.Front.Configs
 		{
 			_Folders = Array.Empty<string>();
 			_Settings = new();
-			
-			if( WithContainer ) 
+			if( null != _Container && WithContainer )  
 			{
-				if( null != _Container.GetParent() ) 
+				if( null != _Container.GetParent() && IsInstanceValid(_Container) ) 
 				{
 					_Container.GetParent().RemoveChild(_Container);
 				}
 
-				_Container.QueueFree();
+				_Container.Free();
 			}
 			
 			Initialize();
@@ -165,12 +164,17 @@ namespace AssetSnap.Front.Configs
 		{
 			if( IsInstanceValid( _Container ) ) 
 			{
-				if( null != _Container.GetParent() ) 
+				if( null != _Container.GetParent() && IsInstanceValid(_Container) ) 
 				{
 					_Container.GetParent().RemoveChild(_Container);
 				}
 	
 				_Container.QueueFree();
+			}
+			
+			if( FolderCount == 0 ) 
+			{
+				return;	
 			}
 			
 			_Container = new();

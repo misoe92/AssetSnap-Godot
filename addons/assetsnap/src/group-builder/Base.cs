@@ -116,6 +116,12 @@ namespace AssetSnap.GroupBuilder
 			}
 		}
 		
+		public void ClearContainer()
+		{
+			Container.GetParent().RemoveChild(Container);
+			Container.QueueFree();
+		}
+		
 		public void ShowMenu( Vector2 Coordinates, string MeshPath ) 
 		{
 			if( IsInstanceValid( MenuPanelContainer ) && IsInstanceValid(_GlobalExplorer.States.Group) ) 

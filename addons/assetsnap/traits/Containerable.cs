@@ -407,38 +407,12 @@ namespace AssetSnap.Component
 		
 		public override void _ExitTree()
 		{
-			Reset();
-			
-			// if( Nodes.Count > 0 ) {
-			// 	for( int i = 0; i < Nodes.Count; i++ ) 
-			// 	{
-			// 		Select(i);
-					
-			// 		if( EditorPlugin.IsInstanceValid( _InnerContainer ) ) 
-			// 		{
-			// 			_InnerContainer.QueueFree();
-			// 		}
-					
-			// 		if( EditorPlugin.IsInstanceValid( _PaddingContainer ) ) 
-			// 		{
-			// 			_PaddingContainer.QueueFree();
-			// 		}
-					
-			// 		if( EditorPlugin.IsInstanceValid( WorkingNode ) ) 
-			// 		{
-			// 			WorkingNode.QueueFree();
-			// 		} 
-					
-			// 		if( EditorPlugin.IsInstanceValid( _MarginContainer ) ) 
-			// 		{
-			// 			_MarginContainer.QueueFree();
-			// 		}
-			// 	}
-			// }
-			
-			// Reset();
+			if( null != WorkingNode && EditorPlugin.IsInstanceValid( WorkingNode ) ) 
+			{
+				WorkingNode.QueueFree();
+			}
 
-			// base._ExitTree();
+			Reset();
 		}
 	}
 }

@@ -22,6 +22,7 @@
 namespace AssetSnap.Front.Components
 {
 	using AssetSnap.Component;
+	using AssetSnap.Explorer;
 	using Godot;
 
 	[Tool]
@@ -82,9 +83,25 @@ namespace AssetSnap.Front.Components
 			{
 				if( false == ClearTrait<Labelable>() ) 
 				{
-					GD.PushError("Labelable was not cleared");
+					GD.PushError("Container was not cleared");
 				}
 				AddTrait(typeof(Labelable));
+			}
+			if( Trait<Panelable>().ContainsIndex(0) )
+			{
+				if( false == ClearTrait<Panelable>() ) 
+				{
+					GD.PushError("Container was not cleared");
+				}
+				AddTrait(typeof(Panelable));
+			}
+			if( Trait<Containerable>().ContainsIndex(0) )
+			{
+				if( false == ClearTrait<Containerable>() ) 
+				{
+					GD.PushError("Container was not cleared");
+				}
+				AddTrait(typeof(Containerable));
 			}
 			
 			if( Trait<Listable>().ContainsIndex(0) )
@@ -96,8 +113,21 @@ namespace AssetSnap.Front.Components
 				AddTrait(typeof(Listable));
 			}
 			
-			CurrentFolderCount = 0;
+			Trait<Containerable>()
+				.SetName( "ListingBoxContainer" )
+				.SetMargin(15, "left")
+				.SetMargin(15, "right")
+				.SetMargin(0, "top")
+				.SetMargin(0, "bottom")
+				.Instantiate();
+			
 			_UpdateListTable();
+			
+			Trait<Containerable>()
+				.Select(0)
+				.AddToContainer(
+					Container
+				);
 		}
 		
 		/*
@@ -107,7 +137,11 @@ namespace AssetSnap.Front.Components
 		*/
 		private void _SetupListTable()
 		{
-			if( _GlobalExplorer.Settings.FolderCount == 0 ) 
+			if(
+				ExplorerUtils.Get()
+					.Settings
+					.FolderCount == 0
+			) 
 			{
 				_SetupNoFoldersTable();
 				return;
@@ -189,12 +223,20 @@ namespace AssetSnap.Front.Components
 		*/
 		private void _UpdateListTable()
 		{
-			if( _GlobalExplorer.Settings.FolderCount == CurrentFolderCount ) 
+			if(
+				ExplorerUtils.Get().Settings.FolderCount == CurrentFolderCount
+			) 
 			{
 				return; 
 			}
+
+			CurrentFolderCount = ExplorerUtils.Get().Settings.FolderCount;
 			
-			if( _GlobalExplorer.Settings.FolderCount == 0 ) 
+			if( 
+				ExplorerUtils.Get()
+					.Settings
+					.FolderCount == 0
+			) 
 			{
 				_SetupNoFolderLabel();
 				return;
