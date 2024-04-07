@@ -116,6 +116,7 @@ namespace AssetSnap.Front.Components
 				Trait<ScrollContainerable>()
 					.SetName("LibrarySettingsScroll")
 					.SetVerticalSizeFlags(Control.SizeFlags.ExpandFill)
+					.SetHorizontalSizeFlags(Control.SizeFlags.ExpandFill)
 					.Instantiate();	
 				
 				Trait<Containerable>()
@@ -130,7 +131,7 @@ namespace AssetSnap.Front.Components
 
 				Container scrollContainerInner = Trait<ScrollContainerable>()
 					.Select(0)
-					.GetInnerContainer();
+					.GetScrollContainer();
 
 				Container componentContainer = Trait<Containerable>()
 					.Select(1)
@@ -184,8 +185,6 @@ namespace AssetSnap.Front.Components
 						_LSEditing.Initialize();
 					}
 					
-				
-						
 					if( _LSSimplePlacement != null ) 
 					{
 						_LSSimplePlacement.Container = Trait<Dropdownable>()

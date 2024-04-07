@@ -263,7 +263,7 @@ namespace AssetSnap.Front.Components
 				.AddToContainer(
 					Trait<ScrollContainerable>()
 						.Select(0)
-						.GetInnerContainer()
+						.GetScrollContainer()
 				);
 					
 			Trait<Containerable>()
