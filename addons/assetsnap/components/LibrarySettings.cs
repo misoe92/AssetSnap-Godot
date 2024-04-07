@@ -184,15 +184,13 @@ namespace AssetSnap.Front.Components
 						_LSEditing.Initialize();
 					}
 					
-					Trait<Dropdownable>()
-						.Select(0)
-						.AddToContainer(componentContainer);
+				
 						
 					if( _LSSimplePlacement != null ) 
 					{
 						_LSSimplePlacement.Container = Trait<Dropdownable>()
 							.Select(0)
-							.GetInnerContainer();
+							.GetDropdownContainer();
 							
 						_LSSimplePlacement.Library = Library;
 						_LSSimplePlacement.Initialize();
@@ -202,21 +200,18 @@ namespace AssetSnap.Front.Components
 					{
 						_LSOptimizedPlacement.Container = Trait<Dropdownable>()
 							.Select(0)
-							.GetInnerContainer();
+							.GetDropdownContainer();
 							
 						_LSOptimizedPlacement.Library = Library;
 						_LSOptimizedPlacement.Initialize();
 					}
-
-					Trait<Dropdownable>()
-						.Select(1)
-						.AddToContainer(componentContainer);
+					
 					
 					if( _LSSnapLayer != null ) 
 					{
 						_LSSnapLayer.Container = Trait<Dropdownable>()
 							.Select(1)
-							.GetInnerContainer();
+							.GetDropdownContainer();
 							
 						_LSSnapLayer.Library = Library;
 						_LSSnapLayer.Initialize();
@@ -226,7 +221,7 @@ namespace AssetSnap.Front.Components
 					{
 						_LSSnapObject.Container = Trait<Dropdownable>()
 							.Select(1)
-							.GetInnerContainer();
+							.GetDropdownContainer();
 							
 						_LSSnapObject.Library = Library;
 						_LSSnapObject.Initialize();
@@ -236,7 +231,7 @@ namespace AssetSnap.Front.Components
 					{
 						_LSSnapOffsetX.Container = Trait<Dropdownable>()
 							.Select(1)
-							.GetInnerContainer();
+							.GetDropdownContainer();
 							
 						_LSSnapOffsetX.Library = Library;
 						_LSSnapOffsetX.Initialize();
@@ -246,21 +241,18 @@ namespace AssetSnap.Front.Components
 					{
 						_LSSnapOffsetZ.Container = Trait<Dropdownable>()
 							.Select(1)
-							.GetInnerContainer();
+							.GetDropdownContainer();
 							
 						_LSSnapOffsetZ.Library = Library;
 						_LSSnapOffsetZ.Initialize();
 					}
 					
-					Trait<Dropdownable>()
-						.Select(2)
-						.AddToContainer(componentContainer);
 						
 					if( _LSSnapToHeight != null ) 
 					{
 						_LSSnapToHeight.Container = Trait<Dropdownable>()
 							.Select(2)
-							.GetInnerContainer();
+							.GetDropdownContainer();
 							
 						_LSSnapToHeight.Library = Library;
 						_LSSnapToHeight.Initialize();
@@ -270,7 +262,7 @@ namespace AssetSnap.Front.Components
 					{
 						_LSSnapToX.Container = Trait<Dropdownable>()
 							.Select(2)
-							.GetInnerContainer();
+							.GetDropdownContainer();
 							
 						_LSSnapToX.Library = Library;
 						_LSSnapToX.Initialize();
@@ -280,21 +272,17 @@ namespace AssetSnap.Front.Components
 					{
 						_LSSnapToZ.Container = Trait<Dropdownable>()
 							.Select(2)
-							.GetInnerContainer();
+							.GetDropdownContainer();
 							
 						_LSSnapToZ.Library = Library;
 						_LSSnapToZ.Initialize();
 					}
-							
-					Trait<Dropdownable>()
-						.Select(3)
-						.AddToContainer(componentContainer);
-						
+					
 					if( _LSSimpleSphereCollision != null )
 					{
 						_LSSimpleSphereCollision.Container = Trait<Dropdownable>()
 							.Select(3)
-							.GetInnerContainer();
+							.GetDropdownContainer();
 
 						_LSSimpleSphereCollision.Library = Library;
 						_LSSimpleSphereCollision.Initialize();
@@ -304,7 +292,7 @@ namespace AssetSnap.Front.Components
 					{
 						_LSConvexPolygonCollision.Container = Trait<Dropdownable>()
 							.Select(3)
-							.GetInnerContainer();
+							.GetDropdownContainer();
 							
 						_LSConvexPolygonCollision.Library = Library;
 						_LSConvexPolygonCollision.Initialize();
@@ -314,12 +302,24 @@ namespace AssetSnap.Front.Components
 					{
 						_LSConcaveCollision.Container = Trait<Dropdownable>()
 							.Select(3)
-							.GetInnerContainer();
+							.GetDropdownContainer();
 							
 						_LSConcaveCollision.Library = Library;
 						_LSConcaveCollision.Initialize();
 					}
 				}
+				Trait<Dropdownable>()
+					.Select(3)
+					.AddToContainer(componentContainer);
+				Trait<Dropdownable>()
+					.Select(2)
+					.AddToContainer(componentContainer);		
+				Trait<Dropdownable>()
+					.Select(1)
+					.AddToContainer(componentContainer);
+				Trait<Dropdownable>()
+					.Select(0)
+					.AddToContainer(componentContainer);
 				
 				Trait<Containerable>()
 					.Select(1)

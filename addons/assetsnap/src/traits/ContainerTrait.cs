@@ -60,6 +60,7 @@ namespace AssetSnap.Trait
 		protected ContainerLayout Layout = ContainerLayout.OneColumn;
 		protected ContainerOrientation Orientation = ContainerOrientation.Vertical;
 		protected ContainerOrientation InnerOrientation = ContainerOrientation.Horizontal;
+		protected bool UsePaddingContainer = true;
 
 		/*
 		** Public Methods
@@ -348,7 +349,7 @@ namespace AssetSnap.Trait
 				SizeFlagsVertical = SizeFlagsVertical,
 				Visible = Visible,
 			};
-			
+
 			if( Size != Vector2.Zero ) 
 			{
 				_MarginContainer.Size = Size;	
@@ -395,9 +396,12 @@ namespace AssetSnap.Trait
 				Name = Name,
 			};
 
-			foreach( (string side, int value ) in Padding ) 
+			if( UsePaddingContainer ) 
 			{
-				_PaddingContainer.AddThemeConstantOverride("margin_" + side, value);
+				foreach( (string side, int value ) in Padding ) 
+				{
+					_PaddingContainer.AddThemeConstantOverride("margin_" + side, value);
+				}
 			}
 			
 			for( int i = 0; i < ColumnCount; i++ ) 
@@ -423,7 +427,7 @@ namespace AssetSnap.Trait
 		**
 		** @return void
 		*/
-		protected void Reset()
+		protected virtual void Reset()
 		{
 			WorkingNode = null;
 			_InnerContainer = null;
