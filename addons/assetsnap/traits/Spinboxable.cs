@@ -39,7 +39,10 @@ namespace AssetSnap.Component
 		private float MinimumValue = 0;
 		private float MaximumValue = 0;
 		private double DefaultValue = 0;
-
+		
+		private Control.SizeFlags SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+		private Control.SizeFlags SizeFlagsVertical = Control.SizeFlags.ShrinkBegin;
+		
 		private MarginContainer _marginContainer;
 
 		private VBoxContainer _innerContainer;
@@ -51,10 +54,14 @@ namespace AssetSnap.Component
 			_marginContainer = new()
 			{
 				Name ="SpinBoxMargin",
+				SizeFlagsHorizontal = SizeFlagsHorizontal,
+				SizeFlagsVertical = SizeFlagsVertical
 			};
 			_innerContainer = new()
 			{
 				Name ="SpinBoxBoxContainer",
+				SizeFlagsHorizontal = SizeFlagsHorizontal,
+				SizeFlagsVertical = SizeFlagsVertical
 			};
 				
 			foreach( (string side, int value ) in Margin ) 
@@ -68,6 +75,8 @@ namespace AssetSnap.Component
 				Prefix = _Prefix,
 				Step = _Step,
 				TooltipText = TooltipText,
+				SizeFlagsHorizontal = SizeFlagsHorizontal,
+				SizeFlagsVertical = SizeFlagsVertical
 			};
 		
 			if( MaximumValue != 0 ) 
@@ -236,7 +245,6 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		
 		public Spinboxable SetMargin( int value, string side = "" ) 
 		{
 			if( side == "" ) 
@@ -251,6 +259,20 @@ namespace AssetSnap.Component
 				Margin[side] = value;
 			}
 			
+			return this;
+		}
+		
+		public Spinboxable SetHorizontalSizeFlags(Control.SizeFlags flag)
+		{
+			SizeFlagsHorizontal = flag;
+
+			return this;
+		}
+		
+		public Spinboxable SetVerticalSizeFlags(Control.SizeFlags flag)
+		{
+			SizeFlagsVertical = flag;
+
 			return this;
 		}
 		

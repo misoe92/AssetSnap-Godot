@@ -159,7 +159,6 @@ namespace AssetSnap.Front.Components
 
 		public override void _ExitTree()
 		{
-			Plugin.GetInstance().StatesChanged -= () => { MaybeUpdateValue(); };
 			Initiated = false;
 			base._ExitTree();
 		}

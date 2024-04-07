@@ -42,6 +42,7 @@ namespace AssetSnap.Component
 			HeaderSmall,
 			HeaderMedium,
 			HeaderLarge,
+			TextSmall,
 		};
 		
 		public string Title = "";

@@ -248,19 +248,6 @@ namespace AssetSnap.Library
 
 		public override void _ExitTree()
 		{
-			for( int i = 0; i < _Libraries.Length; i++ ) 
-			{
-				if( null != _Libraries[i] && IsInstanceValid( _Libraries[i] ) )
-				{
-					if( null != _Libraries[i].GetParent() && IsInstanceValid(_Libraries[i].GetParent())) 
-					{
-						_Libraries[i].GetParent().RemoveChild(_Libraries[i]);
-					}
-					
-					_Libraries[i].QueueFree();
-				} 
-			}
-			
 			_Libraries = Array.Empty<Instance>();
 			_GlobalExplorer = null;
 			_Instance = null; 
