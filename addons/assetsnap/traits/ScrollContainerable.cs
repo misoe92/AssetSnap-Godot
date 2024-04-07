@@ -47,8 +47,6 @@ namespace AssetSnap.Component
 		/*
 		** Private
 		*/
-		private Control.SizeFlags SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
-		private Control.SizeFlags SizeFlagsVertical = Control.SizeFlags.ShrinkBegin;
 		public ContainerOrientation Orientation = ContainerOrientation.Vertical;
 		
 		/*
@@ -62,48 +60,41 @@ namespace AssetSnap.Component
 		*/	
 		public ScrollContainerable Instantiate()
 		{
-			try 
+			base._Instantiate( GetType().ToString() );
+			
+			ScrollContainer _WorkingNode = new()
 			{
-				base._Instantiate( GetType().ToString() );
-				
-				ScrollContainer _WorkingNode = new()
-				{
-					Name="Scroll",
-					SizeFlagsVertical = Control.SizeFlags.ExpandFill,
-					SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
-				};
-				
-				_PaddingContainer = new()
-				{
-					Name="ScrollPadding",
-					SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
-					SizeFlagsVertical = Control.SizeFlags.ExpandFill,
-				};
-
-				_InnerContainer = new()
-				{
-					Name="ScrollInner",
-					SizeFlagsVertical = Control.SizeFlags.ExpandFill,
-					SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
-				};
-				
-				foreach( (string side, int value ) in Padding ) 
-				{
-					_PaddingContainer.AddThemeConstantOverride("margin_" + side, value);
-				}
-
-				_PaddingContainer.AddChild(_InnerContainer);
-				_WorkingNode.AddChild(_PaddingContainer);
-
-				Nodes.Add(_WorkingNode);
-				WorkingNode = _WorkingNode;
-
-				Reset();
-			}
-			catch(Exception e) 
+				Name="Scroll",
+				SizeFlagsVertical = Control.SizeFlags.ExpandFill,
+				SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
+			};
+			
+			_PaddingContainer = new()
 			{
-				GD.PushError(e.Message);
+				Name="ScrollPadding",
+				SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
+				SizeFlagsVertical = Control.SizeFlags.ExpandFill,
+			};
+
+			_InnerContainer = new()
+			{
+				Name="ScrollInner",
+				SizeFlagsVertical = Control.SizeFlags.ExpandFill,
+				SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
+			};
+			
+			foreach( (string side, int value ) in Padding ) 
+			{
+				_PaddingContainer.AddThemeConstantOverride("margin_" + side, value);
 			}
+
+			_PaddingContainer.AddChild(_InnerContainer);
+			_WorkingNode.AddChild(_PaddingContainer);
+
+			Nodes.Add(_WorkingNode);
+			WorkingNode = _WorkingNode;
+
+			Reset();
 			
 			return this;
 		}
@@ -139,18 +130,10 @@ namespace AssetSnap.Component
 			{
 				_PaddingContainer = WorkingNode.GetChild(0) as MarginContainer;
 			}
-			else 
-			{
-				GD.PushError("PaddingContainer is invalid");
-			}
 			
 			if( EditorPlugin.IsInstanceValid(_PaddingContainer) && EditorPlugin.IsInstanceValid(_PaddingContainer.GetChild(0)) ) 
 			{
 				_InnerContainer = _PaddingContainer.GetChild(0) as HBoxContainer;
-			}
-			else 
-			{
-				GD.PushError("InnerContainer is invalid");
 			}
 			
 			return this;
@@ -219,10 +202,6 @@ namespace AssetSnap.Component
 			{
 				controlNode.Visible = state;
 			}
-			else 
-			{
-				GD.PushError("MarginContainer is invalid");
-			}
 
 			return this;
 		}
@@ -234,9 +213,9 @@ namespace AssetSnap.Component
 		** @param Control.SizeFlags flag
 		** @return ScrollContainerable
 		*/
-		public ScrollContainerable SetHorizontalSizeFlags(Control.SizeFlags flag)
+		public override ScrollContainerable SetHorizontalSizeFlags(Control.SizeFlags flag)
 		{
-			SizeFlagsHorizontal = flag;
+			base.SetHorizontalSizeFlags(flag);
 
 			return this;
 		}
@@ -248,9 +227,9 @@ namespace AssetSnap.Component
 		** @param Control.SizeFlags flag
 		** @return ScrollContainerable
 		*/
-		public ScrollContainerable SetVerticalSizeFlags(Control.SizeFlags flag)
+		public override ScrollContainerable SetVerticalSizeFlags(Control.SizeFlags flag)
 		{
-			SizeFlagsVertical = flag;
+			base.SetVerticalSizeFlags(flag);
 
 			return this;
 		}
@@ -281,8 +260,6 @@ namespace AssetSnap.Component
 			
 			return this;
 		}
-		
-		
 		
 		/*
 		** Getter Methods
