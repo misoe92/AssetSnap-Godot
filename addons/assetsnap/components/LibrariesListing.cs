@@ -80,11 +80,30 @@ namespace AssetSnap.Front.Components
 		{
 			if( Trait<Labelable>().ContainsIndex(0) )
 			{
+				GD.Print("Clearing Labelable");
 				if( false == ClearTrait<Labelable>() ) 
 				{
-					GD.PushError("Labelable was not cleared");
+					GD.PushError("Container was not cleared");
 				}
 				AddTrait(typeof(Labelable));
+			}
+			if( Trait<Panelable>().ContainsIndex(0) )
+			{
+				GD.Print("Clearing Panel");
+				if( false == ClearTrait<Panelable>() ) 
+				{
+					GD.PushError("Container was not cleared");
+				}
+				AddTrait(typeof(Panelable));
+			}
+			if( Trait<Containerable>().ContainsIndex(0) )
+			{
+				GD.Print("Clearing Containerable");
+				if( false == ClearTrait<Containerable>() ) 
+				{
+					GD.PushError("Container was not cleared");
+				}
+				AddTrait(typeof(Containerable));
 			}
 			
 			if( Trait<Listable>().ContainsIndex(0) )
@@ -96,8 +115,22 @@ namespace AssetSnap.Front.Components
 				AddTrait(typeof(Listable));
 			}
 			
+			Trait<Containerable>()
+				.SetName( "ListingBoxContainer" )
+				.SetMargin(15, "left")
+				.SetMargin(15, "right")
+				.SetMargin(0, "top")
+				.SetMargin(0, "bottom")
+				.Instantiate();
+			
 			CurrentFolderCount = 0;
 			_UpdateListTable();
+			
+			Trait<Containerable>()
+				.Select(0)
+				.AddToContainer(
+					Container
+				);
 		}
 		
 		/*
