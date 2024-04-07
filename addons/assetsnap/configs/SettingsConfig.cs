@@ -142,7 +142,7 @@ namespace AssetSnap.Front.Configs
 			_Folders = Array.Empty<string>();
 			_Settings = new();
 			
-			if( WithContainer ) 
+			if( null != _Container && WithContainer )  
 			{
 				if( null != _Container.GetParent() ) 
 				{
