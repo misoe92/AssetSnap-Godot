@@ -54,8 +54,6 @@ namespace AssetSnap.Component
 			{"top", 5},
 			{"bottom", 5},
 		};
-		private Control.SizeFlags SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
-		private Control.SizeFlags SizeFlagsVertical = Control.SizeFlags.ShrinkBegin;
 		private PanelType Type = PanelType.DefaultPanelContainer;
 		private MarginContainer _MarginContainer;
 		private MarginContainer _PaddingContainer;
@@ -234,9 +232,9 @@ namespace AssetSnap.Component
 		** @param Control.SizeFlags flag
 		** @return Panelable
 		*/
-		public Panelable SetHorizontalSizeFlags(Control.SizeFlags flag)
+		public override Panelable SetHorizontalSizeFlags(Control.SizeFlags flag)
 		{
-			SizeFlagsHorizontal = flag;
+			base.SetHorizontalSizeFlags(flag);
 
 			return this;
 		}
@@ -248,9 +246,9 @@ namespace AssetSnap.Component
 		** @param Control.SizeFlags flag
 		** @return Panelable
 		*/
-		public Panelable SetVerticalSizeFlags(Control.SizeFlags flag)
+		public override Panelable SetVerticalSizeFlags(Control.SizeFlags flag)
 		{
-			SizeFlagsVertical = flag;
+			base.SetVerticalSizeFlags(flag);
 
 			return this;
 		}
