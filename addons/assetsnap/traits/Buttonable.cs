@@ -69,7 +69,8 @@ namespace AssetSnap.Component
 			{"top", 0},
 			{"bottom", 25},
 		};
-		
+		private new Control.SizeFlags SizeFlagsHorizontal = Control.SizeFlags.ShrinkBegin;
+		private new Control.SizeFlags SizeFlagsVertical = Control.SizeFlags.ShrinkCenter;
 		private ButtonType WorkingButtonType = ButtonType.DefaultButton;
 		private Control.CursorShape DefaultCursorShape = Control.CursorShape.PointingHand;
 		private Texture2D Icon;
