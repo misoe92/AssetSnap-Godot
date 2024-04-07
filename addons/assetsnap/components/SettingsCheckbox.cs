@@ -23,23 +23,15 @@
 namespace AssetSnap.Front.Components
 {
 	using AssetSnap.Component;
+	using AssetSnap.Explorer;
 	using AssetSnap.Static;
 	using Godot;
 
 	[Tool]
-	public partial class SettingsCheckbox : BaseComponent
+	public partial class SettingsCheckbox : TraitableComponent
 	{
 		private string _key;
 		private bool _value = false;
-		
-		private MarginContainer OuterContainer; 
-		private MarginContainer CheckBoxOuterContainer;
-		private VBoxContainer InnerContainer;
-		private Label TitleLabel;
-		private Label DescriptionLabel;
-		private CheckBox _Element;
-		
-		private Callable? _ButtonPressed;
 		
 		public string key 
 		{
@@ -77,106 +69,92 @@ namespace AssetSnap.Front.Components
 		*/
 		public override void Initialize() 
 		{
+			AddTrait(typeof(Panelable));
+			AddTrait(typeof(Containerable));
+			AddTrait(typeof(Labelable));
+			AddTrait(typeof(Checkable));
+
 			Name = "SettingsCheckbox";
 			if( key == null || Container == null ) 
 			{
 				return;
 			}
+			
+			Initiated = true;
 
 			string title = GetTitle( key );
 			string description = GetDescription( key );
-			
-			OuterContainer = new()
-			{
-				Name = "SettingCheckboxMargin",
-			};
-			InnerContainer = new()
-			{
-				Name = "SettingCheckboxInner",
-			};
-			
-			_Element = new()
-			{
-				Name = "SettingCheckbox",
-				Text = _GlobalExplorer.Settings.KeyToLabel(key)
-			};
-			
-			_ButtonPressed = new Callable( this, "UpdateKey" );
 
-			ConfigureOuterContainer(); 
+			Trait<Panelable>()
+				.SetName("SettingsPanel")
+				.SetType(Panelable.PanelType.RoundedPanelContainer)
+				.SetMargin(5, "top")
+				.SetMargin(5, "bottom")
+				.SetMargin(5, "left")
+				.SetMargin(5, "right")
+				.Instantiate();
+				
+			Trait<Containerable>()
+				.SetName("SettingCheckboxContainer")
+				.SetMargin(10, "top")
+				.SetMargin(10, "bottom")
+				.SetMargin(10, "left")
+				.SetMargin(10, "right")
+				.Instantiate();
+
+			Trait<Checkable>()
+				.SetName("SettingsCheckboxInput")
+				.SetText( ExplorerUtils.Get().Settings.KeyToLabel( key ) )
+				.SetAction( new Callable( this, "UpdateKey" ) )
+				.SetValue( value )
+				.Instantiate();
+			
 			ConfigureTitle( title, description );
 			
-			if( value == true )  
+			Container innerContainer = Trait<Containerable>()
+					.Select(0)
+					.GetInnerContainer();
+			
+			if(
+				Trait<Labelable>().Select(0).IsValid()
+			)
 			{
-				_Element.ButtonPressed = true;
+				Trait<Labelable>()
+					.AddToContainer(
+						innerContainer
+					);
 			}
 			
-			if (IfHadTitleOrDescription()) 
+			if(
+				Trait<Labelable>().Select(1).IsValid()
+			)
 			{
-				FinalizeOuterContainer();
-				AddToContainer(OuterContainer);
-			}
-			else 
-			{
-				AddToContainer(_Element);
+				Trait<Labelable>()
+					.AddToContainer(
+						innerContainer
+					);
 			}
 			
-			if( _ButtonPressed is Callable _callable ) 
-			{
-				_Element.Connect(CheckBox.SignalName.Pressed, _callable);
-			}
+			Trait<Checkable>()
+				.Select(0)
+				.AddToContainer(
+					innerContainer
+				);
+
+			Trait<Containerable>()
+				.Select(0)
+				.AddToContainer(
+					Trait<Panelable>()
+						.Select(0)
+						.GetNode()
+				);
+				
+			Trait<Panelable>()
+				.Select(0)
+				.AddToContainer(
+					Container
+				);
 		}
-		
-		/*
-		** Adds component to a container
-		** 
-		** @return void
-		*/
-		private void AddToContainer( Node what) 
-		{
-			Container.AddChild(what);
-		}
-		
-		/*
-		** Checks if component has a title or description
-		** 
-		** @return bool
-		*/
-		private bool IfHadTitleOrDescription()
-		{
-			return TitleLabel != null || DescriptionLabel != null;
-		}
-		
-		/*
-		** Configures the outer container
-		** 
-		** @return void
-		*/
-		private void ConfigureOuterContainer()
-		{
-			OuterContainer.AddThemeConstantOverride("margin_top", 20);
-			OuterContainer.AddThemeConstantOverride("margin_bottom", 20);
-			OuterContainer.AddThemeConstantOverride("margin_left", 30);
-			OuterContainer.AddThemeConstantOverride("margin_right", 30);
-		}
-		
-		/*
-		** Finalizes the outer container
-		** 
-		** @return void
-		*/
-		private void FinalizeOuterContainer()
-		{
-			CheckBoxOuterContainer = new()
-			{
-				Name = "SettingCheckboxOuter",
-			}; 
-			CheckBoxOuterContainer.AddThemeConstantOverride("margin_top", 10);
-			
-			CheckBoxOuterContainer.AddChild(_Element);
-			InnerContainer.AddChild(CheckBoxOuterContainer);
-			OuterContainer.AddChild(InnerContainer);
-		} 
 		
 		/*
 		** Configures the title
@@ -189,35 +167,26 @@ namespace AssetSnap.Front.Components
 			{
 				if (title != null)
 				{
-					TitleLabel = new()
-					{
-						Name = "SettingTitle",
-						ThemeTypeVariation = "HeaderSmall",
-						Text = title,
-					};
-  
-					InnerContainer.AddChild(TitleLabel); 
+					Trait<Labelable>()
+						.SetMargin(0)
+						.SetName("SettingTitle")
+						.SetType(Labelable.TitleType.HeaderMedium)
+						.SetText(title)
+						.Instantiate();
 				}
 				
 				if (description != null)
 				{
-					MarginContainer DescriptionMarginContainer = new()
-					{
-						SizeFlagsVertical = Control.SizeFlags.ShrinkBegin,
-						SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
-						CustomMinimumSize = new Vector2I(0, 70),
-					};
-					
-					DescriptionLabel = new()
-					{
-						Name = "SettingDescription",
-						Text = description,
-						AutowrapMode = TextServer.AutowrapMode.Word,
-						SizeFlagsVertical = Control.SizeFlags.ShrinkBegin,
-					};
-
-					DescriptionMarginContainer.AddChild(DescriptionLabel);
-					InnerContainer.AddChild(DescriptionMarginContainer);
+					Trait<Labelable>()
+						.SetMargin(0)
+						.SetName("SettingDescription")
+						.SetText(description)
+						.SetType(Labelable.TitleType.HeaderSmall)
+						.SetAutoWrap(TextServer.AutowrapMode.Word)
+						.SetHorizontalSizeFlags(Control.SizeFlags.ExpandFill)
+						.SetVerticalSizeFlags(Control.SizeFlags.ShrinkBegin)
+						.SetDimensions(0, 70)
+						.Instantiate();
 				}
 			}
 		}
@@ -254,57 +223,6 @@ namespace AssetSnap.Front.Components
 		{
 			value = !value;
 			_GlobalExplorer.Settings.SetKey(key, value);
-		}
-	
-		/*
-		** Cleans up in references, fields and parameters.
-		** 
-		** @return void
-		*/
-		public override void _ExitTree()
-		{
-			if( IsInstanceValid(_Element) && _Element != null && _ButtonPressed is Callable _callable ) 
-			{
-				if( _Element.IsConnected(CheckBox.SignalName.Pressed, _callable) ) 
-				{
-					_Element.Disconnect(CheckBox.SignalName.Pressed, _callable);
-				}
-			}
-			
-			if( IsInstanceValid(DescriptionLabel) ) 
-			{
-				DescriptionLabel.QueueFree();
-				DescriptionLabel = null;
-			} 
-			
-			if( IsInstanceValid(TitleLabel) ) 
-			{
-				TitleLabel.QueueFree();
-				TitleLabel = null; 
-			}
-			if( IsInstanceValid(_Element) ) 
-			{
-				_Element.QueueFree();
-				_Element = null;
-			}
-			if( IsInstanceValid(CheckBoxOuterContainer) ) 
-			{
-				CheckBoxOuterContainer.QueueFree();
-				CheckBoxOuterContainer = null;
-			}
-			if( IsInstanceValid(InnerContainer) ) 
-			{
-				InnerContainer.QueueFree();
-				InnerContainer = null;
-			}
-			
-			if( IsInstanceValid(OuterContainer) ) 
-			{
-				OuterContainer.QueueFree();
-				OuterContainer = null;
-			}
-
-			_ButtonPressed = null;
 		}
 	}
 }
