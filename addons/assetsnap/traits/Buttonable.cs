@@ -22,7 +22,6 @@
 
 #if TOOLS
 using System;
-using System.Collections.Generic;
 using Godot;
 namespace AssetSnap.Component
 {
@@ -30,9 +29,9 @@ namespace AssetSnap.Component
 	[Tool]
 	public partial class Buttonable : Trait.Base
 	{
-		[Export]
-		public Godot.Collections.Array<Callable> _Actions = new Godot.Collections.Array<Callable>();
-
+		/*
+		** Enums
+		*/
 		public enum ButtonType
 		{
 			DefaultButton,
@@ -49,7 +48,21 @@ namespace AssetSnap.Component
 			SmallDisabledButton,
 		}
 		
-		public new Godot.Collections.Dictionary<string, int> Margin = new()
+		/*
+		** Exports
+		*/
+		[Export]
+		public Godot.Collections.Array<Callable> _Actions = new Godot.Collections.Array<Callable>();
+
+		/*
+		** Public
+		*/
+		public int index = 0;
+		
+		/*
+		** Private
+		*/
+		private new Godot.Collections.Dictionary<string, int> Margin = new()
 		{
 			{"left", 20},
 			{"right", 20},
@@ -59,26 +72,28 @@ namespace AssetSnap.Component
 		
 		private Control.SizeFlags SizeFlagsHorizontal = Control.SizeFlags.ShrinkBegin;
 		private Control.SizeFlags SizeFlagsVertical = Control.SizeFlags.ShrinkCenter;
-		
-		public string Text = "";
-		public string TooltipText = "";
-		public int index = 0;
+		private ButtonType WorkingButtonType = ButtonType.DefaultButton;
+		private Control.CursorShape DefaultCursorShape = Control.CursorShape.PointingHand;
+		private Texture2D Icon;
+		private HorizontalAlignment IconAlignment;
 
-		public ButtonType WorkingButtonType = ButtonType.DefaultButton;
-		public Godot.Control.CursorShape DefaultCursorShape = Godot.Control.CursorShape.PointingHand;
-
-		public Texture2D Icon;
-		public HorizontalAlignment IconAlignment;
+		private string Text = "";
+		private string TooltipText = "";
 		
-		public Buttonable()
-		{
-			// _Actions += () => { GD.Print("Change found")};
-		}
+		/*
+		** Public methods
+		*/
 		
+		/*
+		** Instantiate an instance of the trait
+		**
+		** @return Buttonable
+		*/	
 		public Buttonable Instantiate()
 		{
 			base._Instantiate( GetType().ToString() );
 			
+			// Setup the button
 			Button WorkingButton = new()
 			{
 				Name = Name,
@@ -98,24 +113,35 @@ namespace AssetSnap.Component
 			}
 
 			WorkingButton.SetMeta("index", index);
-		
-			Callable actionCallable = _Actions[index];
-			Godot.Error error = WorkingButton.Connect( Button.SignalName.Pressed, actionCallable);
-			
-			if( error != Godot.Error.Ok)
+
+			// Connect the button to it's action
+			if( _Actions.Count >= index ) 
 			{
-				GD.Print("Error connecting signal: " + error.ToString());
+				Callable actionCallable = _Actions[index];
+				Godot.Error error = WorkingButton.Connect( Button.SignalName.Pressed, actionCallable);
+				if( error != Godot.Error.Ok)
+				{
+					GD.Print("Error connecting signal: " + error.ToString());
+				}
 			}
 			
+			// Add the button to the nodes array			
 			Nodes.Add(WorkingButton);
-			WorkingNode = WorkingButton;
 
+			// Increase index and clear the trait
 			index += 1;
 			Reset();
 		
 			return this;
 		}
 		
+		/*
+		** Selects an placed button in the
+		** nodes array by index
+		**
+		** @param int index
+		** @return Buttonable
+		*/
 		public Buttonable Select(int index)
 		{
 			base._Select(index);
@@ -123,6 +149,13 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
+		/*
+		** Selects an placed button in the
+		** nodes array by name
+		**
+		** @param string name
+		** @return Buttonable
+		*/
 		public Buttonable SelectByName( string name ) 
 		{
 			foreach( Button button in Nodes ) 
@@ -137,6 +170,28 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
+		/*
+		** Adds the currently chosen button
+		** to a specified container
+		**
+		** @param Node Container
+		** @return void
+		*/
+		public void AddToContainer( Node Container )
+		{
+			_AddToContainer(Container, WorkingNode);
+		}
+		
+		/*
+		** Setter Methods
+		*/
+		
+		/*
+		** Sets the name of the current button
+		**
+		** @param string text
+		** @return Buttonable
+		*/
 		public Buttonable SetName( string text ) 
 		{
 			base._SetName(text);
@@ -144,6 +199,12 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
+		/*
+		** Sets the text of the current button
+		**
+		** @param string text
+		** @return Buttonable
+		*/
 		public Buttonable SetText( string text ) 
 		{
 			Text = text;
@@ -151,6 +212,12 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
+		/*
+		** Sets the tooltip text of the current button
+		**
+		** @param string text
+		** @return Buttonable
+		*/
 		public Buttonable SetTooltipText( string text ) 
 		{
 			TooltipText = text;
@@ -158,6 +225,13 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
+		/*
+		** Sets the visibility state of the
+		** currently chosen button
+		**
+		** @param bool state
+		** @return Buttonable
+		*/
 		public Buttonable SetVisible( bool state ) 
 		{
 			base._SetVisible(state);
@@ -170,6 +244,13 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
+		/*
+		** Sets the horizontal size flag, which controls the x
+		** axis, and how it should act.
+		**
+		** @param Control.SizeFlags flag
+		** @return Buttonable
+		*/
 		public Buttonable SetHorizontalSizeFlags(Control.SizeFlags flag)
 		{
 			SizeFlagsHorizontal = flag;
@@ -177,6 +258,13 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
+		/*
+		** Sets the vertical size flag, which controls the y
+		** axis, and how it should act.
+		**
+		** @param Control.SizeFlags flag
+		** @return Buttonable
+		*/
 		public Buttonable SetVerticalSizeFlags(Control.SizeFlags flag)
 		{
 			SizeFlagsVertical = flag;
@@ -184,6 +272,14 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
+		/*
+		** Sets the theme type of the button,
+		** which lays out a set of specified rules
+		** from the theme that the button follows
+		**
+		** @param ButtonType type
+		** @return Buttonable
+		*/
 		public Buttonable SetType( ButtonType type ) 
 		{
 			WorkingButtonType = type;
@@ -191,13 +287,27 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		public Buttonable SetCursorShape( Godot.Control.CursorShape shape ) 
+		/*
+		** Sets the cursorshape of the
+		** currently chosen button
+		**
+		** @param Control.CursorShape shape
+		** @return Buttonable
+		*/
+		public Buttonable SetCursorShape( Control.CursorShape shape ) 
 		{
 			DefaultCursorShape = shape;
 			
 			return this;
 		}
 		
+		/*
+		** Sets the icon of the
+		** currently chosen button
+		**
+		** @param Texture2D icon
+		** @return Buttonable
+		*/
 		public Buttonable SetIcon( Texture2D icon )
 		{
 			Icon = icon;
@@ -205,6 +315,14 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
+		/*
+		** Sets the icon alignment
+		** of the currently chosen
+		** button
+		**
+		** @param HorizontalAlignment alignment
+		** @return Buttonable
+		*/
 		public Buttonable SetIconAlignment( HorizontalAlignment alignment )
 		{
 			IconAlignment = alignment;
@@ -212,6 +330,13 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
+		/*
+		** Sets the action for the
+		** currently chosen button
+		**
+		** @param Action action
+		** @return Buttonable
+		*/
 		public Buttonable SetAction( Action action ) 
 		{
 			_Actions.Add(Callable.From(action));
@@ -219,6 +344,14 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
+		/*
+		** Sets margin values for 
+		** the currently chosen button
+		**
+		** @param int value
+		** @param string side
+		** @return Buttonable
+		*/
 		public Buttonable SetMargin( int value, string side = "" ) 
 		{
 			if( side == "" ) 
@@ -236,41 +369,31 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
+		/*
+		** Booleans
+		*/
+		
+		/*
+		** Checks if the currently
+		** chosen button is visible
+		**
+		** @return bool
+		*/
 		public bool IsVisible()
 		{
 			return Visible;
 		}
 		
-		public void AddToContainer( Node Container )
-		{
-			if( null != WorkingNode ) 
-			{
-				// Single placement
-				Container.AddChild(WorkingNode);
-			}
-			else 
-			{
-				MarginContainer _Container = new()
-				{
-					SizeFlagsVertical = Control.SizeFlags.ShrinkCenter,
-					SizeFlagsHorizontal = Control.SizeFlags.ShrinkBegin,
-				};
-				
-				foreach( (string side, int value ) in Margin ) 
-				{
-					_Container.AddThemeConstantOverride("margin_" + side, value);
-				}
-				 
-				// Multi placement
-				foreach( Button button in Nodes ) 
-				{
-					_Container.AddChild(button);
-				}
-
-				base._AddToContainer(Container, _Container);
-			}
-		}
+		/*
+		** Private
+		*/
 		
+		/*
+		** Resets the trait to
+		** a cleared state
+		**
+		** @return void
+		*/
 		private void Reset()
 		{
 			Text = "";
@@ -278,21 +401,6 @@ namespace AssetSnap.Component
 			WorkingNode = null;
 			WorkingButtonType = ButtonType.DefaultButton;
 			DefaultCursorShape = Godot.Control.CursorShape.PointingHand;
-		}
-		
-		private void _ClearNodes()
-		{
-			for( int i = 0; i < Nodes.Count; i++ ) 
-			{
-				Select(i); 
-				WorkingNode.QueueFree();
-			}
-		}
-
-		public override void _ExitTree()
-		{
-			base._ExitTree(); 
-			// Reset();
 		}
 	}
 }
