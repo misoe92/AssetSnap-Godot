@@ -32,6 +32,7 @@ namespace AssetSnap.Settings
 	{
 		private ScrollContainer _ScrollContainer;
 		private MarginContainer _MarginContainer;
+		private VBoxContainer _VBoxContainer;
 		private HBoxContainer _HBoxContainer;
 		private VBoxContainer SubContainerOne;
 		private VBoxContainer SubContainerTwo;
@@ -65,6 +66,12 @@ namespace AssetSnap.Settings
 			_MarginContainer.AddThemeConstantOverride("margin_left", 5);
 			_MarginContainer.AddThemeConstantOverride("margin_right", 5);
 			_MarginContainer.AddThemeConstantOverride("margin_bottom", 5);
+			
+			_VBoxContainer = new()
+			{
+				SizeFlagsVertical = Control.SizeFlags.ExpandFill,
+				SizeFlagsHorizontal = Control.SizeFlags.ExpandFill
+			};
 			
 			_HBoxContainer = new()
 			{
@@ -102,7 +109,8 @@ namespace AssetSnap.Settings
 			_HBoxContainer.AddChild(SubContainerTwo);
 			_HBoxContainer.AddChild(SubContainerThree);
 			_HBoxContainer.AddChild(SubContainerFour);
-			_MarginContainer.AddChild(_HBoxContainer);
+			_VBoxContainer.AddChild(_HBoxContainer);
+			_MarginContainer.AddChild(_VBoxContainer);
 			_ScrollContainer.AddChild(_MarginContainer);
 			AddChild(_ScrollContainer);
 			StatesUtils.SetLoad("Settings", true);
