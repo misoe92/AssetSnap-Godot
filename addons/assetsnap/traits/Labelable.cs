@@ -57,7 +57,6 @@ namespace AssetSnap.Component
 		/*
 		** Public methods
 		*/
-		
 		public Labelable()
 		{
 			Margin = new()
@@ -67,6 +66,9 @@ namespace AssetSnap.Component
 				{"top", 10},
 				{"bottom", 10},
 			};
+			
+			SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+			SizeFlagsVertical = Control.SizeFlags.ShrinkBegin;
 		}
 		
 		/*
@@ -77,6 +79,14 @@ namespace AssetSnap.Component
 		public override Labelable Instantiate()
 		{
 			base._Instantiate( GetType().ToString() );
+			
+			if ("" != Suffix)
+			{
+				Orientation = ContainerOrientation.Horizontal;
+				InnerOrientation = ContainerOrientation.Vertical;
+				SizeFlagsHorizontal = Control.SizeFlags.ShrinkBegin;
+			}
+			
 			base.Instantiate();
 			
 			if( Title == "" ) 
@@ -100,6 +110,22 @@ namespace AssetSnap.Component
 			
 			GetInnerContainer(0)
 				.AddChild(Label);	
+				
+			if( "" != Suffix ) 
+			{
+				Label suffix = new() 
+				{
+					Name = Name + "-suffix",	
+					Text = Suffix,
+					ThemeTypeVariation = "TextExtraSmall",
+					SizeFlagsHorizontal = Control.SizeFlags.ShrinkCenter,
+					SizeFlagsVertical = Control.SizeFlags.ShrinkBegin,
+					HorizontalAlignment = HorizontalAlignment.Right
+				};
+							
+				GetInnerContainer(0)
+					.AddChild(suffix);
+			}
 
 			Nodes.Add(Label);
 
@@ -364,8 +390,11 @@ namespace AssetSnap.Component
 			WorkingNode = null;
 			Title = "";
 			Suffix = "";
-
+			
 			base.Reset();
+			
+			SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+			SizeFlagsVertical = Control.SizeFlags.ShrinkBegin;
 			
 			Margin = new()
 			{
