@@ -30,5 +30,10 @@ namespace AssetSnap.Explorer
 		{
 			return GlobalExplorer.GetInstance();
 		}
+		
+		public static bool IsValid()
+		{
+			return Get() != null;
+		}
 	}
 }
