@@ -22,6 +22,7 @@
 namespace AssetSnap.Front.Components
 {
 	using AssetSnap.Component;
+	using AssetSnap.Explorer;
 	using Godot;
 
 	[Tool]
@@ -123,7 +124,6 @@ namespace AssetSnap.Front.Components
 				.SetMargin(0, "bottom")
 				.Instantiate();
 			
-			CurrentFolderCount = 0;
 			_UpdateListTable();
 			
 			Trait<Containerable>()
@@ -140,7 +140,11 @@ namespace AssetSnap.Front.Components
 		*/
 		private void _SetupListTable()
 		{
-			if( _GlobalExplorer.Settings.FolderCount == 0 ) 
+			if(
+				ExplorerUtils.Get()
+					.Settings
+					.FolderCount == 0
+			) 
 			{
 				_SetupNoFoldersTable();
 				return;
@@ -222,12 +226,22 @@ namespace AssetSnap.Front.Components
 		*/
 		private void _UpdateListTable()
 		{
-			if( _GlobalExplorer.Settings.FolderCount == CurrentFolderCount ) 
+			if(
+				ExplorerUtils.Get().Settings.FolderCount == CurrentFolderCount
+			) 
 			{
+				GD.Print("same", ExplorerUtils.Get().Settings.FolderCount, CurrentFolderCount);
 				return; 
 			}
+
+			CurrentFolderCount = ExplorerUtils.Get().Settings.FolderCount;
 			
-			if( _GlobalExplorer.Settings.FolderCount == 0 ) 
+			GD.Print("Updates");
+			if( 
+				ExplorerUtils.Get()
+					.Settings
+					.FolderCount == 0
+			) 
 			{
 				_SetupNoFolderLabel();
 				return;
