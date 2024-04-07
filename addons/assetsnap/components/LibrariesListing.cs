@@ -81,7 +81,6 @@ namespace AssetSnap.Front.Components
 		{
 			if( Trait<Labelable>().ContainsIndex(0) )
 			{
-				GD.Print("Clearing Labelable");
 				if( false == ClearTrait<Labelable>() ) 
 				{
 					GD.PushError("Container was not cleared");
@@ -90,7 +89,6 @@ namespace AssetSnap.Front.Components
 			}
 			if( Trait<Panelable>().ContainsIndex(0) )
 			{
-				GD.Print("Clearing Panel");
 				if( false == ClearTrait<Panelable>() ) 
 				{
 					GD.PushError("Container was not cleared");
@@ -99,7 +97,6 @@ namespace AssetSnap.Front.Components
 			}
 			if( Trait<Containerable>().ContainsIndex(0) )
 			{
-				GD.Print("Clearing Containerable");
 				if( false == ClearTrait<Containerable>() ) 
 				{
 					GD.PushError("Container was not cleared");
@@ -230,13 +227,11 @@ namespace AssetSnap.Front.Components
 				ExplorerUtils.Get().Settings.FolderCount == CurrentFolderCount
 			) 
 			{
-				GD.Print("same", ExplorerUtils.Get().Settings.FolderCount, CurrentFolderCount);
 				return; 
 			}
 
 			CurrentFolderCount = ExplorerUtils.Get().Settings.FolderCount;
 			
-			GD.Print("Updates");
 			if( 
 				ExplorerUtils.Get()
 					.Settings
