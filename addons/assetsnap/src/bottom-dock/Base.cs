@@ -230,6 +230,11 @@ namespace AssetSnap.BottomDock
 		*/
 		public void Add( Container container )
 		{
+			if( false == IsValid(container)) 
+			{
+				return;
+			}
+			
 			if( Has( container ) ) 
 			{
 				Remove(container);
@@ -277,6 +282,12 @@ namespace AssetSnap.BottomDock
 		*/
 		public bool Has( Container container )
 		{
+			if( null == _Container || false == EditorPlugin.IsInstanceValid(_Container) ) 
+			{
+				GD.PushError("Invalid container @ Bottom Dock: ", container.Name);
+				return false;
+			}
+			
 			foreach( Node child in _Container.GetChildren() ) 
 			{
 				if( EditorPlugin.IsInstanceValid(child) && child.Name == container.Name ) 
@@ -324,6 +335,11 @@ namespace AssetSnap.BottomDock
 			}
 			
 			GlobalExplorer.GetInstance().States.CurrentLibrary = GlobalExplorer.GetInstance().GetLibraryByIndex(index-1);
+		}
+		
+		private bool IsValid( Container _Container )
+		{
+			return null != _Container && true == EditorPlugin.IsInstanceValid(_Container); 
 		}
 		
 		/*

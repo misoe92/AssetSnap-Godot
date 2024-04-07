@@ -6,3 +6,7 @@ icon.svg.import
 Working Project.csproj
 Working Project.sln
 images/*.import
+assets/*.*
+assets/*/*.*
+assets/*/*/*.*
+addons\assetsnap\config.cfg

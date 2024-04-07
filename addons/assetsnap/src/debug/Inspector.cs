@@ -364,7 +364,7 @@ namespace AssetSnap.Debug
 					}
 					else if( null != value ) 
 					{
-						GD.Print(field.Name);
+						// GD.Print(field.Name);
 					}
 				}
 			}

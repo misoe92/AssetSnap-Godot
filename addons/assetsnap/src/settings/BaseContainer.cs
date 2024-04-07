@@ -25,7 +25,8 @@ namespace AssetSnap.Settings
 	using System.Collections.Generic;
 	using AssetSnap.Front.Components;
 	using AssetSnap.Front.Configs;
-	using Godot;
+    using AssetSnap.States;
+    using Godot;
 
 	public partial class BaseContainer : PanelContainer
 	{
@@ -86,6 +87,7 @@ namespace AssetSnap.Settings
 			_HBoxContainer.AddChild(SubContainerThree);
 			_ScrollContainer.AddChild(_HBoxContainer);
 			AddChild(_ScrollContainer);
+			StatesUtils.SetLoad("Settings", true);
 		}
  
 		/*

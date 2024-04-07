@@ -28,17 +28,19 @@ namespace AssetSnap.Component
 	using System.Reflection;
 	using System.Collections.Generic;
 	using Godot;
+	using AssetSnap.Explorer;
 
-	public partial class Base : Node
+	[Tool]
+	public partial class Base
 	{
-		private Dictionary<string, BaseComponent> _Components = new();
+		private static Godot.Collections.Dictionary<string, BaseComponent> _Components = new();
+		private static Godot.Collections.Array<BaseComponent> _Instances = new();
 		
-		private Godot.Collections.Array<BaseComponent> _Instances = new();
+		[Export]
+		public static Godot.Collections.Dictionary<string, BaseComponent> Components { get => _Components; set => _Components = value; }	
 		
-		public Base()
-		{
-			Name = "AssetSnapComponents";
-		}
+		[Export]
+		public static Godot.Collections.Array<BaseComponent> Instances { get => _Instances; set => _Instances = value; }	
 		
 		/*
 		** Initialization of Component BaseHandler
@@ -91,9 +93,9 @@ namespace AssetSnap.Component
 				}
 				else  
 				{
-					if( instance is Node _node && IsInstanceValid(_node)) 
+					if( instance is Node _node && EditorPlugin.IsInstanceValid(_node)) 
 					{
-						if( null != _node.GetParent() && IsInstanceValid( _node.GetParent() ))
+						if( null != _node.GetParent() && EditorPlugin.IsInstanceValid( _node.GetParent() ))
 						{
 							_node.GetParent().RemoveChild(_node);
 						}
@@ -121,7 +123,10 @@ namespace AssetSnap.Component
 				return;
 			}
 			
-			AddChild(_Component, true);
+			ExplorerUtils.Get()._Plugin
+				.GetInternalContainer()
+				.AddChild(_Component, true);
+				
 			_Component.Enter();
 			_Components.Add(TypeName, _Component);
 		}
@@ -186,7 +191,10 @@ namespace AssetSnap.Component
 			if( unique ) 
 			{
 				component = Activator.CreateInstance<T>() as BaseComponent;
-				AddChild(component, true);
+				
+				ExplorerUtils.Get()._Plugin
+					.GetInternalContainer()
+					.AddChild(component, true);
  
 				_Instances.Add(component);
 			}
@@ -263,9 +271,16 @@ namespace AssetSnap.Component
 				return;
 			}
 
-			RemoveChild(_Components[key]);
+			
+			ExplorerUtils.Get()._Plugin
+				.GetInternalContainer()
+				.RemoveChild(_Components[key]);
+				
 			_Components[key] = new();
-			AddChild(_Components[key]);
+			
+			ExplorerUtils.Get()._Plugin
+				.GetInternalContainer()
+				.AddChild(_Components[key]);
 		}
 		
 		/*
@@ -280,6 +295,7 @@ namespace AssetSnap.Component
 		{
 			if( _Components == null || _Components.Count == 0 ) 
 			{
+				GD.PushError("No components was found");
 				return false;
 			}
 			
@@ -293,43 +309,6 @@ namespace AssetSnap.Component
 			}
 			
 			return true;
-		}
-		
-		public override void _ExitTree()
-		{
-			// if (_Instances != null && _Instances.Count != 0)
-			// {
-			// 	foreach( BaseComponent _component in _Instances ) 
-			// 	{
-			// 		if( EditorPlugin.IsInstanceValid( _component ) )  
-			// 		{
-			// 			_component.Free();
-			// 		}
-			// 	}
-			// }
-			
-			// if( _Components != null && _Components.Count != 0 ) 
-			// {
-			// 	foreach( (string key, BaseComponent _component) in _Components ) 
-			// 	{
-			// 		if( EditorPlugin.IsInstanceValid( _component ) ) 
-			// 		{
-			// 			_component.QueueFree();
-			// 		} 
-			// 	} 
-			// }  
-
-			// _Instances = null; 
-			// _Components = null; 
-
-			// foreach( Node child in GetChildren() ) 
-			// {
-			// 	if( IsInstanceValid( child ) )  
-			// 	{
-			// 		RemoveChild(child); 
-			// 		child.QueueFree();					
-			// 	}
-			// }
 		}
 	}
 }
