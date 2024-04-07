@@ -23,7 +23,6 @@
 #if TOOLS
 namespace AssetSnap.Trait
 {
-	using System;
 	using Godot;
 	
 	[Tool]
