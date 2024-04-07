@@ -302,6 +302,7 @@ namespace AssetSnap.Front.Components
 			
 			Trait<Labelable>()
 				.SetName( "NotFoundText" )
+				.SetType(Labelable.TitleType.TextMedium)
 				.SetText(NotFoundText)
 				.SetAutoWrap( TextServer.AutowrapMode.Word )
 				.SetDimensions(500, 0)
@@ -318,14 +319,6 @@ namespace AssetSnap.Front.Components
 
 		public override void _ExitTree()
 		{
-			// foreach( GodotObject _object in _Entries ) 
-			// {
-			// 	if( null != _object && IsInstanceValid(_object) && _object is Node _node ) 
-			// 	{
-			// 		GD.Print("Unloaded library listing entry: ", _node.Name);
-			// 		_node.QueueFree();
-			// 	}
-			// }
 			base._ExitTree();
 		}
 	}
