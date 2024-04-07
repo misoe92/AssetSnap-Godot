@@ -24,8 +24,8 @@ namespace AssetSnap.Library
 {
 	using System;
 	using System.Collections.Generic;
-    using AssetSnap.Explorer;
-    using AssetSnap.Front.Components;
+	using AssetSnap.Explorer;
+	using AssetSnap.Front.Components;
 	using Godot;
 	
 	[Tool]
@@ -119,6 +119,7 @@ namespace AssetSnap.Library
 			
 			// Resets current settings
 			ExplorerUtils.Get().Settings.Reset();
+			MaybeRemoveGroupBuilder();
 
 			if( HasFolders() ) 
 			{
@@ -161,8 +162,19 @@ namespace AssetSnap.Library
 		private void RebindSettingsContainer()
 		{
 			_GlobalExplorer.Settings.InitializeContainer();
-			_GlobalExplorer.Settings.Container.Name = "Settings";
-			_GlobalExplorer.BottomDock.Add(_GlobalExplorer.Settings.Container);
+			if( IsInstanceValid(_GlobalExplorer.Settings.Container)) 
+			{
+				_GlobalExplorer.Settings.Container.Name = "Settings";
+				_GlobalExplorer.BottomDock.Add(_GlobalExplorer.Settings.Container);
+			}
+		}
+		
+		private void MaybeRemoveGroupBuilder()
+		{
+			if( ExplorerUtils.Get().Settings.FolderCount == 0 ) 
+			{
+				ExplorerUtils.Get().GroupBuilder.ClearContainer();
+			}
 		}
 		
 		public void RemoveLibrary( string FolderPath )
