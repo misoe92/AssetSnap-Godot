@@ -29,14 +29,9 @@ namespace AssetSnap.Component
 	[Tool]
 	public partial class Labelable : Trait.Base
 	{
-		public new Godot.Collections.Dictionary<string, int> Margin = new()
-		{
-			{"left", 15},
-			{"right", 15},
-			{"top", 10},
-			{"bottom", 10},
-		};
-		
+		/*
+		** Enums
+		*/
 		public enum TitleType 
 		{
 			HeaderSmall,
@@ -45,20 +40,40 @@ namespace AssetSnap.Component
 			TextSmall,
 		};
 		
-		public string Title = "";
-		public TitleType Type = TitleType.HeaderMedium;
+		/*
+		** Public
+		*/
 		public MarginContainer _MarginContainer;
 		public HBoxContainer _BoxContainer;
-
+		
+		/*
+		** Private
+		*/
+		private new Godot.Collections.Dictionary<string, int> Margin = new()
+		{
+			{"left", 15},
+			{"right", 15},
+			{"top", 10},
+			{"bottom", 10},
+		};
+		private string Title = "";
+		private TitleType Type = TitleType.HeaderMedium;
 		private Control.SizeFlags SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
 		private Control.SizeFlags SizeFlagsVertical = Control.SizeFlags.ShrinkBegin;
 		private TextServer.AutowrapMode AutowrapMode = TextServer.AutowrapMode.Off;
-
 		private Vector2 CustomMinimumSize;
 		private Vector2 Size;
-
 		private HorizontalAlignment _HorizontalAlignment;
 		
+		/*
+		** Public methods
+		*/
+		
+		/*
+		** Instantiate an instance of the trait
+		**
+		** @return Labelable
+		*/	
 		public Labelable Instantiate()
 		{
 			base._Instantiate( GetType().ToString() );
@@ -111,6 +126,13 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
+		/*
+		** Selects an placed label in the
+		** nodes array by index
+		**
+		** @param int index
+		** @return Labelable
+		*/
 		public Labelable Select(int index)
 		{
 			base._Select(index);
@@ -127,6 +149,13 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
+		/*
+		** Selects an placed label in the
+		** nodes array by name
+		**
+		** @param string name
+		** @return Labelable
+		*/
 		public Labelable SelectByName(string name)
 		{
 			base._SelectByName(name);
@@ -134,6 +163,28 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
+		/*
+		** Adds the currently chosen button
+		** to a specified container
+		**
+		** @param Node Container
+		** @return void
+		*/
+		public void AddToContainer( Node Container, int? index = null ) 
+		{
+			base._AddToContainer(Container, _MarginContainer, index);
+		}
+		
+		/*
+		** Setter Methods
+		*/
+		
+		/*
+		** Sets the name of the current label
+		**
+		** @param string text
+		** @return Labelable
+		*/
 		public Labelable SetName( string text ) 
 		{
 			base._SetName(text);
@@ -141,42 +192,12 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		public Labelable SetAlignment( HorizontalAlignment alignment ) 
-		{
-			_HorizontalAlignment = alignment;
-
-			return this;
-		}
-		
-		public Labelable SetDimensions( int width, int height )
-		{
-			CustomMinimumSize = new Vector2( width, height);
-			Size = new Vector2( width, height);
-
-			return this;
-		}
-		
-		public Labelable SetHorizontalSizeFlags(Control.SizeFlags flag)
-		{
-			SizeFlagsHorizontal = flag;
-
-			return this;
-		}
-		
-		public Labelable SetVerticalSizeFlags(Control.SizeFlags flag)
-		{
-			SizeFlagsVertical = flag;
-
-			return this;
-		}
-		
-		public Labelable SetAutoWrap( TextServer.AutowrapMode mode )
-		{
-			AutowrapMode = mode;
-
-			return this;
-		}
-		
+		/*
+		** Sets the text of the current button
+		**
+		** @param string text
+		** @return Labelable
+		*/
 		public Labelable SetText( string text ) 
 		{
 			Title = text;
@@ -189,6 +210,14 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
+		/*
+		** Sets the theme type of the button,
+		** which lays out a set of specified rules
+		** from the theme that the button follows
+		**
+		** @param TitleType type
+		** @return Labelable
+		*/
 		public Labelable SetType(TitleType type) 
 		{
 			Type = type;
@@ -196,6 +225,88 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
+		
+		/*
+		** Sets the alignment for the text
+		** of the current label
+		**
+		** @param HorizontalAlignment alignment
+		** @return Labelable
+		*/
+		public Labelable SetAlignment( HorizontalAlignment alignment ) 
+		{
+			_HorizontalAlignment = alignment;
+
+			return this;
+		}
+		
+		/*
+		** Sets the dimensions for 
+		** the current label
+		**
+		** @param int width
+		** @param int height
+		** @return Labelable
+		*/
+		public Labelable SetDimensions( int width, int height )
+		{
+			CustomMinimumSize = new Vector2( width, height);
+			Size = new Vector2( width, height);
+
+			return this;
+		}
+		
+		/*
+		** Sets the horizontal size flag, which controls the x
+		** axis, and how it should act.
+		**
+		** @param Control.SizeFlags flag
+		** @return Labelable
+		*/
+		public Labelable SetHorizontalSizeFlags(Control.SizeFlags flag)
+		{
+			SizeFlagsHorizontal = flag;
+
+			return this;
+		}
+		
+		/*
+		** Sets the horizontal size flag, which controls the y
+		** axis, and how it should act.
+		**
+		** @param Control.SizeFlags flag
+		** @return Labelable
+		*/
+		public Labelable SetVerticalSizeFlags(Control.SizeFlags flag)
+		{
+			SizeFlagsVertical = flag;
+
+			return this;
+		}
+		
+		/*
+		** Sets the auto wrap of the label
+		** allowing it to break lines based
+		** on rules
+		**
+		** @param TextServer.AutowrapMode mode
+		** @return Labelable
+		*/
+		public Labelable SetAutoWrap( TextServer.AutowrapMode mode )
+		{
+			AutowrapMode = mode;
+
+			return this;
+		}
+		
+		/*
+		** Sets margin values for 
+		** the currently chosen label
+		**
+		** @param int value
+		** @param string side
+		** @return Labelable
+		*/
 		public Labelable SetMargin( int value, string side = "" ) 
 		{
 			if( side == "" ) 
@@ -226,16 +337,40 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
+		/*
+		** Getter Methods
+		*/
+		
+		/*
+		** Fetches the text from the label
+		**
+		** @return string
+		*/
 		public string GetTitle()
 		{
 			return Title;
 		}
 		
+		/*
+		** Fetches the inner container
+		** of the label
+		**
+		** @return HBoxContainer
+		*/
 		public HBoxContainer GetInnerContainer()
 		{
 			return _BoxContainer;
 		}
 		
+		/*
+		** Booleans
+		*/
+		
+		/*
+		** Checks if the label is valid
+		**
+		** @return HBoxContainer
+		*/
 		public override bool IsValid()
 		{
 			if( Nodes.Count > 0 && EditorPlugin.IsInstanceValid(_MarginContainer) ) 
@@ -245,7 +380,17 @@ namespace AssetSnap.Component
 			
 			return base.IsValid();
 		}
-			
+		
+		/*
+		** Private
+		*/
+		
+		/*
+		** Resets the trait to
+		** a cleared state
+		**
+		** @return void
+		*/
 		private void Reset()
 		{
 			WorkingNode = null;
@@ -253,11 +398,10 @@ namespace AssetSnap.Component
 			_MarginContainer = null;
 		}
 		
-		public void AddToContainer( Node Container, int? index = null ) 
-		{
-			base._AddToContainer(Container, _MarginContainer, index);
-		}
 		
+		/*
+		** Cleanup
+		*/
 		public override void _ExitTree()
 		{
 			if( EditorPlugin.IsInstanceValid(WorkingNode) ) 

@@ -76,7 +76,6 @@ namespace AssetSnap.Component
 		private Control.CursorShape DefaultCursorShape = Control.CursorShape.PointingHand;
 		private Texture2D Icon;
 		private HorizontalAlignment IconAlignment;
-
 		private string Text = "";
 		private string TooltipText = "";
 		
