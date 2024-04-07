@@ -40,10 +40,6 @@ namespace AssetSnap.Component
 			{"top", 0},
 			{"bottom", 25},
 		};
-		private Control.SizeFlags SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
-		private Control.SizeFlags SizeFlagsVertical = Control.SizeFlags.ShrinkBegin;
-		private Vector2 CustomMinimumSize;
-		private Vector2 Size;
 		private Action<int, BaseComponent> OnIterationAction;
 		private string ComponentName = "";
 		private int Count = 0;
@@ -59,46 +55,39 @@ namespace AssetSnap.Component
 		*/
 		public Listable Instantiate()
 		{
-			try
+			base._Instantiate( GetType().ToString() );
+			
+			VBoxContainer _WorkingNode = new()
 			{
-				base._Instantiate( GetType().ToString() );
+				CustomMinimumSize = CustomMinimumSize,
+				Size = Size,
+			};
+			
+			for( int i = 0; i < Count; i++) 
+			{
+				string[] ComponentSingleArr = ComponentName.Split(".");
+				string ComponentSingleName = ComponentSingleArr[ComponentSingleArr.Length - 1];
 				
-				VBoxContainer _WorkingNode = new()
+				List<string> Components = new()
 				{
-					CustomMinimumSize = CustomMinimumSize,
-					Size = Size,
+					ComponentSingleName,
 				};
 				
-				for( int i = 0; i < Count; i++) 
+				if (GlobalExplorer.GetInstance().Components.HasAll( Components.ToArray() )) 
 				{
-					string[] ComponentSingleArr = ComponentName.Split(".");
-					string ComponentSingleName = ComponentSingleArr[ComponentSingleArr.Length - 1];
+					BaseComponent component = GlobalExplorer.GetInstance().Components.Single(ComponentName, true);
 					
-					List<string> Components = new()
+					if( null != component && IsInstanceValid( component ) ) 
 					{
-						ComponentSingleName,
-					};
-					
-					if (GlobalExplorer.GetInstance().Components.HasAll( Components.ToArray() )) 
-					{
-						BaseComponent component = GlobalExplorer.GetInstance().Components.Single(ComponentName, true);
-						
-						if( null != component && IsInstanceValid( component ) ) 
-						{
-							component.Container = _WorkingNode;
-							OnIterationAction(i, component);
-						}
+						component.Container = _WorkingNode;
+						OnIterationAction(i, component);
 					}
 				}
+			}
 
-				Nodes.Add(_WorkingNode);
-				WorkingNode = _WorkingNode;
-				Reset();
-			}
-			catch( Exception e) 
-			{
-				throw;
-			}
+			Nodes.Add(_WorkingNode);
+			WorkingNode = _WorkingNode;
+			Reset();
 			
 			return this;
 		}
@@ -181,10 +170,9 @@ namespace AssetSnap.Component
 		** @param int height
 		** @return Listable
 		*/
-		public Listable SetDimensions( int width, int height )
+		public override Listable SetDimensions( int width, int height )
 		{
-			CustomMinimumSize = new Vector2( width, height);
-			Size = new Vector2( width, height);
+			base.SetDimensions(width, height);
 
 			return this;
 		}
@@ -224,9 +212,9 @@ namespace AssetSnap.Component
 		** @param Control.SizeFlags flag
 		** @return Listable
 		*/
-		public Listable SetHorizontalSizeFlags(Control.SizeFlags flag)
+		public override Listable SetHorizontalSizeFlags(Control.SizeFlags flag)
 		{
-			SizeFlagsHorizontal = flag;
+			base.SetHorizontalSizeFlags(flag);
 
 			return this;
 		}
@@ -238,9 +226,9 @@ namespace AssetSnap.Component
 		** @param Control.SizeFlags flag
 		** @return Listable
 		*/
-		public Listable SetVerticalSizeFlags(Control.SizeFlags flag)
+		public override Listable SetVerticalSizeFlags(Control.SizeFlags flag)
 		{
-			SizeFlagsVertical = flag;
+			base.SetVerticalSizeFlags(flag);
 
 			return this;
 		}
