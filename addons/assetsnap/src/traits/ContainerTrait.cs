@@ -306,12 +306,16 @@ namespace AssetSnap.Trait
 		public virtual Container GetInnerContainer( int index )
 		{
 			if(
-				null != WorkingNode &&
+				null != _InnerContainer &&
 				null != _InnerContainer.GetChild( index )
 			) 
 			{
 				// Single placement
 				return _InnerContainer.GetChild( index ) as Container;
+			}
+			else 
+			{
+				GD.Print("Not found @ Inner Container");
 			}
 
 			return null;
