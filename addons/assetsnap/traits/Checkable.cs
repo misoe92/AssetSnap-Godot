@@ -37,6 +37,9 @@ namespace AssetSnap.Component
 		private string TooltipText = "";
 
 		private bool ButtonPressed = false;
+		
+		private Control.SizeFlags SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+		private Control.SizeFlags SizeFlagsVertical = Control.SizeFlags.ShrinkBegin;
 
 		public MarginContainer _marginContainer;
 
@@ -50,11 +53,15 @@ namespace AssetSnap.Component
 			{
 				Name="CheckboxMarginContainer",
 				Visible = Visible,
+				SizeFlagsHorizontal = SizeFlagsHorizontal,
+				SizeFlagsVertical = SizeFlagsVertical
 			};
 			
 			_innerContainer = new()
 			{
 				Name="CheckboxBoxContainer",
+				SizeFlagsHorizontal = SizeFlagsHorizontal,
+				SizeFlagsVertical = SizeFlagsVertical
 			};
 				
 			foreach( (string side, int value ) in Margin ) 
@@ -68,6 +75,8 @@ namespace AssetSnap.Component
 				Text = Text,
 				TooltipText = TooltipText,
 				ButtonPressed = ButtonPressed,
+				SizeFlagsHorizontal = SizeFlagsHorizontal,
+				SizeFlagsVertical = SizeFlagsVertical
 			};
 
 			if( Vector2.Zero != CustomMinimumSize ) 
@@ -163,6 +172,20 @@ namespace AssetSnap.Component
 			{
 				return false;
 			}
+		}
+		
+		public Checkable SetHorizontalSizeFlags(Control.SizeFlags flag)
+		{
+			SizeFlagsHorizontal = flag;
+
+			return this;
+		}
+		
+		public Checkable SetVerticalSizeFlags(Control.SizeFlags flag)
+		{
+			SizeFlagsVertical = flag;
+
+			return this;
 		}
 		
 		public Checkable SetName( string text ) 
