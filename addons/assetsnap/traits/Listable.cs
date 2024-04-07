@@ -30,26 +30,33 @@ namespace AssetSnap.Component
 	[Tool]
 	public partial class Listable : Trait.Base
 	{
-		public new Godot.Collections.Dictionary<string, int> Margin = new()
+		/*
+		** Private
+		*/
+		private new Godot.Collections.Dictionary<string, int> Margin = new()
 		{
 			{"left", 20},
 			{"right", 20},
 			{"top", 0},
 			{"bottom", 25},
 		};
-		
-		public string ComponentName = "";
-		
-		public int Count = 0;
-		
 		private Control.SizeFlags SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
 		private Control.SizeFlags SizeFlagsVertical = Control.SizeFlags.ShrinkBegin;
-		
 		private Vector2 CustomMinimumSize;
 		private Vector2 Size;
+		private Action<int, BaseComponent> OnIterationAction;
+		private string ComponentName = "";
+		private int Count = 0;
 		
-		public Action<int, BaseComponent> OnIterationAction;
+		/*
+		** Public methods
+		*/
 		
+		/*
+		** Instantiate an instance of the trait
+		**
+		** @return Listable
+		*/
 		public Listable Instantiate()
 		{
 			try
@@ -96,6 +103,13 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
+		/*
+		** Selects an placed list in the
+		** nodes array by index
+		**
+		** @param int index
+		** @return Listable
+		*/
 		public Listable Select( int index ) 
 		{
 			base._Select(index);
@@ -103,6 +117,70 @@ namespace AssetSnap.Component
 			return this;
 		}	
 		
+		/*
+		** Selects an placed list in the
+		** nodes array by name
+		**
+		** @param string name
+		** @return Listable
+		*/
+		public Listable SelectByName( string name ) 
+		{
+			base._SelectByName(name);
+
+			return this;
+		}
+		
+		/*
+		** Adds a callback to be ran on each entry of
+		** the list
+		**
+		** @param Action<int, BaseComponent> OnIteration
+		** @return Listable
+		*/
+		public Listable Each( Action<int, BaseComponent> OnIteration ) 
+		{
+			OnIterationAction = OnIteration;
+			
+			return this;
+		}
+		
+		/*
+		** Adds the currently chosen list
+		** to a specified container
+		**
+		** @param Node Container
+		** @return void
+		*/
+		public void AddToContainer( Node Container ) 
+		{
+			base._AddToContainer(Container, WorkingNode);
+		}
+		
+		/*
+		** Setter Methods
+		*/
+		
+		/*
+		** Sets the name of the current list
+		**
+		** @param string text
+		** @return Listable
+		*/
+		public Listable SetName( string text ) 
+		{
+			Name = text;
+
+			return this;
+		}
+		
+		/*
+		** Sets the dimensions of the list
+		**
+		** @param int width
+		** @param int height
+		** @return Listable
+		*/
 		public Listable SetDimensions( int width, int height )
 		{
 			CustomMinimumSize = new Vector2( width, height);
@@ -111,20 +189,13 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		public Listable SelectByName( string name ) 
-		{
-			base._SelectByName(name);
-
-			return this;
-		}
-		
-		public Listable SetName( string text ) 
-		{
-			Name = text;
-
-			return this;
-		}
-		
+		/*
+		** Sets the total count
+		** for the list
+		**
+		** @param int count
+		** @return Listable
+		*/
 		public Listable SetCount( int count ) 
 		{
 			Count = count;
@@ -132,6 +203,13 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
+		/*
+		** Sets the component
+		** to be used
+		**
+		** @param string componentName
+		** @return Listable
+		*/
 		public Listable SetComponent( string componentName ) 
 		{
 			ComponentName = componentName;
@@ -139,6 +217,13 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
+		/*
+		** Sets the horizontal size flag, which controls the x
+		** axis, and how it should act.
+		**
+		** @param Control.SizeFlags flag
+		** @return Listable
+		*/
 		public Listable SetHorizontalSizeFlags(Control.SizeFlags flag)
 		{
 			SizeFlagsHorizontal = flag;
@@ -146,6 +231,13 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
+		/*
+		** Sets the horizontal size flag, which controls the y
+		** axis, and how it should act.
+		**
+		** @param Control.SizeFlags flag
+		** @return Listable
+		*/
 		public Listable SetVerticalSizeFlags(Control.SizeFlags flag)
 		{
 			SizeFlagsVertical = flag;
@@ -153,31 +245,26 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		public Listable Each( Action<int, BaseComponent> OnIteration ) 
-		{
-			OnIterationAction = OnIteration;
-			
-			return this;
-		}
 		
-		public void AddToContainer( Node Container ) 
-		{
-			try 
-			{
-				base._AddToContainer(Container, WorkingNode);
-			}
-			catch( Exception e ) 
-			{
-				throw;
-			}
-		}
+		/*
+		** Private Methods
+		*/
 		
+		/*
+		** Resets the trait to
+		** a cleared state
+		**
+		** @return void
+		*/
 		private void Reset()
 		{
 			WorkingNode = null;
 			Count = 0;
 		}
 
+		/*
+		** Cleanup
+		*/
 		public override void _ExitTree()
 		{
 			if( EditorPlugin.IsInstanceValid(WorkingNode) ) 
