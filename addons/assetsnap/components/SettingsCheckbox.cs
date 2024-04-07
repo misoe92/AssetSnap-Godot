@@ -88,6 +88,7 @@ namespace AssetSnap.Front.Components
 			Trait<Panelable>()
 				.SetName("SettingsPanel")
 				.SetType(Panelable.PanelType.RoundedPanelContainer)
+				.SetHorizontalSizeFlags(Control.SizeFlags.ExpandFill)
 				.SetMargin(5, "top")
 				.SetMargin(5, "bottom")
 				.SetMargin(5, "left")
@@ -96,14 +97,18 @@ namespace AssetSnap.Front.Components
 				
 			Trait<Containerable>()
 				.SetName("SettingCheckboxContainer")
+				.SetHorizontalSizeFlags(Control.SizeFlags.ExpandFill)
 				.SetMargin(10, "top")
 				.SetMargin(10, "bottom")
 				.SetMargin(10, "left")
 				.SetMargin(10, "right")
+				.SetDimensions(0, 150)
 				.Instantiate();
 
 			Trait<Checkable>()
 				.SetName("SettingsCheckboxInput")
+				.SetDimensions(0, 20)
+				.SetVerticalSizeFlags(Control.SizeFlags.ShrinkEnd)
 				.SetText( ExplorerUtils.Get().Settings.KeyToLabel( key ) )
 				.SetAction( new Callable( this, "UpdateKey" ) )
 				.SetValue( value )
@@ -170,7 +175,7 @@ namespace AssetSnap.Front.Components
 					Trait<Labelable>()
 						.SetMargin(0)
 						.SetName("SettingTitle")
-						.SetType(Labelable.TitleType.HeaderMedium)
+						.SetType(Labelable.TitleType.HeaderSmall)
 						.SetText(title)
 						.Instantiate();
 				}
@@ -181,11 +186,11 @@ namespace AssetSnap.Front.Components
 						.SetMargin(0)
 						.SetName("SettingDescription")
 						.SetText(description)
-						.SetType(Labelable.TitleType.HeaderSmall)
+						.SetType(Labelable.TitleType.TextSmall)
 						.SetAutoWrap(TextServer.AutowrapMode.Word)
 						.SetHorizontalSizeFlags(Control.SizeFlags.ExpandFill)
 						.SetVerticalSizeFlags(Control.SizeFlags.ShrinkBegin)
-						.SetDimensions(0, 70)
+						.SetDimensions(0, 85)
 						.Instantiate();
 				}
 			}

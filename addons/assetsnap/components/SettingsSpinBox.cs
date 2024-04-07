@@ -95,11 +95,13 @@ namespace AssetSnap.Front.Components
 				.SetMargin(10, "bottom")
 				.SetMargin(10, "left")
 				.SetMargin(10, "right")
-				.SetDimensions(0, 100)
+				.SetDimensions(0, 150)
 				.Instantiate();
 
 			Trait<Spinboxable>()
 				.SetName(key)
+				.SetDimensions(0, 20)
+				.SetVerticalSizeFlags(Control.SizeFlags.ShrinkEnd)
 				.SetStep(0.0f)
 				.SetValue(value)
 				.SetAction( new Callable(this, "UpdateKey") )
@@ -167,7 +169,9 @@ namespace AssetSnap.Front.Components
 						.SetMargin(0)
 						.SetName("SettingTitle")
 						.SetText(title)
-						.SetType(Labelable.TitleType.HeaderMedium)
+						.SetType(Labelable.TitleType.HeaderSmall)
+						.SetHorizontalSizeFlags(Control.SizeFlags.ShrinkBegin)
+						.SetVerticalSizeFlags(Control.SizeFlags.ShrinkBegin)
 						.Instantiate();
 				}
 				
@@ -177,11 +181,11 @@ namespace AssetSnap.Front.Components
 						.SetMargin(0)
 						.SetName("SettingDescription")
 						.SetText(description)
-						.SetType(Labelable.TitleType.HeaderSmall)
+						.SetType(Labelable.TitleType.TextSmall)
 						.SetHorizontalSizeFlags(Control.SizeFlags.ExpandFill)
 						.SetVerticalSizeFlags(Control.SizeFlags.ShrinkBegin)
 						.SetAutoWrap(TextServer.AutowrapMode.Word)
-						.SetDimensions(0, 70)
+						.SetDimensions(0, 85)
 						.Instantiate();
 				}
 			}
