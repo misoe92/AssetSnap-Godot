@@ -21,7 +21,6 @@
 // SOFTWARE.
 
 #if TOOLS
-using System.Drawing;
 using Godot;
 
 namespace AssetSnap.Component
@@ -38,6 +37,7 @@ namespace AssetSnap.Component
 			HeaderMedium,
 			HeaderLarge,
 			TextSmall,
+			TextMedium,
 		};
 		
 		/*
@@ -58,11 +58,7 @@ namespace AssetSnap.Component
 		};
 		private string Title = "";
 		private TitleType Type = TitleType.HeaderMedium;
-		private Control.SizeFlags SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
-		private Control.SizeFlags SizeFlagsVertical = Control.SizeFlags.ShrinkBegin;
 		private TextServer.AutowrapMode AutowrapMode = TextServer.AutowrapMode.Off;
-		private Vector2 CustomMinimumSize;
-		private Vector2 Size;
 		private HorizontalAlignment _HorizontalAlignment;
 		
 		/*
@@ -248,10 +244,9 @@ namespace AssetSnap.Component
 		** @param int height
 		** @return Labelable
 		*/
-		public Labelable SetDimensions( int width, int height )
+		public override Labelable SetDimensions( int width, int height )
 		{
-			CustomMinimumSize = new Vector2( width, height);
-			Size = new Vector2( width, height);
+			base.SetDimensions(width, height);
 
 			return this;
 		}
@@ -263,9 +258,9 @@ namespace AssetSnap.Component
 		** @param Control.SizeFlags flag
 		** @return Labelable
 		*/
-		public Labelable SetHorizontalSizeFlags(Control.SizeFlags flag)
+		public override Labelable SetHorizontalSizeFlags(Control.SizeFlags flag)
 		{
-			SizeFlagsHorizontal = flag;
+			base.SetHorizontalSizeFlags(flag);
 
 			return this;
 		}
@@ -277,9 +272,9 @@ namespace AssetSnap.Component
 		** @param Control.SizeFlags flag
 		** @return Labelable
 		*/
-		public Labelable SetVerticalSizeFlags(Control.SizeFlags flag)
+		public override Labelable SetVerticalSizeFlags(Control.SizeFlags flag)
 		{
-			SizeFlagsVertical = flag;
+			base.SetVerticalSizeFlags(flag);
 
 			return this;
 		}
