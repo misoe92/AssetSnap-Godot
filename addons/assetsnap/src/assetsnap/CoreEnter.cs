@@ -62,7 +62,7 @@ namespace AssetSnap.Core
  
 			_GlobalExplorer._Plugin.AddChild(_GlobalExplorer.GroupBuilder);
 
-			_GlobalExplorer.Settings.FoldersLoaded += () => { LoadContainers(); };
+			_GlobalExplorer.Settings.FoldersLoaded += () => { _OnLoadContainers(); };
  
 			/** Initialize **/  
 			_GlobalExplorer.Settings.Initialize();
@@ -86,9 +86,8 @@ namespace AssetSnap.Core
 			_GlobalExplorer.Settings.MaybeEmitFoldersLoaded();
 		}
 		
-		private void LoadContainers()
+		private void _OnLoadContainers()
 		{
-			GD.Print("Loading containers");
 			_GlobalExplorer.GroupBuilder.InitializeContainer();
 			if(
 				null == _GlobalExplorer.GroupBuilder.Container ||
