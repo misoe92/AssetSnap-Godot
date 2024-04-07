@@ -407,7 +407,11 @@ namespace AssetSnap.Component
 		
 		public override void _ExitTree()
 		{
-			WorkingNode.QueueFree();
+			if( null != WorkingNode && EditorPlugin.IsInstanceValid( WorkingNode ) ) 
+			{
+				WorkingNode.QueueFree();
+			}
+
 			Reset();
 		}
 	}
