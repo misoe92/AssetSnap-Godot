@@ -48,9 +48,12 @@ namespace AssetSnap.Trait
 			{"top", 0},
 			{"bottom", 0},
 		};
-
+		protected Control.SizeFlags SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+		protected Control.SizeFlags SizeFlagsVertical = Control.SizeFlags.ShrinkBegin;
 		protected Godot.Collections.Array<GodotObject> Nodes = new();
-
+		protected Vector2 CustomMinimumSize = Vector2.Zero;
+		protected Vector2 Size = Vector2.Zero;
+		
 		public bool Visible = true;
 
 		protected Node WorkingNode;
@@ -163,6 +166,47 @@ namespace AssetSnap.Trait
 		public virtual void _SetName( string text ) 
 		{
 			Name = text;
+		}
+		
+		/*
+		** Sets the size of the container
+		**
+		** @param int width
+		** @param int height
+		** @return Containerable
+		*/
+		public virtual Base SetDimensions( int width, int height )
+		{
+			CustomMinimumSize = new Vector2( width, height);
+			Size = new Vector2( width, height);
+
+			return this;
+		}
+		
+		/*
+		** Sets the horizontal size flag, which controls the x
+		** axis, and how it should act.
+		**
+		** @param Control.SizeFlags flag
+		** @return Containerable
+		*/
+		public virtual Base SetHorizontalSizeFlags(Control.SizeFlags flag)
+		{
+			SizeFlagsHorizontal = flag;
+			return this;
+		}
+		
+		/*
+		** Sets the horizontal size flag, which controls the y
+		** axis, and how it should act.
+		**
+		** @param Control.SizeFlags flag
+		** @return Containerable
+		*/
+		public virtual Base SetVerticalSizeFlags(Control.SizeFlags flag)
+		{
+			SizeFlagsVertical = flag;
+			return this;
 		}
 		
 		public virtual void _Select( int index ) 
