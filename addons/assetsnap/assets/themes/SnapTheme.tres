@@ -1002,3 +1002,5 @@ SmallSuccesButton/styles/focus = SubResource("StyleBoxFlat_yxqhi")
 SmallSuccesButton/styles/hover = SubResource("StyleBoxFlat_f4mbh")
 SmallSuccesButton/styles/normal = SubResource("StyleBoxFlat_6txbs")
 SmallSuccesButton/styles/pressed = SubResource("StyleBoxFlat_1wwsn")
+TextSmall/base_type = &"Label"
+TextSmall/font_sizes/font_size = 12
