@@ -208,27 +208,15 @@ namespace AssetSnap.Component
 		private void Reset()
 		{
 			WorkingNode = null;
+			_MarginContainer = null;
+			_PaddingContainer = null;
+			Type = PanelType.DefaultPanelContainer;
 		}
 		
 		public override void _ExitTree()
 		{
+			WorkingNode.QueueFree();
 			Reset();
-			
-			// for( int i = 0; i < Nodes.Count; i++)
-			// {
-			// 	if( EditorPlugin.IsInstanceValid( Nodes[i] ) ) 
-			// 	{
-			// 		PanelContainer panel = Nodes[i] as PanelContainer;
-			// 		Node container = panel.GetParent();
-			// 		panel.QueueFree();
-
-			// 		if( EditorPlugin.IsInstanceValid( container ) ) 
-			// 		{
-			// 			container.QueueFree();
-			// 		}
-			// 	}
-				
-			// }
 		}
 	}
 }
