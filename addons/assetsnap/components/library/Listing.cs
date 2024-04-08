@@ -20,14 +20,14 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace AssetSnap.Front.Components
+namespace AssetSnap.Front.Components.Library
 {
 	using System.Collections.Generic;
 	using AssetSnap.Component;
 	using Godot;
 
 	[Tool]
-	public partial class LibraryListing : LibraryComponent
+	public partial class Listing : LibraryComponent
 	{
 		private string _Folder;
 	
@@ -35,7 +35,7 @@ namespace AssetSnap.Front.Components
 		private	MarginContainer _MarginContainer;
 		private	VBoxContainer _InnerContainer;
 		private Godot.Collections.Array<HBoxContainer> Containers = new();
-		private Godot.Collections.Array<LibraryListEntry> Items = new();
+		private Godot.Collections.Array<ListEntry> Items = new();
 		
 		public string Folder 
 		{
@@ -51,7 +51,7 @@ namespace AssetSnap.Front.Components
 		**
 		** @return void
 		*/
-		public LibraryListing()
+		public Listing()
 		{
 			Name = "LibraryListing";
 
@@ -179,7 +179,7 @@ namespace AssetSnap.Front.Components
 					// Check if the file has a supported extension 
 					if ( IsValidExtension( extension ) )
 					{
-						LibraryListEntry SingleEntry = GlobalExplorer.GetInstance().Components.Single<LibraryListEntry>(true);
+						ListEntry SingleEntry = GlobalExplorer.GetInstance().Components.Single<ListEntry>(true);
 						SingleEntry.Name = "LibraryEntry-" + ((rows + 1) * iteration);
 						
 						SingleEntry.Container = CurrentBoxContainer;

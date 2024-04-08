@@ -20,18 +20,18 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace AssetSnap.Front.Components
+namespace AssetSnap.Front.Components.Library
 {
 	using System.Collections.Generic;
 	using AssetSnap.Component;
 	using Godot;
 
 	[Tool]
-	public partial class LibraryTopbar : LibraryComponent
+	public partial class Topbar : LibraryComponent
 	{
-		public LibraryListTitle _LibraryListTitle;
-		public LibrarySearch _LibrarySearch;
-		public LibraryItems _LibraryItems;
+		public ListTitle _LibraryListTitle;
+		public Search _LibrarySearch;
+		public TotalItems _LibraryItems;
 
 		public int ItemCount 
 		{
@@ -58,7 +58,7 @@ namespace AssetSnap.Front.Components
 		**
 		** @return void
 		*/
-		public LibraryTopbar()
+		public Topbar()
 		{
 			Name = "LibraryTopbar";
 			//_include = false; 
@@ -105,9 +105,9 @@ namespace AssetSnap.Front.Components
 
 			if (GlobalExplorer.GetInstance().Components.HasAll( Components.ToArray() )) 
 			{
-				_LibraryListTitle = GlobalExplorer.GetInstance().Components.Single<LibraryListTitle>(true);
-				_LibrarySearch = GlobalExplorer.GetInstance().Components.Single<LibrarySearch>(true);
-				_LibraryItems = GlobalExplorer.GetInstance().Components.Single<LibraryItems>(true);
+				_LibraryListTitle = GlobalExplorer.GetInstance().Components.Single<ListTitle>(true);
+				_LibrarySearch = GlobalExplorer.GetInstance().Components.Single<Search>(true);
+				_LibraryItems = GlobalExplorer.GetInstance().Components.Single<TotalItems>(true);
 
 				if( _LibraryListTitle != null ) 
 				{

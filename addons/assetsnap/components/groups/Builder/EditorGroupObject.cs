@@ -20,17 +20,18 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace AssetSnap.Front.Components
+namespace AssetSnap.Front.Components.Groups.Builder
 {
 	using System.Collections.Generic;
 	using AssetSnap.Component;
-	using AssetSnap.Helpers;
+    using AssetSnap.Front.Components.Groups.Builder.GroupObject;
+    using AssetSnap.Helpers;
 	using Godot;
 
 	[Tool]
-	public partial class GroupBuilderEditorGroupObject : LibraryComponent
+	public partial class EditorGroupObject : LibraryComponent
 	{
-		public GroupBuilderEditorGroupObject()
+		public EditorGroupObject()
 		{
 			Name = "GroupBuilderEditorGroupObject";
 			//_include = false;
@@ -48,13 +49,13 @@ namespace AssetSnap.Front.Components
 		public Godot.Collections.Dictionary<string, Variant> Options { get; set; }
 
 		/** Components **/
-		private GroupBuilderEditorGroupObjectAdvanced _GroupBuilderEditorGroupObjectAdvanced;
-		private GroupBuilderEditorGroupObjectActions _GroupBuilderEditorGroupObjectActions;
-		public GroupBuilderEditorGroupObjectAdvancedContainer _GroupBuilderEditorGroupObjectAdvancedContainer;
+		private Advanced _GroupBuilderEditorGroupObjectAdvanced;
+		private Actions _GroupBuilderEditorGroupObjectActions;
+		public AdvancedContainer _GroupBuilderEditorGroupObjectAdvancedContainer;
 		
-		public GroupBuilderEditorGroupObjectOrigin _GroupBuilderEditorGroupObjectOrigin;
-		public GroupBuilderEditorGroupObjectScale _GroupBuilderEditorGroupObjectScale;
-		public GroupBuilderEditorGroupObjectRotation _GroupBuilderEditorGroupObjectRotation;
+		public Origin _GroupBuilderEditorGroupObjectOrigin;
+		public Scale _GroupBuilderEditorGroupObjectScale;
+		public Rotation _GroupBuilderEditorGroupObjectRotation;
 		
 		public override void Initialize()
 		{
@@ -110,12 +111,12 @@ namespace AssetSnap.Front.Components
 		{
 			List<string> Components = new()
 			{
-				"GroupBuilderEditorGroupObjectOrigin"
+				"Groups.Builder.GroupObject.Origin"
 			};
 			
 			if (_GlobalExplorer.Components.HasAll( Components.ToArray() )) 
 			{
-				_GroupBuilderEditorGroupObjectOrigin = GlobalExplorer.GetInstance().Components.Single<GroupBuilderEditorGroupObjectOrigin>(true);
+				_GroupBuilderEditorGroupObjectOrigin = GlobalExplorer.GetInstance().Components.Single<Origin>(true);
 				_GroupBuilderEditorGroupObjectOrigin.Container = RowInnerContainer;
 				_GroupBuilderEditorGroupObjectOrigin.Parent = this;
 				_GroupBuilderEditorGroupObjectOrigin.Index = Index;
@@ -128,12 +129,12 @@ namespace AssetSnap.Front.Components
 		{
 			List<string> Components = new()
 			{
-				"GroupBuilderEditorGroupObjectRotation"
+				"Groups.Builder.GroupObject.Rotation"
 			};
 			
 			if (_GlobalExplorer.Components.HasAll( Components.ToArray() )) 
 			{
-				_GroupBuilderEditorGroupObjectRotation = GlobalExplorer.GetInstance().Components.Single<GroupBuilderEditorGroupObjectRotation>(true);
+				_GroupBuilderEditorGroupObjectRotation = GlobalExplorer.GetInstance().Components.Single<Rotation>(true);
 				_GroupBuilderEditorGroupObjectRotation.Container = RowInnerContainer;
 				_GroupBuilderEditorGroupObjectRotation.Index = Index;
 				_GroupBuilderEditorGroupObjectRotation.Parent = this;
@@ -146,12 +147,12 @@ namespace AssetSnap.Front.Components
 		{
 			List<string> Components = new()
 			{
-				"GroupBuilderEditorGroupObjectScale"
+				"Groups.Builder.GroupObject.Scale"
 			};
 			
 			if (_GlobalExplorer.Components.HasAll( Components.ToArray() )) 
 			{
-				_GroupBuilderEditorGroupObjectScale = GlobalExplorer.GetInstance().Components.Single<GroupBuilderEditorGroupObjectScale>(true);
+				_GroupBuilderEditorGroupObjectScale = GlobalExplorer.GetInstance().Components.Single<Scale>(true);
 				_GroupBuilderEditorGroupObjectScale.Container = RowInnerContainer;
 				_GroupBuilderEditorGroupObjectScale.Index = Index;
 				_GroupBuilderEditorGroupObjectScale.Parent = this;
@@ -164,12 +165,12 @@ namespace AssetSnap.Front.Components
 		{
 			List<string> Components = new()
 			{
-				"GroupBuilderEditorGroupObjectActions"
+				"Groups.Builder.GroupObject.Actions"
 			};
 			
 			if (_GlobalExplorer.Components.HasAll( Components.ToArray() )) 
 			{
-				_GroupBuilderEditorGroupObjectActions = GlobalExplorer.GetInstance().Components.Single<GroupBuilderEditorGroupObjectActions>(true);
+				_GroupBuilderEditorGroupObjectActions = GlobalExplorer.GetInstance().Components.Single<Actions>(true);
 				_GroupBuilderEditorGroupObjectActions.Container = RowInnerContainer;
 				_GroupBuilderEditorGroupObjectActions.Index = Index;
 				_GroupBuilderEditorGroupObjectActions.Path = Path;
@@ -181,12 +182,12 @@ namespace AssetSnap.Front.Components
 		{
 			List<string> Components = new()
 			{
-				"GroupBuilderEditorGroupObjectAdvanced"
+				"Groups.Builder.GroupObject.Advanced"
 			};
 			
 			if (_GlobalExplorer.Components.HasAll( Components.ToArray() )) 
 			{
-				_GroupBuilderEditorGroupObjectAdvanced = GlobalExplorer.GetInstance().Components.Single<GroupBuilderEditorGroupObjectAdvanced>(true);
+				_GroupBuilderEditorGroupObjectAdvanced = GlobalExplorer.GetInstance().Components.Single<Advanced>(true);
 				_GroupBuilderEditorGroupObjectAdvanced.Container = RowInnerContainer;
 				_GroupBuilderEditorGroupObjectAdvanced.Parent = this;
 				_GroupBuilderEditorGroupObjectAdvanced.Initialize();
@@ -224,12 +225,12 @@ namespace AssetSnap.Front.Components
 		{
 			List<string> Components = new()
 			{
-				"GroupBuilderEditorGroupObjectAdvancedContainer"
+				"Groups.Builder.GroupObject.AdvancedContainer"
 			};
 			
 			if (_GlobalExplorer.Components.HasAll( Components.ToArray() )) 
 			{
-				_GroupBuilderEditorGroupObjectAdvancedContainer = GlobalExplorer.GetInstance().Components.Single<GroupBuilderEditorGroupObjectAdvancedContainer>(true);
+				_GroupBuilderEditorGroupObjectAdvancedContainer = GlobalExplorer.GetInstance().Components.Single<AdvancedContainer>(true);
 				_GroupBuilderEditorGroupObjectAdvancedContainer.Container = container;
 				_GroupBuilderEditorGroupObjectAdvancedContainer.Index = Index;
 				_GroupBuilderEditorGroupObjectAdvancedContainer.Options = Options;

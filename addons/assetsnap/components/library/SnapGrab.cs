@@ -20,16 +20,16 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace AssetSnap.Front.Components
+namespace AssetSnap.Front.Components.Library
 {
 	using Godot;
 	using AssetSnap.Component;
 	using AssetSnap.Front.Nodes;
 
 	[Tool]
-	public partial class LibrarySnapGrab : LibraryComponent
+	public partial class SnapGrab : LibraryComponent
 	{
-		public LibrarySnapGrab()
+		public SnapGrab()
 		{
 			Name = "LibrarySnapGrab";
 			//_include = false;  
@@ -61,7 +61,7 @@ namespace AssetSnap.Front.Components
 				// Grab the currently chosen node.
 				Node _Node = _GlobalExplorer.GetHandle();
 				Node Parent = null;
-				Library.Instance CurrentLibrary = null;
+				AssetSnap.Library.Instance CurrentLibrary = null;
 				
 				if( _Node is not AsMeshInstance3D && _Node is not AsGrouped3D ) 
 				{

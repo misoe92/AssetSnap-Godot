@@ -28,7 +28,7 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 	[Tool]
 	public partial class Advanced : GroupObjectComponent
 	{
-		public GroupBuilderEditorGroupObject Parent;
+		public EditorGroupObject Parent;
 		
 		protected override void _RegisterTraits()
 		{

@@ -20,19 +20,20 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace AssetSnap.Front.Components
+namespace AssetSnap.Front.Components.Groups.Builder
 {
 	using System.Collections.Generic;
 	using System.IO;
 	using AssetSnap.Component;
+	using AssetSnap.Explorer;
 	using AssetSnap.Front.Nodes;
 	using AssetSnap.Helpers;
 	using Godot;
 
 	[Tool]
-	public partial class GroupBuilderSidebar : LibraryComponent
+	public partial class Sidebar : LibraryComponent
 	{	
-		public GroupBuilderSidebar()
+		public Sidebar()
 		{
 			Name = "GroupBuilderSidebar";
 			//_include = false;
@@ -43,7 +44,7 @@ namespace AssetSnap.Front.Components
 
 		private VBoxContainer GroupContainer;
 
-		private Godot.Collections.Dictionary<string, GroupBuilderListingEntry> _Instances; 
+		private Godot.Collections.Dictionary<string, ListingEntry> _Instances; 
 				
 		public override void Initialize()
 		{
@@ -61,14 +62,14 @@ namespace AssetSnap.Front.Components
 		{
 			List<string> OuterComponents = new()
 			{
-				"GroupContainer",
+				"Groups.Container",
 			};
 		
 			/** Add the tab item if settings is turned on **/
 			Component.Base Components = _GlobalExplorer.Components;
 			if (Components.HasAll(OuterComponents.ToArray()))
 			{
-				GroupContainer _GroupContainer = Components.Single<GroupContainer>();
+				Groups.Container _GroupContainer = Components.Single<Groups.Container>();
 				_GroupContainer.GetLeftInnerContainer().Visible = true;
 			}
 		}
@@ -77,14 +78,14 @@ namespace AssetSnap.Front.Components
 		{
 			List<string> OuterComponents = new()
 			{
-				"GroupContainer",
+				"Groups.Container",
 			};
 		
 			/** Add the tab item if settings is turned on **/
 			Component.Base Components = _GlobalExplorer.Components;
 			if (Components.HasAll(OuterComponents.ToArray()))
 			{
-				GroupContainer _GroupContainer = Components.Single<GroupContainer>();
+				Groups.Container _GroupContainer = Components.Single<Groups.Container>();
 				_GroupContainer.GetLeftInnerContainer().Visible = false;
 			}
 		}
@@ -96,7 +97,10 @@ namespace AssetSnap.Front.Components
 				_GlobalExplorer = GlobalExplorer.GetInstance();
 			}
 			
-			string path = _GlobalExplorer.GroupBuilder._Editor.GroupPath;
+			string path = ExplorerUtils.Get()
+				.GroupBuilder
+				._Editor
+				.GroupPath;
 			
 			if( path == "" ) 
 			{
@@ -111,7 +115,7 @@ namespace AssetSnap.Front.Components
 		
 		public void FocusGroup(string FilePath) 
 		{
-			foreach( (string fp, GroupBuilderListingEntry _Instance ) in _Instances ) 
+			foreach( (string fp, ListingEntry _Instance ) in _Instances ) 
 			{
 				if( fp == FilePath ) 
 				{
@@ -126,7 +130,7 @@ namespace AssetSnap.Front.Components
 		
 		public void UnFocusGroup(string FilePath) 
 		{
-			foreach( (string fp, GroupBuilderListingEntry _Instance ) in _Instances ) 
+			foreach( (string fp, ListingEntry _Instance ) in _Instances ) 
 			{
 				if( fp == FilePath ) 
 				{
@@ -137,7 +141,7 @@ namespace AssetSnap.Front.Components
 		
 		public void SelectGroup(string FilePath) 
 		{
-			foreach( (string fp, GroupBuilderListingEntry _Instance ) in _Instances ) 
+			foreach( (string fp, ListingEntry _Instance ) in _Instances ) 
 			{
 				if( fp == FilePath ) 
 				{
@@ -148,7 +152,7 @@ namespace AssetSnap.Front.Components
 		
 		public void DeselectGroup(string FilePath)
 		{
-			foreach( (string fp, GroupBuilderListingEntry _Instance ) in _Instances ) 
+			foreach( (string fp, ListingEntry _Instance ) in _Instances ) 
 			{
 				if( fp == FilePath ) 
 				{
@@ -202,12 +206,12 @@ namespace AssetSnap.Front.Components
 				string title = path;
 				List<string> Components = new()
 				{
-					"GroupBuilderListingEntry",
+					"Groups.Builder.ListingEntry",
 				};
 				
 				if (GlobalExplorer.GetInstance().Components.HasAll( Components.ToArray() )) 
 				{
-					GroupBuilderListingEntry SingleEntry = GlobalExplorer.GetInstance().Components.Single<GroupBuilderListingEntry>(true);
+					ListingEntry SingleEntry = GlobalExplorer.GetInstance().Components.Single<ListingEntry>(true);
 					
 					SingleEntry.title = title;
 					SingleEntry.Container = GroupContainer;

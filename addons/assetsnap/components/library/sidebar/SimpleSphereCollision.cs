@@ -20,14 +20,14 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace AssetSnap.Front.Components
+namespace AssetSnap.Front.Components.Library.Sidebar
 {
 	using AssetSnap.Component;
 	using AssetSnap.Front.Nodes;
 	using Godot;
 
 	[Tool]
-	public partial class LSSimpleSphereCollision : LSCollisionComponent
+	public partial class SimpleSphereCollision : LSCollisionComponent
 	{
 		private readonly string _Title = "Simple Sphere";
 		private readonly string _CheckboxTooltip = "Simple sphere collision, is fast.";
@@ -37,7 +37,7 @@ namespace AssetSnap.Front.Components
 		** 
 		** @return void
 		*/
-		public LSSimpleSphereCollision()
+		public SimpleSphereCollision()
 		{
 			Name = "LSSimpleSphereCollision";
 			// _include = false; 

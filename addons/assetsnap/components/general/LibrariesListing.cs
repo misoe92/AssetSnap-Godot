@@ -289,17 +289,22 @@ namespace AssetSnap.Front.Components
 		*/
 		private void _SetupNoFolderLabel()
 		{
+			Container outerContainer = Trait<Containerable>()
+				.Select(0)
+				.GetInnerContainer(0);
+				
 			Trait<Panelable>()
 				.SetName("NoFolderPanelContainer")
 				.Instantiate()
 				.Select(0)
 				.AddToContainer(
-					Trait<Containerable>()
-						.Select(0)
-						.GetInnerContainer()
+					outerContainer
 				);
-			
-			
+
+			Node panel = Trait<Panelable>()
+				.Select(0)
+				.GetContainer();
+
 			Trait<Labelable>()
 				.SetName( "NotFoundText" )
 				.SetType(Labelable.TitleType.TextMedium)
@@ -309,11 +314,9 @@ namespace AssetSnap.Front.Components
 				.SetHorizontalSizeFlags(Control.SizeFlags.ShrinkBegin)
 				.SetVerticalSizeFlags(Control.SizeFlags.ShrinkBegin)
 				.Instantiate()
-				.Select(0)
+				.Select(1)
 				.AddToContainer(
-					Trait<Panelable>()
-						.Select(0)
-						.GetNode()
+					panel
 				);
 		}
 

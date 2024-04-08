@@ -20,14 +20,14 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace AssetSnap.Front.Components
+namespace AssetSnap.Front.Components.Library.Sidebar
 {
 	using AssetSnap.Component;
 	using AssetSnap.Front.Nodes;
 	using Godot;
 
 	[Tool]
-	public partial class LSConvexPolygonCollision : LSCollisionComponent
+	public partial class ConvexPolygonCollision : LSCollisionComponent
 	{
 		private readonly string _Title = "Convex Polygon";
 		private readonly string _cleanTitle = "Clean";
@@ -42,7 +42,7 @@ namespace AssetSnap.Front.Components
 		**
 		** @return void
 		*/
-		public LSConvexPolygonCollision()
+		public ConvexPolygonCollision()
 		{
 			Name = "LSConvexPolygonCollision";
 			//_include = false;

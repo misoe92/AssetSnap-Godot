@@ -20,13 +20,13 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace AssetSnap.Front.Components
+namespace AssetSnap.Front.Components.Library.Sidebar
 {
 	using AssetSnap.Component;
 	using Godot;
 
 	[Tool]
-	public partial class LSSnapObject : LSObjectComponent
+	public partial class SnapObject : LSObjectComponent
 	{
 		public bool state 
 		{
@@ -51,7 +51,7 @@ namespace AssetSnap.Front.Components
 		** 
 		** @return void
 		*/	
-		public LSSnapObject()
+		public SnapObject()
 		{
 			Name = "LSSnapObject";
 			//_include = false;

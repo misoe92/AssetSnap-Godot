@@ -24,7 +24,10 @@ namespace AssetSnap.Core
 {
 	using AssetSnap.Component;
 	using AssetSnap.Front.Components;
-	using AssetSnap.Front.Nodes;
+    using AssetSnap.Front.Components.Library;
+    using AssetSnap.Front.Components.Library.Sidebar;
+
+    using AssetSnap.Front.Nodes;
 	using AssetSnap.Static;
 	using Godot;
 	
@@ -368,17 +371,17 @@ namespace AssetSnap.Core
 		*/
 		private Vector3 ApplyGlue(Vector3 Origin, BaseComponent Object)
 		{
-			if( Object is LSSnapToHeight _objectHeight ) 
+			if( Object is SnapToHeight _objectHeight ) 
 			{
 				return _objectHeight.ApplyGlue(Origin);
 			}
 			
-			if( Object is LSSnapToX _objectX ) 
+			if( Object is SnapToX _objectX ) 
 			{
 				return _objectX.ApplyGlue(Origin);
 			}
 
-			if( Object is LSSnapToZ _objectZ ) 
+			if( Object is SnapToZ _objectZ ) 
 			{
 				return _objectZ.ApplyGlue(Origin);
 			}
@@ -414,7 +417,7 @@ namespace AssetSnap.Core
 		**
 		** @return LibrarySettings
 		*/
-		private LibrarySettings GetLibrarySettings()
+		private Settings GetLibrarySettings()
 		{
 			if( false == HasLibrary() ) 
 			{
@@ -493,17 +496,17 @@ namespace AssetSnap.Core
 		*/
 		private bool UsesGlue(BaseComponent Object)
 		{
-			if( Object is LSSnapToHeight _objectHeight ) 
+			if( Object is SnapToHeight _objectHeight ) 
 			{
 				return HasLibrary() && _objectHeight.IsSnapToGlue();
 			}
 			
-			if( Object is LSSnapToX _objectX ) 
+			if( Object is SnapToX _objectX ) 
 			{
 				return HasLibrary() && _objectX.IsSnapToGlue();
 			}
 
-			if( Object is LSSnapToZ _objectZ ) 
+			if( Object is SnapToZ _objectZ ) 
 			{
 				return HasLibrary() && _objectZ.IsSnapToGlue();
 			}

@@ -20,12 +20,12 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace AssetSnap.Front.Components
+namespace AssetSnap.Front.Components.Library.Sidebar
 {
 	using AssetSnap.Component;
 	using Godot;
 
-	public partial class LSCollisionTitle : LibraryComponent
+	public partial class CollisionTitle : LibraryComponent
 	{
 		private readonly string _MainTitle = "Collision shapes";
 		private bool Exited = false;
@@ -39,7 +39,7 @@ namespace AssetSnap.Front.Components
 		**
 		** @return void
 		*/
-		public LSCollisionTitle()
+		public CollisionTitle()
 		{
 			Name = "LSCollisionTitle";
 			// _include = false;

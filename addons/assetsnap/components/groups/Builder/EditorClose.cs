@@ -20,15 +20,15 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace AssetSnap.Front.Components
+namespace AssetSnap.Front.Components.Groups.Builder
 {
 	using AssetSnap.Component;
 	using Godot;
 
 	[Tool]
-	public partial class GroupBuilderEditorClose : LibraryComponent
+	public partial class EditorClose : LibraryComponent
 	{
-		public GroupBuilderEditorClose()
+		public EditorClose()
 		{
 			Name = "GroupBuilderEditorClose";
 			// _include = false;
@@ -62,8 +62,8 @@ namespace AssetSnap.Front.Components
 		private void _OnCloseGroup()
 		{
 			string GroupPath = _GlobalExplorer.GroupBuilder._Editor.GroupPath;
-			GroupBuilderSidebar sidebar = _GlobalExplorer.GroupBuilder._Sidebar;
-			GroupBuilderEditorListing listing = _GlobalExplorer.GroupBuilder._Editor.Listing;
+			Sidebar sidebar = _GlobalExplorer.GroupBuilder._Sidebar;
+			EditorListing listing = _GlobalExplorer.GroupBuilder._Editor.Listing;
 			_GlobalExplorer.GroupBuilder._Editor.GroupPath = "";
 			
 			sidebar.Update(); 

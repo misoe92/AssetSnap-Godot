@@ -20,15 +20,15 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace AssetSnap.Front.Components
+namespace AssetSnap.Front.Components.Groups.Builder
 {
 	using AssetSnap.Component;
 	using Godot;
 
 	[Tool]
-	public partial class GroupBuilderEditorTitleInput : LibraryComponent
+	public partial class EditorTitleInput : LibraryComponent
 	{
-		public GroupBuilderEditorTitleInput()
+		public EditorTitleInput()
 		{
 			Name = "GroupBuilderEditorTitleInput";
 			//_include = false;

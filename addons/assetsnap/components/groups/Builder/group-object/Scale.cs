@@ -28,7 +28,7 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 	[Tool]
 	public partial class Scale : GroupObjectComponent
 	{
-		public GroupBuilderEditorGroupObject Parent;
+		public EditorGroupObject Parent;
 		
 		public double GetValue( int index ) 
 		{

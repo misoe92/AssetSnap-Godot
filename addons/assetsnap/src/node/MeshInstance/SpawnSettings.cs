@@ -24,7 +24,8 @@ namespace AssetSnap.ASNode.MeshInstance
 {
 	using System;
 	using AssetSnap.Front.Components;
-	using Godot;
+    using AssetSnap.Front.Components.Library;
+    using Godot;
 
     public partial class SpawnSettings
 	{
@@ -100,7 +101,7 @@ namespace AssetSnap.ASNode.MeshInstance
 					string keyName = keyArray[0];
 					string keyField = keyArray[1];
 
-					LibrarySettings librarySettings = _Explorer.CurrentLibrary._LibrarySettings;
+					Settings librarySettings = _Explorer.CurrentLibrary._LibrarySettings;
 					
 					if( true == librarySettings.FieldExists(keyName) ) 
 					{

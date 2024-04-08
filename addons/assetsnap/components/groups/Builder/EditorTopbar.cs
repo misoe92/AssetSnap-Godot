@@ -20,26 +20,26 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace AssetSnap.Front.Components
+namespace AssetSnap.Front.Components.Groups.Builder
 {
 	using System.Collections.Generic;
 	using AssetSnap.Component;
 	using Godot;
 
 	[Tool]
-	public partial class GroupBuilderEditorTopbar : LibraryComponent
+	public partial class EditorTopbar : LibraryComponent
 	{
 
-		public GroupBuilderEditorTopbar()
+		public EditorTopbar()
 		{
 			Name = "GroupBuilderEditorTopbar";
 			//_include = false;
 		}	
 		
-		public GroupBuilderEditorTitleInput TitleInput { set; get; }
-		public GroupBuilderEditorPlace PlaceButton { set; get; }
-		public GroupBuilderEditorSave SaveButton { set; get; }
-		public GroupBuilderEditorClose CloseButton { set; get; }
+		public EditorTitleInput TitleInput { set; get; }
+		public EditorPlace PlaceButton { set; get; }
+		public EditorSave SaveButton { set; get; }
+		public EditorClose CloseButton { set; get; }
 		
 		private MarginContainer _MarginContainer;
 		private HBoxContainer _BoxContainer;
@@ -159,8 +159,8 @@ namespace AssetSnap.Front.Components
 		{
 			List<string> Components = new()
 			{
-				"GroupBuilderEditorSave",
-				"GroupBuilderEditorTitleInput",
+				"Groups.Builder.EditorSave",
+				"Groups.Builder.EditorTitleInput",
 			};
 			
 			HBoxContainer hBoxContainer = new();
@@ -191,11 +191,11 @@ namespace AssetSnap.Front.Components
 			
 			if ( _GlobalExplorer.Components.HasAll( Components.ToArray() )) 
 			{
-				TitleInput = _GlobalExplorer.Components.Single<GroupBuilderEditorTitleInput>();
+				TitleInput = _GlobalExplorer.Components.Single<EditorTitleInput>();
 				TitleInput.Container = hBoxContainer;
 				TitleInput.Initialize();
 				
-				SaveButton = _GlobalExplorer.Components.Single<GroupBuilderEditorSave>();
+				SaveButton = _GlobalExplorer.Components.Single<EditorSave>();
 				SaveButton.Container = hBoxContainer;
 				SaveButton.Initialize();
 			}
@@ -207,12 +207,12 @@ namespace AssetSnap.Front.Components
 		{
 			List<string> Components = new()
 			{
-				"GroupBuilderEditorClose",
+				"Groups.Builder.EditorClose",
 			};
 			
 			if (_GlobalExplorer.Components.HasAll( Components.ToArray() )) 
 			{
-				CloseButton = _GlobalExplorer.Components.Single<GroupBuilderEditorClose>();
+				CloseButton = _GlobalExplorer.Components.Single<EditorClose>();
 				CloseButton.Container = container;
 				CloseButton.Initialize();
 			}
@@ -222,12 +222,12 @@ namespace AssetSnap.Front.Components
 		{
 			List<string> Components = new()
 			{
-				"GroupBuilderEditorPlace",
+				"Groups.Builder.EditorPlace",
 			};
 			
 			if (_GlobalExplorer.Components.HasAll( Components.ToArray() )) 
 			{
-				PlaceButton = _GlobalExplorer.Components.Single<GroupBuilderEditorPlace>();
+				PlaceButton = _GlobalExplorer.Components.Single<EditorPlace>();
 				PlaceButton.Container = container;
 				PlaceButton.Initialize();
 			}

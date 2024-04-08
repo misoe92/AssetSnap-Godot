@@ -20,18 +20,18 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace AssetSnap.Front.Components
+namespace AssetSnap.Front.Components.Library
 {
 	using AssetSnap.Component;
 	using Godot;
 
 	[Tool]
-	public partial class LibraryListTitle : LibraryComponent
+	public partial class ListTitle : LibraryComponent
 	{
 		private readonly string Title = "Library List";
 		private	Label _Label;
 		
-		public LibraryListTitle()
+		public ListTitle()
 		{
 			Name = "LibraryListTitle";
 			//_include = false;

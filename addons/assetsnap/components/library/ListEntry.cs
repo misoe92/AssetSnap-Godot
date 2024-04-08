@@ -20,13 +20,13 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace AssetSnap.Front.Components
+namespace AssetSnap.Front.Components.Library
 {
 	using AssetSnap.Component;
 	using Godot;
 
 	[Tool]
-	public partial class LibraryListEntry : LibraryComponent
+	public partial class ListEntry : LibraryComponent
 	{
 		private string _Folder;
 		private string _Filename;
@@ -61,7 +61,7 @@ namespace AssetSnap.Front.Components
 		**
 		** @return void
 		*/
-		public LibraryListEntry()
+		public ListEntry()
 		{
 			Name = "LibraryListEntry";
 			//_include = false;

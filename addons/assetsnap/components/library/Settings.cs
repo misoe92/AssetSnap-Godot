@@ -20,40 +20,41 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 #if TOOLS
-namespace AssetSnap.Front.Components
+namespace AssetSnap.Front.Components.Library
 {
 	using System;
 	using System.Collections.Generic;
 	using System.Reflection;
 	using AssetSnap.Component;
-	using Godot;
+    using AssetSnap.Front.Components.Library.Sidebar;
+    using Godot;
 	
 	[Tool]
-	public partial class LibrarySettings : LibraryComponent
+	public partial class Settings : LibraryComponent
 	{
 		private ScrollContainer _ScrollContainer;
 		private VBoxContainer _BoxContainer;
 		private Label _SnapTitle;
-		public LSSnapObject _LSSnapObject;
-		public LSEditing _LSEditing;
-		public LSSnapLayer _LSSnapLayer;
-		public LSSimpleSphereCollision _LSSimpleSphereCollision;
-		public LSConvexPolygonCollision _LSConvexPolygonCollision;
-		public LSConcaveCollision _LSConcaveCollision;
-		public LSSnapOffsetX _LSSnapOffsetX;
-		public LSSnapOffsetZ _LSSnapOffsetZ;
-		public LSSnapToHeight _LSSnapToHeight;
-		public LSSnapToX _LSSnapToX;
-		public LSSnapToZ _LSSnapToZ;
-		public LSOptimizedPlacement _LSOptimizedPlacement;
-		public LSSimplePlacement _LSSimplePlacement;
+		public SnapObject _LSSnapObject;
+		public Editing _LSEditing;
+		public SnapLayer _LSSnapLayer;
+		public SimpleSphereCollision _LSSimpleSphereCollision;
+		public ConvexPolygonCollision _LSConvexPolygonCollision;
+		public ConcaveCollision _LSConcaveCollision;
+		public SnapOffsetX _LSSnapOffsetX;
+		public SnapOffsetZ _LSSnapOffsetZ;
+		public SnapToHeight _LSSnapToHeight;
+		public SnapToX _LSSnapToX;
+		public SnapToZ _LSSnapToZ;
+		public OptimizedPlacement _LSOptimizedPlacement;
+		public SimplePlacement _LSSimplePlacement;
 			
 		/*
 		** Component constructor
 		**
 		** @return void
 		*/
-		public LibrarySettings()
+		public Settings()
 		{
 			Name = "LibrarySettings";
 			//_include = false;
@@ -144,39 +145,39 @@ namespace AssetSnap.Front.Components
 				
 				List<string> Components = new()
 				{
-					"LSSnapObject",
-					"LSEditing",
-					"LSSnapLayer",
-					"LSSnapOffsetX",
-					"LSSnapOffsetZ",
-					"LSSnapToHeight",
-					"LSSnapToX",
-					"LSSnapToZ",
-					"LSSimplePlacement",
-					"LSOptimizedPlacement",
-					"LSSimpleSphereCollision",
-					"LSConvexPolygonCollision",
-					"LSConcaveCollision"
+					"Library.Sidebar.SnapObject",
+					"Library.Sidebar.Editing",
+					"Library.Sidebar.SnapLayer",
+					"Library.Sidebar.SnapOffsetX",
+					"Library.Sidebar.SnapOffsetZ",
+					"Library.Sidebar.SnapToHeight",
+					"Library.Sidebar.SnapToX",
+					"Library.Sidebar.SnapToZ",
+					"Library.Sidebar.SimplePlacement",
+					"Library.Sidebar.OptimizedPlacement",
+					"Library.Sidebar.SimpleSphereCollision",
+					"Library.Sidebar.ConvexPolygonCollision",
+					"Library.Sidebar.ConcaveCollision"
 				};
 				
 				if (GlobalExplorer.GetInstance().Components.HasAll( Components.ToArray() )) 
 				{
-					_LSEditing = GlobalExplorer.GetInstance().Components.Single<LSEditing>(true);
-					_LSSimplePlacement = GlobalExplorer.GetInstance().Components.Single<LSSimplePlacement>(true);
-					_LSOptimizedPlacement = GlobalExplorer.GetInstance().Components.Single<LSOptimizedPlacement>(true);
+					_LSEditing = GlobalExplorer.GetInstance().Components.Single<Editing>(true);
+					_LSSimplePlacement = GlobalExplorer.GetInstance().Components.Single<SimplePlacement>(true);
+					_LSOptimizedPlacement = GlobalExplorer.GetInstance().Components.Single<OptimizedPlacement>(true);
 					
-					_LSSnapLayer = GlobalExplorer.GetInstance().Components.Single<LSSnapLayer>(true);
-					_LSSnapObject = GlobalExplorer.GetInstance().Components.Single<LSSnapObject>(true);
-					_LSSnapOffsetX = GlobalExplorer.GetInstance().Components.Single<LSSnapOffsetX>(true);
-					_LSSnapOffsetZ = GlobalExplorer.GetInstance().Components.Single<LSSnapOffsetZ>(true);
+					_LSSnapLayer = GlobalExplorer.GetInstance().Components.Single<SnapLayer>(true);
+					_LSSnapObject = GlobalExplorer.GetInstance().Components.Single<SnapObject>(true);
+					_LSSnapOffsetX = GlobalExplorer.GetInstance().Components.Single<SnapOffsetX>(true);
+					_LSSnapOffsetZ = GlobalExplorer.GetInstance().Components.Single<SnapOffsetZ>(true);
 				
-					_LSSnapToHeight = GlobalExplorer.GetInstance().Components.Single<LSSnapToHeight>(true);
-					_LSSnapToX = GlobalExplorer.GetInstance().Components.Single<LSSnapToX>(true);
-					_LSSnapToZ = GlobalExplorer.GetInstance().Components.Single<LSSnapToZ>(true);
+					_LSSnapToHeight = GlobalExplorer.GetInstance().Components.Single<SnapToHeight>(true);
+					_LSSnapToX = GlobalExplorer.GetInstance().Components.Single<SnapToX>(true);
+					_LSSnapToZ = GlobalExplorer.GetInstance().Components.Single<SnapToZ>(true);
 				
-					_LSSimpleSphereCollision = GlobalExplorer.GetInstance().Components.Single<LSSimpleSphereCollision>(true);
-					_LSConvexPolygonCollision = GlobalExplorer.GetInstance().Components.Single<LSConvexPolygonCollision>(true);
-					_LSConcaveCollision = GlobalExplorer.GetInstance().Components.Single<LSConcaveCollision>(true);
+					_LSSimpleSphereCollision = GlobalExplorer.GetInstance().Components.Single<SimpleSphereCollision>(true);
+					_LSConvexPolygonCollision = GlobalExplorer.GetInstance().Components.Single<ConvexPolygonCollision>(true);
+					_LSConcaveCollision = GlobalExplorer.GetInstance().Components.Single<ConcaveCollision>(true);
 					
 					if( _LSEditing != null ) 
 					{
@@ -463,7 +464,7 @@ namespace AssetSnap.Front.Components
 	
 		public bool FieldExists(string fieldName)
 		{
-			Type type = typeof(LibrarySettings);
+			Type type = typeof(Settings);
 			
 			// Use BindingFlags.Public to include public fields
 			// You can modify the BindingFlags as needed based on your requirements

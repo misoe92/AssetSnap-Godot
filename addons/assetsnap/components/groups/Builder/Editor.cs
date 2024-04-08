@@ -19,17 +19,18 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-namespace AssetSnap.Front.Components
+namespace AssetSnap.Front.Components.Groups.Builder
 {
 	using System.Collections.Generic;
 	using AssetSnap.Component;
+	using AssetSnap.Explorer;
 	using AssetSnap.Front.Nodes;
 	using Godot;
 
 	[Tool]
-	public partial class GroupBuilderEditor : LibraryComponent
+	public partial class Editor : LibraryComponent
 	{
-		public GroupBuilderEditor()
+		public Editor()
 		{
 			// _include = false;
 			Name = "GroupBuilderEditor";
@@ -72,10 +73,13 @@ namespace AssetSnap.Front.Components
 		/*
 		** Components
 		*/
-		public GroupBuilderEditorTopbar Topbar;
-		public GroupBuilderEditorListing Listing;
-		public GroupBuilderEditorGroupOptions GroupOptions;
+		public EditorTopbar Topbar;
+		public EditorListing Listing;
+		public EditorGroupOptions GroupOptions;
 		
+		/*
+		** Group Resource
+		*/
 		private GroupResource _Group;
 		private string _GroupPath = "";
 
@@ -86,7 +90,13 @@ namespace AssetSnap.Front.Components
 			_SetupGroupItemsList();
 			_SetupGroupOptions();
 
-			_GlobalExplorer._Plugin.Connect(Plugin.SignalName.StatesChanged, Callable.From(() => { GroupOptions._UpdateGroupOptions();  }));
+			Plugin.GetInstance()
+				.Connect(
+					Plugin.SignalName.StatesChanged,
+					Callable.From(
+						() => { GroupOptions._UpdateGroupOptions();  }
+					)
+				);
 		}
 		
 		public void Update()
@@ -295,12 +305,12 @@ namespace AssetSnap.Front.Components
 		{
 			List<string> Components = new()
 			{
-				"GroupBuilderEditorTopbar",
+				"Groups.BuilderEditor.Topbar",
 			};
 			
 			if (_GlobalExplorer.Components.HasAll( Components.ToArray() )) 
 			{
-				Topbar = _GlobalExplorer.Components.Single<GroupBuilderEditorTopbar>();
+				Topbar = _GlobalExplorer.Components.Single<EditorTopbar>();
 				Topbar.Container = Container;
 				Topbar.Initialize();
 			}
@@ -310,12 +320,12 @@ namespace AssetSnap.Front.Components
 		{
 			List<string> Components = new()
 			{
-				"GroupBuilderEditorListing",
+				"Groups.Builder.EditorListing",
 			};
 			
 			if (_GlobalExplorer.Components.HasAll( Components.ToArray() )) 
 			{
-				Listing = _GlobalExplorer.Components.Single<GroupBuilderEditorListing>();
+				Listing = _GlobalExplorer.Components.Single<EditorListing>();
 				Listing.Container = Container;
 				Listing.Initialize();
 			}
@@ -325,12 +335,12 @@ namespace AssetSnap.Front.Components
 		{
 			List<string> Components = new()
 			{
-				"GroupBuilderEditorGroupOptions",
+				"Groups.Builder.EditorGroupOptions",
 			};
 			
 			if (_GlobalExplorer.Components.HasAll( Components.ToArray() )) 
 			{
-				GroupOptions = _GlobalExplorer.Components.Single<GroupBuilderEditorGroupOptions>();
+				GroupOptions = _GlobalExplorer.Components.Single<EditorGroupOptions>();
 				GroupOptions.Container = Container;
 				GroupOptions.Initialize();
 			}

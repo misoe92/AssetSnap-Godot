@@ -20,42 +20,43 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace AssetSnap.Front.Components
+namespace AssetSnap.Front.Components.Groups.Builder
 {
 	using System.Collections.Generic;
 	using AssetSnap.Component;
+	using AssetSnap.Front.Components.Groups.Builder.GroupOptions;
 	using AssetSnap.Instance.Input;
 	using Godot;
 
 	[Tool]
-	public partial class GroupBuilderEditorGroupOptions : LibraryComponent
+	public partial class EditorGroupOptions : LibraryComponent
 	{
-		public GroupBuilderEditorGroupOptions()
+		public EditorGroupOptions()
 		{
 			Name = "GroupBuilderEditorGroupOptions";
 			//_include = false;
 		}
 		
 		/** Option Values **/
-		private GroupBuilderEditorGroupOptionSnapToObject _GroupBuilderEditorGroupOptionSnapToObject;
-		private GroupBuilderEditorGroupOptionSnapLayer _GroupBuilderEditorGroupOptionSnapLayer;
-		private GroupBuilderEditorGroupOptionSnapToObjectOffsetX _GroupBuilderEditorGroupOptionSnapToObjectOffsetX;
-		private GroupBuilderEditorGroupOptionSnapToObjectOffsetZ _GroupBuilderEditorGroupOptionSnapToObjectOffsetZ;
-		private GroupBuilderEditorGroupOptionSnapToObjectPosition _GroupBuilderEditorGroupOptionSnapToObjectPosition;
-		private GroupBuilderEditorGroupOptionSnapToHeight _GroupBuilderEditorGroupOptionSnapToHeight;
-		private GroupBuilderEditorGroupOptionSnapToHeightValue _GroupBuilderEditorGroupOptionSnapToHeightValue;
-		private GroupBuilderEditorGroupOptionSnapToX _GroupBuilderEditorGroupOptionSnapToX;
-		private GroupBuilderEditorGroupOptionSnapToXValue _GroupBuilderEditorGroupOptionSnapToXValue;
-		private GroupBuilderEditorGroupOptionSnapToZ _GroupBuilderEditorGroupOptionSnapToZ;
-		private GroupBuilderEditorGroupOptionSnapToZValue _GroupBuilderEditorGroupOptionSnapToZValue;
-		private GroupBuilderEditorGroupOptionSphereCollision _GroupBuilderEditorGroupOptionSphereCollision;
-		private GroupBuilderEditorGroupOptionConcaveCollision _GroupBuilderEditorGroupOptionConcaveCollision;
-		private GroupBuilderEditorGroupOptionConvexCollision _GroupBuilderEditorGroupOptionConvexCollision;
-		private GroupBuilderEditorGroupOptionConvexClean _GroupBuilderEditorGroupOptionConvexClean;
-		private GroupBuilderEditorGroupOptionConvexSimplify _GroupBuilderEditorGroupOptionConvexSimplify;
-		private GroupBuilderEditorGroupOptionDragOffset _GroupBuilderEditorGroupOptionDragOffset;
-		private GroupBuilderEditorGroupOptionPlacementSimple _GroupBuilderEditorGroupOptionPlacementSimple;
-		private GroupBuilderEditorGroupOptionPlacementOptimized _GroupBuilderEditorGroupOptionPlacementOptimized;
+		private SnapToObject _GroupBuilderEditorGroupOptionSnapToObject;
+		private SnapLayer _GroupBuilderEditorGroupOptionSnapLayer;
+		private SnapToObjectOffsetX _GroupBuilderEditorGroupOptionSnapToObjectOffsetX;
+		private SnapToObjectOffsetZ _GroupBuilderEditorGroupOptionSnapToObjectOffsetZ;
+		private SnapToObjectPosition _GroupBuilderEditorGroupOptionSnapToObjectPosition;
+		private SnapToHeight _GroupBuilderEditorGroupOptionSnapToHeight;
+		private SnapToHeightValue _GroupBuilderEditorGroupOptionSnapToHeightValue;
+		private SnapToX _GroupBuilderEditorGroupOptionSnapToX;
+		private SnapToXValue _GroupBuilderEditorGroupOptionSnapToXValue;
+		private SnapToZ _GroupBuilderEditorGroupOptionSnapToZ;
+		private SnapToZValue _GroupBuilderEditorGroupOptionSnapToZValue;
+		private SphereCollision _GroupBuilderEditorGroupOptionSphereCollision;
+		private ConcaveCollision _GroupBuilderEditorGroupOptionConcaveCollision;
+		private ConvexCollision _GroupBuilderEditorGroupOptionConvexCollision;
+		private ConvexClean _GroupBuilderEditorGroupOptionConvexClean;
+		private ConvexSimplify _GroupBuilderEditorGroupOptionConvexSimplify;
+		private DragOffset _GroupBuilderEditorGroupOptionDragOffset;
+		private PlacementSimple _GroupBuilderEditorGroupOptionPlacementSimple;
+		private PlacementOptimized _GroupBuilderEditorGroupOptionPlacementOptimized;
 		
 		public override void Initialize()
 		{
@@ -170,49 +171,49 @@ namespace AssetSnap.Front.Components
 		{
 			List<string> PlacementModesComponents = new()
 			{
-				"GroupBuilderEditorGroupOptionPlacementSimple",
-				"GroupBuilderEditorGroupOptionPlacementOptimized",
+				"Groups.Builder.GroupOptions.PlacementSimple",
+				"Groups.Builder.GroupOptions.PlacementOptimized",
 			};
 
 			List<string> SnaptoObjectComponents = new()
 			{
-				"GroupBuilderEditorGroupOptionSnapToObject",
-				"GroupBuilderEditorGroupOptionSnapToObjectPosition",
-				"GroupBuilderEditorGroupOptionSnapLayer",
-				"GroupBuilderEditorGroupOptionSnapToObjectOffsetX",
-				"GroupBuilderEditorGroupOptionSnapToObjectOffsetZ",
+				"Groups.Builder.GroupOptions.SnapToObject",
+				"Groups.Builder.GroupOptions.SnapToObjectPosition",
+				"Groups.Builder.GroupOptions.SnapLayer",
+				"Groups.Builder.GroupOptions.SnapToObjectOffsetX",
+				"Groups.Builder.GroupOptions.SnapToObjectOffsetZ",
 			};
 			
 			List<string> SnapToPlaneComponents = new()
 			{
-				"GroupBuilderEditorGroupOptionSnapToHeight",
-				"GroupBuilderEditorGroupOptionSnapToHeightValue",
-				"GroupBuilderEditorGroupOptionSnapToX",
-				"GroupBuilderEditorGroupOptionSnapToXValue",
-				"GroupBuilderEditorGroupOptionSnapToZ",
-				"GroupBuilderEditorGroupOptionSnapToZValue",
+				"Groups.Builder.GroupOptions.SnapToHeight",
+				"Groups.Builder.GroupOptions.SnapToHeightValue",
+				"Groups.Builder.GroupOptions.SnapToX",
+				"Groups.Builder.GroupOptions.SnapToXValue",
+				"Groups.Builder.GroupOptions.SnapToZ",
+				"Groups.Builder.GroupOptions.SnapToZValue",
 			};
 			
 			List<string> CollisionComponents = new()
 			{
-				"GroupBuilderEditorGroupOptionSphereCollision",
-				"GroupBuilderEditorGroupOptionConcaveCollision",
-				"GroupBuilderEditorGroupOptionConvexCollision",
-				"GroupBuilderEditorGroupOptionConvexClean",
-				"GroupBuilderEditorGroupOptionConvexSimplify",
+				"Groups.Builder.GroupOptions.SphereCollision",
+				"Groups.Builder.GroupOptions.ConcaveCollision",
+				"Groups.Builder.GroupOptions.ConvexCollision",
+				"Groups.Builder.GroupOptions.ConvexClean",
+				"Groups.Builder.GroupOptions.ConvexSimplify",
 			};
 			
 			List<string> DragComponents = new()
 			{
-				"GroupBuilderEditorGroupOptionDragOffset",
+				"Groups.Builder.GroupOptions.DragOffset",
 			};
 			
 			/** Initializing Snap Object fields **/
 			_InitializeGroupOptionPlacementModeTitle(Trait<Containerable>().Select(2).GetInnerContainer(0));
 			if (_GlobalExplorer.Components.HasAll(PlacementModesComponents.ToArray()))
 			{
-				_GroupBuilderEditorGroupOptionPlacementSimple = GlobalExplorer.GetInstance().Components.Single<GroupBuilderEditorGroupOptionPlacementSimple>(true);
-				_GroupBuilderEditorGroupOptionPlacementOptimized = GlobalExplorer.GetInstance().Components.Single<GroupBuilderEditorGroupOptionPlacementOptimized>(true);
+				_GroupBuilderEditorGroupOptionPlacementSimple = GlobalExplorer.GetInstance().Components.Single<PlacementSimple>(true);
+				_GroupBuilderEditorGroupOptionPlacementOptimized = GlobalExplorer.GetInstance().Components.Single<PlacementOptimized>(true);
 			
 				if( null != _GroupBuilderEditorGroupOptionPlacementSimple) 
 				{
@@ -236,11 +237,11 @@ namespace AssetSnap.Front.Components
 			_InitializeGroupOptionSnapObjectTitle(Trait<Containerable>().Select(2).GetInnerContainer(1));
 			if (_GlobalExplorer.Components.HasAll( SnaptoObjectComponents.ToArray() )) 
 			{
-				_GroupBuilderEditorGroupOptionSnapToObject = GlobalExplorer.GetInstance().Components.Single<GroupBuilderEditorGroupOptionSnapToObject>(true);
-				_GroupBuilderEditorGroupOptionSnapLayer = GlobalExplorer.GetInstance().Components.Single<GroupBuilderEditorGroupOptionSnapLayer>(true);
-				_GroupBuilderEditorGroupOptionSnapToObjectOffsetX = GlobalExplorer.GetInstance().Components.Single<GroupBuilderEditorGroupOptionSnapToObjectOffsetX>(true);
-				_GroupBuilderEditorGroupOptionSnapToObjectOffsetZ = GlobalExplorer.GetInstance().Components.Single<GroupBuilderEditorGroupOptionSnapToObjectOffsetZ>(true);
-				_GroupBuilderEditorGroupOptionSnapToObjectPosition = GlobalExplorer.GetInstance().Components.Single<GroupBuilderEditorGroupOptionSnapToObjectPosition>(true);
+				_GroupBuilderEditorGroupOptionSnapToObject = GlobalExplorer.GetInstance().Components.Single<SnapToObject>(true);
+				_GroupBuilderEditorGroupOptionSnapLayer = GlobalExplorer.GetInstance().Components.Single<SnapLayer>(true);
+				_GroupBuilderEditorGroupOptionSnapToObjectOffsetX = GlobalExplorer.GetInstance().Components.Single<SnapToObjectOffsetX>(true);
+				_GroupBuilderEditorGroupOptionSnapToObjectOffsetZ = GlobalExplorer.GetInstance().Components.Single<SnapToObjectOffsetZ>(true);
+				_GroupBuilderEditorGroupOptionSnapToObjectPosition = GlobalExplorer.GetInstance().Components.Single<SnapToObjectPosition>(true);
 				
 				if( null != _GroupBuilderEditorGroupOptionSnapToObject) 
 				{
@@ -293,12 +294,12 @@ namespace AssetSnap.Front.Components
 			_InitializeGroupOptionSnapTitle(Trait<Containerable>().Select(2).GetInnerContainer(2));
 			if (_GlobalExplorer.Components.HasAll( SnapToPlaneComponents.ToArray() )) 
 			{
-				_GroupBuilderEditorGroupOptionSnapToHeight = GlobalExplorer.GetInstance().Components.Single<GroupBuilderEditorGroupOptionSnapToHeight>(true);
-				_GroupBuilderEditorGroupOptionSnapToHeightValue = GlobalExplorer.GetInstance().Components.Single<GroupBuilderEditorGroupOptionSnapToHeightValue>(true);
-				_GroupBuilderEditorGroupOptionSnapToX = GlobalExplorer.GetInstance().Components.Single<GroupBuilderEditorGroupOptionSnapToX>(true);
-				_GroupBuilderEditorGroupOptionSnapToXValue = GlobalExplorer.GetInstance().Components.Single<GroupBuilderEditorGroupOptionSnapToXValue>(true);
-				_GroupBuilderEditorGroupOptionSnapToZ = GlobalExplorer.GetInstance().Components.Single<GroupBuilderEditorGroupOptionSnapToZ>(true);
-				_GroupBuilderEditorGroupOptionSnapToZValue = GlobalExplorer.GetInstance().Components.Single<GroupBuilderEditorGroupOptionSnapToZValue>(true);
+				_GroupBuilderEditorGroupOptionSnapToHeight = GlobalExplorer.GetInstance().Components.Single<SnapToHeight>(true);
+				_GroupBuilderEditorGroupOptionSnapToHeightValue = GlobalExplorer.GetInstance().Components.Single<SnapToHeightValue>(true);
+				_GroupBuilderEditorGroupOptionSnapToX = GlobalExplorer.GetInstance().Components.Single<SnapToX>(true);
+				_GroupBuilderEditorGroupOptionSnapToXValue = GlobalExplorer.GetInstance().Components.Single<SnapToXValue>(true);
+				_GroupBuilderEditorGroupOptionSnapToZ = GlobalExplorer.GetInstance().Components.Single<SnapToZ>(true);
+				_GroupBuilderEditorGroupOptionSnapToZValue = GlobalExplorer.GetInstance().Components.Single<SnapToZValue>(true);
 				
 				if( null != _GroupBuilderEditorGroupOptionSnapToHeight) 
 				{
@@ -359,11 +360,11 @@ namespace AssetSnap.Front.Components
 			_InitializeGroupOptionCollisionTitle(Trait<Containerable>().Select(2).GetInnerContainer(0));
 			if (_GlobalExplorer.Components.HasAll( CollisionComponents.ToArray() )) 
 			{
-				_GroupBuilderEditorGroupOptionSphereCollision = GlobalExplorer.GetInstance().Components.Single<GroupBuilderEditorGroupOptionSphereCollision>(true);
-				_GroupBuilderEditorGroupOptionConcaveCollision = GlobalExplorer.GetInstance().Components.Single<GroupBuilderEditorGroupOptionConcaveCollision>(true);
-				_GroupBuilderEditorGroupOptionConvexCollision = GlobalExplorer.GetInstance().Components.Single<GroupBuilderEditorGroupOptionConvexCollision>(true);
-				_GroupBuilderEditorGroupOptionConvexClean = GlobalExplorer.GetInstance().Components.Single<GroupBuilderEditorGroupOptionConvexClean>(true);
-				_GroupBuilderEditorGroupOptionConvexSimplify = GlobalExplorer.GetInstance().Components.Single<GroupBuilderEditorGroupOptionConvexSimplify>(true);
+				_GroupBuilderEditorGroupOptionSphereCollision = GlobalExplorer.GetInstance().Components.Single<SphereCollision>(true);
+				_GroupBuilderEditorGroupOptionConcaveCollision = GlobalExplorer.GetInstance().Components.Single<ConcaveCollision>(true);
+				_GroupBuilderEditorGroupOptionConvexCollision = GlobalExplorer.GetInstance().Components.Single<ConvexCollision>(true);
+				_GroupBuilderEditorGroupOptionConvexClean = GlobalExplorer.GetInstance().Components.Single<ConvexClean>(true);
+				_GroupBuilderEditorGroupOptionConvexSimplify = GlobalExplorer.GetInstance().Components.Single<ConvexSimplify>(true);
 			
 				if( null != _GroupBuilderEditorGroupOptionSphereCollision) 
 				{
@@ -414,7 +415,7 @@ namespace AssetSnap.Front.Components
 			_InitializeGroupOptionDragTitle(Trait<Containerable>().Select(2).GetInnerContainer(1));
 			if (_GlobalExplorer.Components.HasAll( DragComponents.ToArray() )) 
 			{
-				_GroupBuilderEditorGroupOptionDragOffset = GlobalExplorer.GetInstance().Components.Single<GroupBuilderEditorGroupOptionDragOffset>(true);
+				_GroupBuilderEditorGroupOptionDragOffset = GlobalExplorer.GetInstance().Components.Single<DragOffset>(true);
 			
 				if( null != _GroupBuilderEditorGroupOptionDragOffset) 
 				{
@@ -584,6 +585,7 @@ namespace AssetSnap.Front.Components
 				GD.PushWarning("Group options object is not initialized");
 				return;
 			}
+			
 			_GroupBuilderEditorGroupOptionSnapToObject.SetValue(_GlobalExplorer.GroupBuilder._Editor.Group.SnapToObject);
 			_GroupBuilderEditorGroupOptionSnapLayer.SetValue(_GlobalExplorer.GroupBuilder._Editor.Group.SnapLayer);
 			_GroupBuilderEditorGroupOptionSnapToObjectOffsetX.SetValue(_GlobalExplorer.GroupBuilder._Editor.Group.ObjectOffsetX);

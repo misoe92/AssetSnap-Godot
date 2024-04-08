@@ -20,14 +20,14 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace AssetSnap.Front.Components
+namespace AssetSnap.Front.Components.Library
 {
 	using AssetSnap.Component;
 	using AssetSnap.Front.Nodes;
 	using Godot;
 
 	[Tool]
-	public partial class LibrarySearch : LibraryComponent
+	public partial class Search : LibraryComponent
 	{
 		private readonly string Title = "Search Library";
 		private string value = "";
@@ -49,7 +49,7 @@ namespace AssetSnap.Front.Components
 		**
 		** @return void
 		*/
-		public LibrarySearch()
+		public Search()
 		{
 			Name = "LibrarySearch";
 			//_include = false;

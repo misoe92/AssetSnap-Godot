@@ -29,7 +29,7 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 	public partial class Origin : GroupObjectComponent
 	{
 
-		public GroupBuilderEditorGroupObject Parent;
+		public EditorGroupObject Parent;
 		
 		public double GetValue( int index ) 
 		{

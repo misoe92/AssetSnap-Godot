@@ -91,7 +91,7 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 		{
 			List<string> Components = new()
 			{
-				"GroupBuilderEditorGroupObjectAdvancedContainerSnapLayer"
+				"Groups.Builder.GroupObjects.AdvancedContainers.SnapLayer"
 			};
 			
 			if (_GlobalExplorer.Components.HasAll( Components.ToArray() )) 
@@ -109,7 +109,7 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 		{
 			List<string> Components = new()
 			{
-				"GroupBuilderEditorGroupObjectAdvancedContainerSphereCollision"
+				"Groups.Builder.GroupObjects.AdvancedContainers.SphereCollision"
 			};
 			
 			if (_GlobalExplorer.Components.HasAll( Components.ToArray() )) 
@@ -127,7 +127,7 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 		{
 			List<string> Components = new()
 			{
-				"GroupBuilderEditorGroupObjectAdvancedContainerConvexCollision"
+				"Groups.Builder.GroupObjects.AdvancedContainers.ConvexCollision"
 			};
 			
 			if (_GlobalExplorer.Components.HasAll( Components.ToArray() )) 
@@ -145,7 +145,7 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 		{
 			List<string> Components = new()
 			{
-				"GroupBuilderEditorGroupObjectAdvancedContainerConcaveCollision"
+				"Groups.Builder.GroupObjects.AdvancedContainers.ConcaveCollision"
 			};
 			
 			if (_GlobalExplorer.Components.HasAll( Components.ToArray() )) 

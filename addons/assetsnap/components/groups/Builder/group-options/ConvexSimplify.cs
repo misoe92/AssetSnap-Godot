@@ -20,13 +20,13 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace AssetSnap.Front.Components
+namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 {
 	using AssetSnap.Component;
 	using Godot;
 
 	[Tool]
-	public partial class GroupBuilderEditorGroupOptionConvexSimplify : GroupOptionCheckableComponent
+	public partial class ConvexSimplify : GroupOptionCheckableComponent
 	{
 		protected override void _InitializeFields()
 		{

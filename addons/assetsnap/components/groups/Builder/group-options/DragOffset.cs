@@ -20,14 +20,14 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace AssetSnap.Front.Components
+namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 {
 	using AssetSnap.Component;
 	using AssetSnap.Instance.Input;
 	using Godot;
 
 	[Tool]
-	public partial class GroupBuilderEditorGroupOptionDragOffset : GroupOptionSpinboxableComponent
+	public partial class DragOffset : GroupOptionSpinboxableComponent
 	{
 		protected override void _InitializeFields()
 		{

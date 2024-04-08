@@ -20,13 +20,13 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace AssetSnap.Front.Components
+namespace AssetSnap.Front.Components.Library.Sidebar
 {
 	using AssetSnap.Component;
 	using Godot;
 
 	[Tool]
-	public partial class LSOptimizedPlacement : CheckableComponent
+	public partial class OptimizedPlacement : CheckableComponent
 	{
 		private readonly string _Title = "Optimized placement";
 		private readonly string _CheckboxTooltip = "Will use multi mesh for placing the elements, will be good when a large amount of objects is needed to be spawned";
@@ -36,7 +36,7 @@ namespace AssetSnap.Front.Components
 		**
 		** @return void
 		*/
-		public LSOptimizedPlacement()
+		public OptimizedPlacement()
 		{
 			Name = "LSOptimizedPlacement";
 			// _include = false;

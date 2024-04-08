@@ -20,14 +20,14 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace AssetSnap.Front.Components
+namespace AssetSnap.Front.Components.Library
 {
 	using Godot;
 	using AssetSnap.Component;
 	using AssetSnap.Front.Nodes;
 
 	[Tool]
-	public partial class LibrarySnapRotate : LibraryComponent
+	public partial class SnapRotate : LibraryComponent
 	{
 		public bool value = false;
 		public float RotationX = 0.0f;
@@ -37,7 +37,7 @@ namespace AssetSnap.Front.Components
 		public Callable? StateChangeCallable;
 		public InputEvent CurrentEvent;
 
-		public LibrarySnapRotate()
+		public SnapRotate()
 		{
 			Name = "LibrarySnapRotate";
 			//_include = false;  

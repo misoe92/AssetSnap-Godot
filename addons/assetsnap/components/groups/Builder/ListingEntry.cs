@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace AssetSnap.Front.Components
+namespace AssetSnap.Front.Components.Groups.Builder
 {
 	using System.Collections.Generic;
 	using AssetSnap.Component;
@@ -28,10 +28,10 @@ namespace AssetSnap.Front.Components
 	using Godot;
 
 	[Tool]
-	public partial class GroupBuilderListingEntry : LibraryComponent
+	public partial class ListingEntry : LibraryComponent
 	{
 		
-		public GroupBuilderListingEntry()
+		public ListingEntry()
 		{
 			Name = "GroupBuilderListingEntry";
 			//_include = false;
@@ -57,12 +57,12 @@ namespace AssetSnap.Front.Components
 		
 		private readonly List<string> RootSidebar = new()
 		{
-			"GroupBuilderSidebar",
+			"Groups.Builder.Sidebar",
 		};
 		
 		private readonly List<string> GroupEditor = new()
 		{
-			"GroupBuilderEditor",
+			"Groups.Builder.Editor",
 		};
 		
 		public override void Initialize()
@@ -120,14 +120,14 @@ namespace AssetSnap.Front.Components
 			
 			if (Components.HasAll(GroupEditor.ToArray()))
 			{
-				GroupBuilderEditor Editor = Components.Single<GroupBuilderEditor>();
+				Editor Editor = Components.Single<Editor>();
 
 				Editor.GroupPath = null;
 			}
 			
 			if ( Components.HasAll( RootSidebar.ToArray() )) 
 			{
-				GroupBuilderSidebar _Sidebar = Components.Single<GroupBuilderSidebar>();
+				Sidebar _Sidebar = Components.Single<Sidebar>();
 
 				_Sidebar.UnFocusGroup(title);
 			}
@@ -139,14 +139,14 @@ namespace AssetSnap.Front.Components
 			
 			if (Components.HasAll(GroupEditor.ToArray()))
 			{
-				GroupBuilderEditor Editor = Components.Single<GroupBuilderEditor>();
+				Editor Editor = Components.Single<Editor>();
 
 				Editor.GroupPath = title;
 			}
 			
 			if ( Components.HasAll( RootSidebar.ToArray() )) 
 			{
-				GroupBuilderSidebar _Sidebar = Components.Single<GroupBuilderSidebar>();
+				Sidebar _Sidebar = Components.Single<Sidebar>();
 
 				_Sidebar.FocusGroup(title);
 			}
@@ -304,7 +304,7 @@ namespace AssetSnap.Front.Components
 			Component.Base Components = _GlobalExplorer.Components;
 			if ( Components.HasAll( RootSidebar.ToArray() )) 
 			{
-				GroupBuilderSidebar _Sidebar = Components.Single<GroupBuilderSidebar>();
+				Sidebar _Sidebar = Components.Single<Sidebar>();
 
 				_Sidebar.RemoveGroup(title);
 				_Sidebar.RefreshExistingGroups();
@@ -317,13 +317,13 @@ namespace AssetSnap.Front.Components
 
 			if (Components.HasAll(GroupEditor.ToArray()))
 			{
-				GroupBuilderEditor Editor = Components.Single<GroupBuilderEditor>();
+				Editor Editor = Components.Single<Editor>();
 				Editor.GroupPath = title;
 			}
 			
 			if ( Components.HasAll( RootSidebar.ToArray() )) 
 			{
-				GroupBuilderSidebar _Sidebar = Components.Single<GroupBuilderSidebar>();
+				Sidebar _Sidebar = Components.Single<Sidebar>();
 
 				_Sidebar.Update();
 			}

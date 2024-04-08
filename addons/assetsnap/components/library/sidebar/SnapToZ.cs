@@ -20,13 +20,13 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace AssetSnap.Front.Components
+namespace AssetSnap.Front.Components.Library.Sidebar
 {
 	using AssetSnap.Component;
 	using Godot;
 
 	[Tool]
-	public partial class LSSnapToZ : LSSnapComponent
+	public partial class SnapToZ : LSSnapComponent
 	{
 		private readonly string _Title = "Snap Z";
 		private readonly string _CheckboxTitle = "Snap To Z";
@@ -40,7 +40,7 @@ namespace AssetSnap.Front.Components
 		** 
 		** @return void
 		*/
-		public LSSnapToZ()
+		public SnapToZ()
 		{
 			Name = "LSSnapToZ";
 			Angle = GlobalStates.SnapAngleEnums.Z;

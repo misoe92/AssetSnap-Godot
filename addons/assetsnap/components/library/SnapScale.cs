@@ -20,14 +20,14 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace AssetSnap.Front.Components
+namespace AssetSnap.Front.Components.Library
 {
 	using Godot;
 	using AssetSnap.Component;
 	using AssetSnap.Front.Nodes;
 
 	[Tool]
-	public partial class LibrarySnapScale : LibraryComponent
+	public partial class SnapScale : LibraryComponent
 	{ 
 		private float SnapHeight;
 		
@@ -39,7 +39,7 @@ namespace AssetSnap.Front.Components
 		public Callable? StateChangeCallable;
 		public InputEvent CurrentEvent;
 
-		public LibrarySnapScale()
+		public SnapScale()
 		{
 			Name = "LibrarySnapScale";
 			//_include = false; 

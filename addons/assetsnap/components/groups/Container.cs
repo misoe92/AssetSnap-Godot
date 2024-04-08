@@ -20,20 +20,20 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace AssetSnap.Front.Components
+namespace AssetSnap.Front.Components.Groups
 {
 	using AssetSnap.Component;
 	using Godot;
 
 	[Tool]
-	public partial class GroupContainer : LibraryComponent
+	public partial class Container : LibraryComponent
 	{
 		/*
 		** Constructor of component
 		** 
 		** @return void
 		*/
-		public GroupContainer()
+		public Container()
 		{
 			Name = "GroupContainer"; 
 			//_include = false;
@@ -62,13 +62,11 @@ namespace AssetSnap.Front.Components
 				.SetHorizontalSizeFlags(Control.SizeFlags.ExpandFill)
 				.SetLayout( Containerable.ContainerLayout.TwoColumns )
 				.Instantiate();
-
-			
 		}
 		
 		private void _FinalizeFields()
 		{
-			Container sidebar = Trait<Containerable>()
+			Godot.Container sidebar = Trait<Containerable>()
 				.Select(0)
 				.GetInnerContainer(0);
 
@@ -87,7 +85,7 @@ namespace AssetSnap.Front.Components
 		**
 		** @return VBoxContainer
 		*/
-		public Container GetLeftInnerContainer() 
+		public Godot.Container GetLeftInnerContainer() 
 		{
 			return Trait<Containerable>()
 				.Select(0)
@@ -99,7 +97,7 @@ namespace AssetSnap.Front.Components
 		**
 		** @return VBoxContainer
 		*/
-		public Container GetRightInnerContainer() 
+		public Godot.Container GetRightInnerContainer() 
 		{
 			return Trait<Containerable>()
 				.Select(0)

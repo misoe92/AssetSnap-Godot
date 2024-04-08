@@ -20,16 +20,16 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace AssetSnap.Front.Components
+namespace AssetSnap.Front.Components.Groups.Builder
 {
 	using System.Collections.Generic;
 	using AssetSnap.Component;
 	using Godot;
 
 	[Tool]
-	public partial class GroupBuilderEditorListing : LibraryComponent
+	public partial class EditorListing : LibraryComponent
 	{
-		public GroupBuilderEditorListing()
+		public EditorListing()
 		{
 			Name = "GroupBuilderEditorListing";
 			//_include = false;
@@ -298,7 +298,7 @@ namespace AssetSnap.Front.Components
 		{
 			List<string> Components = new()
 			{
-				"GroupBuilderEditorGroupObject",
+				"Groups.Builder.EditorGroupObject",
 			};
 			
 			if (_GlobalExplorer.Components.HasAll( Components.ToArray() )) 
@@ -317,7 +317,7 @@ namespace AssetSnap.Front.Components
 					
 					Godot.Collections.Dictionary<string, Variant> options = _GlobalExplorer.GroupBuilder._Editor.Group._Options[i];
 					
-					GroupBuilderEditorGroupObject SingleEntry = GlobalExplorer.GetInstance().Components.Single<GroupBuilderEditorGroupObject>(true);
+					EditorGroupObject SingleEntry = GlobalExplorer.GetInstance().Components.Single<EditorGroupObject>(true);
 					
 					SingleEntry.Path = path;
 					SingleEntry.Origin = origin;

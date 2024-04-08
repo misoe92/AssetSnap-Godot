@@ -20,12 +20,12 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace AssetSnap.Front.Components
+namespace AssetSnap.Front.Components.Library.Sidebar
 {
 	using AssetSnap.Component;
 	using Godot;
 
-	public partial class LSEditing : LibraryComponent
+	public partial class Editing : LibraryComponent
 	{
 		private readonly string _Title = "Currently Editing";
 
@@ -41,7 +41,7 @@ namespace AssetSnap.Front.Components
 		** 
 		** @return void
 		*/	 
-		public LSEditing()
+		public Editing()
 		{
 			Name = "LSEditing";
 			//_include = false;

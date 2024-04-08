@@ -20,13 +20,13 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace AssetSnap.Front.Components
+namespace AssetSnap.Front.Components.Library.Sidebar
 {
 	using AssetSnap.Component;
 	using Godot;
 
 	[Tool]
-	public partial class LSSimplePlacement : CheckableComponent
+	public partial class SimplePlacement : CheckableComponent
 	{
 		private readonly string _Title = "Simple placement";
 		private readonly string _CheckboxTooltip = "Can be used for single object scripts and when you only need few objects";
@@ -36,7 +36,7 @@ namespace AssetSnap.Front.Components
 		**
 		** @return void
 		*/
-		public LSSimplePlacement()
+		public SimplePlacement()
 		{
 			Name = "LSSimplePlacement";
 			//_include = false;

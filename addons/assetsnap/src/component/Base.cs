@@ -64,11 +64,14 @@ namespace AssetSnap.Component
 			// Get all types in the current assembly
 			Type[] types = Assembly.GetExecutingAssembly().GetTypes();
 
-			// Filter types by namespace
-			System.Collections.Generic.IEnumerable<System.Type> ClassesInNamespace = types
-				.Where(type => type.Namespace == TargetNamespace && type.IsClass);
+			// Filter types by namespace recursively
+			IEnumerable<Type> classesInNamespace = types
+				.Where(type => type.Namespace != null && 
+							(type.Namespace == TargetNamespace || 
+								type.Namespace.StartsWith(TargetNamespace + ".")) && 
+							type.IsClass);
 
-			return ClassesInNamespace;
+			return classesInNamespace;
 		}
 		
 		/*
@@ -83,13 +86,13 @@ namespace AssetSnap.Component
 		{
 			foreach (Type classType in ClassesInNamespace)
 			{
-				string TypeName = classType.Name;
+				string TypeName = classType.FullName;
 				
 				// Create an instance of the class
 				object instance = Activator.CreateInstance(classType);
 				if( IsComponent(instance) && ShouldInclude(instance) ) 
 				{
-					EnterComponent(instance, TypeName);
+					EnterComponent(instance, TypeName.Replace("AssetSnap.Front.Components.", "").Split(".").Join(""));
 				}
 				else  
 				{
@@ -179,8 +182,8 @@ namespace AssetSnap.Component
 		*/
 		public T Single<T>( bool unique = false )
 		{
-			string key = typeof(T).Name;
-			
+			string key = typeof(T).FullName.Replace("AssetSnap.Front.Components.", "").Split(".").Join("");
+
 			if( false == Has(key) ) 
 			{
 				return default(T);
@@ -227,7 +230,7 @@ namespace AssetSnap.Component
 				return null;
 			}
 
-			BaseComponent component = _Components[keyName];
+			BaseComponent component = _Components[keyName.Split(".").Join("")];
 			
 			if( unique ) 
 			{
@@ -256,7 +259,7 @@ namespace AssetSnap.Component
 		*/
 		public bool Has( string key )
 		{
-			if( false == _Components.ContainsKey(key) ) 
+			if( false == _Components.ContainsKey(key.Split(".").Join("")) ) 
 			{
 				return false;
 			}
@@ -274,13 +277,13 @@ namespace AssetSnap.Component
 			
 			ExplorerUtils.Get()._Plugin
 				.GetInternalContainer()
-				.RemoveChild(_Components[key]);
+				.RemoveChild(_Components[key.Split(".").Join("")]);
 				
-			_Components[key] = new();
+			_Components[key.Split(".").Join("")] = new();
 			
 			ExplorerUtils.Get()._Plugin
 				.GetInternalContainer()
-				.AddChild(_Components[key]);
+				.AddChild(_Components[key.Split(".").Join("")]);
 		}
 		
 		/*
@@ -298,11 +301,11 @@ namespace AssetSnap.Component
 				GD.PushError("No components was found");
 				return false;
 			}
-			
+
 			for( int i = 0; i < keys.Length; i++)
 			{
 				string key = keys[i];
-				if( false == _Components.ContainsKey(key) ) 
+				if( false == _Components.ContainsKey(key.Split(".").Join("")) ) 
 				{
 					return false;
 				}
