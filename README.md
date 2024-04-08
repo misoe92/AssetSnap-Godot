@@ -40,7 +40,7 @@
     <a href="#"><strong>Docs comming soon »</strong></a>
     <br />
     <br />
-    <a href="https://github.com/misoe92/AssetSnap-Godot-Template">Example Project</a>
+    <a href="https://github.com/misoe92/AssetSnap-Godot-Template">Example Project (Soon)</a>
     ·
     <a href="https://github.com/misoe92/AssetSnap-Godot/issues/new?labels=bug&template=bug-report---.md">Report Bug</a>
     ·
@@ -237,10 +237,10 @@ As of 0.1.1
 - [x] Array modifier, that enables configureable array spawn of an object
 
 As of 0.1.2
-- [ ] Upgraded settings UI
+- [x] Upgraded settings UI
 - [ ] Level of detail Control
 - [ ] Better Decal UI
-- [ ] Better folder structure for components
+- [x] Better folder structure for components
 
 See the [open issues](https://github.com/misoe92/AssetSnap-Godot/issues) for a full list of proposed features (and known issues).
 
