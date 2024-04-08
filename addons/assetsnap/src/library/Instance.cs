@@ -24,7 +24,8 @@ namespace AssetSnap.Library
 {
 	using System.Collections.Generic;
 	using AssetSnap.Front.Components;
-	using Godot;
+    using AssetSnap.Front.Components.Library;
+    using Godot;
 	
 	[Tool]
 	public partial class Instance : Node
@@ -40,24 +41,24 @@ namespace AssetSnap.Library
 		
 		private readonly List<string> BodyComponents = new()
 		{
-			"LibraryBody",
+			"Library.Body",
 		};
 		
 		private readonly List<string> TopbarComponents = new()
 		{
-			"LibraryTopbar",
+			"Library.Topbar",
 		};
 		
 		private readonly List<string> SettingsComponents = new()
 		{
-			"LibraryBody",
-			"LibrarySettings",
+			"Library.Body",
+			"Library.Settings",
 		};
 		
 		private readonly List<string> ListingComponents = new()
 		{
-			"LibraryBody",
-			"LibraryListing",
+			"Library.Body",
+			"Library.Listing",
 		};
 		
 		public string Folder 
@@ -94,10 +95,10 @@ namespace AssetSnap.Library
 		}
 
 		/** Components **/
-		public LibraryBody _LibraryBody;
-		public LibraryTopbar _LibraryTopbar;
-		public LibrarySettings _LibrarySettings;
-		public LibraryListing _LibraryListing;
+		public Body _LibraryBody;
+		public Topbar _LibraryTopbar;
+		public Settings _LibrarySettings;
+		public Listing _LibraryListing;
 		
 		public Instance()
 		{
@@ -229,7 +230,7 @@ namespace AssetSnap.Library
 			Component.Base Components = _GlobalExplorer.Components;
 			if ( Components.HasAll( BodyComponents.ToArray() )) 
 			{
-				_LibraryBody = Components.Single<LibraryBody>(true);
+				_LibraryBody = Components.Single<Body>(true);
 				
 				if( HasLibraryBody() ) 
 				{
@@ -251,7 +252,7 @@ namespace AssetSnap.Library
 			
 			if ( Components.HasAll( TopbarComponents.ToArray() )) 
 			{
-				_LibraryTopbar = Components.Single<LibraryTopbar>(true);
+				_LibraryTopbar = Components.Single<Topbar>(true);
 				
 				if( HasLibraryTopbar() ) 
 				{
@@ -272,7 +273,7 @@ namespace AssetSnap.Library
 			Component.Base Components = _GlobalExplorer.Components;
 			if (Components.HasAll( SettingsComponents.ToArray() )) 
 			{
-				_LibrarySettings = Components.Single<LibrarySettings>(true);
+				_LibrarySettings = Components.Single<Settings>(true);
 				
 				if( HasLibrarySettings() ) 
 				{
@@ -293,7 +294,7 @@ namespace AssetSnap.Library
 			Component.Base Components = _GlobalExplorer.Components;
 			if (Components.HasAll( ListingComponents.ToArray() )) 
 			{
-				_LibraryListing = Components.Single<LibraryListing>(true);
+				_LibraryListing = Components.Single<Listing>(true);
 				
 				if( HasLibraryListing() ) 
 				{

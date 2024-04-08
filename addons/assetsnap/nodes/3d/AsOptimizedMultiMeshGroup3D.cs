@@ -28,8 +28,8 @@ namespace AssetSnap.Front.Nodes
 	public partial class AsOptimizedMultiMeshGroup3D : Node3D
 	{
 
-		bool disposed = false;
-		bool Initiated = false;
+		protected bool disposed = false;
+		protected bool Initiated = false;
 		
 		[Export]
 		public int CurrentItemCount { get; set; } = 0;

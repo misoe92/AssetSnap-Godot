@@ -56,7 +56,7 @@ namespace AssetSnap.Trait
 		protected Vector2 CustomMinimumSize = Vector2.Zero;
 		protected Vector2 Size = Vector2.Zero;
 		protected bool _select = true;
-		protected bool disposed = false;
+		public bool disposed = false;
 		protected bool Visible = true;
 		protected Node WorkingNode;
 		protected string TypeString = "";

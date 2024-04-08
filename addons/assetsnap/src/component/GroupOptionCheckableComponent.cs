@@ -21,7 +21,7 @@
 // SOFTWARE.
 
 #if TOOLS
-using AssetSnap.Front.Components;
+using AssetSnap.Front.Components.Groups.Builder;
 using Godot;
 
 namespace AssetSnap.Component
@@ -29,7 +29,7 @@ namespace AssetSnap.Component
 	[Tool]
 	public partial class GroupOptionCheckableComponent : GroupOptionComponent
 	{
-		public GroupBuilderEditorGroupOptions Parent;
+		public EditorGroupOptions Parent;
 		
 		public override void Initialize()
 		{

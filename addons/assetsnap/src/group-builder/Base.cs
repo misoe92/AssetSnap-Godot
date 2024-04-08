@@ -24,7 +24,8 @@ namespace AssetSnap.GroupBuilder
 {
 	using System.Collections.Generic;
 	using AssetSnap.Explorer;
-	using AssetSnap.Front.Components;
+
+	using AssetSnap.Front.Components.Groups.Builder;
 	using AssetSnap.Front.Nodes;
 	using AssetSnap.States;
 	using Godot;
@@ -34,9 +35,9 @@ namespace AssetSnap.GroupBuilder
 	{
 		public PanelContainer Container;
 
-		public GroupContainer _GroupContainer;
-		public GroupBuilderSidebar _Sidebar;
-		public GroupBuilderEditor _Editor;
+		public Front.Components.Groups.Container _GroupContainer;
+		public Sidebar _Sidebar;
+		public Editor _Editor;
 
 		public PanelContainer MenuPanelContainer;
 		public MarginContainer MenuMarginContainer;
@@ -53,13 +54,13 @@ namespace AssetSnap.GroupBuilder
 		
 		private readonly List<string> OuterComponents = new()
 		{
-			"GroupContainer",
+			"Groups.Container",
 		};
 		
 		private readonly List<string> InnerComponents = new()
 		{
-			"GroupBuilderSidebar",
-			"GroupBuilderEditor",
+			"Groups.Builder.Sidebar",
+			"Groups.Builder.Editor",
 		};
 		
 		public void Initialize()
@@ -86,33 +87,45 @@ namespace AssetSnap.GroupBuilder
 			Component.Base Components = ExplorerUtils.Get().Components;
 			if ( Components.HasAll( OuterComponents.ToArray() )) 
 			{
-				_GroupContainer = Components.Single<GroupContainer>();
+				_GroupContainer = Components.Single<AssetSnap.Front.Components.Groups.Container>();
 				
 				if( HasGroupContainer() ) 
 				{
 					_GroupContainer.Container = Container;
 					_GroupContainer.Initialize();
-				}
 			
-				if ( Components.HasAll( InnerComponents.ToArray() )) 
+					if ( Components.HasAll( InnerComponents.ToArray() )) 
+					{
+						_Sidebar = Components.Single<Sidebar>();
+						_Editor = Components.Single<Editor>();
+						
+						if( HasSidebar() ) 
+						{
+							_Sidebar.Container = _GroupContainer.GetLeftInnerContainer();
+							_Sidebar.Initialize();
+						}
+						
+						if( HasListing() ) 
+						{
+							_Editor.Container = _GroupContainer.GetRightInnerContainer();
+							_Editor.Initialize();
+						}
+						
+						StatesUtils.SetLoad("GroupBuilderContainer", true);
+					}
+					else
+					{
+						GD.PushError("Components was not found @ GroupBuilder -> Inner");
+					}
+				}
+				else 
 				{
-					_Sidebar = Components.Single<GroupBuilderSidebar>();
-					_Editor = Components.Single<GroupBuilderEditor>();
-					
-					if( HasSidebar() ) 
-					{
-						_Sidebar.Container = _GroupContainer.GetLeftInnerContainer();
-						_Sidebar.Initialize();
-					}
-					
-					if( HasListing() ) 
-					{
-						_Editor.Container = _GroupContainer.GetRightInnerContainer();
-						_Editor.Initialize();
-					}
+					GD.PushError("Could not spawn group container");
 				}
-			
-				StatesUtils.SetLoad("GroupBuilderContainer", true);
+			}
+			else
+			{
+				GD.PushError("Components was not found @ GroupBuilder -> Outer");
 			}
 		}
 		

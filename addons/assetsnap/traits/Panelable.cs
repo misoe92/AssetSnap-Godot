@@ -294,6 +294,20 @@ namespace AssetSnap.Component
 		}
 		
 		/*
+		** Getter Methods
+		*/
+		
+		public MarginContainer GetContainer()
+		{
+			if( null == _PaddingContainer ) 
+			{
+				return null;
+			}
+			
+			return _PaddingContainer as MarginContainer;
+		}
+		
+		/*
 		** Private
 		*/
 		

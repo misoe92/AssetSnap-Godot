@@ -25,7 +25,8 @@ namespace AssetSnap.ContextMenu
 {
 	using System.Collections.Generic;
 	using AssetSnap.Front.Components;
-	using AssetSnap.Front.Nodes;
+    using AssetSnap.Front.Components.Library;
+    using AssetSnap.Front.Nodes;
 	using Godot;
 	
 	public partial class Base : Node
@@ -363,9 +364,9 @@ namespace AssetSnap.ContextMenu
 		*/
 		public void InitializeComponents()
 		{
-			LibrarySnapRotate _LibrarySnapRotate = GlobalExplorer.GetInstance().Components.Single<LibrarySnapRotate>();
-			LibrarySnapScale _LibrarySnapScale = GlobalExplorer.GetInstance().Components.Single<LibrarySnapScale>();
-			LibrarySnapGrab _LibrarySnapGrab = GlobalExplorer.GetInstance().Components.Single<LibrarySnapGrab>();
+			SnapRotate _LibrarySnapRotate = GlobalExplorer.GetInstance().Components.Single<SnapRotate>();
+			SnapScale _LibrarySnapScale = GlobalExplorer.GetInstance().Components.Single<SnapScale>();
+			SnapGrab _LibrarySnapGrab = GlobalExplorer.GetInstance().Components.Single<SnapGrab>();
 			
 			if( null != _LibrarySnapRotate ) 
 			{

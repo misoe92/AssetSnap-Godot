@@ -178,6 +178,7 @@ namespace AssetSnap.Component
 		public void AddToContainer( Node Container, int? index = null ) 
 		{
 			base._AddToContainer(Container, _MarginContainer, index);
+			Reset();
 		}
 		
 		/*
