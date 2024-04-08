@@ -237,10 +237,10 @@ As of 0.1.1
 - [x] Array modifier, that enables configureable array spawn of an object
 
 As of 0.1.2
-- [x] Upgraded settings UI
+- [ ] Upgraded settings UI
 - [ ] Level of detail Control
 - [ ] Better Decal UI
-- [x] Better folder structure for components
+- [ ] Better folder structure for components
 
 See the [open issues](https://github.com/misoe92/AssetSnap-Godot/issues) for a full list of proposed features (and known issues).
 
