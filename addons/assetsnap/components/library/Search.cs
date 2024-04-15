@@ -25,7 +25,6 @@ namespace AssetSnap.Front.Components.Library
 	using AssetSnap.Component;
 	using AssetSnap.Front.Nodes;
 	using Godot;
-	using Godot.Collections;
 
 	[Tool]
 	public partial class Search : LibraryComponent
@@ -35,8 +34,6 @@ namespace AssetSnap.Front.Components.Library
 		private string LastValue = "";
 		private double ValueIntervalTimer = 0.0;
 		
-		private MarginContainer _MarginContainer;
-		private	HBoxContainer _InnerContainer;
 		private	Label _Label;
 		private	AsSearchInput _SearchInput;
 
