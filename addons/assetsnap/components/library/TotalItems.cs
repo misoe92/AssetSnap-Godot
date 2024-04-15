@@ -48,7 +48,7 @@ namespace AssetSnap.Front.Components.Library
 			
 			//_include = false;
 		}
-		
+
 		/*
 		** Initializes the component
 		**
@@ -58,6 +58,8 @@ namespace AssetSnap.Front.Components.Library
 		{
 			base.Initialize();
 			Initiated = true;
+			Library.ItemCountUpdated += (int count) => { _OnItemCountUpdated(count); }; 
+			ItemCount = Library.ItemCount;
 			
 			Trait<Labelable>()
 				.SetName("LibraryItemsCount")
@@ -72,7 +74,7 @@ namespace AssetSnap.Front.Components.Library
 				.SetAlignment( Godot.HorizontalAlignment.Right )
 				.Instantiate()
 				.Select(0)
-				.AddToContainer(Container);
+				.AddToContainer(this);
 		}
 		
 		public int GetItemCount() 
@@ -85,12 +87,28 @@ namespace AssetSnap.Front.Components.Library
 			ItemCount = count;
 			
 			if( 
-				HasTrait<Labelable>() &&
+				HasTrait<Labelable>(true) &&
 				Trait<Labelable>().Select(0).IsValid()
 			) 
 			{
 				Trait<Labelable>().SetText(Title + ": " + count);
 			}
+			else 
+			{
+				GD.PushError("Total items label not available", HasTrait<Labelable>());
+			}
+		}
+		
+		private void _OnItemCountUpdated(int count )
+		{
+			GD.Print("Count Update found", count);
+			SetItemCount(count);
+		}
+
+		public override void _ExitTree()
+		{
+			Library.ItemCountUpdated -= (int count) => { _OnItemCountUpdated(count); }; 
+			base._ExitTree();
 		}
 	}
 }

@@ -153,12 +153,21 @@ namespace AssetSnap.Component
 		public override Labelable Select(int index, bool debug = false)
 		{
 			base._Select(index);
-			// GD.Print("her", index, TraitName, WorkingNode);
+
+			GD.Print(debug);
+			if( debug ) 
+			{
+				GD.Print("her", index, TraitName);
+			}
 
 			if( false != Dependencies.ContainsKey(TraitName + "_WorkingNode")) 
 			{
 				Godot.Collections.Dictionary<string, Variant> dependencies = Plugin.Singleton.traitGlobal.GetDependencies(index, TypeString, OwnerName);
 				Dependencies = dependencies;
+				if( debug ) 
+				{
+					GD.Print("her2", Dependencies);
+				}
 			}
 			else 
 			{
@@ -397,16 +406,22 @@ namespace AssetSnap.Component
 		**
 		** @return bool
 		*/
-		public override bool IsValid()
+		public override bool IsValid( bool debug = false )
 		{
-			if( base.IsValid() ) 
+			if( base.IsValid( debug ) ) 
 			{
 				if(
-					Nodes.Count > 0 &&
 					false != Dependencies.ContainsKey(TraitName + "_MarginContainer")
 				) 
 				{
 					return true;
+				}
+				else 
+				{
+					if ( debug ) 
+					{
+						GD.PushError("No outer container was found", Dependencies);
+					}
 				}
 			}
 			
