@@ -26,8 +26,8 @@ namespace AssetSnap
 	using System;
 	using AssetSnap.ASNode.Types;
 	using AssetSnap.Core;
-	using AssetSnap.Explorer;
-	using AssetSnap.Front.Nodes;
+    using AssetSnap.Explorer;
+    using AssetSnap.Front.Nodes;
 	using AssetSnap.Trait;
 	using Godot;
 	
@@ -66,7 +66,7 @@ namespace AssetSnap
 			}
 			set 
 			{
-				GD.Print("Cant be set");
+				// GD.Print("Cant be set");
 			}
 		}
 			
@@ -175,6 +175,8 @@ namespace AssetSnap
 				RemoveControlFromBottomPanel(_dock);
 				_dock.Free();
 			}
+
+			ExplorerUtils.Get().Components.Dispose(); 
 		} 
 		 
 		/*

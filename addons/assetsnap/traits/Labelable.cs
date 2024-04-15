@@ -153,12 +153,20 @@ namespace AssetSnap.Component
 		public override Labelable Select(int index, bool debug = false)
 		{
 			base._Select(index);
-			// GD.Print("her", index, TraitName, WorkingNode);
+
+			if( debug ) 
+			{
+				GD.Print("Selected", index, TraitName);
+			}
 
 			if( false != Dependencies.ContainsKey(TraitName + "_WorkingNode")) 
 			{
 				Godot.Collections.Dictionary<string, Variant> dependencies = Plugin.Singleton.traitGlobal.GetDependencies(index, TypeString, OwnerName);
 				Dependencies = dependencies;
+				if( debug ) 
+				{
+					GD.Print("Dependencies", Dependencies);
+				}
 			}
 			else 
 			{

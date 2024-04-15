@@ -91,6 +91,21 @@ namespace AssetSnap.Front.Components.Library
 			{
 				Trait<Labelable>().SetText(Title + ": " + count);
 			}
+			else 
+			{
+				GD.PushError("Total items label not available", HasTrait<Labelable>());
+			}
+		}
+		
+		private void _OnItemCountUpdated(int count )
+		{
+			SetItemCount(count);
+		}
+
+		public override void _ExitTree()
+		{
+			Library.ItemCountUpdated -= (int count) => { _OnItemCountUpdated(count); }; 
+			base._ExitTree();
 		}
 	}
 }

@@ -36,6 +36,19 @@ namespace AssetSnap.Library
 		[Export]
 		public string _FileName;
 		
+		[Export]
+		public int ItemCount 
+		{
+			get => _ItemCount;
+			set 
+			{
+				_ItemCount = value;
+				EmitSignal(SignalName.ItemCountUpdated, value);
+			}
+		}
+		
+		public int _ItemCount = 0;
+		
 		private GlobalExplorer _GlobalExplorer;
 		private Godot.Collections.Array<AsLibraryPanelContainer> Panels = new();
 		private PanelContainer _PanelContainer;
@@ -98,6 +111,7 @@ namespace AssetSnap.Library
 		
 		public Instance()
 		{
+			Name = "LibraryInstance";
 			SizeFlagsVertical = SizeFlags.ExpandFill;
 			SizeFlagsHorizontal = SizeFlags.ExpandFill;
 		}
