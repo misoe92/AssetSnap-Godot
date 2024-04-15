@@ -25,7 +25,6 @@ namespace AssetSnap.Component
 {
 	using System;
 	using System.Linq;
-	using System.Reflection;
 	using Godot;
 
 	[Tool]
@@ -90,10 +89,15 @@ namespace AssetSnap.Component
 			}
 		}
 		
-		public bool HasTrait<T>()
+		public bool HasTrait<T>( bool debug = false)
 		{
 			if( boundTraits.Count == 0 ) 
 			{
+				if (debug)
+				{
+					GD.PushError("No traits found");
+				}
+				
 				return false;
 			}
 
@@ -111,9 +115,37 @@ namespace AssetSnap.Component
 				}
 			);
 			
-			if( null != traitInstance && IsInstanceValid(traitInstance) && traitInstance.IsValid() && traitInstance.Build == false ) 
+			if(
+				null != traitInstance &&
+				IsInstanceValid(traitInstance) &&
+				traitInstance.Select(0).IsValid() &&
+				traitInstance.Build == false
+			) 
 			{
 				return true;
+			}
+			
+			if( debug )
+			{
+				if( null == traitInstance ) 
+				{
+					GD.PushError("No trait instance was set");
+				}
+				
+				if( null != traitInstance && false == IsInstanceValid(traitInstance) ) 
+				{
+					GD.PushError("Trait instance was invalid");
+				}
+				
+				if( null != traitInstance && false == traitInstance.Select(0).IsValid() ) 
+				{
+					GD.PushError("Trait is not valid: ", traitInstance.Select(0).IsValid());
+				}
+				
+				if( null != traitInstance && true == traitInstance.Build ) 
+				{
+					GD.PushError("Trait instance was building");
+				}
 			}
 			
 			return false;

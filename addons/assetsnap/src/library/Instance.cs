@@ -30,9 +30,14 @@ namespace AssetSnap.Library
 	[Tool]
 	public partial class Instance : VBoxContainer
 	{
+		[Signal]
+		public delegate void ItemCountUpdatedEventHandler( int count );
+		
 		public int Index;
+
 		[Export]
 		public string _Folder;
+		
 		[Export]
 		public string _FileName;
 		
@@ -352,16 +357,6 @@ namespace AssetSnap.Library
 					_LibraryListing.Folder = Folder;
 					_LibraryListing.Library = this;
 					_LibraryListing.Initialize();
-					
-					if( null != _LibraryTopbar ) 
-					{
-						// GD.Print("Sets", GetPanels().Count);
-						_LibraryTopbar.ItemCount = GetPanels().Count;
-					}
-					else 
-					{
-						GD.Print("Topbar not found", GetPanels().Count);
-					}
 				}
 			}
 		}

@@ -32,26 +32,6 @@ namespace AssetSnap.Front.Components.Library
 		public ListTitle _LibraryListTitle;
 		public Search _LibrarySearch;
 		public TotalItems _LibraryItems;
-
-		public int ItemCount 
-		{
-			get => _ItemCount;
-			set 
-			{
-				_ItemCount = value;
-				 
-				if(
-					null != _LibraryItems &&
-					ItemCount != _LibraryItems.GetItemCount() &&
-					null != _LibraryItems && IsInstanceValid(_LibraryItems)
-				)
-				{
-					_LibraryItems.SetItemCount( ItemCount );
-				}
-			}
-		}
-
-		private int _ItemCount = 0;
 		
 		/*
 		** Constructor
@@ -133,7 +113,6 @@ namespace AssetSnap.Front.Components.Library
 				if( _LibraryItems != null ) 
 				{
 					_LibraryItems.Container = ContainerThree;
-					_LibraryItems.SetItemCount( ItemCount );
 					_LibraryItems.Library = Library;
 					_LibraryItems.Initialize();
 				}

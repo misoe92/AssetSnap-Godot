@@ -55,7 +55,7 @@ namespace AssetSnap
 
 		/** Internal data **/
 		private bool disposed = false;
-		private readonly string _Version = "0.1.1";
+		private readonly string _Version = "0.1.2";
 		private readonly string _Name = "Plugin";
 		
 		/* Bottom Dock */

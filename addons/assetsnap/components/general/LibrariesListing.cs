@@ -316,7 +316,6 @@ namespace AssetSnap.Front.Components
 				
 			if( null != Trait<Listable>().Select(0).GetNode() ) 
 			{
-				GD.Print("Runs");
 				Trait<Listable>().Iteration = 0;
 				Trait<Listable>().Clear(0);
 			}

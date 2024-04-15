@@ -152,7 +152,12 @@ namespace AssetSnap.Trait
 			}
 		}
 		
-			
+		public virtual Trait.Base Select( int index, bool debug = false ) 
+		{
+			_Select(index, debug);
+			return this;
+		}
+
 		/*
 		** Selects an existing instance of
 		** the trait
@@ -449,11 +454,24 @@ namespace AssetSnap.Trait
 		**
 		** return Node
 		*/
-		public virtual Node GetNode()
+		public virtual Node GetNode( bool debug = false )
 		{
-			if( Dependencies.ContainsKey(TraitName + "_WorkingNode") ) 
+			if( null != Dependencies && Dependencies.ContainsKey(TraitName + "_WorkingNode") ) 
 			{
 				return Dependencies[TraitName + "_WorkingNode"].As<GodotObject>() as Node;
+			}
+			
+			if( debug ) 
+			{
+				if( null == Dependencies ) 
+				{
+					GD.PushError("Dependencies not set");
+				}
+				
+				if( null != Dependencies && false == Dependencies.ContainsKey(TraitName + "_WorkingNode") ) 
+				{
+					GD.PushError("No active set of dependencies was found");
+				}
 			}
 
 			return null;
@@ -468,17 +486,109 @@ namespace AssetSnap.Trait
 		**
 		** @return bool
 		*/
-		public virtual bool IsValid()
+		public virtual bool IsValid( bool debug = false )
 		{
-			return 
-				TotalCount != 0 && 
-				_select != false &&
-				IsDisposed() != true &&
-				Build == false &&
-				null != Plugin.Singleton &&
-				null != Plugin.Singleton.traitGlobal &&
-				null != OwnerName &&
-				null != TypeString;
+			if( debug ) 
+			{
+				GD.PushError("DEBUG DATA FOR TRAIT");
+			}
+			
+			if( TotalCount == 0 ) 
+			{
+				if( debug ) 
+				{
+					GD.PushError("No items found");
+				}
+				
+				return false;
+			}
+			
+			if( _select == false ) 
+			{
+				if( debug ) 
+				{
+					GD.PushError("Failed to select item");
+				}
+
+				return false;
+			}
+				
+			if( IsDisposed() ) 
+			{
+				if( debug ) 
+				{
+					GD.PushError("The object has been disposed");
+				}
+				
+				return false;
+			}
+			
+			if( Build ) 
+			{
+				if( debug ) 
+				{
+					GD.PushError("Object is currently building");
+				}
+				
+				return false;
+			}
+				
+			if( null == Plugin.Singleton ) 
+			{
+				if( debug ) 
+				{
+					GD.PushError("Plugin is not available");
+				}
+
+				return false;
+			}
+
+			if( null == Plugin.Singleton || null == Plugin.Singleton.traitGlobal ) 
+			{
+				if( debug ) 
+				{
+					GD.PushError("Trait Global is not available");
+				}
+				
+				return false;
+			}
+				
+			if( null == OwnerName ) 
+			{
+				if( debug ) 
+				{
+					GD.PushError("Owner name was not found");
+				}
+				
+				return false;
+			}
+
+			if( null == TypeString ) 
+			{
+				if( debug ) 
+				{
+					GD.PushError("TypeString was not found");
+				}
+				
+				return false;
+			}
+			
+			if( 0 == Dependencies.Count ) 
+			{
+				if( debug ) 
+				{
+					GD.PushError("Dependencies was not set");
+				}
+				
+				return false;
+			}
+
+			if( debug ) 
+			{
+				GD.PushError("Seems to return valid");
+			}
+			
+			return true;
 		}
 		
 		/*

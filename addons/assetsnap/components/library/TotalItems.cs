@@ -48,7 +48,7 @@ namespace AssetSnap.Front.Components.Library
 			
 			//_include = false;
 		}
-		
+
 		/*
 		** Initializes the component
 		**
@@ -58,6 +58,8 @@ namespace AssetSnap.Front.Components.Library
 		{
 			base.Initialize();
 			Initiated = true;
+			Library.ItemCountUpdated += (int count) => { _OnItemCountUpdated(count); }; 
+			ItemCount = Library.ItemCount;
 			
 			Trait<Labelable>()
 				.SetName("LibraryItemsCount")
@@ -72,7 +74,7 @@ namespace AssetSnap.Front.Components.Library
 				.SetAlignment( Godot.HorizontalAlignment.Right )
 				.Instantiate()
 				.Select(0)
-				.AddToContainer(Container);
+				.AddToContainer(this);
 		}
 		
 		public int GetItemCount() 
@@ -85,7 +87,7 @@ namespace AssetSnap.Front.Components.Library
 			ItemCount = count;
 			
 			if( 
-				HasTrait<Labelable>() &&
+				HasTrait<Labelable>(true) &&
 				Trait<Labelable>().Select(0).IsValid()
 			) 
 			{

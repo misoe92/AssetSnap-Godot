@@ -405,16 +405,22 @@ namespace AssetSnap.Component
 		**
 		** @return bool
 		*/
-		public override bool IsValid()
+		public override bool IsValid( bool debug = false )
 		{
-			if( base.IsValid() ) 
+			if( base.IsValid( debug ) ) 
 			{
 				if(
-					Nodes.Count > 0 &&
 					false != Dependencies.ContainsKey(TraitName + "_MarginContainer")
 				) 
 				{
 					return true;
+				}
+				else 
+				{
+					if ( debug ) 
+					{
+						GD.PushError("No outer container was found", Dependencies);
+					}
 				}
 			}
 			
