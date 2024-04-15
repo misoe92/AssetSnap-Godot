@@ -199,8 +199,7 @@ namespace AssetSnap.Component
 				null != _GlobalExplorer.States &&
 				false != Initiated &&
 				null != Trait<Checkable>() &&
-				false != HasTrait<Checkable>() &&
-				IsInstanceValid( Trait<Checkable>() );
+				false != HasTrait<Checkable>();
 		}
 		
 		/*

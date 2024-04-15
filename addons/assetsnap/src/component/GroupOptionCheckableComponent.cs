@@ -33,13 +33,12 @@ namespace AssetSnap.Component
 		
 		public override void Initialize()
 		{
-			AddTrait(typeof(Checkable));
+			base.Initialize();
+			
 			Initiated = true;
 			
 			_InitializeFields();
 			_FinalizeFields();
-			
-			base.Initialize();
 		}
 		
 		public void Show()
@@ -96,7 +95,7 @@ namespace AssetSnap.Component
 			Trait<Checkable>()
 				.Select(0)
 				.AddToContainer(
-					Container
+					this
 				);
 		}
 	}

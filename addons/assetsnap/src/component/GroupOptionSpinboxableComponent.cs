@@ -33,13 +33,12 @@ namespace AssetSnap.Component
 		
 		public override void Initialize()
 		{
-			AddTrait(typeof(Spinboxable));
+			base.Initialize();
+		
 			Initiated = true;
 			
 			_InitializeFields();
 			_FinalizeFields();
-			
-			base.Initialize();
 		}
 		
 		public void Show()

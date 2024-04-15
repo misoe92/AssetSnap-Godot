@@ -27,12 +27,13 @@ namespace AssetSnap.Component
 	public partial class LSCollisionComponent : LibraryComponent
 	{
 		protected string Type = "";
-		public bool state 
+		private bool _state = false;
+		protected bool state 
 		{
-			get => GetState();
+			get => _state;
 			set 
 			{
-				SetState(value);
+				_state = value;
 			}
 		}
 		
@@ -44,8 +45,6 @@ namespace AssetSnap.Component
 
 		public override void Initialize()
 		{
-			AddTrait(typeof(Checkable));
-			
 			base.Initialize();
 		}
 
@@ -135,8 +134,7 @@ namespace AssetSnap.Component
 				null != _GlobalExplorer.States &&
 				false != Initiated &&
 				null != Trait<Checkable>() &&
-				false != HasTrait<Checkable>() &&
-				IsInstanceValid( Trait<Checkable>() );
+				false != HasTrait<Checkable>();
 		}		
 
 		public override void _ExitTree()
