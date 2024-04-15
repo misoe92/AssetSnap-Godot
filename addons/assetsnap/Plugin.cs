@@ -26,11 +26,24 @@ namespace AssetSnap
 	using System;
 	using AssetSnap.ASNode.Types;
 	using AssetSnap.Core;
+	using AssetSnap.Explorer;
+	using AssetSnap.Front.Nodes;
+	using AssetSnap.Trait;
 	using Godot;
-
+	
 	[Tool]
 	public partial class Plugin : EditorPlugin
 	{
+		// ~Plugin()
+		// {
+		// 	// Code to run when object is being finalized (disposed)
+		// 	// This will run automatically when the object is garbage collected
+		// 	Dispose(true);
+		// }
+		
+		[Signal]
+		public delegate void FoldersLoadedEventHandler();
+		
 		[Signal]
 		public delegate void SettingKeyChangedEventHandler();
 		
@@ -41,8 +54,28 @@ namespace AssetSnap
 		public delegate void StatesChangedEventHandler();
 
 		/** Internal data **/
+		private bool disposed = false;
 		private readonly string _Version = "0.1.1";
 		private readonly string _Name = "Plugin";
+		
+		/* Bottom Dock */
+		public TraitGlobal traitGlobal {
+			get
+			{
+				return TraitGlobal.Singleton;
+			}
+			set 
+			{
+				GD.Print("Cant be set");
+			}
+		}
+			
+		[Export]
+		public Node internalNode;
+		
+		[Export] 
+		public AsBottomDock _dock;
+	
 		protected Callable? UpdateHandleCallable;
 		private bool _initialized = false;
 		
@@ -51,17 +84,27 @@ namespace AssetSnap
 		private CoreInput _CoreInput = new();
 		private CoreProcess _CoreProcess = new();
 		private CoreHandles _CoreHandles = new();
- 
+
 		/** Editor Node Types **/ 
 		public NodeType[] NodeTypes = Array.Empty<NodeType>();
-
-		public Node internalNode;
-
 		private static Plugin _Instance;
+		
+		public static Plugin Singleton 
+		{
+			get
+			{
+				return _Instance;
+			}
+		}
 		
 		public static Plugin GetInstance()
 		{
-			return _Instance;
+			return Singleton;
+		}
+		
+		public Plugin()
+		{	
+			_Instance = this;
 		}
 		
 		/*
@@ -72,38 +115,46 @@ namespace AssetSnap
 		public override void _EnterTree() 
 		{
 			Name = "AssetSnapPlugin";
-			Plugin._Instance = this;
-
-			internalNode = new();
-			AddChild(internalNode);
-
+			AddChild(traitGlobal);
+			
+			if( null == internalNode ) 
+			{
+				internalNode = new()
+				{
+					Name = "InternalNode"
+				};
+				
+				AddChild(internalNode);
+			}
+			_dock = GD.Load<PackedScene>("res://addons/assetsnap/scenes/dock.tscn").Instantiate<AsBottomDock>();
+			AddControlToBottomPanel(_dock, "Assets");
+			
+			
 			if( null == GlobalExplorer.InitializeExplorer() ) 
 			{
 				GD.PushError("No explorer is available");
 				return;
 			}
 
-
 			Connect(SignalName.SceneChanged, Callable.From( (Node scene) => { _OnSceneChanged(scene); } ) );
-			
 			// UpdateHandleCallable = new(this, "UpdateHandle");
 			
 			// if(false == IsUpdateHandleConnected()) 
 			// {
 			// 	EditorInterface.Singleton.GetInspector().Connect(EditorInspector.SignalName.EditedObjectChanged, UpdateCallable());
-			// } 
+			// }
 		}
 		
-		public override void _Ready() 
+		public override void _Ready()
 		{
 			// Finalize Initialize of plugin 
 			_CoreEnter.InitializeCore();
 		}
-		
-		public Node GetInternalContainer()
+	
+		public Node GetInternalContainer() 
 		{
 			return internalNode;
-		}
+		} 
 		
 		private void _OnSceneChanged(Node Scene)
 		{
@@ -114,21 +165,18 @@ namespace AssetSnap
 		** Destruction of our plugin
 		**
 		** @return void 
-		*/ 
+		*/
 		public override void _ExitTree()
 		{
-			// SceneChanged -= (scene) => { _OnSceneChanged(scene); };
-			// RemoveAutoloadSingleton("GlobalExplorer");
-
-			_CoreEnter = null;
-			_CoreInput = null;
-			_CoreProcess = null;
-			_CoreHandles = null;
-
-			_Instance = null;
-			UpdateHandleCallable = null; 
+			disposed = true;
+			
+			if( null != _dock ) 
+			{
+				RemoveControlFromBottomPanel(_dock);
+				_dock.Free();
+			}
 		} 
-		
+		 
 		/*
 		** Handling of communication with editor handles
 		** 
@@ -136,13 +184,13 @@ namespace AssetSnap
 		*/
 		public override bool _Handles( GodotObject _object ) 
 		{
-			if (_CoreHandles == null)
+			if (_CoreHandles == null || disposed )
 			{
 				return true;
 			}
 			
 			return _CoreHandles.Handle(_object);
-		}
+		} 
 		
 		/*
 		** Handling of GUI Input in the editor.
@@ -152,7 +200,7 @@ namespace AssetSnap
 		public override int _Forward3DGuiInput( Camera3D camera, InputEvent @event ) 
 		{
 			// If internal component is not set
-			if( _CoreInput == null ) 
+			if( _CoreInput == null || disposed ) 
 			{
 				return (int)EditorPlugin.AfterGuiInput.Pass;
 			}
@@ -167,7 +215,7 @@ namespace AssetSnap
 		*/
 		public override void _Process( double delta ) 
 		{
-			if( _CoreProcess == null ) 
+			if( _CoreProcess == null || disposed ) 
 			{
 				return;
 			}
@@ -237,6 +285,12 @@ namespace AssetSnap
 			
 			return false;
 		}
+		 
+		public TabContainer GetTabContainer()
+		{
+			return _dock._TabContainer; 
+			// AsBottomDock; 
+		}
 		
 		/*
 		** Fetches the current plugin version
@@ -258,6 +312,15 @@ namespace AssetSnap
 			return _Version;
 		}
 		
+		// public void OnBeforeSerialize()
+		// {
+
+		// }
+
+		// public void OnAfterDeserialize()
+		// {
+		// 	GD.Print("We're ready now. Target sprite" + (_dock == null ? " is" : " is not") + " null");
+		// }
 	}
 }
-#endif
+#endif 
