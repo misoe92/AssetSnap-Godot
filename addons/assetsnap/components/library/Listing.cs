@@ -23,9 +23,9 @@
 namespace AssetSnap.Front.Components.Library
 {
 	using System.Collections.Generic;
-	using AssetSnap.Component;
+    using System.Linq;
+    using AssetSnap.Component;
 	using Godot;
-	using Godot.Collections;
 
 	[Tool]
 	public partial class Listing : LibraryComponent
@@ -178,6 +178,8 @@ namespace AssetSnap.Front.Components.Library
 
 				HBoxContainer CurrentBoxContainer = _SetupListContainer(BoxContainer);
 				string[] fileNames = System.IO.Directory.GetFiles(folderPath.Split("res://").Join(""));
+
+				Library.ItemCount = fileNames.Length;
 				foreach (string fileName in fileNames)
 				{
 					if(fileName.Contains(".import")) 

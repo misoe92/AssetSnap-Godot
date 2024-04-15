@@ -86,7 +86,7 @@ namespace AssetSnap.Trait
 		** @param int index
 		** @return Containerable
 		*/
-		public virtual ContainerTrait Select(int index, bool debug = false)
+		public override ContainerTrait Select(int index, bool debug = false)
 		{
 			base._Select(index, debug);
 			
