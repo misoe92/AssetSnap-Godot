@@ -24,6 +24,8 @@ namespace AssetSnap.Front.Components
 {
 	using Godot;
 	using AssetSnap.Component;
+	using AssetSnap.Explorer;
+	using Godot.Collections;
 
 	[Tool]
 	public partial class AddFolderToLibrary : TraitableComponent
@@ -39,6 +41,13 @@ namespace AssetSnap.Front.Components
 		public AddFolderToLibrary()
 		{ 
 			Name = "AddFolderToLibrary";
+			
+			UsingTraits = new()
+			{
+				{ typeof(Containerable).ToString() },
+				{ typeof(Labelable).ToString() },
+				{ typeof(Buttonable).ToString() },
+			};
 			
 			/* Debugging Purpose */ 
 			// _include = false;  
@@ -59,13 +68,10 @@ namespace AssetSnap.Front.Components
 
 			base.Initialize();
 			
-			AddTrait(typeof(Containerable));
-			AddTrait(typeof(Labelable));
-			AddTrait(typeof(Buttonable));
-			
 			Initiated = true;
 			
 			Trait<Containerable>()
+				.SetName("AddFolderContainer")
 				.SetInnerOrientation(Containerable.ContainerOrientation.Horizontal)
 				.SetOrientation(Containerable.ContainerOrientation.Vertical)
 				.SetMargin(20, "left")
@@ -80,7 +86,7 @@ namespace AssetSnap.Front.Components
 				.Instantiate() 
 				.Select(0)
 				.AddToContainer( 
-					Container
+					this
 				); 
 				
 			Trait<Buttonable>()
@@ -99,7 +105,7 @@ namespace AssetSnap.Front.Components
 			Trait<Containerable>()
 				.Select(0)
 				.AddToContainer(
-					Container
+					this
 				);
 		}
 		
@@ -116,7 +122,7 @@ namespace AssetSnap.Front.Components
 			
 			if( null != _GlobalExplorer.Library ) 
 			{
-				_GlobalExplorer.Library.Refresh(_GlobalExplorer.BottomDock);
+				_GlobalExplorer.Library.Refresh( ExplorerUtils.Get()._Plugin.GetTabContainer() );
 			}
 
 			// fileDialog.DirSelected -= _OnFolderSelected;
