@@ -76,7 +76,7 @@ namespace AssetSnap.Component
 			{
 				return;
 			}
-			
+
 			Container.AddChild(this);
 		}
 		
