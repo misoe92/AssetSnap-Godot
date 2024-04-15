@@ -30,13 +30,24 @@ namespace AssetSnap.Front.Configs
 
 	public partial class SettingsConfig : Config.BaseConfig
 	{
-		[Signal]
-		public delegate void FoldersLoadedEventHandler();
-		
 		private string _ConfigPath;
 		private string[] _Folders;
 		private Godot.Collections.Dictionary<string,Variant> _Settings;
 		private BaseContainer _Container;
+
+		private static SettingsConfig _Instance = null;
+		public static SettingsConfig Singleton { 
+			get
+			{
+				if( _Instance == null ) 
+				{
+					_Instance = new SettingsConfig();
+					_Instance.Initialize();
+				}
+
+				return _Instance;
+			}
+		}
 		
 		public string _Name 
 		{
@@ -80,6 +91,11 @@ namespace AssetSnap.Front.Configs
 		*/
 		public void Initialize() 
 		{
+			if( null == _Instance ) 
+			{
+				_Instance = this;
+			}
+
 			_ConfigPath = "config.cfg";
 			LoadConfig( _ConfigPath );
 			
@@ -115,6 +131,8 @@ namespace AssetSnap.Front.Configs
 				
 				_Folders = _FolderList.ToArray();
 				_FolderList.Clear();
+
+				// GD.Print(FolderCount);
 			}
 			else 
 			{
@@ -125,9 +143,9 @@ namespace AssetSnap.Front.Configs
 		
 		public void MaybeEmitFoldersLoaded()
 		{
-			if( 0 != FolderCount ) 
+			if( null != Plugin.GetInstance() ) 
 			{
-				EmitSignal(SignalName.FoldersLoaded);
+				Plugin.GetInstance().EmitSignal(Plugin.SignalName.FoldersLoaded);
 			}
 		}
 		
@@ -143,7 +161,7 @@ namespace AssetSnap.Front.Configs
 			_Settings = new();
 			if( null != _Container && WithContainer )  
 			{
-				if( null != _Container.GetParent() && IsInstanceValid(_Container) ) 
+				if( null != _Container.GetParent() && EditorPlugin.IsInstanceValid(_Container) ) 
 				{
 					_Container.GetParent().RemoveChild(_Container);
 				}
@@ -162,9 +180,9 @@ namespace AssetSnap.Front.Configs
 		*/
 		public void InitializeContainer()
 		{
-			if( IsInstanceValid( _Container ) ) 
+			if( EditorPlugin.IsInstanceValid( _Container ) ) 
 			{
-				if( null != _Container.GetParent() && IsInstanceValid(_Container) ) 
+				if( null != _Container.GetParent() && EditorPlugin.IsInstanceValid(_Container) ) 
 				{
 					_Container.GetParent().RemoveChild(_Container);
 				}
@@ -253,6 +271,10 @@ namespace AssetSnap.Front.Configs
 			{
 				GD.PushError(result);
 			}
+
+			LoadOk = false;
+			Initialize();
+			MaybeEmitFoldersLoaded();
 		}
 
 		/*
@@ -289,25 +311,6 @@ namespace AssetSnap.Front.Configs
 		public Godot.Collections.Dictionary<string,Variant> GetSettings()
 		{
 			return _Settings;
-		}
-		
-		/*
-		** Cleans up references, parameters and fields
-		** 
-		** @return void 
-		*/	
-		public override void _ExitTree()
-		{
-			_ConfigPath = null;
-			_Folders = null;
-			_Settings = null; 
-
-			if( IsInstanceValid(_Container)) 
-			{
-				_Container.QueueFree();
-			}
-
-			base._ExitTree();
 		}
 	}
 }
