@@ -20,8 +20,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using AssetSnap.Config;
-using AssetSnap.Front.Nodes;
 using Godot;
 
 namespace AssetSnap.Core 
@@ -47,47 +45,34 @@ namespace AssetSnap.Core
 			new ASNode.Types.AsOptimizedMultiMeshGroupType().Initialize();
 			new ASNode.Types.AsMultiMeshType().Initialize();
 			
-			// Adding base components to the tree
-			_GlobalExplorer._Plugin.AddChild(_GlobalExplorer.Settings);
-			_GlobalExplorer._Plugin.AddChild(_GlobalExplorer.Waypoints);
-			_GlobalExplorer._Plugin.AddChild(_GlobalExplorer.ContextMenu);
-			_GlobalExplorer._Plugin.AddChild(_GlobalExplorer.BottomDock);
-			_GlobalExplorer._Plugin.AddChild(_GlobalExplorer.Inspector);
- 
-			_GlobalExplorer._Plugin.AddChild(_GlobalExplorer.Decal);
-			_GlobalExplorer._Plugin.AddChild(_GlobalExplorer.Raycast);
+			_GlobalExplorer._Plugin.FoldersLoaded += () => { _OnLoadContainers(); };
 
-			_GlobalExplorer._Plugin.AddChild(_GlobalExplorer.Library); 
-			_GlobalExplorer._Plugin.AddChild(_GlobalExplorer.Modifiers);
- 
-			_GlobalExplorer._Plugin.AddChild(_GlobalExplorer.GroupBuilder);
-
-			_GlobalExplorer.Settings.FoldersLoaded += () => { _OnLoadContainers(); };
+			_GlobalExplorer._Plugin.GetInternalContainer().AddChild(_GlobalExplorer.GroupBuilder);
  
 			/** Initialize **/  
-			_GlobalExplorer.Settings.Initialize();
-			_GlobalExplorer.Components.Initialize();
 			_GlobalExplorer.Waypoints.Initialize();
-			_GlobalExplorer.BottomDock.Initialize();  
-			_GlobalExplorer.ContextMenu.Initialize(); 
+			_GlobalExplorer.ContextMenu.Initialize();
 			_GlobalExplorer.Snap.Initialize();
-			 
+			
 			_GlobalExplorer.Decal.Initialize();  
-			_GlobalExplorer.Raycast.Initialize();  
+			_GlobalExplorer.Raycast.Initialize();
 			
-			// Finalize Group builder container  
-			_GlobalExplorer.GroupBuilder.Initialize();
-			
+			// Finalize Group builder container 
+			_GlobalExplorer.GroupBuilder.Initialize(); 
+			 
 			_GlobalExplorer.Inspector.Initialize();
 			_GlobalExplorer.Inspector.AddToDock();
 			
-			_GlobalExplorer.BottomDock.AddToBottomPanel();
-
 			_GlobalExplorer.Settings.MaybeEmitFoldersLoaded();
-		}
+		} 
 		
-		private void _OnLoadContainers()
+		private void _OnLoadContainers() 
 		{
+			if( _GlobalExplorer.GroupBuilder.Initialized ) 
+			{
+				_GlobalExplorer.GroupBuilder.ClearContainer();
+			}
+			
 			_GlobalExplorer.GroupBuilder.InitializeContainer();
 			if(
 				null == _GlobalExplorer.GroupBuilder.Container ||
@@ -98,9 +83,7 @@ namespace AssetSnap.Core
 			}
 			
 			_GlobalExplorer.BottomDock.Add(_GlobalExplorer.GroupBuilder.Container); 
-		
 			_GlobalExplorer.Library.Initialize();
-		
 			_GlobalExplorer.Settings.InitializeContainer();
 			if(
 				null == _GlobalExplorer.Settings.Container ||
@@ -111,6 +94,11 @@ namespace AssetSnap.Core
 			}
 			
 			_GlobalExplorer.BottomDock.Add(_GlobalExplorer.Settings.Container);
+		}
+		
+		public void dispose()
+		{
+			_GlobalExplorer._Plugin.FoldersLoaded -= () => { _OnLoadContainers(); };
 		}
 	}
 }

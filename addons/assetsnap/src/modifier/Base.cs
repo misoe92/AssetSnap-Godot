@@ -26,27 +26,30 @@ namespace AssetSnap.Modifier
 	using Godot;
 	using AssetSnap.Front.Modifiers;
 	
-	public partial class Base : Node
+	public partial class Base
 	{
+		private string Name = "";
 		/** Modifiers **/
 		public AsArrayModifier ArrayModifier = new();
 		public AsScatterModifier ScatterModifier = new();
 		
 		private static Base _Instance;
-		
-		public static Base GetInstance()
+	
+		public static Base Singleton 
 		{
-			if( null == _Instance ) 
+			get
 			{
-				_Instance = new()
+				if( null == _Instance ) 
 				{
-					Name = "AssetSnapModifier",
-				};
+					_Instance = new()
+					{
+						Name = "AssetSnapModifier",
+					};
+				}
+				
+				return _Instance;
 			}
-
-			return _Instance;
 		}
-		
 		public void _Exit()
 		{
 			ArrayModifier = null;

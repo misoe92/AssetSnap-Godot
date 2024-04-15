@@ -25,10 +25,19 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 	using AssetSnap.Component;
 	using AssetSnap.Instance.Input;
 	using Godot;
+	using Godot.Collections;
 
 	[Tool]
 	public partial class DragOffset : GroupOptionSpinboxableComponent
 	{
+		public DragOffset()
+		{
+			UsingTraits = new()
+			{
+				{ typeof(Spinboxable).ToString() },
+			};
+		}
+		
 		protected override void _InitializeFields()
 		{
 			Trait<Spinboxable>()

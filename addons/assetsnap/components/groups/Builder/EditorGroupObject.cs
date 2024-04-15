@@ -24,19 +24,14 @@ namespace AssetSnap.Front.Components.Groups.Builder
 {
 	using System.Collections.Generic;
 	using AssetSnap.Component;
-    using AssetSnap.Front.Components.Groups.Builder.GroupObject;
-    using AssetSnap.Helpers;
+	using AssetSnap.Front.Components.Groups.Builder.GroupObject;
+	using AssetSnap.Helpers;
 	using Godot;
+	using Godot.Collections;
 
 	[Tool]
 	public partial class EditorGroupObject : LibraryComponent
 	{
-		public EditorGroupObject()
-		{
-			Name = "GroupBuilderEditorGroupObject";
-			//_include = false;
-		}
-		
 		public int Index = 0;
 		public string Path = "";
 
@@ -56,16 +51,28 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		public Origin _GroupBuilderEditorGroupObjectOrigin;
 		public Scale _GroupBuilderEditorGroupObjectScale;
 		public Rotation _GroupBuilderEditorGroupObjectRotation;
+
+		public EditorGroupObject()
+		{
+			Name = "GroupBuilderEditorGroupObject";
+			
+			UsingTraits = new()
+			{
+				{ typeof(Containerable).ToString() },
+				{ typeof(Panelable).ToString() },
+				{ typeof(Labelable).ToString() },
+				{ typeof(Spinboxable).ToString() },
+				{ typeof(Buttonable).ToString() },
+				{ typeof(Thumbnaileable).ToString() },
+			};
+			
+			//_include = false;
+		}
 		
 		public override void Initialize()
 		{
-			AddTrait(typeof(Containerable));
-			AddTrait(typeof(Panelable));
-			AddTrait(typeof(Labelable));
-			AddTrait(typeof(Spinboxable));
-			AddTrait(typeof(Buttonable));
-			AddTrait(typeof(Thumbnaileable));
-			
+			base.Initialize();
+		
 			Initiated = true;
 			
 			_InitializeFields();
@@ -258,7 +265,7 @@ namespace AssetSnap.Front.Components.Groups.Builder
 				.SetName("IndexLabel")
 				.SetMargin(20, "left")
 				.SetMargin(20, "right")
-				.SetMargin(40, "top")
+				.SetMargin(20, "top")
 				.SetMargin(10, "bottom")
 				.SetText(Index.ToString())
 				.SetHorizontalSizeFlags(Control.SizeFlags.ShrinkBegin)
@@ -287,7 +294,7 @@ namespace AssetSnap.Front.Components.Groups.Builder
 				
 			Trait<Panelable>()
 				.Select(0)
-				.AddToContainer(Container);
+				.AddToContainer(this);
 		}
 	}
 }

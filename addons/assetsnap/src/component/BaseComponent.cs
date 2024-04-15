@@ -27,6 +27,8 @@ namespace AssetSnap.Component
 	using System.Reflection;
 	using AssetSnap.Abstracts;
 	using Godot;
+	using Godot.Collections;
+
 	[Tool]
 	public partial class BaseComponent : AbstractComponentBase
 	{
@@ -35,8 +37,11 @@ namespace AssetSnap.Component
 		protected bool Disposed = false;
 		/* -- */
 		
+		public Array<string> UsingTraits = new(){};
+		
 		protected Node _Container;
  
+		[Export]
 		public Node Container 
 		{ 
 			get => _Container;
@@ -44,13 +49,6 @@ namespace AssetSnap.Component
 			{
 				_Container = value;
 			}
-		}
-
-		public override void _EnterTree()
-		{
-			_GlobalExplorer = GlobalExplorer.GetInstance();
-		 
-			base._EnterTree();
 		}
 
 		/*
@@ -74,7 +72,12 @@ namespace AssetSnap.Component
 		*/
 		public virtual void Initialize()
 		{
-			//
+			if( GetParent() == Container ) 
+			{
+				return;
+			}
+			
+			Container.AddChild(this);
 		}
 		
 		public virtual Variant GetValueFor( string key )
@@ -192,21 +195,25 @@ namespace AssetSnap.Component
 			return null;
 		}
 		
-		/*
-		** Cleaning of various fields when the component
-		** is leaving the tree
-		**
-		** @return void
-		*/
-		public override void _ExitTree()
+		// /*
+		// ** Cleaning of various fields when the component
+		// ** is leaving the tree
+		// **
+		// ** @return void
+		// */
+		// public override void _ExitTree()
+		// {
+		// 	// if( IsInstanceValid(_Container) ) 
+		// 	// {
+		// 	// 	_Container.QueueFree();
+		// 	// }
+		// 	_Container = null;
+		// 	// Disposed = true; 
+		// }
+		
+		public virtual void Clear()
 		{
-			// if( IsInstanceValid(_Container) ) 
-			// {
-			// 	_Container.QueueFree();
-			// }
-			_Container = null;
-			_GlobalExplorer = null;
-			// Disposed = true; 
+			
 		}
 	}
 }

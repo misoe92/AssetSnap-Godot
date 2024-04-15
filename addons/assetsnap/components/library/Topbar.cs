@@ -25,6 +25,7 @@ namespace AssetSnap.Front.Components.Library
 	using System.Collections.Generic;
 	using AssetSnap.Component;
 	using Godot;
+	using Godot.Collections;
 
 	[Tool]
 	public partial class Topbar : LibraryComponent
@@ -61,6 +62,14 @@ namespace AssetSnap.Front.Components.Library
 		public Topbar()
 		{
 			Name = "LibraryTopbar";
+			SizeFlagsHorizontal = SizeFlags.ExpandFill;
+			SizeFlagsVertical = SizeFlags.ShrinkBegin;
+			
+			UsingTraits = new()
+			{
+				{ typeof(Containerable).ToString() },
+			};
+			
 			//_include = false; 
 		}
 		
@@ -72,7 +81,6 @@ namespace AssetSnap.Front.Components.Library
 		public override void Initialize()
 		{
 			base.Initialize();
-			AddTrait(typeof(Containerable));
 			Initiated = true;
 			
 			// Container 3 way
@@ -134,7 +142,7 @@ namespace AssetSnap.Front.Components.Library
 
 			Trait<Containerable>()
 				.Select(0)
-				.AddToContainer(Container);	
+				.AddToContainer(this);	
 		}
 	
 		public Container GetContainer()

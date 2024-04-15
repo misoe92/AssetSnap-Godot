@@ -44,6 +44,10 @@ namespace AssetSnap.Component
 		/*
 		** Public methods
 		*/
+		public Spinboxable()
+		{
+			TypeString = GetType().ToString();
+		}
 		
 		/*
 		** Instantiate an instance of the trait
@@ -52,12 +56,12 @@ namespace AssetSnap.Component
 		*/
 		public override Spinboxable Instantiate()
 		{
-			base._Instantiate( GetType().ToString() );
+			base._Instantiate();
 			base.Instantiate();
 			
 			SpinBox WorkingInput = new()
 			{
-				Name = Name,
+				Name = TraitName,
 				Prefix = _Prefix,
 				Step = _Step,
 				TooltipText = TooltipText,
@@ -95,12 +99,18 @@ namespace AssetSnap.Component
 				WorkingInput.Connect(SpinBox.SignalName.ValueChanged, _callable);
 			}
 
-			Nodes.Add(WorkingInput);
+			Dependencies[TraitName + "_WorkingNode"] = WorkingInput;
+			
+			Plugin.Singleton.traitGlobal.AddInstance(Iteration, WorkingInput, OwnerName, TypeString, Dependencies);
+			Plugin.Singleton.traitGlobal.AddName(Iteration, TraitName, OwnerName, TypeString);
+			
 			_Actions.Add(_Action);
 
 			GetInnerContainer(0).AddChild(WorkingInput);
 
 			Reset();
+			Iteration += 1;
+			Dependencies = new();
 			
 			return this;
 		}
@@ -112,18 +122,16 @@ namespace AssetSnap.Component
 		** @param int index
 		** @return Spinboxable
 		*/
-		public override Spinboxable Select(int index)
+		public override Spinboxable Select(int index, bool debug = false)
 		{
-			base._Select(index);
+			base._Select(index, debug);
 			
-			if( IsInstanceValid(WorkingNode) && WorkingNode is SpinBox InputNode )
+			if( false != Dependencies.ContainsKey(TraitName + "_WorkingNode") ) 
 			{
-				_Action = _Actions[index];
-
-				_MarginContainer = WorkingNode.GetParent().GetParent().GetParent().GetParent().GetParent() as MarginContainer;
-				_InnerContainer = WorkingNode.GetParent().GetParent() as Container;
+				Godot.Collections.Dictionary<string, Variant> dependencies = Plugin.Singleton.traitGlobal.GetDependencies(index, TypeString, OwnerName);
+				Dependencies = dependencies;
 			}
-
+			
 			return this;
 		}
 		
@@ -140,7 +148,7 @@ namespace AssetSnap.Component
 			{
 				if( button.Name == name ) 
 				{
-					WorkingNode = button;
+					Dependencies[TraitName + "_WorkingNode"] = button;
 					break;
 				}
 			}
@@ -157,7 +165,15 @@ namespace AssetSnap.Component
 		*/
 		public void AddToContainer( Node Container )
 		{
-			_AddToContainer(Container, _MarginContainer);
+			if( false == Dependencies.ContainsKey(TraitName + "_MarginContainer") ) 
+			{
+				GD.PushError("Container was not found @ AddToContainer");
+				GD.PushError("AddToContainer::Keys-> ", Dependencies.Keys);
+				GD.PushError("AddToContainer::ADDTO-> ", TraitName + "_MarginContainer");
+				return;
+			}
+			
+			_AddToContainer(Container, Dependencies[TraitName + "_MarginContainer"].As<MarginContainer>());
 		}
 		
 		/*
@@ -252,7 +268,7 @@ namespace AssetSnap.Component
 		{
 			DefaultValue = value;
 			
-			if( IsInstanceValid(WorkingNode) && WorkingNode is SpinBox WorkingInput) 
+			if( false != Dependencies.ContainsKey(TraitName + "_WorkingNode") && Dependencies[TraitName + "_WorkingNode"].As<GodotObject>() is SpinBox WorkingInput) 
 			{
 				WorkingInput.Value = value;
 			}
@@ -354,7 +370,7 @@ namespace AssetSnap.Component
 		*/
 		public double GetValue()
 		{
-			if( IsInstanceValid(WorkingNode) && WorkingNode is SpinBox WorkingInput) 
+			if( false != Dependencies.ContainsKey(TraitName + "_WorkingNode") && Dependencies[TraitName + "_WorkingNode"].As<GodotObject>() is SpinBox WorkingInput) 
 			{
 				return WorkingInput.Value;
 			}
@@ -382,21 +398,9 @@ namespace AssetSnap.Component
 			_Step = 1;
 			MinimumValue = 0;
 			MaximumValue = 0;
-			
-			WorkingNode = null;
 			_Action = null;
 
 			base.Reset();
-		}
-		
-		/*
-		** Cleanup
-		*/
-		public override void _ExitTree()
-		{
-			Reset();
-			 
-			base._ExitTree();
 		}
 	}
 }

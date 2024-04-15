@@ -24,17 +24,15 @@
 namespace AssetSnap.ContextMenu
 {
 	using System.Collections.Generic;
-	using AssetSnap.Front.Components;
-    using AssetSnap.Front.Components.Library;
-    using AssetSnap.Front.Nodes;
+	using AssetSnap.Front.Components.Library;
+	using AssetSnap.Front.Nodes;
 	using Godot;
 	
-	public partial class Base : Node
+	public partial class Base
 	{
+		public string Name = "";
 		private readonly PackedScene _Scene = GD.Load<PackedScene>("res://addons/assetsnap/scenes/ContextMenu.tscn");
-		private bool Shown = false;
-		private AsContextMenu _Instance;
-		PopupMenu dropdownMenu;
+		private AsContextMenu _NodeInstance;
 		private List<string> Components = new()
 		{
 			"LibrarySnapRotate",
@@ -44,6 +42,20 @@ namespace AssetSnap.ContextMenu
 		public Base()
 		{
 			Name = "AssetSnapContextMenu";
+		}
+		
+		private static Base _Instance;
+		public static Base Singleton
+		{
+			get
+			{
+				if( null == _Instance ) 
+				{
+					_Instance = new();
+				}
+
+				return _Instance;
+			}
 		}
 	
 		/*
@@ -56,18 +68,15 @@ namespace AssetSnap.ContextMenu
 				return;
 			}
 
-			Shown = true;
-
-			if ( HasComponents() ) 
-			{
-				InitializeComponents();
-			}  
+			// if ( HasComponents() ) 
+			// {
+			// 	InitializeComponents();
+			// }  
 		}
 		
-		public override void _Ready()
+		public void _Ready()
 		{
-			
-			_Initialize();
+			// _Initialize();
 		}
 		
 		/*
@@ -77,21 +86,21 @@ namespace AssetSnap.ContextMenu
 		** @param double delta
 		** @return void
 		*/
-		public override void _Process(double delta)
+		public void _Process(double delta)
 		{
-			if( false == Shown && _ShouldUseOverlay()) 
-			{
-				Shown = true;
+			// if( false == Shown && _ShouldUseOverlay()) 
+			// {
+			// 	Shown = true; 
  
-				if( GlobalExplorer.GetInstance().HandleIsModel() ) 
-				{
-					SetVisible(true);
-				}
-			}
-			else if( true == Shown && false == _ShouldUseOverlay() ) 
-			{
-				ClearOverlay();
-			}
+			// 	if( GlobalExplorer.GetInstance().HandleIsModel() ) 
+			// 	{
+			// 		SetVisible(true);
+			// 	}
+			// }
+			// else if( true == Shown && false == _ShouldUseOverlay() ) 
+			// { 
+			// 	ClearOverlay();
+			// }
 		} 
 		
 		/*
@@ -108,11 +117,11 @@ namespace AssetSnap.ContextMenu
 			
 			SetVisible(true);
 			
-			if( _Instance is AsContextMenu ContextMenu ) 
+			if( _NodeInstance is AsContextMenu ContextMenu ) 
 			{
 				Node3D Handle = GlobalExplorer.GetInstance().GetHandle();
 				
-				if( IsInstanceValid( Handle ) ) 
+				if( EditorPlugin.IsInstanceValid( Handle ) ) 
 				{
 					ContextMenu.SetRotationX(Handle.RotationDegrees.X);
 					ContextMenu.SetRotationY(Handle.RotationDegrees.Y);
@@ -154,7 +163,7 @@ namespace AssetSnap.ContextMenu
 				return;
 			}
 			
-			if( _Instance is AsContextMenu ContextMenu ) 
+			if( _NodeInstance is AsContextMenu ContextMenu ) 
 			{
 				ContextMenu.SetRotationX(Rotation.X);
 				ContextMenu.SetRotationY(Rotation.Y);
@@ -186,7 +195,7 @@ namespace AssetSnap.ContextMenu
 				return;
 			}
 			
-			if( _Instance is AsContextMenu ContextMenu ) 
+			if( _NodeInstance is AsContextMenu ContextMenu ) 
 			{
 				ContextMenu.SetScaleX(Scale.X);
 				ContextMenu.SetScaleY(Scale.Y);
@@ -219,7 +228,7 @@ namespace AssetSnap.ContextMenu
 		
 		public Control GetInstance()
 		{
-			return _Instance;
+			return _NodeInstance;
 		}
 		
 		/*
@@ -234,7 +243,7 @@ namespace AssetSnap.ContextMenu
 				return Vector3.Zero;
 			}
 			
-			if( _Instance is AsContextMenu ContextMenu ) 
+			if( _NodeInstance is AsContextMenu ContextMenu ) 
 			{
 				return new Vector3(ContextMenu.GetRotationX(), ContextMenu.GetRotationY(), ContextMenu.GetRotationZ());
 			}
@@ -254,7 +263,7 @@ namespace AssetSnap.ContextMenu
 				return Vector3.Zero;
 			}
 			
-			if( _Instance is AsContextMenu ContextMenu ) 
+			if( _NodeInstance is AsContextMenu ContextMenu ) 
 			{
 				return new Vector3(ContextMenu.GetScaleX(), ContextMenu.GetScaleY(), ContextMenu.GetScaleZ());
 			}
@@ -274,7 +283,7 @@ namespace AssetSnap.ContextMenu
 				return 0;
 			}
 			
-			if( _Instance is AsContextMenu ContextMenu ) 
+			if( _NodeInstance is AsContextMenu ContextMenu ) 
 			{
 				return ContextMenu.GetAngleIndex();
 			}
@@ -288,8 +297,8 @@ namespace AssetSnap.ContextMenu
 		*/
 		public void SetVisible(bool state)
 		{
-			_Instance.Visible = state;
-			_Instance.Active = state;
+			_NodeInstance.Visible = state;
+			_NodeInstance.Active = state;
 		}
 		
 		/*
@@ -304,7 +313,7 @@ namespace AssetSnap.ContextMenu
 				return true;
 			}
 			
-			return _Instance.Visible == false;
+			return _NodeInstance.Visible == false;
 		}
 		
 		/*
@@ -314,7 +323,7 @@ namespace AssetSnap.ContextMenu
 		*/
 		public bool IsContextMenuValid()
 		{
-			return IsInstanceValid(_Instance) && null != _Instance.GetParent();
+			return EditorPlugin.IsInstanceValid(_NodeInstance) && null != _NodeInstance.GetParent();
 		}
 		
 		/*
@@ -349,11 +358,10 @@ namespace AssetSnap.ContextMenu
 		*/
 		private void _Initialize() 
 		{
-			_Instance = _Scene.Instantiate<AsContextMenu>();
+			_NodeInstance = _Scene.Instantiate<AsContextMenu>();
 			SetVisible(false);
-			EditorInterface.Singleton.GetBaseControl().AddChild( _Instance );
+			EditorInterface.Singleton.GetBaseControl().AddChild( _NodeInstance );
 			
-			GlobalExplorer.GetInstance().ContextMenu.GetInstance().Connect(AsContextMenu.SignalName.VectorsChanged, new Callable(this, "_OnUpdateVectors"));
 		}
 
 		/*
@@ -388,28 +396,16 @@ namespace AssetSnap.ContextMenu
 		}
 		
 		/*
-		** Updates rotation and scale valus on the current handle
-		** when a change is received from the context menu
-		**
-		** @param Godot.Collections.Dictionary package
-		** @return void
-		*/
-		private void _OnUpdateVectors(Godot.Collections.Dictionary package)
-		{
-			Node3D Handle = GlobalExplorer.GetInstance().GetHandle();
-			Handle.RotationDegrees = package["Rotation"].As<Vector3>();
-			Handle.Scale = package["Scale"].As<Vector3>();
-		}
-		
-		/*
 		** Clears the instance and set's it's shown state to false
 		**
 		** @return void
 		*/
-		private void ClearOverlay()
+		private void ClearOverlay() 
 		{
-			_Instance.QueueFree();
-			Shown = false;
+			if( null != _NodeInstance )  
+			{
+				_NodeInstance.QueueFree();
+			}
 		}
 		
 		/*
@@ -417,7 +413,7 @@ namespace AssetSnap.ContextMenu
 		**
 		** @return bool
 		*/
-		private bool Is_GlobalExplorerConnected()
+		private bool IsGlobalExplorerConnected()
 		{
 			return null != GlobalExplorer.GetInstance() && null != GlobalExplorer.GetInstance().Settings;
 		}
@@ -446,32 +442,6 @@ namespace AssetSnap.ContextMenu
 
 			bool UseAsOverlay = GlobalExplorer.GetInstance().Settings.GetKey("use_as_overlay").As<bool>();
 			return UseAsOverlay;
-		}
-		 
-		/* 
-		** Cleaning of fields, references and more.
-		**
-		** @return void
-		*/
-		public override void _ExitTree()
-		{
-			Components = null;
-			
-			if( IsInstanceValid(_Instance) )  
-			{ 
-				if( _Instance is AsContextMenu ContextMenu )  
-				{
-					if(ContextMenu.IsConnected(AsContextMenu.SignalName.VectorsChanged, new Callable(this, "_OnUpdateVectors")))
-					{
-						ContextMenu.Disconnect(AsContextMenu.SignalName.VectorsChanged, new Callable(this, "_OnUpdateVectors"));
-					} 
-				}
-			
-				_Instance.QueueFree();
-			}
-
-			_Instance = null; 
-			base._ExitTree();
 		}
 	}
 }

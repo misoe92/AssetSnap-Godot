@@ -31,23 +31,19 @@ namespace AssetSnap.Library
 	[Tool]
 	public partial class Base : Node
 	{
-		private GlobalExplorer _GlobalExplorer;
-		
 		private Instance[] _Libraries = Array.Empty<Instance>();
 
 		private static Base _Instance;
 		
-		public static Base GetInstance()
-		{
-			if( null == _Instance ) 
-			{
-				_Instance = new()
+		public static Base Singleton {
+			get {
+				if( _Instance == null ) 
 				{
-					Name = "AssetSnapLibraries",
-				};
+					_Instance = new();
+				} 
+				
+				return _Instance;
 			}
-
-			return _Instance;
 		}
 		
 		public Instance[] Libraries 
@@ -57,50 +53,53 @@ namespace AssetSnap.Library
 		
 		public void Initialize()
 		{
-			_GlobalExplorer = GlobalExplorer.GetInstance();
-			
 			/** Initialize libraries **/
-			if( _GlobalExplorer.Settings.FolderCount != 0 ) 
+			if( ExplorerUtils.Get().Settings.FolderCount != 0 ) 
 			{
-				string[] Folders = _GlobalExplorer.Settings.Folders; 
+				string[] Folders = ExplorerUtils.Get().Settings.Folders; 
 				
-				for( int i = 0; i < _GlobalExplorer.Settings.FolderCount; i++)  
+				for( int i = 0; i < ExplorerUtils.Get().Settings.FolderCount; i++)  
 				{
 					string Folder = Folders[i];
-					_GlobalExplorer.Library.New(_GlobalExplorer.BottomDock, Folder, i); 
+					ExplorerUtils.Get().Library.New(ExplorerUtils.Get()._Plugin.GetTabContainer(), Folder, i); 
 				}
 			} 
 		}
 		
-		/*
+		/* 
 		** Creates a new instance of Library
 		**
 		** @param TabContainer _Container
 		** @param string _Folder
 		** @return void
 		*/
-		public void New( BottomDock.Base Dock,  string _Folder, int index )
+		public void New( TabContainer Dock,  string _Folder, int index )
 		{
 			if( false == IsGlobalExplorerValid() ) 
 			{
 				return;
 			}
 			
+			// if( AlreadyHaveFolder( _Folder ) ) 
+			// {
+			// 	CleanOldLibrary(_Folder);
+			// }
+			
 			Instance _Base = new()
 			{
-				Container = Dock.Container,
 				Folder = _Folder,
 				Index = index,
+				Dock = Dock,
 			};
 
-			AddChild(_Base);
- 
+			_Base.Name = _Base.FileName.Capitalize();
+
 			_Base.Initialize(); 
 			
 			List<Instance> _LibrariesList = new(_Libraries)
 			{
 				_Base
-			};
+			}; 
 
 			_Libraries = _LibrariesList.ToArray();
 		}
@@ -110,7 +109,7 @@ namespace AssetSnap.Library
 		**
 		** @param TabContainer _Container
 		*/
-		public void Refresh(BottomDock.Base Dock)
+		public void Refresh(TabContainer Dock)
 		{
 			if( false == IsGlobalExplorerValid() ) 
 			{
@@ -121,37 +120,66 @@ namespace AssetSnap.Library
 			ExplorerUtils.Get().Settings.Reset();
 			MaybeRemoveGroupBuilder();
 
-			if( HasFolders() ) 
-			{
-				string[] Folders = ExplorerUtils.Get().Settings.Folders;
+			// if( HasFolders() ) 
+			// {
+			// 	string[] Folders = ExplorerUtils.Get().Settings.Folders;
 				
-				for( int i = 0; i < ExplorerUtils.Get().Settings.FolderCount; i++) 
-				{
-					string Folder = Folders[i];
-					bool exist = false;
+			// 	for( int i = 0; i < ExplorerUtils.Get().Settings.FolderCount; i++) 
+			// 	{
+			// 		string Folder = Folders[i];
+			// 		bool exist = false;
 					 
-					foreach(Instance Library in _Libraries ) 
-					{ 
-						if( Library.Folder == Folder ) 
-						{
-							exist = true;
-						}  
-					}
+			// 		foreach(Instance Library in _Libraries ) 
+			// 		{ 
+			// 			if( Library.Folder == Folder ) 
+			// 			{
+			// 				exist = true;
+			// 			}  
+			// 		}
 					 
-					if( false == exist ) 
-					{
-						New(Dock, Folder, i);
-					}
-				}
-			} 
+			// 		if( false == exist ) 
+			// 		{
+			// 			New(Dock, Folder, i);
+			// 		}
+			// 	}
+			// } 
 			
-			if( HasLibraryListing() ) 
+			// if( HasLibraryListing() ) 
+			// {
+			// 	LibrariesListing _LibrariesListing = GetLibraryListing();
+			// 	_LibrariesListing.ForceUpdate();
+			// }
+			
+			// RebindSettingsContainer();
+		}
+		
+		private bool AlreadyHaveFolder( string Folder )
+		{
+			foreach( Library.Instance instance in _Libraries ) 
 			{
-				LibrariesListing _LibrariesListing = GetLibraryListing();
-				_LibrariesListing.ForceUpdate();
+				if( Folder == instance._Folder ) 
+				{
+					return true;
+				}
 			}
-			
-			RebindSettingsContainer();
+
+			return false;
+		}
+		
+		private bool CleanOldLibrary( string Folder )
+		{
+			foreach( Library.Instance instance in _Libraries ) 
+			{
+				if( Folder == instance._Folder ) 
+				{
+					// instance.Clear();
+					instance.GetParent().RemoveChild(instance);
+					instance.QueueFree();
+					return true;
+				}
+			}
+
+			return false;
 		}
 		
 		/*
@@ -161,11 +189,11 @@ namespace AssetSnap.Library
 		*/  
 		private void RebindSettingsContainer()
 		{
-			_GlobalExplorer.Settings.InitializeContainer();
-			if( IsInstanceValid(_GlobalExplorer.Settings.Container)) 
+			ExplorerUtils.Get().Settings.InitializeContainer();
+			if( EditorPlugin.IsInstanceValid(ExplorerUtils.Get().Settings.Container)) 
 			{
-				_GlobalExplorer.Settings.Container.Name = "Settings";
-				_GlobalExplorer.BottomDock.Add(_GlobalExplorer.Settings.Container);
+				ExplorerUtils.Get().Settings.Container.Name = "Settings";
+				ExplorerUtils.Get().BottomDock.Add(ExplorerUtils.Get().Settings.Container);
 			}
 		}
 		
@@ -187,7 +215,7 @@ namespace AssetSnap.Library
 				{
 					list.Remove(Library);
 					
-					if( null != Library.GetParent() && IsInstanceValid(Library.GetParent()) ) 
+					if( null != Library.GetParent() && EditorPlugin.IsInstanceValid(Library.GetParent()) ) 
 					{
 						Library.GetParent().RemoveChild(Library);
 					}
@@ -204,7 +232,7 @@ namespace AssetSnap.Library
 				Library._LibrarySettings.ClearAll();
 			}
 		}
-		
+				
 		/*
 		** Get library listing
 		**
@@ -212,7 +240,7 @@ namespace AssetSnap.Library
 		*/
 		private LibrariesListing GetLibraryListing()
 		{
-			LibrariesListing _LibrariesListing = _GlobalExplorer.Components.Single<LibrariesListing>();
+			LibrariesListing _LibrariesListing = ExplorerUtils.Get().Components.Single<LibrariesListing>();
 			return _LibrariesListing;
 		}
 		
@@ -221,7 +249,7 @@ namespace AssetSnap.Library
 		*/
 		private bool HasFolders()
 		{
-			return _GlobalExplorer.Settings.FolderCount != 0;
+			return ExplorerUtils.Get().Settings.FolderCount != 0;
 		}
 						
 		/*
@@ -231,7 +259,7 @@ namespace AssetSnap.Library
 		*/
 		private bool HasLibraryListing()
 		{
-			LibrariesListing _LibrariesListing = _GlobalExplorer.Components.Single<LibrariesListing>();
+			LibrariesListing _LibrariesListing = ExplorerUtils.Get().Components.Single<LibrariesListing>();
 			return null != _LibrariesListing;
 		}
 		
@@ -244,15 +272,6 @@ namespace AssetSnap.Library
 		private bool IsGlobalExplorerValid()
 		{
 			return ExplorerUtils.IsValid();
-		}
-
-		public override void _ExitTree()
-		{
-			_Libraries = Array.Empty<Instance>();
-			_GlobalExplorer = null;
-			_Instance = null; 
-
-			base._ExitTree();
 		}
 	}
 }

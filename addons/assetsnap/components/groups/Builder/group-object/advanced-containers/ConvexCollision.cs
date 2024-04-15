@@ -25,6 +25,7 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject.AdvancedContaine
 	using AssetSnap.Component;
 	using AssetSnap.Static;
 	using Godot;
+	using Godot.Collections;
 
 	[Tool]
 	public partial class ConvexCollision : AdvancedGroupComponent
@@ -32,12 +33,18 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject.AdvancedContaine
 		public ConvexCollision()
 		{
 			Text = "Convex Collision";
+			
+			UsingTraits = new()
+			{
+				{ typeof(Containerable).ToString() },
+				{ typeof(Labelable).ToString() },
+				{ typeof(Checkable).ToString() },
+			};
 		}
 
 		protected override void _RegisterTraits()
 		{
 			base._RegisterTraits();
-			AddTrait(typeof(Checkable));
 		}
 
 		

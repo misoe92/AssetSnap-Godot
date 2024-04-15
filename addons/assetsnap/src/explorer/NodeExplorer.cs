@@ -23,7 +23,8 @@
 #if TOOLS
 namespace AssetSnap
 {
-	using AssetSnap.Front.Nodes;
+    using AssetSnap.Explorer;
+    using AssetSnap.Front.Nodes;
 	using Godot;
 
 	[Tool]
@@ -160,7 +161,7 @@ namespace AssetSnap
 			{
 				HandleNode = null;
 				
-				if( false == EditorPlugin.IsInstanceValid( ContextMenu ))
+				if( null == ExplorerUtils.Get().ContextMenu ) 
 				{
 					return;	
 				}

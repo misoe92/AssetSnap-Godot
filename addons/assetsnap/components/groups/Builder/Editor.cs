@@ -23,17 +23,18 @@ namespace AssetSnap.Front.Components.Groups.Builder
 {
 	using System.Collections.Generic;
 	using AssetSnap.Component;
-	using AssetSnap.Explorer;
 	using AssetSnap.Front.Nodes;
 	using Godot;
 
 	[Tool]
 	public partial class Editor : LibraryComponent
-	{
+	{	
 		public Editor()
 		{
 			// _include = false;
 			Name = "GroupBuilderEditor";
+			SizeFlagsVertical = Control.SizeFlags.ExpandFill;
+			SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
 		}
 		
 		public GroupResource Group {
@@ -85,6 +86,8 @@ namespace AssetSnap.Front.Components.Groups.Builder
 
 		public override void Initialize()
 		{
+			base.Initialize();
+		
 			Initiated = true;
 			_SetupTopbar();
 			_SetupGroupItemsList();
@@ -97,6 +100,30 @@ namespace AssetSnap.Front.Components.Groups.Builder
 						() => { GroupOptions._UpdateGroupOptions();  }
 					)
 				);
+		}
+		
+		public override void Clear()
+		{
+			Topbar.Clear();
+			Listing.Clear();
+			GroupOptions.Clear();
+			
+			if( Topbar.GetParent() == this ) 
+			{
+				RemoveChild(Topbar);
+			}
+			
+			if( Listing.GetParent() == this ) 
+			{
+				RemoveChild(Listing);
+			}
+			
+			if( GroupOptions.GetParent() == this ) 
+			{
+				RemoveChild(GroupOptions);
+			}
+
+			base.Clear();
 		}
 		
 		public void Update()
@@ -311,7 +338,7 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			if (_GlobalExplorer.Components.HasAll( Components.ToArray() )) 
 			{
 				Topbar = _GlobalExplorer.Components.Single<EditorTopbar>();
-				Topbar.Container = Container;
+				Topbar.Container = this;
 				Topbar.Initialize();
 			}
 		}
@@ -326,7 +353,7 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			if (_GlobalExplorer.Components.HasAll( Components.ToArray() )) 
 			{
 				Listing = _GlobalExplorer.Components.Single<EditorListing>();
-				Listing.Container = Container;
+				Listing.Container = this;
 				Listing.Initialize();
 			}
 		}
@@ -341,7 +368,7 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			if (_GlobalExplorer.Components.HasAll( Components.ToArray() )) 
 			{
 				GroupOptions = _GlobalExplorer.Components.Single<EditorGroupOptions>();
-				GroupOptions.Container = Container;
+				GroupOptions.Container = this;
 				GroupOptions.Initialize();
 			}
 		}

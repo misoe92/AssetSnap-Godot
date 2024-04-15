@@ -25,6 +25,7 @@ namespace AssetSnap.Front.Components.Library
 	using AssetSnap.Component;
 	using AssetSnap.Front.Nodes;
 	using Godot;
+	using Godot.Collections;
 
 	[Tool]
 	public partial class Search : LibraryComponent
@@ -52,6 +53,13 @@ namespace AssetSnap.Front.Components.Library
 		public Search()
 		{
 			Name = "LibrarySearch";
+			
+			UsingTraits = new()
+			{
+				{ typeof(Containerable).ToString() },
+				{ typeof(Buttonable).ToString() },
+			};
+			
 			//_include = false;
 		}
 		
@@ -63,13 +71,12 @@ namespace AssetSnap.Front.Components.Library
 		public override void Initialize()
 		{
 			base.Initialize();
-			AddTrait(typeof(Containerable));
-			AddTrait(typeof(Buttonable));
 			Initiated = true;
 
 			Trait<Containerable>()
 				.SetName("SearchContainer")
-				.SetMargin(4, "top")
+				.SetMargin(5, "top")
+				.SetMargin(3, "bottom")
 				.SetOrientation(Containerable.ContainerOrientation.Horizontal)
 				.SetInnerOrientation(Containerable.ContainerOrientation.Horizontal)
 				.Instantiate();
@@ -112,7 +119,7 @@ namespace AssetSnap.Front.Components.Library
 
 			Trait<Containerable>()
 				.Select(0)
-				.AddToContainer(Container);
+				.AddToContainer(this);
 		}
 
 		/*

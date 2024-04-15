@@ -24,13 +24,14 @@ namespace AssetSnap.Front.Components
 {
 	using AssetSnap.Component;
 	using Godot;
+	using Godot.Collections;
 
 	[Tool]
 	public partial class Introduction : TraitableComponent
 	{
 		private readonly string TitleText = "AssetSnap";
 		private readonly string DescriptionText = "Add folders to start, when an folder has been added a tab with the folder name will appear, Then go to the folder tab and browse your assets and place them. \n\nIf you wish to remove a library all you will have to do is click the red button on the right. In the same column as the library you wish to remove.";
-		
+	
 		/*
 		** Constructor of the class
 		** 
@@ -39,6 +40,12 @@ namespace AssetSnap.Front.Components
 		public Introduction() : base()
 		{
 			Name = "Introduction";
+			
+			UsingTraits = new()
+			{
+				{ typeof(Labelable).ToString() },
+			};
+
 			//_include = false; 
 		}
 		
@@ -56,8 +63,6 @@ namespace AssetSnap.Front.Components
 			
 			base.Initialize();
 			
-			AddTrait(typeof(Labelable));
-			
 			Initiated = true;
 
 			Trait<Labelable>()
@@ -69,6 +74,7 @@ namespace AssetSnap.Front.Components
 				.Instantiate();
 
 			Trait<Labelable>()
+				.SetMargin(0, "top")
 				.SetMargin(0, "bottom")
 				.SetName("IntroductionDescription")
 				.SetType(Labelable.TitleType.TextMedium)
@@ -78,11 +84,11 @@ namespace AssetSnap.Front.Components
 				
 			Trait<Labelable>()
 				.Select(0) 
-				.AddToContainer( Container );  
+				.AddToContainer( this );  
 				
 			Trait<Labelable>()
 				.Select(1) 
-				.AddToContainer( Container );  
+				.AddToContainer( this );  
 		}
 	}
 }

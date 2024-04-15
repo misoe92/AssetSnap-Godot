@@ -50,12 +50,14 @@ namespace AssetSnap.Front.Components.Library
 		*/
 		public override void Initialize() 
 		{
+			base.Initialize();
+			
 			if( _GlobalExplorer == null )
 			{
 				return;
 			}
 			
-			if( false == EditorPlugin.IsInstanceValid( _GlobalExplorer.ContextMenu ) ) 
+			if( null == _GlobalExplorer.ContextMenu ) 
 			{
 				return;
 			}
@@ -82,7 +84,7 @@ namespace AssetSnap.Front.Components.Library
 		*/
 		private void _OnListStateChange( string which ) 
 		{
-			if( false == EditorPlugin.IsInstanceValid( _GlobalExplorer.ContextMenu ) ) 
+			if( null == _GlobalExplorer.ContextMenu ) 
 			{
 				return;
 			}
@@ -459,7 +461,7 @@ namespace AssetSnap.Front.Components.Library
 		*/
 		public override void _ExitTree()
 		{
-			if( null == _GlobalExplorer || false == EditorPlugin.IsInstanceValid( _GlobalExplorer.ContextMenu ) ) 
+			if( null == _GlobalExplorer || null == _GlobalExplorer.ContextMenu ) 
 			{
 				return;
 			}

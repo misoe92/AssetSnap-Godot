@@ -24,6 +24,7 @@ namespace AssetSnap.Front.Components.Library
 {
 	using AssetSnap.Component;
 	using Godot;
+	using Godot.Collections;
 
 	[Tool]
 	public partial class ListTitle : LibraryComponent
@@ -34,6 +35,12 @@ namespace AssetSnap.Front.Components.Library
 		public ListTitle()
 		{
 			Name = "LibraryListTitle";
+			
+			UsingTraits = new()
+			{
+				{ typeof(Labelable).ToString() },
+			};
+			
 			//_include = false;
 		}
 		
@@ -45,17 +52,16 @@ namespace AssetSnap.Front.Components.Library
 		public override void Initialize()
 		{
 			base.Initialize();
-			AddTrait(typeof(Labelable));
 			Initiated = true;
 			
 			Trait<Labelable>()
 				.SetName("LibraryListTitle")
 				.SetText(Title)
 				.SetType(Labelable.TitleType.HeaderMedium)
-				.SetMargin(7, "top")
+				.SetMargin(2, "top")
 				.SetMargin(0, "bottom")	
-				.SetMargin(5, "right")
-				.SetMargin(5, "left")
+				.SetMargin(10, "right")
+				.SetMargin(12, "left")
 				.SetHorizontalSizeFlags(Control.SizeFlags.ExpandFill)
 				.SetVerticalSizeFlags(Control.SizeFlags.ShrinkCenter)
 				.Instantiate()

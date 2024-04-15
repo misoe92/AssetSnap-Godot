@@ -23,63 +23,63 @@ namespace AssetSnap.Abstracts
 		public Plugin _Plugin { get => AssetSnap.Plugin.GetInstance(); }
 		
 		/*
-		** Handles internal components
+		** Handles internal components 
 		*/
-		public Component.Base Components { get => _Components; } 
+		public Component.Base Components { get => AssetSnap.Component.Base.Singleton; } 
 		protected Component.Base _Components = null; 
 		
 		/*
 		** Handles spawn waypoints
 		*/
-		public Front.Configs.SettingsConfig Settings { get => _Settings; } 
+		public Front.Configs.SettingsConfig Settings { get => Front.Configs.SettingsConfig.Singleton; } 
 		protected Front.Configs.SettingsConfig _Settings = null; 
 	
 		/*
-		** Handles spawn waypoints
+		** Handles spawn waypoints 
 		*/
-		public Debug.Inspector Inspector { get => _Inspector; } 
-		protected Debug.Inspector _Inspector = null; 
+		public Debug.Inspector Inspector { get => AssetSnap.Debug.Inspector.Singleton; } 
+		protected Debug.Inspector _Inspector = null;
 		
 		/*
 		** Handles spawn waypoints
 		*/
-		public Snap.Base Snap { get => _Snap; } 
+		public Snap.Base Snap { get => AssetSnap.Snap.Base.Singleton; } 
 		protected Snap.Base _Snap = null; 
 		
 		/*
 		** Handles spawn waypoints
 		*/
-		public Snap.SnappableBase Snappable { get => _Snappable; } 
+		public Snap.SnappableBase Snappable { get => AssetSnap.Snap.SnappableBase.Singleton; } 
 		protected Snap.SnappableBase _Snappable = null; 
 		
 		/*
 		** Handles spawn waypoints
 		*/ 
-		public Waypoint.Base Waypoints { get => _Waypoints; } 
+		public Waypoint.Base Waypoints { get => AssetSnap.Waypoint.Base.Singleton; } 
 		protected Waypoint.Base _Waypoints = null;
 		
 		/*
 		** Handles spawn waypoints
 		*/ 
-		public ContextMenu.Base ContextMenu { get => _ContextMenu; } 
+		public ContextMenu.Base ContextMenu { get => AssetSnap.ContextMenu.Base.Singleton; } 
 		protected ContextMenu.Base _ContextMenu = null;
 		 
 		/*
 		** Handles spawn waypoints 
 		*/ 
-		public Library.Base Library { get => _Library; } 
+		public Library.Base Library { get => AssetSnap.Library.Base.Singleton; } 
 		protected Library.Base _Library = null; 
 		
 		/* 
 		** Handles spawn waypoints
 		*/
-		public Modifier.Base Modifiers { get => _Modifiers; } 
+		public Modifier.Base Modifiers { get => AssetSnap.Modifier.Base.Singleton; } 
 		protected Modifier.Base _Modifiers = null; 
 		
 		/* 
 		** Handles spawn waypoints
 		*/
-		public GroupBuilder.Base GroupBuilder { get => _GroupBuilder; } 
+		public GroupBuilder.Base GroupBuilder { get => AssetSnap.GroupBuilder.Base.Singleton; } 
 		protected GroupBuilder.Base _GroupBuilder = null; 
 		
 		public GroupBuilder.MainScreen GroupMainScreen { get; set; } 
@@ -87,19 +87,19 @@ namespace AssetSnap.Abstracts
 		/*
 		** Handles spawn waypoints
 		*/
-		public BottomDock.Base BottomDock { get => _BottomDock; } 
+		public BottomDock.Base BottomDock { get => AssetSnap.BottomDock.Base.Singleton; } 
 		protected BottomDock.Base _BottomDock = null; 
 
 		/*
 		** The raycast which are being used for projection positions
 		*/
-		public Raycast.Base Raycast { get => _Raycast; } 
+		public Raycast.Base Raycast { get => AssetSnap.Raycast.Base.Singleton; } 
 		protected Raycast.Base _Raycast = null; 
 		
 		/*
 		** Decal handler
 		*/
-		public AssetSnap.Decal.Base Decal { get => _Decal; } 
+		public AssetSnap.Decal.Base Decal { get => AssetSnap.Decal.Base.Singleton; } 
 		protected AssetSnap.Decal.Base _Decal = null; 
 	}
 }

@@ -24,6 +24,7 @@ namespace AssetSnap.Front.Components.Library
 {
 	using AssetSnap.Component;
 	using Godot;
+	using Godot.Collections;
 
 	[Tool]
 	public partial class TotalItems : LibraryComponent
@@ -40,6 +41,12 @@ namespace AssetSnap.Front.Components.Library
 		public TotalItems()
 		{
 			Name = "LibraryItems";
+			
+			UsingTraits = new()
+			{
+				{ typeof(Labelable).ToString() },
+			};
+			
 			//_include = false;
 		}
 		
@@ -51,17 +58,16 @@ namespace AssetSnap.Front.Components.Library
 		public override void Initialize()
 		{
 			base.Initialize();
-			AddTrait(typeof(Labelable));
 			Initiated = true;
 			
 			Trait<Labelable>()
 				.SetName("LibraryItemsCount")
 				.SetText(Title + ": " + ItemCount)
 				.SetType(Labelable.TitleType.HeaderSmall)
-				.SetMargin(7, "top")
+				.SetMargin(3, "top")
 				.SetMargin(0, "bottom")	
-				.SetMargin(5, "right")
-				.SetMargin(5, "left")
+				.SetMargin(10, "right")
+				.SetMargin(10, "left")
 				.SetHorizontalSizeFlags(Control.SizeFlags.ExpandFill)
 				.SetVerticalSizeFlags(Control.SizeFlags.ShrinkCenter)
 				.SetAlignment( Godot.HorizontalAlignment.Right )

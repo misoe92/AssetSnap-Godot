@@ -69,21 +69,10 @@ namespace AssetSnap.Front.Nodes
 			EditorInterface.Singleton.GetBaseControl().Connect(Control.SignalName.Resized, Callable.From(ResizeAction));
 			EditorInterface.Singleton.GetBaseControl().GetNode<Control>("@VBoxContainer@14/@HSplitContainer@17/@HSplitContainer@25/@VSplitContainer@27").Connect(Control.SignalName.Resized, Callable.From(ResizeAction));
 
-			// register cleanup code to prevent unloading issues
-			System.Runtime.Loader.AssemblyLoadContext.GetLoadContext(System.Reflection.Assembly.GetExecutingAssembly()).Unloading += alc =>
-			{
-				GD.Print("Cleaning Context"); 
-				if( null != EditorInterface.Singleton.GetBaseControl() && EditorInterface.Singleton.GetBaseControl().IsConnected(Control.SignalName.Resized, Callable.From(ResizeAction)))
-				{
-					EditorInterface.Singleton.GetBaseControl().Disconnect(Control.SignalName.Resized, Callable.From(ResizeAction));
-				}
-				if( null != EditorInterface.Singleton.GetBaseControl() && EditorInterface.Singleton.GetBaseControl().GetNode<Control>("@VBoxContainer@14/@HSplitContainer@17/@HSplitContainer@25/@VSplitContainer@27").IsConnected(Control.SignalName.Resized, Callable.From(ResizeAction)))
-				{
-					EditorInterface.Singleton.GetBaseControl().GetNode<Control>("@VBoxContainer@14/@HSplitContainer@17/@HSplitContainer@25/@VSplitContainer@27").Disconnect(Control.SignalName.Resized, Callable.From(ResizeAction));
-				}
-
-				handle.Free();
-			};
+			GlobalExplorer.GetInstance().ContextMenu.GetInstance().Connect(
+				SignalName.VectorsChanged,
+				new Callable(this, "_OnUpdateVectors")
+			);
 		}
 		
 		public override void _Input(InputEvent @Event) 
@@ -323,7 +312,19 @@ namespace AssetSnap.Front.Nodes
 			return GetNode<SpinBox>("HBoxContainer/ScaleValues/ScaleAngleZ/SpinBox");
 		}
 		
-	
+		/*
+		** Updates rotation and scale valus on the current handle
+		** when a change is received from the context menu
+		**
+		** @param Godot.Collections.Dictionary package
+		** @return void
+		*/
+		private void _OnUpdateVectors(Godot.Collections.Dictionary package)
+		{
+			Node3D Handle = GlobalExplorer.GetInstance().GetHandle();
+			Handle.RotationDegrees = package["Rotation"].As<Vector3>();
+			Handle.Scale = package["Scale"].As<Vector3>();
+		}
 
 		public override void _ExitTree()
 		{

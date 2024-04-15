@@ -24,17 +24,21 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 {
 	using AssetSnap.Component;
 	using Godot;
+	using Godot.Collections;
 
 	[Tool]
 	public partial class Actions : GroupObjectComponent
 	{
-		protected override void _RegisterTraits()
+		public Actions()
 		{
-			AddTrait(typeof(Containerable));
-			AddTrait(typeof(Buttonable));
-			AddTrait(typeof(Labelable));
-			
+			UsingTraits = new()
+			{
+				{ typeof(Containerable).ToString() },
+				{ typeof(Buttonable).ToString() },
+				{ typeof(Labelable).ToString() },
+			};
 		}
+		
 		protected override void _InitializeFields()
 		{
 			Trait<Containerable>()

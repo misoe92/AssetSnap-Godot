@@ -25,24 +25,31 @@ namespace AssetSnap.Front.Components.Groups.Builder
 	using AssetSnap.Component;
 	using AssetSnap.Instance.Input;
 	using Godot;
+	using Godot.Collections;
 
 	[Tool]
 	public partial class EditorPlace : LibraryComponent
 	{
-		public EditorPlace()
-		{
-			Name = "GroupBuilderEditorPlace";
-			//_include = false;
-		}
-
-
 		private static readonly string Text = "Place"; 
 		private static readonly string TooltipText = "Will let you place the group of objects in the 3D world"; 
 		private static readonly Control.CursorShape MouseDefaultCursorShape = Control.CursorShape.PointingHand; 
 		
+		public EditorPlace()
+		{
+			Name = "GroupBuilderEditorPlace";
+			
+			UsingTraits = new()
+			{
+				{ typeof(Buttonable).ToString() },
+			};
+			
+			//_include = false;
+		}
+		
 		public override void Initialize()
 		{
-			AddTrait(typeof(Buttonable));
+			base.Initialize();
+			
 			Initiated = true;
 
 			_InitializeFields();

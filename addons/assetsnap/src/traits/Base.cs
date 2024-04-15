@@ -20,17 +20,20 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#if TOOLS
 namespace AssetSnap.Trait
 {
 	using Godot;
 	
 	[Tool]
-	public partial class Base : Node
+	public partial class Base : Node, ISerializationListener
 	{
 		/*
 		** Public
 		*/
+		public int Iteration = 0;
+		public string TraitName = "";
+		[Export]
+		public bool Build = false;
 		
 		/*
 		** protected
@@ -42,7 +45,7 @@ namespace AssetSnap.Trait
 			{"top", 0},
 			{"bottom", 0},
 		};
-		
+
 		protected Godot.Collections.Dictionary<string, int> Padding = new()
 		{
 			{"left", 0},
@@ -50,16 +53,40 @@ namespace AssetSnap.Trait
 			{"top", 0},
 			{"bottom", 0},
 		};
+			
+		[Export]
+		public string TypeString;
+		[Export]
+		public string OwnerName;
+
 		protected Control.SizeFlags SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
 		protected Control.SizeFlags SizeFlagsVertical = Control.SizeFlags.ShrinkBegin;
-		protected Godot.Collections.Array<GodotObject> Nodes = new();
+		[Export]
+		public Godot.Collections.Array<GodotObject> Nodes;
 		protected Vector2 CustomMinimumSize = Vector2.Zero;
 		protected Vector2 Size = Vector2.Zero;
+		public int TotalCount = 0;
 		protected bool _select = true;
 		public bool disposed = false;
 		protected bool Visible = true;
-		protected Node WorkingNode;
-		protected string TypeString = "";
+	
+		public Godot.Collections.Dictionary<string, Variant> Dependencies = new();
+
+		public Base()
+		{
+			Name = "TraitBase";
+			Nodes = new();
+			
+			// block unloading with a strong handle
+			var handle = System.Runtime.InteropServices.GCHandle.Alloc(this);
+
+			// register cleanup code to prevent unloading issues
+			System.Runtime.Loader.AssemblyLoadContext.GetLoadContext(System.Reflection.Assembly.GetExecutingAssembly()).Unloading += alc =>
+			{
+				Build = true;
+				handle.Free();
+			};
+		}
 
 		/*
 		** Checks if trait name is set
@@ -68,14 +95,20 @@ namespace AssetSnap.Trait
 		** @param string typeString
 		** @return void
 		*/
-		public void _Instantiate( string typeString )
+		public void _Instantiate()
 		{
 			if( Name == "" ) 
 			{
-				GD.PushWarning("No name was set for the traitable: ", typeString);
+				GD.PushWarning("No name was set for the traitable: ", TypeString);
+			}
+			
+			if( OwnerName == "" ) 
+			{
+				GD.PushWarning("No owner was set for the traitable: ", TypeString);
 			}
 
-			TypeString = typeString;
+			TotalCount += 1;
+			Dependencies = new();
 		}
 		
 		/*
@@ -90,46 +123,32 @@ namespace AssetSnap.Trait
 		{
 			if( null == Node ) 
 			{
-				GD.PushError("No node selected: ", Name, TypeString );
+				GD.PushError("No node selected: ", TraitName, TypeString );
 				return;
 			}
 			
 			if( null == Container ) 
 			{
-				GD.PushError("Provided container is invalid: ", Name, TypeString );
+				GD.PushError("Provided container is invalid: ", TraitName, TypeString );
+				// throw new Exception("");
 				return;
 			}
 
 			if( Node == Container ) 
 			{
-				GD.PushError("Provided container is the same as this object: ", Name, TypeString );
+				GD.PushError("Provided container is the same as this object: ", TraitName, TypeString );
 				return;
 			}
 			
-			if( null != Node ) 
+			// Single placement
+			if( index is int intIndex ) 
 			{
-				// Single placement
-				if( index is int intIndex ) 
-				{
-					Container.AddChild(Node);
-					Container.MoveChild(Node, intIndex);
-				}
-				else
-				{
-					Container.AddChild(Node);
-				}
+				Container.AddChild(Node);
+				Container.MoveChild(Node, intIndex);
 			}
-			else 
+			else
 			{
-				// Multi placement
-				foreach( Node node in Nodes ) 
-				{
-					Container.AddChild(node);
-					if( index is int intIndex ) 
-					{
-						Container.MoveChild(node, intIndex);
-					}
-				}
+				Container.AddChild(Node);
 			}
 		}
 		
@@ -141,47 +160,115 @@ namespace AssetSnap.Trait
 		** @param int index
 		** @return void
 		*/
-		public virtual void _Select( int index ) 
+		public virtual void _Select( int index, bool debug = false ) 
 		{
+			Dependencies = new();
 			_select = true;
 
-			if (
-				false == HasTypeString() ||
-				IsDisposed()
-			)
+			// if (
+			// 	false == HasTypeString() ||
+			// 	IsDisposed()
+			// )
+			// {
+			// 	_select = false;
+			// 	if( IsDisposed() ) 
+			// 	{
+			// 		GD.PushError("Node is disposed", Name);
+			// 	}
+			// 	else 
+			// 	{
+			// 		GD.PushError("No type string", Name);
+			// 	}
+			// 	return;
+			// }
+			
+			if( null == Plugin.Singleton ) 
 			{
+				if( debug ) 
+				{
+					GD.PushError("No PluginController found");
+				}
 				_select = false;
 				return;
 			}
+			
+			if( null == Plugin.Singleton.traitGlobal ) 
+			{
+				if (debug)
+				{
+					GD.PushError("No global trait found");
+				}
+				_select = false;
+				return;
+			}
+			
+			if( null == TypeString ) 
+			{
+				if (debug)
+				{
+					GD.PushError("No typestring is currently set");
+				}
+				_select = false;
+			}
+			
+			if( null == OwnerName ) 
+			{
+				if (debug)
+				{
+					GD.PushError("No ownername is currently set");
+				}
+				_select = false;
+			}
+			
+			if( null == TypeString || null == OwnerName) 
+			{
+				return;
+			} 
 
-			if (false == HasNodeEntries())
+			string NameResult = Plugin.Singleton.traitGlobal.GetName(index, TypeString, OwnerName);
+			TraitName = NameResult;
+			
+
+			if (false == HasNodeEntries())	
 			{
 				_select = false;
+				if (debug)
+				{
+					GD.PushError("No Entries for owner: ", OwnerName, " - ", NameResult);
+				}
 				return;
 			}
 
 			if (false == ContainsIndex(index))
 			{
 				_select = false;
+				if (debug)
+				{
+					GD.PushError("No contain index");
+				}
+				
 				return;
 			}
 
-			if (
-				null == Nodes[index] ||
-				Nodes[index].IsQueuedForDeletion()
-			)
+			Node traitIndex = Plugin.Singleton.traitGlobal.GetInstance(index, TypeString, OwnerName, debug);
+			if (EditorPlugin.IsInstanceValid(traitIndex) && traitIndex is Control childNode)
 			{
-				_select = false;
-				return;
-			}
+				Dependencies[TraitName + "_WorkingNode"] = childNode;
 
-			if (IsInstanceValid(Nodes[index]) && Nodes[index] is Node childNode)
-			{
-				WorkingNode = childNode;
+				if( debug ) 
+				{
+					GD.Print("Node found");
+				}
+				
 				_select = true;
 				return;
 			}
 
+			if (debug)
+			{
+				GD.PushError("Failed: ", TraitName, "::", traitIndex, "::", OwnerName, "::", TypeString, "->", EditorPlugin.IsInstanceValid(traitIndex),"||", traitIndex is Control);
+			}
+			
 			_select = false;
 			return;
 		}
@@ -199,7 +286,7 @@ namespace AssetSnap.Trait
 			{
 				if( label.Name == name ) 
 				{
-					WorkingNode = label;
+					Dependencies[TraitName + "_WorkingNode"] = label;
 					break;
 				}
 			}
@@ -273,7 +360,7 @@ namespace AssetSnap.Trait
 		*/
 		public virtual void _SetName( string text ) 
 		{
-			Name = text;
+			TraitName = text;
 		}
 		
 		/*
@@ -287,6 +374,20 @@ namespace AssetSnap.Trait
 		{
 			CustomMinimumSize = new Vector2( width, height);
 			Size = new Vector2( width, height);
+
+			return this;
+		}
+		
+		/*
+		** Sets the minimum size of the container
+		**
+		** @param int width
+		** @param int height
+		** @return Containerable
+		*/
+		public virtual Base SetMinimumDimension( int width, int height )
+		{
+			CustomMinimumSize = new Vector2( width, height);
 
 			return this;
 		}
@@ -329,10 +430,10 @@ namespace AssetSnap.Trait
 		*/
 		public T GetNode<T>()
 		{
-			if( null != WorkingNode ) 
+			if( Dependencies.ContainsKey(TraitName + "_WorkingNode") ) 
 			{
 				// Single placement
-				if( WorkingNode is T WorkingNodeFull) 
+				if( Dependencies[TraitName + "_WorkingNode"].As<GodotObject>() is T WorkingNodeFull) 
 				{
 					return WorkingNodeFull;
 				}
@@ -350,9 +451,9 @@ namespace AssetSnap.Trait
 		*/
 		public virtual Node GetNode()
 		{
-			if( null != WorkingNode ) 
+			if( Dependencies.ContainsKey(TraitName + "_WorkingNode") ) 
 			{
-				return WorkingNode;
+				return Dependencies[TraitName + "_WorkingNode"].As<GodotObject>() as Node;
 			}
 
 			return null;
@@ -369,7 +470,15 @@ namespace AssetSnap.Trait
 		*/
 		public virtual bool IsValid()
 		{
-			return _select != false && IsDisposed() != true;
+			return 
+				TotalCount != 0 && 
+				_select != false &&
+				IsDisposed() != true &&
+				Build == false &&
+				null != Plugin.Singleton &&
+				null != Plugin.Singleton.traitGlobal &&
+				null != OwnerName &&
+				null != TypeString;
 		}
 		
 		/*
@@ -379,7 +488,7 @@ namespace AssetSnap.Trait
 		*/
 		public bool IsDisposed()
 		{
-			return disposed;
+			return false;
 		}
 		
 		/*
@@ -390,7 +499,7 @@ namespace AssetSnap.Trait
 		*/
 		public bool ContainsIndex( int index ) 
 		{
-			return Nodes.Count >= index;
+			return Plugin.Singleton.traitGlobal.CountOwner( OwnerName ) >= index;
 		}
 		
 		/*
@@ -401,8 +510,7 @@ namespace AssetSnap.Trait
 		*/
 		private bool HasNodeEntries()
 		{
-			return null != Nodes &&
-				Nodes.Count != 0;
+			return Plugin.Singleton.traitGlobal.Count() != 0 && Plugin.Singleton.traitGlobal.CountOwner( OwnerName ) != 0;
 		}
 		
 		/*
@@ -414,18 +522,69 @@ namespace AssetSnap.Trait
 		{
 			return null != TypeString && "" != TypeString;
 		}
+		
+		public virtual void Clear(int index = 0, bool debug = false)
+		{
+			if( null == TypeString || null == OwnerName || null == Plugin.Singleton || null == Plugin.Singleton.traitGlobal ) 
+			{
+				Dependencies = new();
+				return;
+			}
 
-		/*
-		** Cleanup
-		**
-		** @return void
-		*/
+			Godot.Collections.Dictionary<int, Node> instances = Plugin.Singleton.traitGlobal.AllInstances(TypeString, OwnerName);
+			
+			if( null == instances || instances.Count == 0 ) 
+			{
+				Dependencies = new();
+				return;
+			}
+
+			// GD.Print(instances, instances.Count);
+			foreach( (int idx, Node node) in instances )
+			{
+				if( debug ) 
+				{
+					GD.Print("Index::", idx, TypeString, OwnerName);
+				}
+
+				Plugin.Singleton.traitGlobal.RemoveInstance(idx, TypeString, OwnerName );
+			}
+
+			Dependencies = new();
+		}
+		
+		public virtual int Count()
+		{
+			if( null == TypeString || null == OwnerName || null == Plugin.Singleton || null == Plugin.Singleton.traitGlobal ) 
+			{
+				return 0;
+			}
+			
+			Godot.Collections.Dictionary<int, Node> instances = Plugin.Singleton.traitGlobal.AllInstances(TypeString, OwnerName);
+			
+			if( null == instances || instances.Count == 0 ) 
+			{
+				return 0;
+			}
+
+			return instances.Count;
+		}
+			
+		public void OnBeforeSerialize()
+		{
+			Build = true;
+		}
+		
+		public void OnAfterDeserialize()
+		{
+			Build = false;
+		}
+
 		public override void _ExitTree()
 		{
-			disposed = true;
+			// Clear();
 			
 			base._ExitTree();
 		}
 	}
 }
-#endif

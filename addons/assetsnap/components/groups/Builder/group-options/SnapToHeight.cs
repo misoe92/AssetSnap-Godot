@@ -28,6 +28,14 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 	[Tool]
 	public partial class SnapToHeight : GroupOptionCheckableComponent
 	{
+		public SnapToHeight()
+		{
+			UsingTraits = new()
+			{
+				{ typeof(Checkable).ToString() },
+			};
+		}
+		
 		protected override void _InitializeFields()
 		{
 			Trait<Checkable>()

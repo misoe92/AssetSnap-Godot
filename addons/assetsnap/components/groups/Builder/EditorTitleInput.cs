@@ -38,6 +38,8 @@ namespace AssetSnap.Front.Components.Groups.Builder
 
 		public override void Initialize()
 		{
+			base.Initialize();
+			
 			Initiated = true;
 			
 			_InputField = new()
@@ -53,11 +55,6 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		
 		public void Update()
 		{
-			if( null == _GlobalExplorer ) 
-			{
-				_GlobalExplorer = GlobalExplorer.GetInstance();
-			}
-			
 			if( null == _GlobalExplorer.GroupBuilder._Editor.Group || false == IsInstanceValid(_GlobalExplorer.GroupBuilder._Editor.Group) ) 
 			{
 				_InputField.Text = "None, select one in the sidebar or create one to start";

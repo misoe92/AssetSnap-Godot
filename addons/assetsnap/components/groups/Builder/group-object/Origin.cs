@@ -24,6 +24,7 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 {
 	using AssetSnap.Component;
 	using Godot;
+	using Godot.Collections;
 
 	[Tool]
 	public partial class Origin : GroupObjectComponent
@@ -31,18 +32,21 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 
 		public EditorGroupObject Parent;
 		
+		public Origin()
+		{
+			UsingTraits = new()
+			{
+				{ typeof(Containerable).ToString() },
+				{ typeof(Spinboxable).ToString() },
+				{ typeof(Labelable).ToString() },
+			};
+		}
+		
 		public double GetValue( int index ) 
 		{
 			return Trait<Spinboxable>()
 				.Select(index)
 				.GetValue();
-		}
-		
-		protected override void _RegisterTraits()
-		{
-			AddTrait(typeof(Containerable));
-			AddTrait(typeof(Spinboxable));
-			AddTrait(typeof(Labelable));
 		}
 		
 		protected override void _InitializeFields()

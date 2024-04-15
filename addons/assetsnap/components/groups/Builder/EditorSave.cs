@@ -24,23 +24,31 @@ namespace AssetSnap.Front.Components.Groups.Builder
 {
 	using AssetSnap.Component;
 	using Godot;
+	using Godot.Collections;
 
 	[Tool]
 	public partial class EditorSave : LibraryComponent
 	{
-		public EditorSave()
-		{
-			Name = "GroupBuilderEditorSave";
-			//_include = false;
-		}
-		
 		private static readonly string Text = "Save"; 
 		private static readonly string TooltipText = "Will save the title and the object values"; 
 		private static readonly Control.CursorShape MouseDefaultCursorShape = Control.CursorShape.PointingHand;
 
+		public EditorSave()
+		{
+			Name = "GroupBuilderEditorSave";
+			
+			UsingTraits = new()
+			{
+				{ typeof(Buttonable).ToString() },
+			};
+			
+			//_include = false;
+		}
+
 		public override void Initialize()
 		{
-			AddTrait(typeof(Buttonable));
+			base.Initialize();
+			
 			Initiated = true;
 
 			_InitializeFields();

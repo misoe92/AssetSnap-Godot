@@ -23,7 +23,10 @@ namespace AssetSnap.Front.Components
 {
 	using AssetSnap.Component;
 	using AssetSnap.Explorer;
+	using AssetSnap.Settings;
+	using AssetSnap.Trait;
 	using Godot;
+	using Godot.Collections;
 
 	[Tool]
 	public partial class LibrariesListing : TraitableComponent
@@ -31,8 +34,8 @@ namespace AssetSnap.Front.Components
 		private readonly string TitleText = "Libraries";
 		private readonly string NotFoundText = "No folder libraries was found, to start using the addon add a folder first by using the button on the left with the label 'Add Library'.";
 		private int CurrentFolderCount = 0;
-
 		private Godot.Collections.Array<BaseComponent> _Entries = new();
+
 		/*
 		** Constructor of the class
 		** 
@@ -41,6 +44,15 @@ namespace AssetSnap.Front.Components
 		public LibrariesListing()
 		{
 			Name = "LibrariesListing";
+			
+			UsingTraits = new()
+			{
+				{ typeof(Listable).ToString() },
+				{ typeof(Labelable).ToString() },
+				{ typeof(Panelable).ToString() },
+				{ typeof(Containerable).ToString() },
+			};
+		
 			//_include = false;
 		}
 
@@ -50,25 +62,36 @@ namespace AssetSnap.Front.Components
 		** @return void
 		*/ 
 		public override void Initialize()
+		{		
+			base.Initialize();
+			
+			_GlobalExplorer._Plugin.FoldersLoaded += () => { _OnLoadEntries(); };
+		}
+		
+		public void LoadInEntries()
 		{
 			base.Initialize();
-			AddTrait(typeof(Containerable));
-			AddTrait(typeof(Panelable));
-			AddTrait(typeof(Listable));
-			AddTrait(typeof(Labelable));
-			Initiated = true;
+			
+			if( null == Trait<Labelable>() || null == Trait<Listable>() ) 
+			{
+				GD.PushError("Failed to update since traits wasn't loaded");
+				return;
+			}
 			
 			CurrentFolderCount = _GlobalExplorer.Settings.FolderCount;
-
-			Trait<Labelable>()
-				.SetMargin(0, "bottom")
-				.SetName( "ListingTitle" )
-				.SetType( Labelable.TitleType.HeaderLarge)
-				.SetText( TitleText )
-				.Instantiate()
-				.Select(0)
-				.AddToContainer( Container ) ;
-			 
+				
+			if( null == Trait<Labelable>().Select(0).GetNode() ) 
+			{
+				Trait<Labelable>()
+					.SetMargin(0, "bottom")
+					.SetName( "ListingTitle" )
+					.SetType( Labelable.TitleType.HeaderLarge)
+					.SetText( TitleText )
+					.Instantiate()
+					.Select(0)
+					.AddToContainer( this ) ;
+			}
+			
 			_SetupListTable(); 
 		}
 		
@@ -79,55 +102,68 @@ namespace AssetSnap.Front.Components
 		*/
 		public void ForceUpdate()
 		{
-			if( Trait<Labelable>().ContainsIndex(0) )
-			{
-				if( false == ClearTrait<Labelable>() ) 
-				{
-					GD.PushError("Container was not cleared");
-				}
-				AddTrait(typeof(Labelable));
-			}
-			if( Trait<Panelable>().ContainsIndex(0) )
-			{
-				if( false == ClearTrait<Panelable>() ) 
-				{
-					GD.PushError("Container was not cleared");
-				}
-				AddTrait(typeof(Panelable));
-			}
-			if( Trait<Containerable>().ContainsIndex(0) )
-			{
-				if( false == ClearTrait<Containerable>() ) 
-				{
-					GD.PushError("Container was not cleared");
-				}
-				AddTrait(typeof(Containerable));
-			}
+			// if(
+			// 	null != Trait<Labelable>() &&
+			// 	Trait<Labelable>().ContainsIndex(0)
+			// )
+			// {
+			// 	if( false == ClearTrait<Labelable>() ) 
+			// 	{
+			// 		GD.PushError("Container was not cleared");
+			// 	}
+			// }
+			// AddTrait(typeof(Labelable));
+			// if(
+			// 	null != Trait<Panelable>() &&
+			// 	Trait<Panelable>().ContainsIndex(0)
+			// )
+			// {
+			// 	if( false == ClearTrait<Panelable>() ) 
+			// 	{
+			// 		GD.PushError("Container was not cleared");
+			// 	}
+			// }
+			// AddTrait(typeof(Panelable));
+			// if(
+			// 	null != Trait<Containerable>() &&
+			// 	Trait<Containerable>().ContainsIndex(0)
+			// ) 
+			// {
+			// 	if( false == ClearTrait<Containerable>() ) 
+			// 	{ 
+			// 		GD.PushError("Container was not cleared");
+			// 	}
+			// }
+			// AddTrait(typeof(Containerable));
 			
-			if( Trait<Listable>().ContainsIndex(0) )
-			{
-				if( false == ClearTrait<Listable>() ) 
-				{
-					GD.PushError("Listable was not cleared");
-				}
-				AddTrait(typeof(Listable));
-			}
+			// if(
+			// 	null != Trait<Listable>() &&
+			// 	Trait<Listable>().ContainsIndex(0)
+			// )
+			// {
+			// 	if( false == ClearTrait<Listable>() ) 
+			// 	{
+			// 		GD.PushError("Listable was not cleared");
+			// 	}
+			// }
+			 
+			// Trait<Containerable>()
+			// 	.SetName( "ListingBoxContainer" )
+			// 	.SetMargin(115, "left")
+			// 	.SetMargin(35, "right")
+			// 	.SetMargin(0, "top")
+			// 	.SetMargin(0, "bottom")
+			// 	.SetVerticalSizeFlags(Control.SizeFlags.ExpandFill)
+			// 	.Instantiate();
 			
-			Trait<Containerable>()
-				.SetName( "ListingBoxContainer" )
-				.SetMargin(15, "left")
-				.SetMargin(15, "right")
-				.SetMargin(0, "top")
-				.SetMargin(0, "bottom")
-				.Instantiate();
+			// _UpdateListTable();
 			
-			_UpdateListTable();
-			
-			Trait<Containerable>()
-				.Select(0)
-				.AddToContainer(
-					Container
-				);
+			// Trait<Containerable>()
+			// 	.Select(0)
+			// 	.AddToContainer(
+			// 		Container
+			// 	);
+				
 		}
 		
 		/*
@@ -157,21 +193,28 @@ namespace AssetSnap.Front.Components
 		*/
 		private void _SetupNoFoldersTable()
 		{
-			Trait<Containerable>()
-				.SetName( "ListingBoxContainer" )
-				.SetMargin(15, "left")
-				.SetMargin(15, "right")
-				.SetMargin(0, "top")
-				.SetMargin(0, "bottom")
-				.Instantiate();
+			if (null == Trait<Containerable>().Select(0).GetNode())
+			{
+				Trait<Containerable>()
+					.SetName("ListingBoxContainer")
+					.SetMargin(5, "left")
+					.SetMargin(5, "right")
+					.SetMargin(0, "top")
+					.SetMargin(0, "bottom")
+					.SetVerticalSizeFlags(Control.SizeFlags.ExpandFill)
+					.Instantiate();
+			}
 
 			_SetupNoFolderLabel();
-						
-			Trait<Containerable>()
-				.Select(0)
-				.AddToContainer(
-					Container
-				);
+			
+			if (null == Trait<Containerable>().Select(0).GetNode())
+			{		
+				Trait<Containerable>()
+					.Select(0)
+					.AddToContainer(
+						this
+					);
+			}
 		}
 		
 		/*
@@ -181,21 +224,28 @@ namespace AssetSnap.Front.Components
 		*/
 		private void _SetupFolderListTable()
 		{
-			Trait<Containerable>()
-				.SetName( "ListingBoxContainer" )
-				.SetMargin(15, "left")
-				.SetMargin(15, "right")
-				.SetMargin(0, "top")
-				.SetMargin(5, "bottom")
-				.Instantiate();
+			if ( null == Trait<Containerable>().Select(0).GetInnerContainer() )
+			{
+				Trait<Containerable>()
+					.SetName( "ListingBoxContainer" )
+					.SetMargin(5, "left")
+					.SetMargin(5, "right")
+					.SetMargin(0, "top")
+					.SetMargin(5, "bottom")
+					.SetVerticalSizeFlags(Control.SizeFlags.ExpandFill)
+					.Instantiate();
+			}
 
 			_SetupFolderListing();
 
-			Trait<Containerable>()
-				.Select(0)
-				.AddToContainer(
-					Container
-				);
+			if ( null != Trait<Containerable>().Select(0).GetInnerContainer() &&  null == Trait<Containerable>().Select(0).GetContainerParent() )
+			{
+				Trait<Containerable>()
+					.Select(0)
+					.AddToContainer(
+						this
+					);
+			}
 		}
 		
 		/*
@@ -252,15 +302,30 @@ namespace AssetSnap.Front.Components
 		*/
 		private void _SetupFolderListing()
 		{
+			if(
+				null == Trait<Containerable>().Select(0).GetInnerContainer()
+			) 
+			{
+				GD.PushError("No container was found");
+				return;	
+			}
+			
 			Container container = Trait<Containerable>()
 				.Select(0)
 				.GetInnerContainer();
 				
+			if( null != Trait<Listable>().Select(0).GetNode() ) 
+			{
+				GD.Print("Runs");
+				Trait<Listable>().Iteration = 0;
+				Trait<Listable>().Clear(0);
+			}
+				
 			Trait<Listable>()
-				.SetName("LibrariesListing")
-				.SetCount(_GlobalExplorer.Settings.FolderCount)
+				.SetName("LibrariesListing") 
+				.SetCount(SettingsUtils.Get().FolderCount)
 				.SetComponent("AssetSnap.Front.Components.LibrariesListingEntry")
-				.SetDimensions(500, 0)
+				.SetDimensions(400, 0)
 				.Each(
 					(int index, BaseComponent component) =>
 					{
@@ -270,7 +335,7 @@ namespace AssetSnap.Front.Components
 							_component.title = title;
 							_component.Initialize();
 
-							AddChild(_component, true);
+							// AddChild(_component, true);
 							// _Entries.Add(_component);
 						}
 					}
@@ -319,9 +384,23 @@ namespace AssetSnap.Front.Components
 					panel
 				);
 		}
+		
+		public void _OnLoadEntries()
+		{
+			if( Initiated ) 
+			{
+				// GetParent().RemoveChild(this);
+				// Clear();
+			}
+			
+			Initiated = true;
+			LoadInEntries();	
+		}
 
 		public override void _ExitTree()
 		{
+			_GlobalExplorer._Plugin.FoldersLoaded -= () => { _OnLoadEntries(); };
+			
 			base._ExitTree();
 		}
 	}

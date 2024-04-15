@@ -126,9 +126,9 @@ namespace AssetSnap.Front.Components.Library
 		*/
 		private bool _ShouldGrab()
 		{
-			if( null == _GlobalExplorer || false == EditorPlugin.IsInstanceValid(_GlobalExplorer.Settings) ) 
+			if( null == _GlobalExplorer || null == _GlobalExplorer.Settings ) 
 			{
-				return false;
+				return false; 
 			}
 			
 			bool ModelGrab = _GlobalExplorer.Settings.GetKey("allow_model_grab").As<bool>();

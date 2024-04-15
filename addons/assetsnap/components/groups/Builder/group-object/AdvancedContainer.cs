@@ -26,6 +26,7 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 	using AssetSnap.Component;
 	using Godot;
 	using AssetSnap.Front.Components.Groups.Builder.GroupObject.AdvancedContainers;
+	using Godot.Collections;
 
 	[Tool]
 	public partial class AdvancedContainer : GroupObjectComponent
@@ -34,6 +35,17 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 		private ConvexCollision _GroupBuilderEditorGroupObjectAdvancedContainerConvexCollision;
 		private ConcaveCollision _GroupBuilderEditorGroupObjectAdvancedContainerConcaveCollision;
 		private SnapLayer _GroupBuilderEditorGroupObjectAdvancedContainerSnapLayer;
+		
+		public AdvancedContainer()
+		{
+			UsingTraits = new()
+			{
+				{ typeof(Containerable).ToString() },
+				{ typeof(Buttonable).ToString() },
+				{ typeof(Spinboxable).ToString() },
+				{ typeof(Labelable).ToString() },
+			};
+		}
 		
 		public bool IsVisible()
 		{
@@ -49,14 +61,6 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 				.ToggleVisible();
 		}
 		
-		protected override void _RegisterTraits()
-		{
-			AddTrait(typeof(Containerable));
-			AddTrait(typeof(Buttonable));
-			AddTrait(typeof(Spinboxable));
-			AddTrait(typeof(Labelable));
-			
-		}
 		protected override void _InitializeFields()
 		{
 			Trait<Containerable>()
@@ -83,7 +87,7 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 			Trait<Containerable>()
 				.Select(0)
 				.AddToContainer(
-					Container
+					this
 				);
 		}
 		

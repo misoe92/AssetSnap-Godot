@@ -22,8 +22,7 @@
 #if TOOLS
 namespace AssetSnap.Front.Nodes
 {
-using System;
-using Godot;
+	using Godot;
 
 	[Tool] 
 	public partial class DropdownButton : Button

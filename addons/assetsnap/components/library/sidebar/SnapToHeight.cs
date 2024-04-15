@@ -24,6 +24,7 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 {
 	using AssetSnap.Component;
 	using Godot;
+	using Godot.Collections;
 
 	[Tool]
 	public partial class SnapToHeight : LSSnapComponent
@@ -47,6 +48,13 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		{
 			Name = "LSSnapToHeight";
 			Angle = GlobalStates.SnapAngleEnums.Y;
+			
+			UsingTraits = new()
+			{
+				{ typeof(Checkable).ToString() },
+				{ typeof(Spinboxable).ToString() },
+			};
+			
 			//_include = false;
 		}
 		
@@ -58,8 +66,6 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		public override void Initialize()
 		{
 			base.Initialize();
-			AddTrait(typeof(Checkable));
-			AddTrait(typeof(Spinboxable));
 			
 			Initiated = true;
 			
@@ -248,6 +254,12 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			_GlobalExplorer.States.SnapToHeight = Trait<Checkable>().Select(0).GetValue() ? GlobalStates.LibraryStateEnum.Enabled : GlobalStates.LibraryStateEnum.Disabled;
 			_GlobalExplorer.States.SnapToHeightGlue = Trait<Checkable>().Select(1).GetValue() ? GlobalStates.LibraryStateEnum.Enabled : GlobalStates.LibraryStateEnum.Disabled;
 			_GlobalExplorer.States.SnapToHeightValue = (float)Trait<Spinboxable>().GetValue();
+		}
+		
+		public override void _ExitTree()
+		{
+			
+			base._ExitTree();
 		}
 	}
 }

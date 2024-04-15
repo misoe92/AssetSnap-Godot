@@ -22,6 +22,7 @@
 
 #if TOOLS
 using System;
+using AssetSnap.Trait;
 using Godot;
 namespace AssetSnap.Component
 {
@@ -53,11 +54,6 @@ namespace AssetSnap.Component
 		*/
 		[Export]
 		public Godot.Collections.Array<Callable> _Actions = new Godot.Collections.Array<Callable>();
-
-		/*
-		** Public
-		*/
-		public int index = 0;
 		
 		/*
 		** Private
@@ -77,6 +73,11 @@ namespace AssetSnap.Component
 		private HorizontalAlignment IconAlignment;
 		private string Text = "";
 		private string TooltipText = "";
+
+		public Buttonable()
+		{
+			TypeString = GetType().ToString();
+		}
 		
 		/*
 		** Public methods
@@ -89,12 +90,12 @@ namespace AssetSnap.Component
 		*/	
 		public Buttonable Instantiate()
 		{
-			base._Instantiate( GetType().ToString() );
+			base._Instantiate();
 			
 			// Setup the button
 			Button WorkingButton = new()
 			{
-				Name = Name,
+				Name = TraitName,
 				Text = Text,
 				TooltipText = TooltipText,
 				ThemeTypeVariation = WorkingButtonType.ToString(),
@@ -110,39 +111,50 @@ namespace AssetSnap.Component
 				WorkingButton.IconAlignment = IconAlignment;
 			}
 
-			WorkingButton.SetMeta("index", index);
+			WorkingButton.SetMeta("index", Iteration);
 
 			// Connect the button to it's action
-			if( _Actions.Count >= index ) 
+			if( _Actions.Count >= Iteration ) 
 			{
-				Callable actionCallable = _Actions[index];
+				Callable actionCallable = _Actions[Iteration];
 				Godot.Error error = WorkingButton.Connect( Button.SignalName.Pressed, actionCallable);
 				if( error != Godot.Error.Ok)
 				{
 					GD.Print("Error connecting signal: " + error.ToString());
 				}
 			}
+
+			Dependencies[TraitName + "_WorkingNode"] = WorkingButton;
 			
 			// Add the button to the nodes array			
-			Nodes.Add(WorkingButton);
+			Plugin.Singleton.traitGlobal.AddInstance(Iteration, WorkingButton, OwnerName, TypeString, Dependencies);
+			Plugin.Singleton.traitGlobal.AddName(Iteration, TraitName, OwnerName, TypeString);
 
-			// Increase index and clear the trait
-			index += 1;
+			// Increase Iteration and clear the trait
+			Iteration += 1;
 			Reset();
 		
+			Dependencies = new();
+			
 			return this;
 		}
 		
 		/*
 		** Selects an placed button in the
-		** nodes array by index
+		** nodes array by Iteration
 		**
 		** @param int index
 		** @return Buttonable
 		*/
 		public Buttonable Select(int index)
-		{
+		{			
 			base._Select(index);
+			
+			if( false != Dependencies.ContainsKey(TraitName + "_WorkingNode")) 
+			{
+				Godot.Collections.Dictionary<string, Variant> dependencies = Plugin.Singleton.traitGlobal.GetDependencies(index, TypeString, OwnerName);
+				Dependencies = dependencies;
+			}
 			
 			return this;
 		}
@@ -160,7 +172,7 @@ namespace AssetSnap.Component
 			{
 				if( button.Name == name ) 
 				{
-					WorkingNode = button;
+					Dependencies[TraitName + "_WorkingNode"] = button;
 					break;
 				}
 			}
@@ -177,7 +189,12 @@ namespace AssetSnap.Component
 		*/
 		public void AddToContainer( Node Container )
 		{
-			_AddToContainer(Container, WorkingNode);
+			if( false == Dependencies.ContainsKey(TraitName + "_WorkingNode")) 
+			{
+				return;
+			}
+			
+			_AddToContainer(Container, Dependencies[TraitName + "_WorkingNode"].As<Button>());
 		}
 		
 		/*
@@ -206,6 +223,7 @@ namespace AssetSnap.Component
 		public Buttonable SetText( string text ) 
 		{
 			Text = text;
+			TraitName = text;
 			
 			return this;
 		}
@@ -234,7 +252,7 @@ namespace AssetSnap.Component
 		{
 			base._SetVisible(state);
 			
-			if( null != WorkingNode && WorkingNode is Button button) 
+			if( false != Dependencies.ContainsKey(TraitName + "_WorkingNode") && Dependencies[TraitName + "_WorkingNode"].As<GodotObject>() is Button button) 
 			{
 				button.Visible = state;
 			}
@@ -396,7 +414,6 @@ namespace AssetSnap.Component
 		{
 			Text = "";
 			TooltipText = "";
-			WorkingNode = null;
 			WorkingButtonType = ButtonType.DefaultButton;
 			DefaultCursorShape = Godot.Control.CursorShape.PointingHand;
 		}

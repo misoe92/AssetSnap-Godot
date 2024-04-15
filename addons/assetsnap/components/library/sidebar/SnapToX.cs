@@ -24,6 +24,7 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 {
 	using AssetSnap.Component;
 	using Godot;
+	using Godot.Collections;
 
 	[Tool]
 	public partial class SnapToX : LSSnapComponent
@@ -45,6 +46,12 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			Name = "LSSnapToX";
 			Angle = GlobalStates.SnapAngleEnums.X;
 			
+			UsingTraits = new()
+			{
+				{ typeof(Checkable).ToString() },
+				{ typeof(Spinboxable).ToString() },
+			};
+			
 			//_include = false;
 		}
 		
@@ -56,8 +63,6 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		public override void Initialize()
 		{
 			base.Initialize();
-			AddTrait(typeof(Checkable));
-			AddTrait(typeof(Spinboxable));
 
 			Initiated = true;
 			
@@ -66,7 +71,7 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 				_InitializeCheckBox(BoxContainer);
 				_InitializeGlue(BoxContainer);
 				_InitializeSpinBox(BoxContainer);
-					Plugin.GetInstance().StatesChanged += () => { MaybeUpdateValue(); };
+				Plugin.GetInstance().StatesChanged += () => { MaybeUpdateValue(); };
 			}
 		}
 
@@ -97,7 +102,7 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			Callable _callable = Callable.From(() => { _OnCheckboxPressed(); });
 			
 			Trait<Checkable>()
-				.SetName("SnapXGlueCheckbox")
+				.SetName("SnapXCheckbox")
 				.SetAction( _callable )
 				.SetDimensions(140, 20)
 				.SetMargin(10, "left")
@@ -242,6 +247,12 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			_GlobalExplorer.States.SnapToX = Trait<Checkable>().Select(0).GetValue() ? GlobalStates.LibraryStateEnum.Enabled : GlobalStates.LibraryStateEnum.Disabled;
 			_GlobalExplorer.States.SnapToXGlue = Trait<Checkable>().Select(1).GetValue() ? GlobalStates.LibraryStateEnum.Enabled : GlobalStates.LibraryStateEnum.Disabled;
 			_GlobalExplorer.States.SnapToXValue = (float)Trait<Spinboxable>().GetValue();
+		}
+
+		public override void _ExitTree()
+		{
+			
+			base._ExitTree();
 		}
 	}
 }

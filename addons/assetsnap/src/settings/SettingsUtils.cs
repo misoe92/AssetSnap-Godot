@@ -20,40 +20,20 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
-{
-	using AssetSnap.Component;
-	using Godot;
-	using Godot.Collections;
+using AssetSnap.Front.Configs;
 
-	[Tool]
-	public partial class PlacementOptimized : GroupOptionCheckableComponent
+namespace AssetSnap.Settings
+{
+	public static class SettingsUtils
 	{
-		public PlacementOptimized()
+		public static SettingsConfig Get()
 		{
-			UsingTraits = new()
-			{
-				{ typeof(Checkable).ToString() },
-			};
+			return SettingsConfig.Singleton;
 		}
 		
-		protected override void _InitializeFields()
+		public static bool IsValid()
 		{
-			Trait<Checkable>()
-				.SetName("GroupBuilderEditorGroupOptionPlacementOptimized")
-				.SetMargin(35, "right")
-				.SetText("Optimized placement")
-				.SetAction( Callable.From( () => { _OnCheck(); }) )
-				.Instantiate();
-		}
-
-		private void _OnCheck()
-		{
-			_GlobalExplorer.States.PlacingType = GlobalStates.PlacingTypeEnum.Optimized;
-			
-			Parent._UpdateGroupOptions();
-			_MaybeUpdateGrouped("PlacementOptimized", _GlobalExplorer.States.PlacingType == GlobalStates.PlacingTypeEnum.Optimized);
-			_HasGroupDataHasChanged();
+			return Get() != null;
 		}
 	}
 }

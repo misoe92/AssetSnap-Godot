@@ -24,7 +24,6 @@ namespace AssetSnap.GroupBuilder
 {
 	using System.Collections.Generic;
 	using AssetSnap.Explorer;
-
 	using AssetSnap.Front.Components.Groups.Builder;
 	using AssetSnap.Front.Nodes;
 	using AssetSnap.States;
@@ -33,49 +32,111 @@ namespace AssetSnap.GroupBuilder
 	[Tool]
 	public partial class Base : Node
 	{
-		public PanelContainer Container;
+		public bool Initialized = false;
+		/*
+		** Public
+		*/
+		public static Base Singleton
+		{
+			get
+			{
+				if( null == _Instance ) 
+				{
+					_Instance = new();
+				}
 
+				return _Instance;
+			}
+		}
+		
+		public PanelContainer Container;
 		public Front.Components.Groups.Container _GroupContainer;
 		public Sidebar _Sidebar;
 		public Editor _Editor;
-
-		public PanelContainer MenuPanelContainer;
-		public MarginContainer MenuMarginContainer;
-		public VBoxContainer MenuBoxContainer;
-		public Button AddToCurrentGroup;
-		public Label MenuTitle;
-
-		private GlobalExplorer _GlobalExplorer;
-		private readonly Theme _Theme = GD.Load<Theme>("res://addons/assetsnap/assets/themes/SnapMenu.tres");
 		
-		private Godot.Collections.Array<AsMeshInstance3D> _Items = new();
-
-		private string FocusedMesh = "";
-		
+		/*
+		** Private
+		*/
 		private readonly List<string> OuterComponents = new()
 		{
 			"Groups.Container",
 		};
-		
 		private readonly List<string> InnerComponents = new()
 		{
 			"Groups.Builder.Sidebar",
 			"Groups.Builder.Editor",
 		};
+		private static Base _Instance;
 		
+		/*
+		** Initializes the group builder
+		*/
 		public void Initialize()
 		{
-			_GlobalExplorer = GlobalExplorer.GetInstance();
-			_InitializeMenu();
-
 			StatesUtils.SetLoad("GroupBuilder", true);
 		}
+		
+		public bool HasMenu()
+		{
+			return ExplorerUtils.Get()._Plugin
+				.GetInternalContainer()
+				.HasNode("GroupContextMenu");
+		}
+		
+		public AsGroupContextMenu GetMenu()
+		{
+			return ExplorerUtils.Get()._Plugin
+				.GetInternalContainer()
+				.GetNode("GroupContextMenu") as AsGroupContextMenu;
+		}
+		
+		public void CreateMenu()
+		{
+			AsGroupContextMenu menu = new();
+			menu.Initialize();
+			
+			ExplorerUtils.Get()._Plugin 
+				.GetInternalContainer()
+				.AddChild(menu);
+		}
 
+		public void ShowMenu( Vector2 coordinates, string path )
+		{
+			if( ! HasMenu() ) 
+			{
+				CreateMenu();
+			}
+			
+			GetMenu().ShowMenu( coordinates, path );
+		}
+		
+		public void MaybeHideMenu( Vector2 coordinates )
+		{
+			if (!HasMenu())
+			{
+				return;
+			}
+
+			GetMenu().MaybeHideMenu( coordinates );
+		}
+		
 		/*
 		** Initializes the container in the assets tab
 		*/
 		public void InitializeContainer()
 		{
+			Component.Base Components = ExplorerUtils.Get().Components;
+			
+			if( Initialized ) 
+			{
+				// Clear the instances first
+				Components.Clear<Sidebar>();
+				Components.Clear<Editor>();
+				Components.Clear<AssetSnap.Front.Components.Groups.Container>();
+			}
+			
+			Initialized = true;
+			
 			Container = new()
 			{
 				Name = "GroupBuilder",
@@ -84,7 +145,6 @@ namespace AssetSnap.GroupBuilder
 			};
 
 			/** Add the tab item if settings is turned on **/
-			Component.Base Components = ExplorerUtils.Get().Components;
 			if ( Components.HasAll( OuterComponents.ToArray() )) 
 			{
 				_GroupContainer = Components.Single<AssetSnap.Front.Components.Groups.Container>();
@@ -127,49 +187,23 @@ namespace AssetSnap.GroupBuilder
 			{
 				GD.PushError("Components was not found @ GroupBuilder -> Outer");
 			}
-		}
+		} 
 		
 		public void ClearContainer()
 		{
-			Container.GetParent().RemoveChild(Container);
-			Container.QueueFree();
-		}
-		
-		public void ShowMenu( Vector2 Coordinates, string MeshPath ) 
-		{
-			if( IsInstanceValid( MenuPanelContainer ) && IsInstanceValid(_GlobalExplorer.States.Group) ) 
+			if( null != Container ) 
 			{
-				MenuPanelContainer.Visible = true;
-				MenuPanelContainer.Position = Coordinates;
+				if( null != Container.GetParent() ) 
+				{
+					Container.GetParent().RemoveChild(Container);
+				}
 
-				FocusedMesh = MeshPath;
+				Container.QueueFree();
 			}
-		}
-		
-		public void MaybeHideMenu( Vector2 Coordinates ) 
-		{
-			if( IsInstanceValid( MenuPanelContainer ) &&  true == MenuPanelContainer.Visible ) 
+			else 
 			{
-				if( false == GlobalExplorer.GetInstance().BottomDock.Container.Visible ) 
-				{
-					HideMenu();
-					return;
-				}
-				
-				Vector2 CurrentPosition = MenuPanelContainer.Position;
-				if( CurrentPosition.X + MenuPanelContainer.Size.X + 20  < Coordinates.X || CurrentPosition.X - 20 > Coordinates.X || CurrentPosition.Y + MenuPanelContainer.Size.Y + 20 < Coordinates.Y || CurrentPosition.Y - 20 > Coordinates.Y ) 
-				{
-					HideMenu();
-					return;
-				}
+				GD.PushError("Invalid container found");
 			}
-		}
-		
-		public void HideMenu()
-		{
-			MenuPanelContainer.Visible = false;
-			MenuPanelContainer.Position = new Vector2(-400, -400);
-			FocusedMesh = "";
 		}
 		
 		public bool HasSidebar()
@@ -181,80 +215,18 @@ namespace AssetSnap.GroupBuilder
 		{
 			return null != _Editor;
 		}
-		
-		private void _InitializeMenu()
+		public void OnBeforeSerialize()
 		{
-			MenuPanelContainer = new()
-			{
-				Name = "MenuPanelContainer",
-				Visible = false,
-				Theme = _Theme
-			};
-			MenuMarginContainer = new()
-			{
-				Name = "MenuMarginContainer",
-			};
-			MenuBoxContainer = new()
-			{
-				Name = "MenuBoxContainer"
-			};
 
-			MenuTitle = new()
-			{
-				Text = "Menu",
-				ThemeTypeVariation = "HeaderSmall",
-				SizeFlagsHorizontal = Control.SizeFlags.ShrinkCenter,
-				SizeFlagsVertical = Control.SizeFlags.ShrinkBegin,
-			}; 
-			
-			MenuMarginContainer.AddThemeConstantOverride("margin_left", 5);
-			MenuMarginContainer.AddThemeConstantOverride("margin_right", 5);
-			MenuMarginContainer.AddThemeConstantOverride("margin_top", 5);
-			MenuMarginContainer.AddThemeConstantOverride("margin_bottom", 5);
-
-			MenuBoxContainer.AddChild(MenuTitle);
-
-			_SetupAddToCurrentGroupButton(MenuBoxContainer);
-
-			MenuMarginContainer.AddChild(MenuBoxContainer);
-			MenuPanelContainer.AddChild(MenuMarginContainer);
-
-			MenuPanelContainer.Position = new Vector2(-400, -400);
- 
-			AddChild(MenuPanelContainer);
 		}
-		
-		private void _SetupAddToCurrentGroupButton( VBoxContainer MenuBoxContainer )
+
+		public void OnAfterDeserialize()
 		{
-			AddToCurrentGroup = new()
-			{
-				Text = "Add to current group",
-				TooltipText = "Click to add the object to the active group",
-				CustomMinimumSize = new Vector2I(180, 20),
-				MouseDefaultCursorShape = Control.CursorShape.PointingHand
-			};
-
-			AddToCurrentGroup.Connect( Button.SignalName.Pressed, Callable.From( () => { _OnAddToCurrentGroup(); }));
-
-			MenuBoxContainer.AddChild(AddToCurrentGroup);
+			GD.Print("We're ready now.2 Target sprite" + (Container == null ? " is" : " is not") + " null");
 		}
-		
-		private void _OnAddToCurrentGroup()
-		{
-			_Editor.AddMeshToGroup(FocusedMesh);
-			HideMenu();
-		}
-		
 		private bool HasGroupContainer()
 		{
 			return null != _GroupContainer;
-		}
-
-		public override void _ExitTree()
-		{
-			// if( )
-			// AddToCurrentGroup.Disconnect( Button.SignalName.Pressed, Callable.From( () => { _OnAddToCurrentGroup(); }));
-			base._ExitTree();
 		}
 	}
 }

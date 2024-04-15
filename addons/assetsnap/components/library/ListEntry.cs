@@ -56,6 +56,7 @@ namespace AssetSnap.Front.Components.Library
 			}
 		}
 		
+		
 		/*
 		** Class constructor
 		**
@@ -74,35 +75,38 @@ namespace AssetSnap.Front.Components.Library
 		*/
 		public override void Initialize()
 		{
+			SizeFlagsHorizontal = SizeFlags.ExpandFill;
+			SizeFlagsVertical = SizeFlags.ExpandFill;
+			
+			base.Initialize();
+			
 			Initiated = true;
-			if( IsInstanceValid(Container) && Container is HBoxContainer BoxContainer ) 
+		
+			if( Filename == null || Folder == null) 
 			{
-				if( Filename == null || Folder == null) 
-				{
-					return;
-				}
-				
-				PrepareFilenameTitles();
-				
-				_PanelContainer = new()
-				{
-					TooltipText = Filename,
-					Name = _Filename,
-					Library = Library,
-				};
-
-				// Now you can use the previewImage as needed
-				// For example, you could display it in your UI or store it for later use
-				_PanelContainer.SetFilePath(Folder + "\\" + Filename);
-
-				_InitializePreviewContainer(Filename, Folder, _PanelContainer);
-				_InitializeLabelContainer(_PanelContainer);
-				
-				// Add container to parent container
-				BoxContainer.AddChild(_PanelContainer);
-
-				Library.AddPanel(_PanelContainer);
+				return;
 			}
+			
+			PrepareFilenameTitles();
+			
+			_PanelContainer = new()
+			{
+				TooltipText = Filename,
+				Name = _Filename,
+				Library = Library,
+			};
+
+			// Now you can use the previewImage as needed
+			// For example, you could display it in your UI or store it for later use
+			_PanelContainer.SetFilePath(Folder + "\\" + Filename);
+
+			_InitializePreviewContainer(Filename, Folder, _PanelContainer);
+			_InitializeLabelContainer(_PanelContainer);
+			
+			// Add container to parent container
+			AddChild(_PanelContainer);
+
+			Library.AddPanel(_PanelContainer);
 		}
 		
 		/*

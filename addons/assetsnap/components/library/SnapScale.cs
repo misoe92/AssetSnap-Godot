@@ -52,12 +52,14 @@ namespace AssetSnap.Front.Components.Library
 		*/
 		public override void Initialize() 
 		{
+			base.Initialize();
+			
 			if( _GlobalExplorer == null ) 
 			{
 				return;
 			}
 			
-			if( false == EditorPlugin.IsInstanceValid( _GlobalExplorer.ContextMenu ) ) 
+			if( null == _GlobalExplorer.ContextMenu ) 
 			{
 				return;
 			}
@@ -85,7 +87,7 @@ namespace AssetSnap.Front.Components.Library
 		*/
 		private void _OnScaleListStateChange( string which )
 		{
-			if( false == EditorPlugin.IsInstanceValid( _GlobalExplorer.ContextMenu ) ) 
+			if( null == _GlobalExplorer.ContextMenu ) 
 			{
 				return;
 			}

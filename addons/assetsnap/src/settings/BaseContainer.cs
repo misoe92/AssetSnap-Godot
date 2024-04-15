@@ -38,6 +38,8 @@ namespace AssetSnap.Settings
 		private VBoxContainer SubContainerTwo;
 		private VBoxContainer SubContainerThree;
 		private VBoxContainer SubContainerFour;
+		
+		public bool Initialized = false;
 
 		/*
 		** Initializes the settings container
@@ -47,6 +49,15 @@ namespace AssetSnap.Settings
 		*/
 		public void Initialize()
 		{
+			if( Initialized ) 
+			{
+				// Clear the instances first
+				_ScrollContainer.GetParent().RemoveChild(_ScrollContainer);
+				_ScrollContainer.QueueFree();
+			}
+
+			Initialized = true;
+			
 			SettingsConfig _Config = GlobalExplorer.GetInstance().Settings;
 			Name = "Settings";
 			

@@ -32,6 +32,20 @@ namespace AssetSnap.Snap
 	{
 		public float SnapDistance = 1.0f;
 		
+		private static SnappableBase _Instance;
+		public static SnappableBase Singleton
+		{
+			get
+			{
+				if( null == _Instance ) 
+				{
+					_Instance = new();
+				}
+
+				return _Instance;
+			}
+		}
+		
 		/*
 		** Returns snap coordinates based on a given
 		** vector 3 coordinate set and a snap layer.

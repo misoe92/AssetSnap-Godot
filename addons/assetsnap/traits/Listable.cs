@@ -42,11 +42,15 @@ namespace AssetSnap.Component
 		};
 		private Action<int, BaseComponent> OnIterationAction;
 		private string ComponentName = "";
-		private int Count = 0;
+		private int count = 0;
 		
 		/*
 		** Public methods
 		*/
+		public Listable()
+		{
+			TypeString = GetType().ToString();
+		}
 		
 		/*
 		** Instantiate an instance of the trait
@@ -55,7 +59,7 @@ namespace AssetSnap.Component
 		*/
 		public Listable Instantiate()
 		{
-			base._Instantiate( GetType().ToString() );
+			base._Instantiate();
 			
 			VBoxContainer _WorkingNode = new()
 			{
@@ -63,7 +67,9 @@ namespace AssetSnap.Component
 				Size = Size,
 			};
 			
-			for( int i = 0; i < Count; i++) 
+			Godot.Collections.Array _components = new();
+			
+			for( int i = 0; i < count; i++) 
 			{
 				string[] ComponentSingleArr = ComponentName.Split(".");
 				string ComponentSingleName = ComponentSingleArr[ComponentSingleArr.Length - 1];
@@ -77,17 +83,25 @@ namespace AssetSnap.Component
 				{
 					BaseComponent component = GlobalExplorer.GetInstance().Components.Single(ComponentName, true);
 					
-					if( null != component && IsInstanceValid( component ) ) 
+					if( null != component && EditorPlugin.IsInstanceValid( component ) ) 
 					{
 						component.Container = _WorkingNode;
 						OnIterationAction(i, component);
+						_components.Add(component);
+						// AddChild(component);
 					}
 				}
 			}
+			
+			Dependencies[TraitName + "_Components"] = _components;
+			Dependencies[TraitName + "_WorkingNode"] = _WorkingNode;
 
-			Nodes.Add(_WorkingNode);
-			WorkingNode = _WorkingNode;
+			Plugin.Singleton.traitGlobal.AddInstance(Iteration, _WorkingNode, OwnerName, TypeString, Dependencies);
+			Plugin.Singleton.traitGlobal.AddName(Iteration, TraitName, OwnerName, TypeString);
+			
 			Reset();
+			Iteration += 1;
+			Dependencies = new();
 			
 			return this;
 		}
@@ -99,10 +113,23 @@ namespace AssetSnap.Component
 		** @param int index
 		** @return Listable
 		*/
-		public Listable Select( int index ) 
+		public Listable Select( int index, bool debug = false ) 
 		{
-			base._Select(index);
+			base._Select(index, debug);
 
+			if( false != Dependencies.ContainsKey(TraitName + "_WorkingNode")) 
+			{
+				Godot.Collections.Dictionary<string, Variant> dependencies = Plugin.Singleton.traitGlobal.GetDependencies(index, TypeString, OwnerName);
+				Dependencies = dependencies;
+			}
+			else
+			{
+				if( debug ) 
+				{
+					GD.PushError("No dependencies found for panel", index, TraitName);
+				}
+			}
+ 
 			return this;
 		}	
 		
@@ -143,7 +170,12 @@ namespace AssetSnap.Component
 		*/
 		public void AddToContainer( Node Container ) 
 		{
-			base._AddToContainer(Container, WorkingNode);
+			if( false == Dependencies.ContainsKey(TraitName + "_WorkingNode") ) 
+			{
+				return;
+			}
+			
+			base._AddToContainer(Container, Dependencies[TraitName + "_WorkingNode"].As<VBoxContainer>());
 		}
 		
 		/*
@@ -159,6 +191,7 @@ namespace AssetSnap.Component
 		public Listable SetName( string text ) 
 		{
 			Name = text;
+			TraitName = text;
 
 			return this;
 		}
@@ -184,9 +217,9 @@ namespace AssetSnap.Component
 		** @param int count
 		** @return Listable
 		*/
-		public Listable SetCount( int count ) 
+		public Listable SetCount( int _count ) 
 		{
-			Count = count;
+			count = _count;
 
 			return this;
 		}
@@ -232,12 +265,16 @@ namespace AssetSnap.Component
 
 			return this;
 		}
-		
-		
+
+		public override void Clear(int index = 0, bool debug = false)
+		{
+			base.Clear(index, debug);
+		}
+
 		/*
 		** Private Methods
 		*/
-		
+
 		/*
 		** Resets the trait to
 		** a cleared state
@@ -246,19 +283,7 @@ namespace AssetSnap.Component
 		*/
 		private void Reset()
 		{
-			WorkingNode = null;
-			Count = 0;
-		}
-
-		/*
-		** Cleanup
-		*/
-		public override void _ExitTree()
-		{
-			if( EditorPlugin.IsInstanceValid(WorkingNode) ) 
-			{
-				WorkingNode.QueueFree();
-			}
+			count = 0;
 		}
 	}
 }

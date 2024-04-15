@@ -30,9 +30,20 @@ namespace AssetSnap
 	using Godot;
 
 	[Tool]
-	public partial class GlobalExplorer : NodeExplorer 
+	public partial class GlobalExplorer : NodeExplorer
 	{
 		private static GlobalExplorer Instance;
+		public static GlobalExplorer Singleton {
+			get 
+			{
+				if( Instance == null ) 
+				{
+					Instance = new();
+				}
+				
+				return Instance;	
+			}
+		}
 		
 		/*
 		** The input driver which are currently in use
@@ -53,20 +64,20 @@ namespace AssetSnap
 			{
 				Instance = new GlobalExplorer()
 				{
-					_Settings = new(),
+					_Settings = Front.Configs.SettingsConfig.Singleton,
 					_Waypoints = new(),
-					_Components = new(),
-					_ContextMenu = new(), 
-					_BottomDock = new(),
+					_Components = Component.Base.Singleton,
+					_ContextMenu = AssetSnap.ContextMenu.Base.Singleton, 
+					_BottomDock = AssetSnap.BottomDock.Base.Singleton,
 					_Decal = new(),
-					_Raycast = new(),
+					_Raycast = new(), 
 					_Modifiers = new(),  
-					_Library = new(),
-					_GroupBuilder = new(),
-					_Snap = new(),
-					_States = new(),
+					_Library = AssetSnap.Library.Base.Singleton,
+					_GroupBuilder = AssetSnap.GroupBuilder.Base.Singleton,
+					_Snap = AssetSnap.Snap.Base.Singleton,
+					_States = GlobalStates.Singleton,
 					_Inspector = new(),
-					_Snappable = new(),
+					_Snappable = AssetSnap.Snap.SnappableBase.Singleton,
 				};
 			}
 			
@@ -75,12 +86,12 @@ namespace AssetSnap
 		
 		public static GlobalExplorer GetInstance()
 		{
-			return Instance;
+			return Singleton;
 		}
-		
+		 
 		public Library.Instance GetLibraryByName( string name )
 		{
-			foreach( Library.Instance instance in _Library.Libraries ) 
+			foreach( Library.Instance instance in Library.Libraries ) 
 			{
 				if( EditorPlugin.IsInstanceValid( instance ) && instance.GetName() == name ) 
 				{
@@ -93,13 +104,13 @@ namespace AssetSnap
 		
 		public Library.Instance GetLibraryByIndex( long index )
 		{
-			if( index > -1 && _Library.Libraries.Length > index && EditorPlugin.IsInstanceValid(_Library.Libraries[index]) ) 
+			if( index > -1 && Library.Libraries.Length > index && EditorPlugin.IsInstanceValid(Library.Libraries[index]) ) 
 			{
-				return _Library.Libraries[index];
+				return Library.Libraries[index];
 			}
 			
 			return null;
-		}
+		} 
 		
 		public void PrintChildNames( Node which ) 
 		{
@@ -223,6 +234,7 @@ namespace AssetSnap
 			bool value = Settings.GetKey("allow_drag_add").As<bool>(); 
 			return value;
 		}
+		
 	}
 }
 #endif
