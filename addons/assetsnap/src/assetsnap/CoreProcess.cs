@@ -23,11 +23,13 @@
 namespace AssetSnap.Core 
 {
 	using AssetSnap.Component;
+	using AssetSnap.Explorer;
 	using AssetSnap.Front.Components;
-    using AssetSnap.Front.Components.Library;
-    using AssetSnap.Front.Components.Library.Sidebar;
+	using AssetSnap.Front.Components.Library;
+	using AssetSnap.Front.Components.Library.Sidebar;
 
-    using AssetSnap.Front.Nodes;
+	using AssetSnap.Front.Nodes;
+	using AssetSnap.Settings;
 	using AssetSnap.Static;
 	using Godot;
 	
@@ -41,54 +43,67 @@ namespace AssetSnap.Core
 		*/
 		public void Tick( double delta ) 
 		{
-			if( null == _GlobalExplorer || null == _GlobalExplorer.Settings) 
+			if( null == ExplorerUtils.Get() || null == SettingsUtils.Get() ) 
 			{
 				return;
 			}
 
-			_GlobalExplorer.Snap.Tick(delta);
+			ExplorerUtils.Get().Snap.Tick(delta);
 			
-			if( null != _GlobalExplorer.GroupBuilder ) 
+			if( null != ExplorerUtils.Get().GroupBuilder && EditorPlugin.IsInstanceValid(Plugin.Singleton))
 			{
-				Vector2 mouseGlobalPosition = _GlobalExplorer._Plugin.GetViewport().GetMousePosition();
-				_GlobalExplorer.GroupBuilder.MaybeHideMenu(mouseGlobalPosition);	
-			}		
-			
-			_GlobalExplorer.DeltaTime += (float)delta;
-			
-			if( null != _GlobalExplorer._ForceFocus && EditorPlugin.IsInstanceValid( _GlobalExplorer._ForceFocus )) 
-			{
-				if( EditorInterface.Singleton.GetInspector().GetEditedObject() != _GlobalExplorer._ForceFocus ) 
+				if( null == Plugin.Singleton.GetViewport() ) 
 				{
-					EditorInterface.Singleton.EditNode(_GlobalExplorer._ForceFocus);
+					return;
+				}
+				
+				Vector2 mouseGlobalPosition = Plugin.Singleton.GetViewport().GetMousePosition();
+				ExplorerUtils.Get().GroupBuilder.MaybeHideMenu(mouseGlobalPosition);	
+			}		
+			 
+			ExplorerUtils.Get().DeltaTime += (float)delta;
+			
+			if(
+				null != ExplorerUtils.Get()._ForceFocus &&
+				EditorPlugin.IsInstanceValid( ExplorerUtils.Get()._ForceFocus )
+			) 
+			{
+				if(
+					EditorInterface.Singleton.GetInspector().GetEditedObject() != ExplorerUtils.Get()._ForceFocus
+				) 
+				{
+					EditorInterface.Singleton.EditNode(ExplorerUtils.Get()._ForceFocus);
 				}
 
-				_GlobalExplorer._Forced += 1;
+				ExplorerUtils.Get()._Forced += 1;
 				
-				if( 5 == _GlobalExplorer._Forced ) 
+				if( 5 == ExplorerUtils.Get()._Forced ) 
 				{
-					_GlobalExplorer._ForceFocus = null;
-					_GlobalExplorer._Forced = 0;
+					ExplorerUtils.Get()._ForceFocus = null;
+					ExplorerUtils.Get()._Forced = 0;
 				}
 			}
-			else if(null != _GlobalExplorer._ForceFocus && false == EditorPlugin.IsInstanceValid( _GlobalExplorer._ForceFocus )) 
+			else if(
+				null != ExplorerUtils.Get()._ForceFocus &&
+				false == EditorPlugin.IsInstanceValid( ExplorerUtils.Get()._ForceFocus )
+			) 
 			{
 				GD.PushWarning("Invalid focus object");
-				_GlobalExplorer._ForceFocus = null;
-				_GlobalExplorer._Forced = 0;
+				ExplorerUtils.Get()._ForceFocus = null;
+				ExplorerUtils.Get()._Forced = 0;
 			}
 
 			if(
 				ShouldHideContextMenu()
 			) 
 			{
-				_GlobalExplorer.ContextMenu.Hide();
+				ExplorerUtils.Get().ContextMenu.Hide();
 			}
 			else if (
 				ShouldShowContextMenu()
 			)
 			{
-				_GlobalExplorer.ContextMenu.Show();
+				ExplorerUtils.Get().ContextMenu.Show();
 			}
 
 			if(
@@ -99,7 +114,7 @@ namespace AssetSnap.Core
 			{
 				if( HasDecal() ) 
 				{
-					_GlobalExplorer.Decal.Hide();
+					ExplorerUtils.Get().Decal.Hide();
 				}
 
 				return;
@@ -109,7 +124,7 @@ namespace AssetSnap.Core
 			if( HasDecal() && HandleIsGroup() ) 
 			{
 				// If so we handle model specific operations
-				ProcessGroupHandle();
+				ProcessGroupHandle(); 
 			}
 			// Checks if current handle is a model
 			else if( HasDecal() && HandleIsModel() && false == HandleIsGroup() ) 
@@ -121,31 +136,31 @@ namespace AssetSnap.Core
 		
 		private bool ShouldHideContextMenu()
 		{
-			if( null == _GlobalExplorer || true == _GlobalExplorer.ContextMenu.IsHidden() ) 
+			if( null == ExplorerUtils.Get() || true == ExplorerUtils.Get().ContextMenu.IsHidden() ) 
 			{
 				return false;
 			}
 			
 			if(
-				null == _GlobalExplorer.States.CurrentScene ||
-				true == _GlobalExplorer.GroupMainScreen.Visible
+				null == ExplorerUtils.Get().States.CurrentScene ||
+				true == ExplorerUtils.Get().GroupMainScreen.Visible
 			) 
 			{
 				return true;
 			}
 			
-			if( null == _GlobalExplorer.GetHandle() ) 
+			if( null == ExplorerUtils.Get().GetHandle() ) 
 			{
 				return true;
 			}
 			
-			Node3D Handle = _GlobalExplorer.GetHandle();
+			Node3D Handle = ExplorerUtils.Get().GetHandle();
 			
 			if( Handle is AsMeshInstance3D meshInstance3D ) 
 			{
 				if( meshInstance3D.Floating == false ) 
 				{
-					return _GlobalExplorer.States.CurrentScene != _GlobalExplorer.States.EditingObject.Owner;
+					return ExplorerUtils.Get().States.CurrentScene != ExplorerUtils.Get().States.EditingObject.Owner;
 				}
 				else
 				{
@@ -158,37 +173,37 @@ namespace AssetSnap.Core
 		
 		private bool ShouldShowContextMenu()
 		{
-			if( null == _GlobalExplorer || false == _GlobalExplorer.ContextMenu.IsHidden() ) 
+			if( null == ExplorerUtils.Get() || false == ExplorerUtils.Get().ContextMenu.IsHidden() ) 
 			{
 				return false;
 			}
 			
 			if(
-				null == _GlobalExplorer.States.CurrentScene ||
-				null != _GlobalExplorer.GroupMainScreen && 
-				true == _GlobalExplorer.GroupMainScreen.Visible
+				null == ExplorerUtils.Get().States.CurrentScene ||
+				null != ExplorerUtils.Get().GroupMainScreen && 
+				true == ExplorerUtils.Get().GroupMainScreen.Visible
 			) 
 			{
 				return false;
 			}
 			
-			if( null != _GlobalExplorer.GroupedObject ) 
+			if( null != ExplorerUtils.Get().GroupedObject ) 
 			{
 				return true;
 			}
 			
-			if( null == _GlobalExplorer.GetHandle() ) 
+			if( null == ExplorerUtils.Get().GetHandle() ) 
 			{
 				return false;
 			}
 
-			Node3D Handle = _GlobalExplorer.GetHandle();
+			Node3D Handle = ExplorerUtils.Get().GetHandle();
 			
 			if( Handle is AsMeshInstance3D meshInstance3D ) 
 			{
 				if( meshInstance3D.Floating == false ) 
 				{
-					return _GlobalExplorer.States.CurrentScene == _GlobalExplorer.GetHandle().Owner;
+					return ExplorerUtils.Get().States.CurrentScene == ExplorerUtils.Get().GetHandle().Owner;
 				}
 				else
 				{
@@ -206,14 +221,14 @@ namespace AssetSnap.Core
 		private void ProcessModelHandle()
 		{ 
 			// Checks if our decal is hidden
-			if( _GlobalExplorer.Decal.IsHidden() ) 
+			if( ExplorerUtils.Get().Decal.IsHidden() ) 
 			{
 				// If it is we show it
-				_GlobalExplorer.Decal.Show();
+				ExplorerUtils.Get().Decal.Show();
 			}
 
 			// Checks if current mouse is event is motion
-			if( MouseEventIsMove() && _GlobalExplorer.HasProjectNormal() && _GlobalExplorer.HasProjectOrigin() )
+			if( MouseEventIsMove() && ExplorerUtils.Get().HasProjectNormal() && ExplorerUtils.Get().HasProjectOrigin() )
 			{
 				ConfigureRayCast();
 				Transform3D ItemTransform = new(Basis.Identity, Vector3.Up);
@@ -221,58 +236,58 @@ namespace AssetSnap.Core
 				// Checks if raycast did collide
 				if( RaycastDidCollide() ) 
 				{
-					_GlobalExplorer.PositionDraw = _GlobalExplorer.Raycast.GetNode().GetCollisionPoint();
-					ItemTransform.Origin = _GlobalExplorer.GetPositionDrawn();
+					ExplorerUtils.Get().PositionDraw = ExplorerUtils.Get().Raycast.GetNode().GetCollisionPoint();
+					ItemTransform.Origin = ExplorerUtils.Get().GetPositionDrawn();
 
 					// Checks if the object can and should snap to another object
 					ItemTransform.Origin = HandleObjectSnap(ItemTransform.Origin);
 					
 					// Checks if glue is used and applies it
-					if( UsesGlue(_GlobalExplorer.CurrentLibrary._LibrarySettings._LSSnapToHeight) ) 
+					if( UsesGlue(ExplorerUtils.Get().CurrentLibrary._LibrarySettings._LSSnapToHeight) ) 
 					{
-						ItemTransform.Origin = ApplyGlue(ItemTransform.Origin,_GlobalExplorer.CurrentLibrary._LibrarySettings._LSSnapToHeight);
+						ItemTransform.Origin = ApplyGlue(ItemTransform.Origin,ExplorerUtils.Get().CurrentLibrary._LibrarySettings._LSSnapToHeight);
 					}
 					
-					if( UsesGlue(_GlobalExplorer.CurrentLibrary._LibrarySettings._LSSnapToX) ) 
+					if( UsesGlue(ExplorerUtils.Get().CurrentLibrary._LibrarySettings._LSSnapToX) ) 
 					{
-						ItemTransform.Origin = ApplyGlue(ItemTransform.Origin,_GlobalExplorer.CurrentLibrary._LibrarySettings._LSSnapToX);
+						ItemTransform.Origin = ApplyGlue(ItemTransform.Origin,ExplorerUtils.Get().CurrentLibrary._LibrarySettings._LSSnapToX);
 					}
 					
-					if( UsesGlue(_GlobalExplorer.CurrentLibrary._LibrarySettings._LSSnapToZ) ) 
+					if( UsesGlue(ExplorerUtils.Get().CurrentLibrary._LibrarySettings._LSSnapToZ) ) 
 					{
-						ItemTransform.Origin = ApplyGlue(ItemTransform.Origin,_GlobalExplorer.CurrentLibrary._LibrarySettings._LSSnapToZ);
+						ItemTransform.Origin = ApplyGlue(ItemTransform.Origin,ExplorerUtils.Get().CurrentLibrary._LibrarySettings._LSSnapToZ);
 					}
 					
 					// Updates decal preview
-					if( EditorPlugin.IsInstanceValid(_GlobalExplorer.Decal)) 
+					if( null != ExplorerUtils.Get().Decal ) 
 					{
-						_GlobalExplorer.Decal._UpdateDecalPreview(true);						
+						ExplorerUtils.Get().Decal._UpdateDecalPreview(true);						
 					}
 				}
 				else 
 				{
 					// Use mouse position and hard set height to 0
 					ItemTransform.Origin = new Vector3(0, 0.25f, 0);
-					_GlobalExplorer.Decal.Hide();
+					ExplorerUtils.Get().Decal.Hide();
 				}
 				
 				// Sets transform and resets the current mouse input
-				_GlobalExplorer._CurrentMouseInput = EventMouse.EventNone;
-				_GlobalExplorer.Decal.SetTransform(ItemTransform);
+				ExplorerUtils.Get()._CurrentMouseInput = EventMouse.EventNone;
+				ExplorerUtils.Get().Decal.SetTransform(ItemTransform);
 			}
 		}
 		
 		private void ProcessGroupHandle()
 		{
 			// Checks if our decal is hidden
-			if( _GlobalExplorer.Decal.IsHidden() ) 
+			if( ExplorerUtils.Get().Decal.IsHidden() ) 
 			{
 				// If it is we show it
-				_GlobalExplorer.Decal.Show();
+				ExplorerUtils.Get().Decal.Show();
 			}
 			
 			// Checks if current mouse is event is motion
-			if( MouseEventIsMove() && _GlobalExplorer.HasProjectNormal() && _GlobalExplorer.HasProjectOrigin() )
+			if( MouseEventIsMove() && ExplorerUtils.Get().HasProjectNormal() && ExplorerUtils.Get().HasProjectOrigin() )
 			{
 				ConfigureRayCast();
 				Transform3D ItemTransform = new(Basis.Identity, Vector3.Up);
@@ -280,43 +295,43 @@ namespace AssetSnap.Core
 				// Checks if raycast did collide
 				if( RaycastDidCollide() ) 
 				{
-					_GlobalExplorer.PositionDraw = _GlobalExplorer.Raycast.GetNode().GetCollisionPoint();
-					ItemTransform.Origin = _GlobalExplorer.GetPositionDrawn();
+					ExplorerUtils.Get().PositionDraw = ExplorerUtils.Get().Raycast.GetNode().GetCollisionPoint();
+					ItemTransform.Origin = ExplorerUtils.Get().GetPositionDrawn();
 					// Checks if the object can and should snap to another object
 					ItemTransform.Origin = HandleObjectSnap(ItemTransform.Origin);
 					
 					// Checks if glue is used and applies it
-					if( _GlobalExplorer.States.SnapToHeight == GlobalStates.LibraryStateEnum.Enabled ) 
+					if( ExplorerUtils.Get().States.SnapToHeight == GlobalStates.LibraryStateEnum.Enabled ) 
 					{
-						ItemTransform.Origin.Y = _GlobalExplorer.States.SnapToHeightValue;
+						ItemTransform.Origin.Y = ExplorerUtils.Get().States.SnapToHeightValue;
 					}
 					
-					if( _GlobalExplorer.States.SnapToX == GlobalStates.LibraryStateEnum.Enabled ) 
+					if( ExplorerUtils.Get().States.SnapToX == GlobalStates.LibraryStateEnum.Enabled ) 
 					{
-						ItemTransform.Origin.X = _GlobalExplorer.States.SnapToXValue;
+						ItemTransform.Origin.X = ExplorerUtils.Get().States.SnapToXValue;
 					}
 					
-					if( _GlobalExplorer.States.SnapToZ == GlobalStates.LibraryStateEnum.Enabled ) 
+					if( ExplorerUtils.Get().States.SnapToZ == GlobalStates.LibraryStateEnum.Enabled ) 
 					{
-						ItemTransform.Origin.Z = _GlobalExplorer.States.SnapToZValue;
+						ItemTransform.Origin.Z = ExplorerUtils.Get().States.SnapToZValue;
 					}
 					
 					// Updates decal preview
-					if( EditorPlugin.IsInstanceValid(_GlobalExplorer.Decal)) 
+					if( null != ExplorerUtils.Get().Decal ) 
 					{
-						_GlobalExplorer.Decal._UpdateDecalPreview(true);						
+						ExplorerUtils.Get().Decal._UpdateDecalPreview(true);						
 					}
 				}
 				else  
 				{
 					// Use mouse position and hard set height to 0
 					ItemTransform.Origin = new Vector3(0, 0.25f, 0);
-					_GlobalExplorer.Decal.Hide();
+					ExplorerUtils.Get().Decal.Hide();
 				}
 				
 				// Sets transform and resets the current mouse input
-				_GlobalExplorer._CurrentMouseInput = EventMouse.EventNone;
-				_GlobalExplorer.Decal.SetTransform(ItemTransform);
+				ExplorerUtils.Get()._CurrentMouseInput = EventMouse.EventNone;
+				ExplorerUtils.Get().Decal.SetTransform(ItemTransform);
 			}
 		}
 		
@@ -343,7 +358,7 @@ namespace AssetSnap.Core
 					}
 				}
 			}
-			else if( GlobalExplorer.GetInstance().States.PlacingMode == GlobalStates.PlacingModeEnum.Group ) 
+			else if( ExplorerUtils.Get().States.PlacingMode == GlobalStates.PlacingModeEnum.Group ) 
 			{
 				// Snap group style
 				Node Handle = GetHandle();
@@ -398,16 +413,16 @@ namespace AssetSnap.Core
 		*/
 		private void ConfigureRayCast()
 		{
-			if( EditorPlugin.IsInstanceValid(_GlobalExplorer.Raycast) ) 
+			if( null != ExplorerUtils.Get().Raycast ) 
 			{
-				_GlobalExplorer.Raycast.ResetCollider();
+				ExplorerUtils.Get().Raycast.ResetCollider();
 				
-				Transform3D GlobalTrans = _GlobalExplorer.Raycast.GetTransform();
-				GlobalTrans.Origin = _GlobalExplorer.GetProjectOrigin();
-				GlobalTrans.Basis.Y = _GlobalExplorer.GetProjectNormal();
-				_GlobalExplorer.Raycast.SetTransform(GlobalTrans);
-				_GlobalExplorer.Raycast.TargetPosition = new Vector3(0, 1000, 0);
-				_GlobalExplorer.Raycast.Update();
+				Transform3D GlobalTrans = ExplorerUtils.Get().Raycast.GetTransform();
+				GlobalTrans.Origin = ExplorerUtils.Get().GetProjectOrigin();
+				GlobalTrans.Basis.Y = ExplorerUtils.Get().GetProjectNormal();
+				ExplorerUtils.Get().Raycast.SetTransform(GlobalTrans);
+				ExplorerUtils.Get().Raycast.TargetPosition = new Vector3(0, 1000, 0);
+				ExplorerUtils.Get().Raycast.Update();
 			}
 		}
 		
@@ -429,7 +444,7 @@ namespace AssetSnap.Core
 				return null;
 			}
 
-			return _GlobalExplorer.CurrentLibrary._LibrarySettings;
+			return ExplorerUtils.Get().CurrentLibrary._LibrarySettings;
 		}
 		
 		/*
@@ -440,7 +455,7 @@ namespace AssetSnap.Core
 		*/
 		private Node GetHandle()
 		{
-			return _GlobalExplorer.GetHandle();
+			return ExplorerUtils.Get().GetHandle();
 		}
 		
 		/*
@@ -450,7 +465,7 @@ namespace AssetSnap.Core
 		*/
 		private bool HasHandle()
 		{
-			return _GlobalExplorer.GetHandle() != null;
+			return ExplorerUtils.Get().GetHandle() != null;
 		}
 		
 		/*
@@ -460,7 +475,7 @@ namespace AssetSnap.Core
 		*/
 		private bool HasDecal()
 		{
-			return null != _GlobalExplorer.Decal;
+			return null != ExplorerUtils.Get().Decal;
 		}
 			
 		/*
@@ -469,12 +484,12 @@ namespace AssetSnap.Core
 		*/
 		private bool HandleIsModel()
 		{
-			return _GlobalExplorer.GetHandle() is MeshInstance3D && _GlobalExplorer.States.PlacingMode == GlobalStates.PlacingModeEnum.Model;
+			return ExplorerUtils.Get().GetHandle() is MeshInstance3D && ExplorerUtils.Get().States.PlacingMode == GlobalStates.PlacingModeEnum.Model;
 		}
 		
 		private bool HandleIsGroup()
 		{
-			return _GlobalExplorer.GetHandle() is AsGrouped3D && _GlobalExplorer.States.PlacingMode == GlobalStates.PlacingModeEnum.Group;
+			return ExplorerUtils.Get().GetHandle() is AsGrouped3D && ExplorerUtils.Get().States.PlacingMode == GlobalStates.PlacingModeEnum.Group;
 		}
 		
 		/*
@@ -485,7 +500,7 @@ namespace AssetSnap.Core
 		*/
 		private bool RaycastDidCollide()
 		{
-			return _GlobalExplorer.Raycast.HasCollision();
+			return ExplorerUtils.Get().Raycast.HasCollision();
 		}
 			
 		/*
@@ -521,7 +536,7 @@ namespace AssetSnap.Core
 		*/
 		private bool ShouldSnap()
 		{
-			return _GlobalExplorer.States.SnapToObject == GlobalStates.LibraryStateEnum.Enabled;
+			return ExplorerUtils.Get().States.SnapToObject == GlobalStates.LibraryStateEnum.Enabled;
 		}
 		
 		/*
@@ -537,7 +552,7 @@ namespace AssetSnap.Core
 				return false;
 			}
 			
-			return _GlobalExplorer.CurrentLibrary._LibrarySettings != null;
+			return ExplorerUtils.Get().CurrentLibrary._LibrarySettings != null;
 		}
 		
 		/*
@@ -547,7 +562,7 @@ namespace AssetSnap.Core
 		*/
 		private bool HasLibrary()
 		{
-			return null != _GlobalExplorer.CurrentLibrary;
+			return null != ExplorerUtils.Get().CurrentLibrary;
 		}
 		
 		/*
@@ -557,7 +572,7 @@ namespace AssetSnap.Core
 		*/
 		private bool HasRayProjections()
 		{
-			return _GlobalExplorer.ProjectRayOrigin != Vector3.Zero && _GlobalExplorer.ProjectRayNormal != Vector3.Zero;
+			return ExplorerUtils.Get().ProjectRayOrigin != Vector3.Zero && ExplorerUtils.Get().ProjectRayNormal != Vector3.Zero;
 		}
 		
 		/*
@@ -568,7 +583,7 @@ namespace AssetSnap.Core
 		*/
 		private bool MouseEventIsMove()
 		{
-			EventMouse MouseEvent = _GlobalExplorer._CurrentMouseInput;
+			EventMouse MouseEvent = ExplorerUtils.Get()._CurrentMouseInput;
 			return MouseEvent == EventMouse.EventMove;
 		}
 	}
