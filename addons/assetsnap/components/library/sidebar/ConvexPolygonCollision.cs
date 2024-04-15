@@ -25,6 +25,7 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 	using AssetSnap.Component;
 	using AssetSnap.Front.Nodes;
 	using Godot;
+	using Godot.Collections;
 
 	[Tool]
 	public partial class ConvexPolygonCollision : LSCollisionComponent
@@ -45,9 +46,15 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		public ConvexPolygonCollision()
 		{
 			Name = "LSConvexPolygonCollision";
+			
+			UsingTraits = new()
+			{
+				{ typeof(Checkable).ToString() },
+			};
+			
 			//_include = false;
 		} 
-	
+		
 		/*
 		** Initializes the component
 		**
@@ -55,7 +62,6 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		*/
 		public override void Initialize()
 		{
-			AddTrait(typeof(Checkable));
 			base.Initialize();
 
 			Callable _callable = Callable.From(() => { _OnCheckboxPressed(); });
@@ -410,10 +416,11 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 				_GlobalExplorer.States.ConvexSimplify = Trait<Checkable>().Select(2).GetValue() ? GlobalStates.LibraryStateEnum.Enabled : GlobalStates.LibraryStateEnum.Disabled;
 			}
 		}
-				
+		
 		public override void _ExitTree()
 		{
 			Initiated = false;
+			
 			base._ExitTree();
 		}
 	}

@@ -32,23 +32,27 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		public EditorListing()
 		{
 			Name = "GroupBuilderEditorListing";
+			
+			UsingTraits = new()
+			{
+				{ typeof(Containerable).ToString() },
+				{ typeof(Labelable).ToString() },
+				{ typeof(Buttonable).ToString() },
+				{ typeof(Panelable).ToString() },
+				{ typeof(ScrollContainerable).ToString() },
+			};
+			
 			//_include = false;
 		}
-
+		
 		public override void Initialize()
 		{
-			AddTrait(typeof(Containerable));
-			AddTrait(typeof(Labelable));
-			AddTrait(typeof(Buttonable));
-			AddTrait(typeof(Panelable));
-			AddTrait(typeof(ScrollContainerable));
+			SizeFlagsVertical = Control.SizeFlags.ExpandFill;
+			SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+			
+			base.Initialize();
 			
 			Initiated = true;
-			
-			if( _GlobalExplorer == null ) 
-			{
-				_GlobalExplorer = GlobalExplorer.GetInstance();
-			}
 			
 			_InitializeFields();
 		
@@ -104,11 +108,6 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		
 		public void Update()
 		{
-			if( _GlobalExplorer == null ) 
-			{
-				_GlobalExplorer = GlobalExplorer.GetInstance();
-			}
-			
 			if( null != _GlobalExplorer.GroupBuilder._Editor.Group )
 			{
 				if( _GlobalExplorer.GroupBuilder._Editor.Group._Paths.Count == 0 ) 
@@ -285,12 +284,11 @@ namespace AssetSnap.Front.Components.Groups.Builder
 						.Select(0)
 						.GetNode()
 				);
-			
 				
 			Trait<Panelable>()
 				.Select(0)
 				.AddToContainer(
-					Container
+					this
 				);
 		}
 		
@@ -339,8 +337,8 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		{
 			MarginContainer NoFoundMargin = new();
 			
-			NoFoundMargin.AddThemeConstantOverride("margin_left", 15);
-			NoFoundMargin.AddThemeConstantOverride("margin_right", 15);
+			NoFoundMargin.AddThemeConstantOverride("margin_left", 5);
+			NoFoundMargin.AddThemeConstantOverride("margin_right", 5);
 			NoFoundMargin.AddThemeConstantOverride("margin_top", 10);
 			NoFoundMargin.AddThemeConstantOverride("margin_bottom", 10);
 			
@@ -359,8 +357,8 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		{
 			MarginContainer NoFoundMargin = new();
 			
-			NoFoundMargin.AddThemeConstantOverride("margin_left", 15);
-			NoFoundMargin.AddThemeConstantOverride("margin_right", 15);
+			NoFoundMargin.AddThemeConstantOverride("margin_left", 5);
+			NoFoundMargin.AddThemeConstantOverride("margin_right", 5);
 			NoFoundMargin.AddThemeConstantOverride("margin_top", 10);
 			NoFoundMargin.AddThemeConstantOverride("margin_bottom", 10);
 			

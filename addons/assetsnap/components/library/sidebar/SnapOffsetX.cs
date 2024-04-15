@@ -24,6 +24,7 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 {
 	using AssetSnap.Component;
 	using Godot;
+	using Godot.Collections;
 
 	[Tool]
 	public partial class SnapOffsetX : LSObjectComponent
@@ -51,6 +52,12 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		public SnapOffsetX()
 		{
 			Name = "LSSnapOffsetX";
+			
+			UsingTraits = new()
+			{
+				{ typeof(Spinboxable).ToString() },
+			};
+			
 			//_include = false;
 		}
 			
@@ -62,7 +69,6 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		public override void Initialize()
 		{
 			base.Initialize();
-			AddTrait(typeof(Spinboxable));
 
 			Callable _callable = Callable.From((double value) => { _OnSpinBoxValueChange((float)value); });
 			
@@ -170,8 +176,7 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 				null != _GlobalExplorer.States &&
 				false != Initiated &&
 				null != Trait<Spinboxable>() &&
-				false != HasTrait<Spinboxable>() &&
-				IsInstanceValid( Trait<Spinboxable>() );
+				false != HasTrait<Spinboxable>();
 		}
 		
 		/*
@@ -188,6 +193,12 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			}
 			
 			_GlobalExplorer.States.SnapToObjectOffsetXValue = (float)Trait<Spinboxable>().Select(0).GetValue();
+		}
+		
+		public override void _ExitTree()
+		{
+			
+			base._ExitTree();
 		}
 	}
 }

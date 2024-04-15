@@ -31,18 +31,11 @@ namespace AssetSnap.Front.Components.Groups.Builder
 	[Tool]
 	public partial class EditorGroupOptions : LibraryComponent
 	{
-		public EditorGroupOptions()
-		{
-			Name = "GroupBuilderEditorGroupOptions";
-			//_include = false;
-		}
-		
 		/** Option Values **/
 		private SnapToObject _GroupBuilderEditorGroupOptionSnapToObject;
 		private SnapLayer _GroupBuilderEditorGroupOptionSnapLayer;
 		private SnapToObjectOffsetX _GroupBuilderEditorGroupOptionSnapToObjectOffsetX;
 		private SnapToObjectOffsetZ _GroupBuilderEditorGroupOptionSnapToObjectOffsetZ;
-		private SnapToObjectPosition _GroupBuilderEditorGroupOptionSnapToObjectPosition;
 		private SnapToHeight _GroupBuilderEditorGroupOptionSnapToHeight;
 		private SnapToHeightValue _GroupBuilderEditorGroupOptionSnapToHeightValue;
 		private SnapToX _GroupBuilderEditorGroupOptionSnapToX;
@@ -58,21 +51,149 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		private PlacementSimple _GroupBuilderEditorGroupOptionPlacementSimple;
 		private PlacementOptimized _GroupBuilderEditorGroupOptionPlacementOptimized;
 		
+		public EditorGroupOptions()
+		{
+			Name = "GroupBuilderEditorGroupOptions";
+			
+			UsingTraits = new()
+			{
+				{ typeof(Containerable).ToString() },
+				{ typeof(Labelable).ToString() },
+				{ typeof(Buttonable).ToString() },
+				{ typeof(Panelable).ToString() },
+				{ typeof(ScrollContainerable).ToString() },
+			};
+			
+			//_include = false;
+		}
+		
+		public override void Clear()
+		{
+			_GroupBuilderEditorGroupOptionSnapToObject.Clear();
+			_GroupBuilderEditorGroupOptionSnapLayer.Clear();
+			_GroupBuilderEditorGroupOptionSnapToObjectOffsetX.Clear();
+			_GroupBuilderEditorGroupOptionSnapToObjectOffsetZ.Clear();
+			_GroupBuilderEditorGroupOptionSnapToHeight.Clear();
+			_GroupBuilderEditorGroupOptionSnapToHeightValue.Clear();
+			_GroupBuilderEditorGroupOptionSnapToX.Clear();
+			_GroupBuilderEditorGroupOptionSnapToXValue.Clear();
+			_GroupBuilderEditorGroupOptionSnapToZ.Clear();
+			_GroupBuilderEditorGroupOptionSnapToZValue.Clear();
+			_GroupBuilderEditorGroupOptionSphereCollision.Clear();
+			_GroupBuilderEditorGroupOptionConcaveCollision.Clear();
+			_GroupBuilderEditorGroupOptionConvexCollision.Clear();
+			_GroupBuilderEditorGroupOptionConvexClean.Clear();
+			_GroupBuilderEditorGroupOptionConvexSimplify.Clear();
+			_GroupBuilderEditorGroupOptionDragOffset.Clear();
+			_GroupBuilderEditorGroupOptionPlacementSimple.Clear();
+			_GroupBuilderEditorGroupOptionPlacementOptimized.Clear();
+			
+						
+			if( _GroupBuilderEditorGroupOptionSnapToObject.GetParent() == this ) 
+			{
+				RemoveChild(_GroupBuilderEditorGroupOptionSnapToObject);
+			}
+			
+			if( _GroupBuilderEditorGroupOptionSnapLayer.GetParent() == this ) 
+			{
+				RemoveChild(_GroupBuilderEditorGroupOptionSnapLayer);
+			}
+			
+			if( _GroupBuilderEditorGroupOptionSnapToObjectOffsetX.GetParent() == this ) 
+			{
+				RemoveChild(_GroupBuilderEditorGroupOptionSnapToObjectOffsetX);
+			}
+
+			if( _GroupBuilderEditorGroupOptionSnapToObjectOffsetZ.GetParent() == this ) 
+			{
+				RemoveChild(_GroupBuilderEditorGroupOptionSnapToObjectOffsetZ);
+			}
+			
+			if( _GroupBuilderEditorGroupOptionSnapToHeight.GetParent() == this ) 
+			{
+				RemoveChild(_GroupBuilderEditorGroupOptionSnapToHeight);
+			}
+			
+			if( _GroupBuilderEditorGroupOptionSnapToHeightValue.GetParent() == this ) 
+			{
+				RemoveChild(_GroupBuilderEditorGroupOptionSnapToHeightValue);
+			}
+
+			if( _GroupBuilderEditorGroupOptionSnapToX.GetParent() == this ) 
+			{
+				RemoveChild(_GroupBuilderEditorGroupOptionSnapToX);
+			}
+			
+			if( _GroupBuilderEditorGroupOptionSnapToXValue.GetParent() == this ) 
+			{
+				RemoveChild(_GroupBuilderEditorGroupOptionSnapToXValue);
+			}
+			
+			if( _GroupBuilderEditorGroupOptionSnapToZ.GetParent() == this ) 
+			{
+				RemoveChild(_GroupBuilderEditorGroupOptionSnapToZ);
+			}
+			
+			if( _GroupBuilderEditorGroupOptionSnapToZValue.GetParent() == this ) 
+			{
+				RemoveChild(_GroupBuilderEditorGroupOptionSnapToZValue);
+			}
+
+			if( _GroupBuilderEditorGroupOptionSphereCollision.GetParent() == this ) 
+			{
+				RemoveChild(_GroupBuilderEditorGroupOptionSphereCollision);
+			}
+			
+			if( _GroupBuilderEditorGroupOptionConcaveCollision.GetParent() == this ) 
+			{
+				RemoveChild(_GroupBuilderEditorGroupOptionConcaveCollision);
+			}
+			
+			if( _GroupBuilderEditorGroupOptionConvexCollision.GetParent() == this ) 
+			{
+				RemoveChild(_GroupBuilderEditorGroupOptionConvexCollision);
+			}
+			
+			if( _GroupBuilderEditorGroupOptionConvexClean.GetParent() == this ) 
+			{
+				RemoveChild(_GroupBuilderEditorGroupOptionConvexClean);
+			}
+
+			if( _GroupBuilderEditorGroupOptionConvexSimplify.GetParent() == this ) 
+			{
+				RemoveChild(_GroupBuilderEditorGroupOptionConvexSimplify);
+			}
+			
+			if( _GroupBuilderEditorGroupOptionDragOffset.GetParent() == this ) 
+			{
+				RemoveChild(_GroupBuilderEditorGroupOptionDragOffset);
+			}
+			
+			if( _GroupBuilderEditorGroupOptionPlacementSimple.GetParent() == this ) 
+			{
+				RemoveChild(_GroupBuilderEditorGroupOptionPlacementSimple);
+			}
+			
+			if( _GroupBuilderEditorGroupOptionPlacementOptimized.GetParent() == this ) 
+			{
+				RemoveChild(_GroupBuilderEditorGroupOptionPlacementOptimized);
+			}
+
+			base.Clear();
+		}
+		
 		public override void Initialize()
 		{
-			AddTrait(typeof(Containerable));
-			AddTrait(typeof(Labelable));
-			AddTrait(typeof(Buttonable));
-			AddTrait(typeof(Panelable));
-			AddTrait(typeof(ScrollContainerable));
+			base.Initialize();
+		
 			Initiated = true;
-			
+
+			Visible = false;
+						
 			_InitializeFields();
 			_InitializeComponents();
 
 			_FinalizeFields();
-			
-			base.Initialize();
 		}
 		
 		public void _InitializeFields()
@@ -90,7 +211,6 @@ namespace AssetSnap.Front.Components.Groups.Builder
 				.SetPadding(10, "bottom")
 				.SetPadding(15, "left")
 				.SetPadding(15, "right")
-				.SetVisible(false)
 				.Instantiate();
 
 			Trait<ScrollContainerable>()
@@ -241,7 +361,6 @@ namespace AssetSnap.Front.Components.Groups.Builder
 				_GroupBuilderEditorGroupOptionSnapLayer = GlobalExplorer.GetInstance().Components.Single<SnapLayer>(true);
 				_GroupBuilderEditorGroupOptionSnapToObjectOffsetX = GlobalExplorer.GetInstance().Components.Single<SnapToObjectOffsetX>(true);
 				_GroupBuilderEditorGroupOptionSnapToObjectOffsetZ = GlobalExplorer.GetInstance().Components.Single<SnapToObjectOffsetZ>(true);
-				_GroupBuilderEditorGroupOptionSnapToObjectPosition = GlobalExplorer.GetInstance().Components.Single<SnapToObjectPosition>(true);
 				
 				if( null != _GroupBuilderEditorGroupOptionSnapToObject) 
 				{
@@ -503,23 +622,19 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			Trait<Panelable>()
 				.Select(0)
 				.AddToContainer(
-					Container
+					this
 				);
 		}
 		
-		public void Show()
-		{
-			Trait<Panelable>()
-				.Select(0)
-				.SetVisible(true);
-		}
+		// public void Show()
+		// {
+		// 	Visible = true;
+		// }
 		
-		public void Hide()
-		{
-			Trait<Panelable>()
-				.Select(0)
-				.SetVisible(false);
-		}
+		// public void Hide()
+		// {
+		// 	Visible = false;
+		// }
 
 		public void _UpdateGroupOption(string Name, Variant value ) 
 		{

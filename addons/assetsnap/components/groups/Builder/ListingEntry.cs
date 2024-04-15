@@ -24,6 +24,7 @@ namespace AssetSnap.Front.Components.Groups.Builder
 {
 	using System.Collections.Generic;
 	using AssetSnap.Component;
+	using AssetSnap.Explorer;
 	using AssetSnap.Helpers;
 	using Godot;
 
@@ -67,6 +68,8 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		
 		public override void Initialize()
 		{
+			base.Initialize();
+		
 			Initiated = true;
 			
 			OuterMarginContainer = new()
@@ -111,7 +114,7 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			InnerMarginContainer.AddChild(Row);
 			_PanelContainer.AddChild(InnerMarginContainer);
 			OuterMarginContainer.AddChild(_PanelContainer);
-			Container.AddChild(OuterMarginContainer);
+			AddChild(OuterMarginContainer);
 		}
 		
 		public void DeselectGroup()
@@ -121,14 +124,12 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			if (Components.HasAll(GroupEditor.ToArray()))
 			{
 				Editor Editor = Components.Single<Editor>();
-
 				Editor.GroupPath = null;
 			}
 			
 			if ( Components.HasAll( RootSidebar.ToArray() )) 
 			{
 				Sidebar _Sidebar = Components.Single<Sidebar>();
-
 				_Sidebar.UnFocusGroup(title);
 			}
 		}
@@ -140,14 +141,12 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			if (Components.HasAll(GroupEditor.ToArray()))
 			{
 				Editor Editor = Components.Single<Editor>();
-
 				Editor.GroupPath = title;
 			}
 			
 			if ( Components.HasAll( RootSidebar.ToArray() )) 
 			{
 				Sidebar _Sidebar = Components.Single<Sidebar>();
-
 				_Sidebar.FocusGroup(title);
 			}
 		}
@@ -301,11 +300,10 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			
 		private void _OnConfirmRemoveGroup()
 		{
-			Component.Base Components = _GlobalExplorer.Components;
+			Component.Base Components = ExplorerUtils.Get().Components;
 			if ( Components.HasAll( RootSidebar.ToArray() )) 
 			{
 				Sidebar _Sidebar = Components.Single<Sidebar>();
-
 				_Sidebar.RemoveGroup(title);
 				_Sidebar.RefreshExistingGroups();
 			}
@@ -313,7 +311,7 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		
 		private void _OnSelectGroup()
 		{
-			Component.Base Components = _GlobalExplorer.Components;
+			Component.Base Components = ExplorerUtils.Get().Components;
 
 			if (Components.HasAll(GroupEditor.ToArray()))
 			{
@@ -324,7 +322,6 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			if ( Components.HasAll( RootSidebar.ToArray() )) 
 			{
 				Sidebar _Sidebar = Components.Single<Sidebar>();
-
 				_Sidebar.Update();
 			}
 		}

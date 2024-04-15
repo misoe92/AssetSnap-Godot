@@ -29,28 +29,38 @@ namespace AssetSnap.Front.Components.Groups.Builder
 	using AssetSnap.Front.Nodes;
 	using AssetSnap.Helpers;
 	using Godot;
+	using Godot.Collections;
 
 	[Tool]
 	public partial class Sidebar : LibraryComponent
 	{	
-		public Sidebar()
-		{
-			Name = "GroupBuilderSidebar";
-			//_include = false;
-		}
-		
 		private readonly string TitleText = "Current Groups";
 		private readonly string ButtonText = "Create new Group";
 
 		private VBoxContainer GroupContainer;
 
 		private Godot.Collections.Dictionary<string, ListingEntry> _Instances; 
-				
+		
+		public Sidebar()
+		{
+			Name = "GroupBuilderSidebar";
+			
+			UsingTraits = new()
+			{
+				{ typeof(Buttonable).ToString() },
+				{ typeof(Containerable).ToString() },
+				{ typeof(Labelable).ToString() },
+			};
+			
+			SizeFlagsVertical = Control.SizeFlags.ExpandFill;
+			SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+			
+			//_include = false;
+		}
+		
 		public override void Initialize()
 		{
-			AddTrait(typeof(Buttonable));
-			AddTrait(typeof(Containerable));
-			AddTrait(typeof(Labelable));
+			base.Initialize();
 			
 			Initiated = true;
 			
@@ -92,11 +102,6 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		
 		public void Update()
 		{
-			if( null == _GlobalExplorer ) 
-			{
-				_GlobalExplorer = GlobalExplorer.GetInstance();
-			}
-			
 			string path = ExplorerUtils.Get()
 				.GroupBuilder
 				._Editor
@@ -173,7 +178,7 @@ namespace AssetSnap.Front.Components.Groups.Builder
 				.SetMargin(4, "bottom")
 				.SetOrientation(Containerable.ContainerOrientation.Horizontal)
 				.Instantiate();
-
+				
 			Container InnerContainerLeft = Trait<Containerable>()
 				.Select(0)
 				.GetInnerContainer(0);
@@ -181,6 +186,11 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			Container InnerContainerRight = Trait<Containerable>()
 				.Select(0)
 				.GetInnerContainer(1);
+				
+			if( null == InnerContainerLeft || null == InnerContainerRight ) 
+			{
+				GD.PushError("No inner container was found @ group topbar");
+			}
 
 			InnerContainerLeft.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
 			InnerContainerRight.SizeFlagsHorizontal = Control.SizeFlags.ShrinkEnd;
@@ -189,14 +199,14 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			_SetupNewGroupButton(InnerContainerRight);
 
 			Trait<Containerable>()
+				.Select(0)
 				.AddToContainer(
-					Container
+					this
 				);
 		}
 		
 		private void _SetupExistingGroupList()
 		{
-			GroupContainer = new();
 			_Instances = new();
 
 			string[] Groups = _GetCurrentGroupPaths();
@@ -214,14 +224,13 @@ namespace AssetSnap.Front.Components.Groups.Builder
 					ListingEntry SingleEntry = GlobalExplorer.GetInstance().Components.Single<ListingEntry>(true);
 					
 					SingleEntry.title = title;
-					SingleEntry.Container = GroupContainer;
+					SingleEntry.Container = this;
 					SingleEntry.Initialize();
 
 					_Instances.Add(title, SingleEntry);
+					// AddChild(SingleEntry);
 				}
 			}
-			
-			Container.AddChild(GroupContainer);
 		}
 		
 		public void RefreshExistingGroups()
@@ -240,6 +249,7 @@ namespace AssetSnap.Front.Components.Groups.Builder
 				.SetType(Labelable.TitleType.HeaderMedium)
 				.SetText(TitleText)
 				.SetMargin(0)
+				.SetMargin(2, "top")
 				.Instantiate()
 				.Select(0)
 				.AddToContainer(
@@ -249,6 +259,17 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		
 		private void _SetupNewGroupButton( Container container )
 		{
+
+			Trait<Containerable>()
+				.SetName("NewGroupButtonContainer")
+				.SetMargin(4, "top")
+				.SetHorizontalSizeFlags(Control.SizeFlags.ExpandFill)
+				.SetLayout(Containerable.ContainerLayout.OneColumn)
+				.SetOrientation(Containerable.ContainerOrientation.Horizontal)
+				.Instantiate()
+				.Select(1)
+				.AddToContainer(container);
+
 			Trait<Buttonable>()
 				.SetName("GroupBuilderSidebarNewGroupBtn")
 				.SetHorizontalSizeFlags(Control.SizeFlags.ShrinkEnd)
@@ -258,7 +279,9 @@ namespace AssetSnap.Front.Components.Groups.Builder
 				.Instantiate()
 				.Select(0)
 				.AddToContainer(
-					container
+					Trait<Containerable>()
+						.Select(1)
+						.GetInnerContainer()
 				);
 		}
 		

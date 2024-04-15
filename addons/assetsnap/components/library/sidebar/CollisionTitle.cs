@@ -52,27 +52,26 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		*/
 		public override void Initialize()
 		{
-			if( Container is VBoxContainer BoxContainer ) 
+			base.Initialize();
+		
+			_MarginContainer = new();
+			_InnerContainer = new();
+			
+			_Label = new()
 			{
-				_MarginContainer = new();
-				_InnerContainer = new();
-				
-				_Label = new()
-				{
-					ThemeTypeVariation = "HeaderMedium",
-					Text = _MainTitle,
-				};
-				
-				_MarginContainer.AddThemeConstantOverride("margin_left", 10); 
-				_MarginContainer.AddThemeConstantOverride("margin_right", 10);
-				_MarginContainer.AddThemeConstantOverride("margin_top", 2);
-				_MarginContainer.AddThemeConstantOverride("margin_bottom", 2);
-				
-				_InnerContainer.AddChild(_Label);
-				_MarginContainer.AddChild(_InnerContainer);
-				
-				BoxContainer.AddChild(_MarginContainer);
-			}
+				ThemeTypeVariation = "HeaderMedium",
+				Text = _MainTitle,
+			};
+			
+			_MarginContainer.AddThemeConstantOverride("margin_left", 10); 
+			_MarginContainer.AddThemeConstantOverride("margin_right", 10);
+			_MarginContainer.AddThemeConstantOverride("margin_top", 2);
+			_MarginContainer.AddThemeConstantOverride("margin_bottom", 2);
+			
+			_InnerContainer.AddChild(_Label);
+			_MarginContainer.AddChild(_InnerContainer);
+			
+			AddChild(_MarginContainer);
 		}
 	
 		/*

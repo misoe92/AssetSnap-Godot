@@ -25,15 +25,13 @@ namespace AssetSnap.Front.Components.Library
 	using System.Collections.Generic;
 	using AssetSnap.Component;
 	using Godot;
+	using Godot.Collections;
 
 	[Tool]
 	public partial class Listing : LibraryComponent
 	{
 		private string _Folder;
 	
-		private ScrollContainer _ScrollContainer;
-		private	MarginContainer _MarginContainer;
-		private	VBoxContainer _InnerContainer;
 		private Godot.Collections.Array<HBoxContainer> Containers = new();
 		private Godot.Collections.Array<ListEntry> Items = new();
 		
@@ -54,7 +52,13 @@ namespace AssetSnap.Front.Components.Library
 		public Listing()
 		{
 			Name = "LibraryListing";
-
+			
+			UsingTraits = new()
+			{
+				{ typeof(Containerable).ToString() },
+				{ typeof(ScrollContainerable).ToString() },
+			};
+			
 			//_include = false; 
 		}
 		
@@ -65,50 +69,71 @@ namespace AssetSnap.Front.Components.Library
 		*/
 		public override void Initialize()
 		{
+			base.Initialize();
+			
 			Containers = new();
 			Items = new();
-		
 			Initiated = true;
 			
-			
-			if( Container is VBoxContainer BoxContainer ) 
+			SizeFlagsHorizontal = SizeFlags.ExpandFill;
+			SizeFlagsVertical = SizeFlags.ExpandFill;
+		
+			if( Folder == null ) 
 			{
-				if( BoxContainer == null || Folder == null ) 
-				{
-					return;
-				}
-				
-				_ScrollContainer = new()
-				{
-					SizeFlagsVertical = Control.SizeFlags.ExpandFill,
-					SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
-					CustomMinimumSize = new Vector2(0, 170),
-				};
-
-				_MarginContainer = new()
-				{
-					SizeFlagsVertical = Control.SizeFlags.ExpandFill,
-					SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
-				};
-				_InnerContainer = new()
-				{
-					SizeFlagsVertical = Control.SizeFlags.ExpandFill,
-					SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
-				};
-				
-				_MarginContainer.AddThemeConstantOverride("margin_left", 5);
-				_MarginContainer.AddThemeConstantOverride("margin_right", 5);
-				_MarginContainer.AddThemeConstantOverride("margin_top", 5);
-				_MarginContainer.AddThemeConstantOverride("margin_bottom", 5);
-				
-				// Get the bottom dock
-				IterateFiles(_Folder, _InnerContainer); 
-				
-				_MarginContainer.AddChild(_InnerContainer);
-				_ScrollContainer.AddChild(_MarginContainer);
-				
-				Container.AddChild(_ScrollContainer);
+				return;
 			}
+						
+			Trait<Containerable>()
+				.SetName("LibraryListingInner")
+				.SetVerticalSizeFlags(Control.SizeFlags.ExpandFill)
+				.SetMargin(2, "top")
+				.SetMargin(5, "left")
+				.SetMargin(5, "right")
+				.Instantiate();
+				
+			Trait<ScrollContainerable>()
+				.SetName("LibraryListingMain")
+				.SetVerticalSizeFlags(Control.SizeFlags.ExpandFill)
+				.SetMargin(5, "right")
+				.SetMargin(5, "left")
+				.Instantiate();
+				
+			Trait<Containerable>()
+				.SetName("LibraryListingInner")
+				.SetVerticalSizeFlags(Control.SizeFlags.ExpandFill)
+				.SetMargin(5, "left")
+				.SetMargin(5, "right")
+				.Instantiate();
+			
+			// Get the bottom dock
+			IterateFiles(
+				_Folder,
+				Trait<Containerable>()
+					.Select(1)
+					.GetInnerContainer()
+			);
+
+			Trait<Containerable>()
+				.Select(1)
+				.AddToContainer(
+					Trait<ScrollContainerable>()
+						.Select(0)
+						.GetScrollContainer()
+				);
+
+			Trait<ScrollContainerable>()
+				.Select(0)
+				.AddToContainer(
+					Trait<Containerable>()
+						.Select(0)
+						.GetInnerContainer()
+				);
+				
+			Trait<Containerable>()
+				.Select(0)
+				.AddToContainer(
+					this
+				);
 		}
 		
 		/*
@@ -119,17 +144,17 @@ namespace AssetSnap.Front.Components.Library
 		public void Update()
 		{
 			// _Library.RemoveAllPanelState();
-			foreach(HBoxContainer child in _InnerContainer.GetChildren()) 
+			foreach(HBoxContainer child in Trait<Containerable>().Select(0).GetInnerContainer().GetChildren()) 
 			{
 				if( IsInstanceValid( child ) ) 
 				{
 					_Library.RemoveAllPanelState();
-					_InnerContainer.RemoveChild(child);	
+					Trait<Containerable>().Select(0).GetInnerContainer().RemoveChild(child);	
 					child.QueueFree();	
 				}
 			}
 
-			IterateFiles(Folder, _InnerContainer);
+			IterateFiles(Folder, Trait<Containerable>().Select(0).GetInnerContainer());
 		}
 	
 		/*
@@ -138,7 +163,7 @@ namespace AssetSnap.Front.Components.Library
 		**
 		** @return void
 		*/
-		private void IterateFiles(string folderPath, VBoxContainer BoxContainer)
+		private void IterateFiles(string folderPath, Container BoxContainer)
 		{		
 			List<string> Components = new()
 			{
@@ -223,7 +248,7 @@ namespace AssetSnap.Front.Components.Library
 		**
 		** @return HBoxContainer
 		*/
-		private HBoxContainer _SetupListContainer(VBoxContainer BoxContainer)
+		private HBoxContainer _SetupListContainer(Container BoxContainer)
 		{
 			HBoxContainer _Con = new()
 			{
@@ -235,69 +260,6 @@ namespace AssetSnap.Front.Components.Library
 			Containers.Add( _Con );
 
 			return _Con;
-		}
-			
-		/*
-		** Cleans up in references, fields and parameters.
-		** 
-		** @return void
-		*/
-		public override void _ExitTree()
-		{
-			// Items = null;
-			// Containers = null;
-			// if( Items != null)  
-			// {
-			// 	for( int i = 0;  i < Items.Count;  i++ ) 
-			// 	{
-			// 		if( IsInstanceValid(Items[i]) ) 
-			// 		{
-			// 			if( IsInstanceValid( Items[i].GetParent() ) ) 
-			// 			{
-			// 				Items[i].GetParent().RemoveChild(Items[i]);
-			// 			}
-						
-			// 			Items[i].Free();
-			// 		}
-			// 	}
-			// 	Items = null;
-			// }
-			
-			// if( Containers != null ) 
-			// {
-			// 	for( int i = 0;  i < Containers.Count; i++  ) 
-			// 	{
-			// 		if( IsInstanceValid(Containers[i]) ) 
-			// 		{
-			// 			if( IsInstanceValid( Containers[i].GetParent() ) ) 
-			// 			{
-			// 				Containers[i].GetParent().RemoveChild(Containers[i]);
-			// 			}
-						
-			// 			Containers[i].Free();
-			// 		}
-			// 	}
-	
-			// 	Containers = null;
-			// }
-			
-			if( IsInstanceValid(_InnerContainer) ) 
-			{
-				_InnerContainer.QueueFree();
-				_InnerContainer = null;
-			}
-			
-			if( IsInstanceValid(_MarginContainer) ) 
-			{
-				_MarginContainer.QueueFree();
-				_MarginContainer = null;
-			}
-			
-			if( IsInstanceValid(_ScrollContainer) ) 
-			{
-				_ScrollContainer.QueueFree();
-				_ScrollContainer = null;
-			}
 		}
 	}
 }

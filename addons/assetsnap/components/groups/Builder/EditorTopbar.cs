@@ -47,9 +47,41 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		private HBoxContainer _InnerBoxContainer;
 		private MarginContainer totalMarginContainer;
 		private Label _TotalItems;
+		
+		public override void Clear()
+		{
+			TitleInput.Clear();
+			PlaceButton.Clear();
+			SaveButton.Clear();
+			CloseButton.Clear();
+			
+			if( null != TitleInput.GetParent() ) 
+			{
+				TitleInput.GetParent().RemoveChild(TitleInput);
+			}
+			
+			if( null != PlaceButton.GetParent() ) 
+			{
+				PlaceButton.GetParent().RemoveChild(PlaceButton);
+			}
+			
+			if( null != SaveButton.GetParent() ) 
+			{
+				SaveButton.GetParent().RemoveChild(SaveButton);
+			}
+
+			if( null != CloseButton.GetParent() ) 
+			{
+				CloseButton.GetParent().RemoveChild(CloseButton);
+			}
+			
+			base.Clear();
+		}
 
 		public override void Initialize()
 		{
+			base.Initialize();
+		
 			Initiated = true;
 			
 			_InitializeFields();
@@ -68,7 +100,7 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			_BoxContainer.AddChild(_InnerMarginContainer);
 			_MarginContainer.AddChild(_BoxContainer);
 			
-			Container.AddChild(_MarginContainer);
+			AddChild(_MarginContainer);
 		}
 			
 		public void UpdateTotalItems( int items )
@@ -163,7 +195,10 @@ namespace AssetSnap.Front.Components.Groups.Builder
 				"Groups.Builder.EditorTitleInput",
 			};
 			
-			HBoxContainer hBoxContainer = new();
+			HBoxContainer hBoxContainer = new()
+			{
+				Name = "GroupTitleContainer"
+			};
 
 			totalMarginContainer = new()
 			{

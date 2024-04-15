@@ -24,6 +24,7 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 {
 	using AssetSnap.Component;
 	using Godot;
+	using Godot.Collections;
 
 	[Tool]
 	public partial class SnapObject : LSObjectComponent
@@ -54,6 +55,12 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		public SnapObject()
 		{
 			Name = "LSSnapObject";
+			
+			UsingTraits = new()
+			{
+				{ typeof(Checkable).ToString() },
+			};
+			
 			//_include = false;
 		}
 		
@@ -77,7 +84,6 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		public override void Initialize()
 		{
 			base.Initialize();
-			AddTrait(typeof(Checkable)); 
 
 			Callable _callable = Callable.From(() => { _OnCheckboxPressed(); });
 			
@@ -187,8 +193,7 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 				null != _GlobalExplorer.States &&
 				false != Initiated &&
 				null != Trait<Checkable>() &&
-				false != HasTrait<Checkable>() &&
-				IsInstanceValid( Trait<Checkable>() );
+				false != HasTrait<Checkable>();
 		}
 		
 		/*
@@ -200,6 +205,12 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		public override void Sync() 
 		{
 			_GlobalExplorer.States.SnapToObject = state ? GlobalStates.LibraryStateEnum.Enabled : GlobalStates.LibraryStateEnum.Disabled;
+		}
+		
+		public override void _ExitTree()
+		{
+			
+			base._ExitTree();
 		}
 	}
 }

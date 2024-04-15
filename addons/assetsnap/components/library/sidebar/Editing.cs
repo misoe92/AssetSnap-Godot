@@ -54,48 +54,46 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		*/
 		public override void Initialize()
 		{
+			base.Initialize();
+			
 			Initiated = true;
 			
+			_MarginContainer = new();
+			_InnerMarginContainer = new();
+			_PanelContainer = new();
+			_InnerContainer = new();
+
+			_InnerContainer.AddThemeConstantOverride("separation", 0);
 			
-			if( Container is VBoxContainer BoxContainer ) 
+			_Label = new()
 			{
-				_MarginContainer = new();
-				_InnerMarginContainer = new();
-				_PanelContainer = new();
-				_InnerContainer = new();
+				ThemeTypeVariation = "HeaderXtraSmall",
+				Text = _Title
+			};
+							
+			_LabelEditing = new()
+			{
+				ThemeTypeVariation = "HeaderSmall", 
+				Text = _GlobalExplorer.HasModel ? GetModelName() : "None",
+			};
+			
+			_MarginContainer.AddThemeConstantOverride("margin_left", 0); 
+			_MarginContainer.AddThemeConstantOverride("margin_right", 0);
+			_MarginContainer.AddThemeConstantOverride("margin_top", 0);
+			_MarginContainer.AddThemeConstantOverride("margin_bottom", 0);
+			
+			_InnerMarginContainer.AddThemeConstantOverride("margin_left", 12); 
+			_InnerMarginContainer.AddThemeConstantOverride("margin_right", 12);
+			_InnerMarginContainer.AddThemeConstantOverride("margin_top", 5);
+			_InnerMarginContainer.AddThemeConstantOverride("margin_bottom", 5);
+			
+			_InnerContainer.AddChild(_Label); 
+			_InnerContainer.AddChild(_LabelEditing); 
+			_InnerMarginContainer.AddChild(_InnerContainer); 
+			_PanelContainer.AddChild(_InnerMarginContainer);
+			_MarginContainer.AddChild(_PanelContainer);
 
-				_InnerContainer.AddThemeConstantOverride("separation", 0);
-				
-				_Label = new()
-				{
-					ThemeTypeVariation = "HeaderXtraSmall",
-					Text = _Title
-				};
-								
-				_LabelEditing = new()
-				{
-					ThemeTypeVariation = "HeaderSmall", 
-					Text = _GlobalExplorer.HasModel ? GetModelName() : "None",
-				};
-				
-				_MarginContainer.AddThemeConstantOverride("margin_left", 0); 
-				_MarginContainer.AddThemeConstantOverride("margin_right", 0);
-				_MarginContainer.AddThemeConstantOverride("margin_top", 0);
-				_MarginContainer.AddThemeConstantOverride("margin_bottom", 0);
-				
-				_InnerMarginContainer.AddThemeConstantOverride("margin_left", 10); 
-				_InnerMarginContainer.AddThemeConstantOverride("margin_right", 10);
-				_InnerMarginContainer.AddThemeConstantOverride("margin_top", 5);
-				_InnerMarginContainer.AddThemeConstantOverride("margin_bottom", 5);
-				
-				_InnerContainer.AddChild(_Label); 
-				_InnerContainer.AddChild(_LabelEditing); 
-				_InnerMarginContainer.AddChild(_InnerContainer); 
-				_PanelContainer.AddChild(_InnerMarginContainer);
-				_MarginContainer.AddChild(_PanelContainer);
-
-				BoxContainer.AddChild(_MarginContainer);
-			}
+			AddChild(_MarginContainer);
 		}
 		
 		private string GetModelName()

@@ -26,6 +26,7 @@ namespace AssetSnap.Front.Components
 	using AssetSnap.Explorer;
 	using AssetSnap.Static;
 	using Godot;
+	using Godot.Collections;
 
 	[Tool]
 	public partial class SettingsCheckbox : TraitableComponent
@@ -59,6 +60,15 @@ namespace AssetSnap.Front.Components
 		public SettingsCheckbox()
 		{
 			Name = "SettingsCheckbox";
+			
+			UsingTraits = new()
+			{
+				{ typeof(Panelable).ToString() },
+				{ typeof(Containerable).ToString() },
+				{ typeof(Labelable).ToString() },
+				{ typeof(Checkable).ToString() },
+			};
+			
 			//_include = false;
 		}
 		
@@ -69,11 +79,8 @@ namespace AssetSnap.Front.Components
 		*/
 		public override void Initialize() 
 		{
-			AddTrait(typeof(Panelable));
-			AddTrait(typeof(Containerable));
-			AddTrait(typeof(Labelable));
-			AddTrait(typeof(Checkable));
-
+			base.Initialize();
+			
 			Name = "SettingsCheckbox";
 			if( key == null || Container == null ) 
 			{
@@ -120,21 +127,19 @@ namespace AssetSnap.Front.Components
 					.Select(0)
 					.GetInnerContainer();
 			
-			if(
-				Trait<Labelable>().Select(0).IsValid()
-			)
+			if( null != title ) 
 			{
 				Trait<Labelable>()
+					.Select(0)
 					.AddToContainer(
 						innerContainer
 					);
 			}
 			
-			if(
-				Trait<Labelable>().Select(1).IsValid()
-			)
+			if( null != description ) 
 			{
 				Trait<Labelable>()
+					.Select(1)
 					.AddToContainer(
 						innerContainer
 					);
@@ -157,7 +162,7 @@ namespace AssetSnap.Front.Components
 			Trait<Panelable>()
 				.Select(0)
 				.AddToContainer(
-					Container
+					this
 				);
 		}
 		
@@ -168,9 +173,9 @@ namespace AssetSnap.Front.Components
 		*/
 		private void ConfigureTitle( string title, string description)
 		{
-			if (title != null || description != null)
+			if( null != title || null != description )
 			{
-				if (title != null)
+				if( null != title )
 				{
 					Trait<Labelable>()
 						.SetMargin(0)
@@ -180,7 +185,7 @@ namespace AssetSnap.Front.Components
 						.Instantiate();
 				}
 				
-				if (description != null)
+				if ( null != description )
 				{
 					Trait<Labelable>()
 						.SetMargin(0)

@@ -25,6 +25,7 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject.AdvancedContaine
 	using AssetSnap.Component;
 	using AssetSnap.Static;
 	using Godot;
+	using Godot.Collections;
 
 	[Tool]
 	public partial class SnapLayer : AdvancedGroupComponent
@@ -32,12 +33,18 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject.AdvancedContaine
 		public SnapLayer()
 		{
 			Text = "Snap Layer";
+			
+			UsingTraits = new()
+			{
+				{ typeof(Containerable).ToString() },
+				{ typeof(Labelable).ToString() },
+				{ typeof(Spinboxable).ToString() },
+			};
 		}
-
+		
 		protected override void _RegisterTraits()
 		{
 			base._RegisterTraits();
-			AddTrait(typeof(Spinboxable));
 		}
 		
 		protected override void _InitializeFields()

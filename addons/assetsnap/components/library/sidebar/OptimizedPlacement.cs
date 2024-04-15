@@ -24,6 +24,7 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 {
 	using AssetSnap.Component;
 	using Godot;
+	using Godot.Collections;
 
 	[Tool]
 	public partial class OptimizedPlacement : CheckableComponent
@@ -39,6 +40,12 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		public OptimizedPlacement()
 		{
 			Name = "LSOptimizedPlacement";
+			
+			UsingTraits = new()
+			{
+				{ typeof(Checkable).ToString() },
+			};
+			
 			// _include = false;
 		}
 
@@ -50,7 +57,6 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		public override void Initialize()
 		{
 			base.Initialize();
-			AddTrait(typeof(Checkable));
 			Callable _callable = Callable.From(() => { _OnCheckboxPressed(); });
 			Initiated = true;
 			
@@ -157,6 +163,7 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		public override void _ExitTree()
 		{
 			Initiated = false;
+			
 			base._ExitTree();
 		}
 	}

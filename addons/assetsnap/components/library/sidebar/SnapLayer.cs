@@ -24,6 +24,7 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 {
 	using AssetSnap.Component;
 	using Godot;
+	using Godot.Collections;
 
 	[Tool]
 	public partial class SnapLayer : LibraryComponent
@@ -39,6 +40,12 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		public SnapLayer()
 		{
 			Name = "LSSnapLayer";
+			
+			UsingTraits = new()
+			{
+				{ typeof(Spinboxable).ToString() },
+			};
+			
 			//_include = false;
 		}
 		 
@@ -50,7 +57,6 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		public override void Initialize()
 		{
 			base.Initialize();
-			AddTrait(typeof(Spinboxable));
 
 			Callable _callable = Callable.From((double value) => { _OnSpinBoxValueChange((int)value); });
 			
@@ -111,8 +117,7 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 				null != _GlobalExplorer.States &&
 				false != Initiated &&
 				null != Trait<Spinboxable>() &&
-				false != HasTrait<Spinboxable>() &&
-				IsInstanceValid( Trait<Spinboxable>() );
+				false != HasTrait<Spinboxable>();
 		}
 		
 		/*

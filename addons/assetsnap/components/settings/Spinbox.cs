@@ -27,6 +27,7 @@ namespace AssetSnap.Front.Components
 	using AssetSnap.Explorer;
 	using AssetSnap.Static;
 	using Godot;
+	using Godot.Collections;
 
 	[Tool]
 	public partial class SettingsSpinBox : TraitableComponent
@@ -60,6 +61,15 @@ namespace AssetSnap.Front.Components
 		public SettingsSpinBox()
 		{
 			Name = "SettingsSpinBox";
+			
+			UsingTraits = new()
+			{
+				{ typeof(Panelable).ToString() },
+				{ typeof(Containerable).ToString() },
+				{ typeof(Labelable).ToString() },
+				{ typeof(Spinboxable).ToString() },
+			};
+			
 			//_include = false;   
 		}
 		
@@ -70,10 +80,7 @@ namespace AssetSnap.Front.Components
 		*/
 		public override void Initialize() 
 		{
-			AddTrait(typeof(Panelable));
-			AddTrait(typeof(Containerable));
-			AddTrait(typeof(Labelable));
-			AddTrait(typeof(Spinboxable));
+			base.Initialize();
 			
 			string title = GetTitle( key );
 			string description = GetDescription( key );
@@ -83,7 +90,8 @@ namespace AssetSnap.Front.Components
 			Trait<Panelable>()
 				.SetName("SettingsPanel")
 				.SetType(Panelable.PanelType.RoundedPanelContainer)
-				.SetMargin(5, "top")
+				.SetHorizontalSizeFlags(Control.SizeFlags.ExpandFill)
+				.SetMargin(1, "top")
 				.SetMargin(5, "bottom")
 				.SetMargin(5, "left")
 				.SetMargin(5, "right")
@@ -91,6 +99,7 @@ namespace AssetSnap.Front.Components
 			
 			Trait<Containerable>()
 				.SetName("SettingsSpinboxContainer")
+				.SetHorizontalSizeFlags(Control.SizeFlags.ExpandFill)
 				.SetMargin(10, "top")
 				.SetMargin(10, "bottom")
 				.SetMargin(10, "left")
@@ -113,21 +122,19 @@ namespace AssetSnap.Front.Components
 					.Select(0)
 					.GetInnerContainer();
 			
-			if(
-				Trait<Labelable>().Select(0).IsValid()
-			)
+			if( null != title ) 
 			{
 				Trait<Labelable>()
+					.Select(0)
 					.AddToContainer(
 						innerContainer
 					);
 			}
 			
-			if(
-				Trait<Labelable>().Select(1).IsValid()
-			)
+			if( null != description ) 
 			{
 				Trait<Labelable>()
+					.Select(1)
 					.AddToContainer(
 						innerContainer
 					);

@@ -24,6 +24,7 @@ namespace AssetSnap.Front.Components.Library
 {
 	using AssetSnap.Component;
 	using Godot;
+	using Godot.Collections;
 
 	[Tool]
 	public partial class Body : LibraryComponent
@@ -36,6 +37,12 @@ namespace AssetSnap.Front.Components.Library
 		public Body()
 		{
 			Name = "LibraryBody";
+			
+			UsingTraits = new()
+			{
+				{ typeof(Containerable).ToString() },
+			};
+		
 			//_include = false;
 		}
 		
@@ -47,33 +54,36 @@ namespace AssetSnap.Front.Components.Library
 		public override void Initialize()
 		{
 			base.Initialize();
-			AddTrait(typeof(Containerable));
 			Initiated = true;
 			
-			if( Container is PanelContainer PanelContainer ) 
-			{
-				Trait<Containerable>()
-					.SetName("MainLibraryContainer")
-					.SetMargin(5)
-					.SetLayout(Containerable.ContainerLayout.TwoColumns)
-					.SetHorizontalSizeFlags(Control.SizeFlags.ExpandFill)
-					.SetVerticalSizeFlags(Control.SizeFlags.ExpandFill)
-					.Instantiate()
-					.Select(0)
-					.AddToContainer( PanelContainer );
+			SizeFlagsHorizontal = SizeFlags.ExpandFill;
+			SizeFlagsVertical = SizeFlags.ExpandFill;
+		
+			Trait<Containerable>()
+				.SetName("MainLibraryContainer")
+				.SetMargin(5)
+				.SetLayout(Containerable.ContainerLayout.TwoColumns)
+				.SetHorizontalSizeFlags(Control.SizeFlags.ExpandFill)
+				.SetVerticalSizeFlags(Control.SizeFlags.ExpandFill)
+				.Instantiate()
+				.Select(0)
+				.AddToContainer( this );
 
-				Container container = Trait<Containerable>()
-					.Select(0)
-					.GetInnerContainer(0);
-					
-				Container containerTwo = Trait<Containerable>()
-					.Select(0)
-					.GetInnerContainer(1);
+			Container container = Trait<Containerable>()
+				.Select(0)
+				.GetInnerContainer(0);
+				
+			Container containerTwo = Trait<Containerable>()
+				.Select(0)
+				.GetInnerContainer(1);
 
-				container.SizeFlagsHorizontal = Control.SizeFlags.ShrinkBegin;
-				container.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
-				container.CustomMinimumSize = new Vector2(225,0);
-			}
+			container.SizeFlagsHorizontal = Control.SizeFlags.ShrinkBegin;
+			container.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
+			
+			container.CustomMinimumSize = new Vector2(225,0);
+			
+			// containerTwo.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+			// containerTwo.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
 		}
 			
 		/*
@@ -81,11 +91,11 @@ namespace AssetSnap.Front.Components.Library
 		**
 		** @return VBoxContainer
 		*/
-		public VBoxContainer GetLeftInnerContainer() 
+		public Container GetLeftInnerContainer() 
 		{
 			return Trait<Containerable>()
 					.Select(0)
-					.GetInnerContainer(0) as VBoxContainer;
+					.GetInnerContainer(0) as Container;
 		}
 		
 		/*
@@ -93,11 +103,11 @@ namespace AssetSnap.Front.Components.Library
 		**
 		** @return VBoxContainer
 		*/
-		public VBoxContainer GetRightInnerContainer() 
+		public Container GetRightInnerContainer() 
 		{
 			return Trait<Containerable>()
 					.Select(0)
-					.GetInnerContainer(1) as VBoxContainer;
+					.GetInnerContainer(1) as Container;
 		} 
 	}
 }

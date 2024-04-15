@@ -24,23 +24,32 @@ namespace AssetSnap.Front.Components.Groups.Builder
 {
 	using AssetSnap.Component;
 	using Godot;
+	using Godot.Collections;
 
 	[Tool]
 	public partial class EditorClose : LibraryComponent
 	{
-		public EditorClose()
-		{
-			Name = "GroupBuilderEditorClose";
-			// _include = false;
-		}
-
 		private static readonly string Text = "Close"; 
 		private static readonly string TooltipText = "Close the current group and stop editing it."; 
 		private static readonly Control.CursorShape MouseDefaultCursorShape = Control.CursorShape.PointingHand; 
+
+		public EditorClose()
+		{
+			Name = "GroupBuilderEditorClose";
+			
+			UsingTraits = new()
+			{
+				{ typeof(Buttonable).ToString() },
+			};
+			
+			// _include = false;
+		}
+
 		
 		public override void Initialize()
 		{
-			AddTrait(typeof(Buttonable));
+			base.Initialize();
+		
 			Initiated = true;
 
 			_InitializeFields();

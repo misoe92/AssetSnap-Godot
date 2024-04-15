@@ -24,10 +24,19 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 {
 	using AssetSnap.Component;
 	using Godot;
+    using Godot.Collections;
 
-	[Tool]
+    [Tool]
 	public partial class SnapToObjectOffsetX : GroupOptionSpinboxableComponent
 	{
+		public SnapToObjectOffsetX()
+		{
+			UsingTraits = new()
+			{
+				{ typeof(Spinboxable).ToString() },
+			};
+		}
+		
 		protected override void _InitializeFields()
 		{
 			Trait<Spinboxable>()

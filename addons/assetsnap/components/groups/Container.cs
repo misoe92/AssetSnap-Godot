@@ -35,7 +35,13 @@ namespace AssetSnap.Front.Components.Groups
 		*/
 		public Container()
 		{
-			Name = "GroupContainer"; 
+			Name = "GroupContainer";
+			
+			UsingTraits = new()
+			{
+				{ typeof(Containerable).ToString() },
+			};
+			
 			//_include = false;
 			// _include = false;
 		}
@@ -47,7 +53,11 @@ namespace AssetSnap.Front.Components.Groups
 		*/
 		public override void Initialize()
 		{
-			AddTrait(typeof(Containerable));
+			SizeFlagsVertical = Control.SizeFlags.ExpandFill;
+			SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+			
+			base.Initialize();
+			
 			Initiated = true;
 
 			_InitializeFields();
@@ -58,6 +68,7 @@ namespace AssetSnap.Front.Components.Groups
 		{
 			Trait<Containerable>()
 				.SetName("GroupContainer")
+				.SetMargin(10, "bottom")
 				.SetVerticalSizeFlags(Control.SizeFlags.ExpandFill)
 				.SetHorizontalSizeFlags(Control.SizeFlags.ExpandFill)
 				.SetLayout( Containerable.ContainerLayout.TwoColumns )
@@ -76,7 +87,7 @@ namespace AssetSnap.Front.Components.Groups
 			Trait<Containerable>()
 				.Select(0)
 				.AddToContainer(
-					Container
+					this
 				);
 		}
 		

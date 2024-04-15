@@ -24,10 +24,19 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 {
 	using AssetSnap.Component;
 	using Godot;
+	using Godot.Collections;
 
 	[Tool]
 	public partial class SnapLayer : GroupOptionSpinboxableComponent
 	{
+		public SnapLayer()
+		{
+			UsingTraits = new()
+			{
+				{ typeof(Spinboxable).ToString() },
+			};
+		}
+		
 		protected override void _InitializeFields()
 		{
 			Trait<Spinboxable>()
