@@ -51,6 +51,7 @@ namespace AssetSnap.Front.Nodes
 		
 		public override void _EnterTree()
 		{
+			Name = "BottomDock";
 			Theme = _Theme;
 		
 			// CustomMinimumSize = new Vector2(0, 205);
