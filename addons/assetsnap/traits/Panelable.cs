@@ -61,6 +61,10 @@ namespace AssetSnap.Component
 		/*
 		** Public methods
 		*/
+		public Panelable()
+		{
+			TypeString = GetType().ToString();
+		}
 		
 		/*
 		** Instantiate an instance of the trait
@@ -69,7 +73,7 @@ namespace AssetSnap.Component
 		*/	
 		public Panelable Instantiate()
 		{
-			base._Instantiate( GetType().ToString() );
+			base._Instantiate();
 
 			_MarginContainer = new()
 			{
@@ -86,7 +90,7 @@ namespace AssetSnap.Component
 			
 			PanelContainer WorkingPanel = new()
 			{
-				Name = Name,
+				Name = TraitName,
 				ThemeTypeVariation = Type.ToString(),
 				SizeFlagsHorizontal = SizeFlagsHorizontal,
 				SizeFlagsVertical = SizeFlagsVertical,
@@ -98,7 +102,7 @@ namespace AssetSnap.Component
 				SizeFlagsHorizontal = SizeFlagsHorizontal,
 				SizeFlagsVertical = SizeFlagsVertical,
 			};
-			
+			 
 			foreach( (string side, int value ) in Padding ) 
 			{
 				_PaddingContainer.AddThemeConstantOverride("margin_" + side, value);
@@ -107,10 +111,18 @@ namespace AssetSnap.Component
 			WorkingPanel.AddChild(_PaddingContainer);
 			_MarginContainer.AddChild(WorkingPanel);
 
-			Nodes.Add(WorkingPanel);
-			WorkingNode = WorkingPanel;
+			Dependencies[TraitName + "_WorkingNode"] = WorkingPanel;
+			Dependencies[TraitName + "_PanelPaddingContainer"] = _PaddingContainer;
+			Dependencies[TraitName + "_MarginContainer"] = _MarginContainer;
 
+			Plugin.Singleton.traitGlobal.AddInstance(Iteration, WorkingPanel, OwnerName, TypeString, Dependencies);
+			Plugin.Singleton.traitGlobal.AddName(Iteration, TraitName, OwnerName, TypeString);
+
+			// GD.Print(Iteration);
+		
 			Reset();
+			Iteration += 1;
+			Dependencies = new();
 			
 			return this;
 		}
@@ -126,17 +138,10 @@ namespace AssetSnap.Component
 		{
 			base._Select(index);
 			
-			if( _select ) 
+			if( false != Dependencies.ContainsKey(TraitName + "_WorkingNode") ) 
 			{
-				if( IsInstanceValid( WorkingNode.GetParent() ) && WorkingNode.GetParent() is MarginContainer marginContainer )
-				{
-					_MarginContainer = marginContainer;	
-				}
-				
-				if( IsInstanceValid( WorkingNode.GetChild(0) ) && WorkingNode.GetChild(0) is MarginContainer paddingContainer )
-				{
-					_PaddingContainer = paddingContainer;	
-				}
+				Godot.Collections.Dictionary<string, Variant> dependencies = Plugin.Singleton.traitGlobal.GetDependencies(index, TypeString, OwnerName);
+				Dependencies = dependencies;
 			}
 
 			return this;
@@ -155,7 +160,7 @@ namespace AssetSnap.Component
 			{
 				if( button.Name == name ) 
 				{
-					WorkingNode = button;
+					Dependencies["WorkingNode"] = button;
 					break;
 				}
 			}
@@ -172,7 +177,15 @@ namespace AssetSnap.Component
 		*/
 		public void AddToContainer( Node Container )
 		{
-			base._AddToContainer(Container, _MarginContainer);
+			if( false == Dependencies.ContainsKey(TraitName + "_MarginContainer") ) 
+			{
+				GD.PushError("Container was not found @ AddToContainer");
+				GD.PushError("AddToContainer::Keys-> ", Dependencies.Keys);
+				GD.PushError("AddToContainer::ADDTO-> ", TraitName + "_MarginContainer");
+				return;
+			}
+			
+			base._AddToContainer(Container, Dependencies[TraitName + "_MarginContainer"].As<MarginContainer>());
 		}
 		
 		/*
@@ -217,9 +230,13 @@ namespace AssetSnap.Component
 		{
 			base._SetVisible(state);
 			
-			if( null != WorkingNode && WorkingNode is PanelContainer panel ) 
+			if(
+				null != Dependencies &&
+				false != Dependencies.ContainsKey(TraitName + "WorkingNode") &&
+				Dependencies["WorkingNode"].As<GodotObject>() is PanelContainer panel
+			) 
 			{
-				_MarginContainer.Visible = state;
+				Dependencies[TraitName + "_MarginContainer"].As<MarginContainer>().Visible = state;
 			}
 			
 			return this;
@@ -299,12 +316,12 @@ namespace AssetSnap.Component
 		
 		public MarginContainer GetContainer()
 		{
-			if( null == _PaddingContainer ) 
+			if( false == Dependencies.ContainsKey(TraitName + "_PaddingContainer") ) 
 			{
 				return null;
 			}
 			
-			return _PaddingContainer as MarginContainer;
+			return Dependencies[TraitName + "_PaddingContainer"].As<MarginContainer>();
 		}
 		
 		/*
@@ -319,23 +336,9 @@ namespace AssetSnap.Component
 		*/
 		private void Reset()
 		{
-			WorkingNode = null;
 			_MarginContainer = null;
 			_PaddingContainer = null;
 			Type = PanelType.DefaultPanelContainer;
-		}
-		
-		/*
-		** Cleanup
-		*/
-		public override void _ExitTree()
-		{
-			if( null != WorkingNode && EditorPlugin.IsInstanceValid( WorkingNode ) ) 
-			{
-				WorkingNode.QueueFree();
-			}
-			
-			Reset();
 		}
 	}
 }

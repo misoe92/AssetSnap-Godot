@@ -67,6 +67,7 @@ namespace AssetSnap.Component
 				{"bottom", 10},
 			};
 			
+			TypeString = GetType().ToString();
 			SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
 			SizeFlagsVertical = Control.SizeFlags.ShrinkBegin;
 		}
@@ -78,7 +79,7 @@ namespace AssetSnap.Component
 		*/	
 		public override Labelable Instantiate()
 		{
-			base._Instantiate( GetType().ToString() );
+			base._Instantiate();
 			
 			if ("" != Suffix)
 			{
@@ -88,7 +89,7 @@ namespace AssetSnap.Component
 			}
 			
 			base.Instantiate();
-			
+			// GD.Print("Labeltrait: ", TraitName);
 			if( Title == "" ) 
 			{
 				GD.PushWarning("Title not found");
@@ -97,7 +98,7 @@ namespace AssetSnap.Component
 			
 			Label Label = new() 
 			{
-				Name = Name,	
+				Name = TraitName,	
 				Text = Title,
 				CustomMinimumSize = CustomMinimumSize,
 				Size = Size,
@@ -115,7 +116,7 @@ namespace AssetSnap.Component
 			{
 				Label suffix = new() 
 				{
-					Name = Name + "-suffix",	
+					Name = TraitName + "-suffix",	
 					Text = Suffix,
 					ThemeTypeVariation = "TextExtraSmall",
 					SizeFlagsHorizontal = Control.SizeFlags.ShrinkCenter,
@@ -125,11 +126,19 @@ namespace AssetSnap.Component
 							
 				GetInnerContainer(0)
 					.AddChild(suffix);
+					
+				Dependencies.Add(TraitName + "_Suffix", suffix);
 			}
 
-			Nodes.Add(Label);
+			Dependencies[TraitName + "_WorkingNode"] = Label;
+			
+			Plugin.Singleton.traitGlobal.AddInstance(Iteration, Label, OwnerName, TypeString, Dependencies );
+			Plugin.Singleton.traitGlobal.AddName(Iteration, TraitName, OwnerName, TypeString);
 
+			
 			Reset();
+			Iteration += 1;
+			Dependencies = new();
 			
 			return this;
 		}
@@ -141,14 +150,19 @@ namespace AssetSnap.Component
 		** @param int index
 		** @return Labelable
 		*/
-		public override Labelable Select(int index)
+		public override Labelable Select(int index, bool debug = false)
 		{
 			base._Select(index);
+			// GD.Print("her", index, TraitName, WorkingNode);
 
-			if( null != WorkingNode && EditorPlugin.IsInstanceValid(WorkingNode)) 
+			if( false != Dependencies.ContainsKey(TraitName + "_WorkingNode")) 
 			{
-				_InnerContainer = WorkingNode.GetParent().GetParent() as Container;		
-				_MarginContainer = WorkingNode.GetParent().GetParent().GetParent().GetParent().GetParent() as MarginContainer;		
+				Godot.Collections.Dictionary<string, Variant> dependencies = Plugin.Singleton.traitGlobal.GetDependencies(index, TypeString, OwnerName);
+				Dependencies = dependencies;
+			}
+			else 
+			{
+				GD.Print("NO DEPENDENCIES");
 			}
 
 			return this;
@@ -177,7 +191,21 @@ namespace AssetSnap.Component
 		*/
 		public void AddToContainer( Node Container, int? index = null ) 
 		{
-			base._AddToContainer(Container, _MarginContainer, index);
+			if( null == Dependencies ) 
+			{
+				GD.PushError("Dependencies not set @ AddToContainer");
+				return;
+			}
+			
+			if( false == Dependencies.ContainsKey(TraitName + "_MarginContainer") ) 
+			{
+				GD.PushError("Container was not found @ AddToContainer");
+				GD.PushError("AddToContainer::Keys-> ", Dependencies.Keys);
+				GD.PushError("AddToContainer::ADDTO-> ", TraitName + "_MarginContainer");
+				return;
+			}
+
+			base._AddToContainer(Container, Dependencies[TraitName + "_MarginContainer"].As<MarginContainer>(), index);
 			Reset();
 		}
 		
@@ -208,9 +236,12 @@ namespace AssetSnap.Component
 		{
 			Title = text;
 			
-			if( EditorPlugin.IsInstanceValid(WorkingNode) && WorkingNode is Label labelNode ) 
+			if( 
+				false != Dependencies.ContainsKey(TraitName + "_WorkingNode") &&
+				Dependencies[TraitName + "_WorkingNode"].As<GodotObject>() is Label labelNode
+			) 
 			{
-				labelNode.Text =text;
+				labelNode.Text = text;
 			}
 			
 			return this;
@@ -368,12 +399,18 @@ namespace AssetSnap.Component
 		*/
 		public override bool IsValid()
 		{
-			if( Nodes.Count > 0 && EditorPlugin.IsInstanceValid(_MarginContainer) ) 
+			if( base.IsValid() ) 
 			{
-				return true;
+				if(
+					Nodes.Count > 0 &&
+					false != Dependencies.ContainsKey(TraitName + "_MarginContainer")
+				) 
+				{
+					return true;
+				}
 			}
 			
-			return base.IsValid();
+			return false;
 		}
 		
 		/*
@@ -388,7 +425,6 @@ namespace AssetSnap.Component
 		*/
 		protected override void Reset()
 		{
-			WorkingNode = null;
 			Title = "";
 			Suffix = "";
 			
@@ -404,18 +440,6 @@ namespace AssetSnap.Component
 				{"top", 10},
 				{"bottom", 10},
 			};
-		}
-		
-		
-		/*
-		** Cleanup
-		*/
-		public override void _ExitTree()
-		{
-			if( EditorPlugin.IsInstanceValid(WorkingNode) ) 
-			{
-				WorkingNode.QueueFree();
-			}
 		}
 	}
 }

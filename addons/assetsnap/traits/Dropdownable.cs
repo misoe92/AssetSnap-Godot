@@ -62,6 +62,10 @@ namespace AssetSnap.Component
 		/*
 		** Public methods
 		*/
+		public Dropdownable()
+		{
+			TypeString = GetType().ToString();
+		}
 		
 		/*
 		** Instantiate an instance of the trait
@@ -71,9 +75,9 @@ namespace AssetSnap.Component
 		public Dropdownable Instantiate(int i)
 		{
 			UsePaddingContainer = false;
-			base._Instantiate( GetType().ToString() );
+			base._Instantiate();
 			base.Instantiate();
-			
+
 			panelContainer = new()
 			{
 				Name = "DropdownPanel",
@@ -122,20 +126,27 @@ namespace AssetSnap.Component
 				Name = "DropdownInnerContainer",
 			};
 
-			WorkingNode = panelContainer; 
-
 			// Setup the layout
 			_PanelPaddingContainer.AddChild(ItemsInnerContainer);
 			panelInnerContainer.AddChild(SelectedBlock);
 			panelInnerContainer.AddChild(_PanelPaddingContainer);
 			panelContainer.AddChild(panelInnerContainer);
 			base.GetInnerContainer(0).AddChild(panelContainer);
+			
+			Dependencies[TraitName + "_WorkingNode"] = panelContainer;
+			Dependencies[TraitName + "_PanelPaddingContainer"] = _PanelPaddingContainer;
+			Dependencies[TraitName + "_PanelInnerContainer"] = panelInnerContainer;
+			Dependencies[TraitName + "_SelectedBlock"] = SelectedBlock;
+			Dependencies[TraitName + "_ItemsInnerContainer"] = ItemsInnerContainer;
 
 			// Add the node to the nodes array
-			Nodes.Insert(i, panelContainer);
+			Plugin.Singleton.traitGlobal.AddInstance(Iteration, panelContainer, OwnerName, TypeString, Dependencies);
+			Plugin.Singleton.traitGlobal.AddName(Iteration, TraitName, OwnerName, TypeString);
  
 			// Clear the trait
 			Reset();
+			Iteration += 1;
+			Dependencies = new();
 
 			return this;
 		}
@@ -147,17 +158,14 @@ namespace AssetSnap.Component
 		** @param int index
 		** @return Dropdownable
 		*/
-		public override Dropdownable Select(int index)
+		public override Dropdownable Select(int index, bool debug = false)
 		{
 			base._Select(index);
 
-			if( null != WorkingNode ) 
+			if( false != Dependencies.ContainsKey(TraitName + "_WorkingNode")) 
 			{
-				_MarginContainer = WorkingNode.GetParent().GetParent().GetParent().GetParent().GetParent() as MarginContainer;
-				panelInnerContainer = WorkingNode.GetChild(0) as VBoxContainer;
-				SelectedBlock = panelInnerContainer.GetChild(0) as DropdownButton; 
-				_PanelPaddingContainer = panelInnerContainer.GetChild(1) as MarginContainer;
-				ItemsInnerContainer = _PanelPaddingContainer.GetChild(0) as VBoxContainer;
+				Godot.Collections.Dictionary<string, Variant> dependencies = Plugin.Singleton.traitGlobal.GetDependencies(index, TypeString, OwnerName);
+				Dependencies = dependencies;
 			}
 
 			return this; 
@@ -199,7 +207,23 @@ namespace AssetSnap.Component
 		*/
 		public void AddToContainer( Node Container ) 
 		{
-			base._AddToContainer(Container, _MarginContainer, 0);
+			if( null == Dependencies || false == Dependencies.ContainsKey(TraitName + "_MarginContainer") ) 
+			{
+				GD.PushError("Container was not found @ AddToContainer");
+				
+				if( null == Dependencies ) 
+				{
+					return;
+				}
+				
+				GD.PushError("AddToContainer::Keys-> ", Dependencies.Keys);
+				GD.PushError("AddToContainer::ADDTO-> ", TraitName + "_MarginContainer");
+				return;
+			}
+			
+			base._AddToContainer(Container, Dependencies[TraitName + "_MarginContainer"].As<MarginContainer>(), 0);
+
+			Reset();
 		}
 		
 		/*
@@ -287,7 +311,12 @@ namespace AssetSnap.Component
 		*/
 		public Container GetDropdownContainer()
 		{
-			return ItemsInnerContainer;
+			if( null == Dependencies || false == Dependencies.ContainsKey(TraitName + "_ItemsInnerContainer") ) 
+			{
+				return null;
+			}
+			
+			return Dependencies[TraitName + "_ItemsInnerContainer"].As<Container>();
 		}
 				
 		/*
@@ -302,22 +331,15 @@ namespace AssetSnap.Component
 		*/
 		protected override void Reset()
 		{
-			WorkingNode = null;
 			panelContainer = null;
 			panelInnerContainer = null;
 			SelectedBlock = null;
 			ItemsInnerContainer = null;
 			_PanelPaddingContainer = null;
 
+			Dependencies = new();
+
 			base.Reset();
-		}
-		
-		/*
-		** Cleanup
-		*/
-		public void ExitTree()
-		{
-			Items = null;
 		}
 	}
 }

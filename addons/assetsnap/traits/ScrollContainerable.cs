@@ -35,6 +35,11 @@ namespace AssetSnap.Component
 		public VBoxContainer _ScrollInnerContainer;
 		public MarginContainer _ScrollPaddingContainer;
 		
+		public ScrollContainerable()
+		{
+			TypeString = GetType().ToString();
+		}
+		
 		/*
 		** Instantiate an instance of the trait
 		**
@@ -43,7 +48,7 @@ namespace AssetSnap.Component
 		public override ScrollContainerable Instantiate()
 		{
 			UsePaddingContainer = false;
-			base._Instantiate( GetType().ToString() );
+			base._Instantiate();
 			base.Instantiate();
 			
 			ScrollContainer _WorkingNode = new()
@@ -75,11 +80,17 @@ namespace AssetSnap.Component
 			_ScrollPaddingContainer.AddChild(_ScrollInnerContainer);
 			_WorkingNode.AddChild(_ScrollPaddingContainer);
 			GetInnerContainer(0).AddChild(_WorkingNode);
+		
+			Dependencies[TraitName + "_WorkingNode"] = _WorkingNode;
+			Dependencies[TraitName + "_ScrollPaddingContainer"] = _ScrollPaddingContainer;
+			Dependencies[TraitName + "_ScrollInnerContainer"] = _ScrollInnerContainer;
 			
-			Nodes.Add(_WorkingNode);
-			WorkingNode = _WorkingNode;
+			Plugin.Singleton.traitGlobal.AddInstance(Iteration, _WorkingNode, OwnerName, TypeString, Dependencies);
+			Plugin.Singleton.traitGlobal.AddName(Iteration, TraitName, OwnerName, TypeString);
 
 			Reset();
+			Iteration += 1;
+			Dependencies = new();
 			
 			return this;
 		}
@@ -91,18 +102,14 @@ namespace AssetSnap.Component
 		** @param int index
 		** @return ScrollContainerable
 		*/
-		public override ScrollContainerable Select(int index)
+		public override ScrollContainerable Select(int index, bool debug = false)
 		{
-			base._Select(index);
-		
-			if( null != WorkingNode ) 
+			base._Select(index, debug);
+					
+			if( false != Dependencies.ContainsKey(TraitName + "_WorkingNode") ) 
 			{
-				_InnerContainer = WorkingNode.GetParent().GetParent() as Container;
-			}
-			
-			if( null != WorkingNode ) 
-			{
-				_MarginContainer = WorkingNode.GetParent().GetParent().GetParent().GetParent().GetParent() as MarginContainer;
+				Godot.Collections.Dictionary<string, Variant> dependencies = Plugin.Singleton.traitGlobal.GetDependencies(index, TypeString, OwnerName);
+				Dependencies = dependencies;
 			}
 			
 			return this;
@@ -121,7 +128,7 @@ namespace AssetSnap.Component
 			{
 				if( container.Name == name ) 
 				{
-					WorkingNode = container;
+					Dependencies[TraitName + "_WorkingNode"] = container;
 					break;
 				}
 			}
@@ -138,7 +145,15 @@ namespace AssetSnap.Component
 		*/
 		public void AddToContainer( Node Container ) 
 		{
-			base._AddToContainer(Container, _MarginContainer);
+			if( false == Dependencies.ContainsKey(TraitName + "_MarginContainer") ) 
+			{
+				GD.PushError("Container was not found @ AddToContainer");
+				GD.PushError("AddToContainer::Keys-> ", Dependencies.Keys);
+				GD.PushError("AddToContainer::ADDTO-> ", TraitName + "_MarginContainer");
+				return;
+			}
+			
+			base._AddToContainer(Container, Dependencies[TraitName + "_MarginContainer"].As<MarginContainer>());
 		}
 		
 		/*
@@ -168,6 +183,34 @@ namespace AssetSnap.Component
 		public override ScrollContainerable SetVisible( bool state ) 
 		{
 			base.SetVisible(state);
+
+			return this;
+		}
+		
+		/*
+		** Sets the dimensions of the
+		** currently chosen scroll container
+		**
+		** @param bool state
+		** @return ScrollContainerable
+		*/
+		public override ScrollContainerable SetDimensions( int width, int height ) 
+		{
+			base.SetDimensions(width,height);
+
+			return this;
+		}
+		
+		/*
+		** Sets the minimum dimensions of the
+		** currently chosen scroll container
+		**
+		** @param bool state
+		** @return ScrollContainerable
+		*/
+		public override ScrollContainerable SetMinimumDimension( int width, int height ) 
+		{
+			base.SetMinimumDimension(width,height);
 
 			return this;
 		}
@@ -239,10 +282,22 @@ namespace AssetSnap.Component
 		*/
 		public Container GetScrollContainer()
 		{
-			if( null != WorkingNode ) 
+			if( null != Dependencies && false != Dependencies.ContainsKey(TraitName + "_ScrollInnerContainer") ) 
 			{
 				// Single placement
-				return _ScrollInnerContainer as Container;
+				return Dependencies[TraitName + "_ScrollInnerContainer"].As<Container>();
+			}
+			
+			if( null == Dependencies ) 
+			{
+				GD.PushError("No dependencies set");
+				return null;
+			}
+			
+			if( false == Dependencies.ContainsKey(TraitName + "_ScrollInnerContainer") ) 
+			{
+				GD.PushError("No scroll inner container set");
+				return null;
 			}
 
 			return null;
@@ -260,21 +315,9 @@ namespace AssetSnap.Component
 		*/
 		protected override void Reset()
 		{
-			WorkingNode = null;
 			Orientation = ContainerOrientation.Vertical;
 
 			base.Reset();
-		}
-
-		/*
-		** Cleanup
-		*/
-		public override void _ExitTree()
-		{
-			if( EditorPlugin.IsInstanceValid(WorkingNode) ) 
-			{
-				WorkingNode.QueueFree();
-			}
 		}
 	}
 }

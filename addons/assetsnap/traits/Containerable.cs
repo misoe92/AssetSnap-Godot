@@ -33,6 +33,10 @@ namespace AssetSnap.Component
 		/*
 		** Public methods
 		*/
+		public Containerable()
+		{
+			TypeString = GetType().ToString();
+		}
 		
 		/*
 		** Instantiate an instance of the trait
@@ -41,13 +45,15 @@ namespace AssetSnap.Component
 		*/	
 		public override Containerable Instantiate()
 		{
-			base._Instantiate( GetType().ToString() );
+			base._Instantiate();
 			base.Instantiate();
 
-			Nodes.Add(_ContainerNode);
-			WorkingNode = _ContainerNode;
+			Plugin.Singleton.traitGlobal.AddInstance(Iteration, Dependencies[TraitName + "_Container"].As<Container>(), OwnerName, TypeString, Dependencies );
+			Plugin.Singleton.traitGlobal.AddName(Iteration, TraitName, OwnerName, TypeString);
 
 			Reset();
+			Iteration += 1;
+			Dependencies = new();
 			
 			return this;
 		}
@@ -59,9 +65,11 @@ namespace AssetSnap.Component
 		** @param int index
 		** @return Containerable
 		*/
-		public override Containerable Select(int index)
+		public override Containerable Select(int index, bool debug = false)
 		{
 			base.Select(index);
+
+			// GD.Print("VALGT: ", WorkingNode.Name);
 			
 			return this;
 		}
@@ -88,9 +96,39 @@ namespace AssetSnap.Component
 		** @param int|null index
 		** @return void
 		*/
-		public void AddToContainer( Node Container, int? index = null ) 
+		public virtual void AddToContainer( Node Container, int? index = null ) 
 		{
-			base._AddToContainer(Container, _MarginContainer, index);
+			if( null == Dependencies || false == Dependencies.ContainsKey(TraitName + "_MarginContainer") ) 
+			{
+				GD.PushError("Container was not found @ AddToContainer");
+				
+				if( null == Dependencies ) 
+				{
+					return;
+				}
+				
+				GD.PushError("AddToContainer::Keys-> ", Dependencies.Keys);
+				GD.PushError("AddToContainer::ADDTO-> ", TraitName + "_MarginContainer");
+				return;
+			}
+			
+			if( null != Dependencies[TraitName + "_MarginContainer"].As<MarginContainer>().GetParent() ) 
+			{
+				GD.PushError("Container already has a parent @ AddToContainer - ", TraitName, Dependencies[TraitName + "_MarginContainer"].As<MarginContainer>().GetParent().Name);
+				
+				if( null == Dependencies ) 
+				{
+					return;
+				}
+				
+				GD.PushError("AddToContainer::Keys-> ", Dependencies.Keys);
+				GD.PushError("AddToContainer::ADDTO-> ", TraitName + "_MarginContainer");
+				throw new Exception("her");
+				
+				return;
+			}
+			
+			base._AddToContainer(Container, Dependencies[TraitName + "_MarginContainer"].As<MarginContainer>(), index);
 		}
 		
 		/*
@@ -273,6 +311,11 @@ namespace AssetSnap.Component
 		public override Container GetInnerContainer( int index = 0 )
 		{
 			return base.GetInnerContainer( index );
+		}
+		
+		public Node GetContainerParent() 
+		{
+			return GetParentContainer();
 		}
 	}
 }

@@ -42,6 +42,10 @@ namespace AssetSnap.Component
 		/*
 		** Public methods
 		*/
+		public Checkable()
+		{
+			TypeString = GetType().ToString();
+		}
 		
 		/*
 		** Instantiate an instance of the trait
@@ -50,13 +54,13 @@ namespace AssetSnap.Component
 		*/
 		public override Checkable Instantiate()
 		{
-			base._Instantiate( GetType().ToString() );
+			base._Instantiate();
 			base.Instantiate();
 			
 			// Setup the checkbox
 			CheckBox WorkingInput = new()
 			{
-				Name = Name,
+				Name = TraitName,
 				Text = Text,
 				TooltipText = TooltipText,
 				ButtonPressed = ButtonPressed,
@@ -83,14 +87,20 @@ namespace AssetSnap.Component
 				WorkingInput.Connect(CheckBox.SignalName.Pressed, _callable);
 			}
 			
+			Dependencies[TraitName + "_WorkingNode"] = WorkingInput;
+			
 			// Add the button to the nodes array			
-			Nodes.Add(WorkingInput);
+			Plugin.Singleton.traitGlobal.AddInstance(Iteration, WorkingInput, OwnerName, TypeString, Dependencies);
+			Plugin.Singleton.traitGlobal.AddName(Iteration, TraitName, OwnerName, TypeString);
 			
 			// Add the action to the actions array			
 			_Actions.Add(_Action);
 			
 			// Clear the trait
 			Reset();
+			
+			Iteration += 1;
+			Dependencies = new();
 			
 			return this;
 		}
@@ -102,30 +112,14 @@ namespace AssetSnap.Component
 		** @param int index
 		** @return Checkable
 		*/
-		public override Checkable Select(int index)
+		public override Checkable Select(int index, bool debug = false)
 		{
-			base._Select(index);
+			base._Select(index, debug);
 			
-			if(
-				false == _select ||
-				false == IsInstanceValid( WorkingNode )
-			) 
+			if( false != Dependencies.ContainsKey(TraitName + "_WorkingNode")) 
 			{
-				return this;
-			}
-
-			if( WorkingNode is CheckBox InputNode )
-			{
-				if( index < _Actions.Count ) 
-				{
-					_Action = _Actions[index];
-				}
-				
-				if( IsInstanceValid( InputNode.GetParent() ) ) 
-				{
-					_InnerContainer = InputNode.GetParent().GetParent() as Container;
-					_MarginContainer = InputNode.GetParent().GetParent().GetParent().GetParent().GetParent() as MarginContainer;
-				}
+				Godot.Collections.Dictionary<string, Variant> dependencies = Plugin.Singleton.traitGlobal.GetDependencies(index, TypeString, OwnerName);
+				Dependencies = dependencies;
 			}
 			
 			return this;
@@ -144,7 +138,7 @@ namespace AssetSnap.Component
 			{
 				if( button.Name == name ) 
 				{
-					WorkingNode = button;
+					Dependencies[TraitName + "_WorkingNode"] = button;
 					break;
 				}
 			}
@@ -161,7 +155,15 @@ namespace AssetSnap.Component
 		*/
 		public void AddToContainer( Node Container )
 		{
-			_AddToContainer(Container, _MarginContainer);
+			if( false == Dependencies.ContainsKey(TraitName + "_MarginContainer") ) 
+			{
+				GD.PushError("Container was not found @ AddToContainer");
+				GD.PushError("AddToContainer::Keys-> ", Dependencies.Keys);
+				GD.PushError("AddToContainer::ADDTO-> ", TraitName + "_MarginContainer");
+				return;
+			}
+			
+			_AddToContainer(Container, Dependencies[TraitName + "_MarginContainer"].As<MarginContainer>());
 		}
 		
 		/*
@@ -215,7 +217,10 @@ namespace AssetSnap.Component
 		*/
 		public Checkable SetValue( bool value )
 		{
-			if( IsInstanceValid( WorkingNode ) && WorkingNode is CheckBox WorkingInput) 
+			if(
+				false != Dependencies.ContainsKey(TraitName + "_WorkingNode") &&
+				Dependencies[TraitName + "_WorkingNode"].As<GodotObject>() is CheckBox WorkingInput
+			) 
 			{
 				WorkingInput.ButtonPressed = value;
 			}
@@ -322,7 +327,7 @@ namespace AssetSnap.Component
 		*/
 		public bool GetValue()
 		{
-			if( IsInstanceValid( WorkingNode ) && WorkingNode is CheckBox WorkingInput) 
+			if( false != Dependencies.ContainsKey(TraitName + "_WorkingNode") && Dependencies[TraitName + "_WorkingNode"].As<GodotObject>() is CheckBox WorkingInput) 
 			{
 				// GD.PushError(Name);
 				return WorkingInput.ButtonPressed;
@@ -357,22 +362,9 @@ namespace AssetSnap.Component
 		*/
 		protected override void Reset()
 		{
-			WorkingNode = null;
 			_Action = null;
 
 			base.Reset();
-		}
-		
-		/*
-		** Cleanup
-		*/
-		public override void _ExitTree()
-		{
-			Nodes = new();
-			disposed = true;
-			Reset();
-			 
-			base._ExitTree();
 		}
 	}
 }

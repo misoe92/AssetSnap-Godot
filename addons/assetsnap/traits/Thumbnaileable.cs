@@ -40,6 +40,10 @@ namespace AssetSnap.Component
 		/*
 		** Public methods
 		*/
+		public Thumbnaileable()
+		{
+			TypeString = GetType().ToString();
+		}
 		
 		/*
 		** Instantiate an instance of the trait
@@ -48,12 +52,12 @@ namespace AssetSnap.Component
 		*/	
 		public override Thumbnaileable Instantiate()
 		{
-			base._Instantiate( GetType().ToString() );
+			base._Instantiate();
 			base.Instantiate();
 			
 			AsModelViewerRect _TextureRect = new()
 			{
-				Name = Name + "-Preview",
+				Name = TraitName + "-Preview",
 				ExpandMode = ExpandMode,
 				StretchMode = StretchMode
 			};
@@ -63,9 +67,14 @@ namespace AssetSnap.Component
 			
 			GetInnerContainer(0).AddChild(_TextureRect);
 
-			Nodes.Add(_TextureRect);
-
+			Dependencies[TraitName + "_WorkingNode"] = _TextureRect;
+		
+			Plugin.Singleton.traitGlobal.AddInstance(Iteration, _TextureRect, OwnerName, TypeString, Dependencies);
+			Plugin.Singleton.traitGlobal.AddName(Iteration, TraitName, OwnerName, TypeString);
+			
 			Reset();
+			Iteration += 1;
+			Dependencies = new();
 			
 			return this;
 		}
@@ -77,14 +86,14 @@ namespace AssetSnap.Component
 		** @param int index
 		** @return Thumbnaileable
 		*/
-		public override Thumbnaileable Select(int index)
+		public override Thumbnaileable Select(int index, bool debug = false)
 		{
 			base._Select(index);
 			
-			if( EditorPlugin.IsInstanceValid(WorkingNode) ) 
+			if( false != Dependencies.ContainsKey(TraitName + "_WorkingNode") ) 
 			{
-				_InnerContainer = WorkingNode.GetParent().GetParent() as Container;
-				_MarginContainer = WorkingNode.GetParent().GetParent().GetParent().GetParent().GetParent() as MarginContainer;
+				Godot.Collections.Dictionary<string, Variant> dependencies = Plugin.Singleton.traitGlobal.GetDependencies(index, TypeString, OwnerName);
+				Dependencies = dependencies;
 			}
 			
 			return this;
@@ -103,7 +112,7 @@ namespace AssetSnap.Component
 			{
 				if( container.Name == name ) 
 				{
-					WorkingNode = container;
+					Dependencies[TraitName + "_WorkingNode"] = container;
 					break;
 				}
 			}
@@ -120,7 +129,15 @@ namespace AssetSnap.Component
 		*/
 		public void AddToContainer( Node Container ) 
 		{
-			base._AddToContainer(Container, _MarginContainer);
+			if( false == Dependencies.ContainsKey(TraitName + "_MarginContainer") ) 
+			{
+				GD.PushError("Container was not found @ AddToContainer");
+				GD.PushError("AddToContainer::Keys-> ", Dependencies.Keys);
+				GD.PushError("AddToContainer::ADDTO-> ", TraitName + "_MarginContainer");
+				return;
+			}
+
+			base._AddToContainer(Container, Dependencies[TraitName + "_MarginContainer"].As<MarginContainer>());
 		}
 		
 		/*
@@ -261,34 +278,6 @@ namespace AssetSnap.Component
 			base.SetMargin(value, side);
 			
 			return this;
-		}
-
-		/*
-		** Private Methods
-		*/
-		
-		/*
-		** Resets the trait to
-		** a cleared state
-		**
-		** @return void
-		*/
-		protected override void Reset()
-		{
-			WorkingNode = null;
-
-			base.Reset();
-		}
-
-		/*
-		** Cleanup
-		*/
-		public override void _ExitTree()
-		{
-			if( EditorPlugin.IsInstanceValid(WorkingNode) ) 
-			{
-				WorkingNode.QueueFree();
-			}
 		}
 	}
 }
