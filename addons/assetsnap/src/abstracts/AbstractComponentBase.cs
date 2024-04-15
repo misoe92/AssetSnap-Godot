@@ -1,11 +1,12 @@
 namespace AssetSnap.Abstracts
 {
+	using AssetSnap.Explorer;
 	using Godot;
 
 	[Tool]
-	public abstract partial class AbstractComponentBase : Node 
+	public abstract partial class AbstractComponentBase : VBoxContainer
 	{
-		protected GlobalExplorer _GlobalExplorer;
+		protected GlobalExplorer _GlobalExplorer { get => ExplorerUtils.Get(); }
 		// protected Plugin _Plugin { get => _GlobalExplorer._Plugin; }
 		// protected Component.Base Components { get => _GlobalExplorer.Components; }
 		// protected Waypoint.Base Waypoints { get => _GlobalExplorer.Waypoints; }
@@ -17,7 +18,7 @@ namespace AssetSnap.Abstracts
 		// protected AssetSnap.Decal.Base Decal { get => _GlobalExplorer.Decal; }
 		// protected BaseInputDriver InputDriver { get => _GlobalExplorer.InputDriver; }
 		// protected SettingsConfig Settings { get => _GlobalExplorer.Settings; }
-		
+
 		/*
 		** Fetches handle from the global class
 		**
