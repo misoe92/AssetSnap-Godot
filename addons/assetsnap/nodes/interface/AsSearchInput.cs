@@ -33,6 +33,7 @@ namespace AssetSnap.Front.Nodes
 		*/
 		public override void _EnterTree()
 		{
+			Name = "AsSearchInput";
 			CustomMinimumSize = new Vector2(140, 15);
 		}
 	}
