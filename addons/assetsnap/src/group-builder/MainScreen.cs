@@ -573,7 +573,7 @@ namespace AssetSnap.GroupBuilder
 			
 			return
 				null != explorer &&
-				IsInstanceValid(GlobalExplorer.GetInstance().GroupBuilder) &&
+				null != GlobalExplorer.GetInstance().GroupBuilder &&
 				IsInstanceValid(GlobalExplorer.GetInstance().GroupBuilder._Editor) &&
 				IsInstanceValid(GlobalExplorer.GetInstance().GroupBuilder._Editor.Group);
 		}

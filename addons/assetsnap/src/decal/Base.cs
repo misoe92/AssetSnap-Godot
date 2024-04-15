@@ -27,8 +27,9 @@ namespace AssetSnap.Decal
 	using AssetSnap.Instance.Input;
 	using Godot;
 
-	public partial class Base : Node
+	public partial class Base
 	{
+		private string Name = "";
 		private AsDecal3D _Decal;
 		private Mesh _ModelMesh;
 		private MeshInstance3D _ModelMeshInstance;
@@ -72,18 +73,21 @@ namespace AssetSnap.Decal
 		}
 		
 		private static Base _Instance;
-		
-		public static Base GetInstance()
+	
+		public static Base Singleton 
 		{
-			if( null == _Instance ) 
+			get
 			{
-				_Instance = new()
+				if( null == _Instance ) 
 				{
-					Name = "AssetSnapDecal",
-				};
+					_Instance = new()
+					{
+						Name = "AssetSnapDecal",
+					};
+				}
+				
+				return _Instance;
 			}
-
-			return _Instance;
 		}
 		
 		/*
@@ -126,7 +130,7 @@ namespace AssetSnap.Decal
 		*/
 		public void _UpdateDecalPreview( bool State ) 
 		{
-			if( false == IsInstanceValid( _GlobalExplorer.GetHandle() ) || false == IsInstanceValid(_Decal) ) 
+			if( false == EditorPlugin.IsInstanceValid( _GlobalExplorer.GetHandle() ) || false == EditorPlugin.IsInstanceValid(_Decal) ) 
 			{
 				return;
 			}
@@ -276,7 +280,7 @@ namespace AssetSnap.Decal
 		*/
 		private void ClearCurrentChildren( Node Model, Node model )
 		{
-			if( IsInstanceValid( Model ) && Model != model ) 
+			if( EditorPlugin.IsInstanceValid( Model ) && Model != model ) 
 			{
 				_Decal.RemoveChild(Model);			
 			}
@@ -377,15 +381,15 @@ namespace AssetSnap.Decal
 			return null != _GlobalExplorer && null != _GlobalExplorer.Settings;
 		}
 
-		public override void _ExitTree()
-		{
-			if( IsInstanceValid(Decal)) 
-			{
-				Decal.QueueFree();
-			}
+		// public override void _ExitTree()
+		// {
+		// 	if( IsInstanceValid(Decal)) 
+		// 	{
+		// 		Decal.QueueFree();
+		// 	}
 			
-			base._ExitTree();
-		}
+		// 	base._ExitTree();
+		// }
 	}
 }
 #endif
