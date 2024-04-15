@@ -39,7 +39,7 @@ namespace AssetSnap.Core
 		*/
 		public bool Handle( GodotObject _object )
 		{
-			if( null == _GlobalExplorer || null == _GlobalExplorer._Plugin || false == EditorPlugin.IsInstanceValid(_GlobalExplorer.ContextMenu) || null == _object ) 
+			if( null == _GlobalExplorer || null == _GlobalExplorer._Plugin || null != _GlobalExplorer.ContextMenu || null == _object ) 
 			{
 				return true;
 			}
