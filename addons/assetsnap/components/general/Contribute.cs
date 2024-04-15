@@ -24,6 +24,7 @@ namespace AssetSnap.Front.Components
 {
 	using AssetSnap.Component;
 	using Godot;
+	using Godot.Collections;
 
 	[Tool]
 	public partial class Contribute : TraitableComponent
@@ -47,6 +48,12 @@ namespace AssetSnap.Front.Components
 		public Contribute()
 		{
 			Name = "Contribute";
+			
+			UsingTraits = new()
+			{
+				{ typeof(Labelable).ToString() },
+			};
+			
 			/* Debugging Purpose */ 
 			// _include = false;
 			/* -- */  
@@ -66,7 +73,6 @@ namespace AssetSnap.Front.Components
 			
 			base.Initialize();
 			
-			AddTrait(typeof(Labelable));
 			Initiated = true;
 			
 			Trait<Labelable>()
@@ -78,6 +84,7 @@ namespace AssetSnap.Front.Components
 				.Instantiate();
 			 
 			Trait<Labelable>()
+				.SetMargin(0, "top")
 				.SetMargin(0, "bottom")
 				.SetName( "ContributeDescription" )
 				.SetType( Labelable.TitleType.TextMedium)
@@ -87,11 +94,11 @@ namespace AssetSnap.Front.Components
 				
 			Trait<Labelable>()
 				.Select(0) 
-				.AddToContainer( Container );  
+				.AddToContainer( this );  
 				
 			Trait<Labelable>()
 				.Select(1) 
-				.AddToContainer( Container ); 
+				.AddToContainer( this ); 
 				
 			_SetupContributors();
 		}
@@ -128,7 +135,7 @@ namespace AssetSnap.Front.Components
 
 			_ContributorsScrollr.AddChild(_ContributorsInnerContainer);
 			_ContributorsContainer.AddChild(_ContributorsScrollr);
-			Container.AddChild(_ContributorsContainer);
+			AddChild(_ContributorsContainer);
 		}
 			
 		/*
