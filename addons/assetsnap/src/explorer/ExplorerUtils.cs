@@ -28,7 +28,7 @@ namespace AssetSnap.Explorer
 	{
 		public static GlobalExplorer Get()
 		{
-			return GlobalExplorer.GetInstance();
+			return GlobalExplorer.Singleton;
 		}
 		
 		public static bool IsValid()

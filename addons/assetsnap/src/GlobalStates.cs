@@ -26,13 +26,13 @@ namespace AssetSnap
 	using System;
 	using System.Collections.Generic;
 	using System.Reflection;
-    using AssetSnap.States;
+	using AssetSnap.States;
 
-    using AssetSnap.Front.Nodes;
+	using AssetSnap.Front.Nodes;
 	using Godot;
 
 	[Tool]
-	public partial class GlobalStates : LoadStates
+	public partial class GlobalStates : LoadStates, ISerializationListener 
 	{
 	
 		/** Library Enums **/
@@ -579,6 +579,20 @@ namespace AssetSnap
 		public Godot.Collections.Dictionary<Mesh, AsOptimizedMultiMeshGroup3D> OptimizedGroups = new();
 
 		public string Name = "GlobalStates";
+
+		private static GlobalStates _Instance;
+		public static GlobalStates Singleton 
+		{
+			get
+			{
+				if( null == _Instance )
+				{
+					_Instance = new();
+				}
+
+				return _Instance;
+			}
+		}
 		
 		public bool Has( string name ) 
 		{
@@ -651,6 +665,16 @@ namespace AssetSnap
 			StateChanged();
 		}
 		
+		
+		public void OnBeforeSerialize()
+		{
+			
+		}
+		
+		public void OnAfterDeserialize()
+		{
+			// GD.Print("DONE @ Explorer");
+		}
 	}
 }
 #endif

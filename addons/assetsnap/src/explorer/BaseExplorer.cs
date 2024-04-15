@@ -31,7 +31,7 @@ namespace AssetSnap
 	public partial class BaseExplorer : AbstractExplorerBase
 	{
 		public GlobalStates States {
-			get => _States;
+			get => GlobalStates.Singleton;
 		}
 		
 		protected GlobalStates _States = null;
