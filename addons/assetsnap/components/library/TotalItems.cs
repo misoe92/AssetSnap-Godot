@@ -24,7 +24,6 @@ namespace AssetSnap.Front.Components.Library
 {
 	using AssetSnap.Component;
 	using Godot;
-	using Godot.Collections;
 
 	[Tool]
 	public partial class TotalItems : LibraryComponent
