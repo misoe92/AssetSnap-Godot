@@ -26,7 +26,6 @@ namespace AssetSnap
 	using System;
 	using AssetSnap.ASNode.Types;
 	using AssetSnap.Core;
-	using AssetSnap.Explorer;
 	using AssetSnap.Front.Nodes;
 	using AssetSnap.Trait;
 	using Godot;
@@ -55,7 +54,7 @@ namespace AssetSnap
 
 		/** Internal data **/
 		private bool disposed = false;
-		private readonly string _Version = "0.1.1";
+		private readonly string _Version = "0.1.2";
 		private readonly string _Name = "Plugin";
 		
 		/* Bottom Dock */
