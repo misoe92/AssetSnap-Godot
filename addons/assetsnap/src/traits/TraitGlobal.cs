@@ -49,7 +49,6 @@ namespace AssetSnap.Trait
 				if( _Instance == null ) 
 				{
 
-					GD.Print("NEUE");
 					_Instance = new()
 					{
 						IsSingleton = true
@@ -420,10 +419,10 @@ namespace AssetSnap.Trait
 			return Instances.Count;
 		}
 		
-		public int CountOwner( string owner )
+		public int CountOwner( string owner, bool debug = false )
 		{
 			int count = 0;
-			// GD.Print("COUNT::", owner);
+
 			foreach ((string item, Dictionary<string, Dictionary<int, string>> obj) in Names)
 			{
 				if (item == owner)
@@ -434,9 +433,8 @@ namespace AssetSnap.Trait
 					}
 				}
 			}
-			// GD.Print("RESULT::", count);
 
-			if( count == 0 ) 
+			if( debug && count == 0 ) 
 			{
 				GD.Print("MISSINGOWNER::", owner);
 			}
