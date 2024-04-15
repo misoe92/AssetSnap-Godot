@@ -127,6 +127,11 @@ namespace AssetSnap.Library
 				Components.Clear<Settings>();
 				Components.Clear<Listing>();
 				Components.Clear<Body>();
+
+				_LibraryBody = null;
+				_LibraryTopbar = null;
+				_LibraryListing = null;
+				_LibrarySettings = null;
 				
 				_PanelContainer.GetParent().RemoveChild(_PanelContainer);
 				_PanelContainer.QueueFree();
@@ -134,7 +139,7 @@ namespace AssetSnap.Library
 				// To ensure we reset it's position
 				Dock.RemoveChild(this);
 				// GD.Print("Removed tab entry");
-				// Dock.AddChild(this);
+				Dock.AddChild(this);
 			}
 			else 
 			{
@@ -281,7 +286,6 @@ namespace AssetSnap.Library
 		private void _SetupLibraryTopbar()
 		{
 			Component.Base Components = _GlobalExplorer.Components;
-			
 			if ( Components.HasAll( TopbarComponents.ToArray() )) 
 			{
 				_LibraryTopbar = Components.Single<Topbar>(true);
@@ -337,7 +341,12 @@ namespace AssetSnap.Library
 					
 					if( null != _LibraryTopbar ) 
 					{
+						// GD.Print("Sets", GetPanels().Count);
 						_LibraryTopbar.ItemCount = GetPanels().Count;
+					}
+					else 
+					{
+						GD.Print("Topbar not found", GetPanels().Count);
 					}
 				}
 			}

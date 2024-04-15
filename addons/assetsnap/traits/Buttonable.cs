@@ -22,7 +22,6 @@
 
 #if TOOLS
 using System;
-using AssetSnap.Trait;
 using Godot;
 namespace AssetSnap.Component
 {
@@ -222,6 +221,12 @@ namespace AssetSnap.Component
 		*/
 		public Buttonable SetText( string text ) 
 		{
+			if( text == "" ) 
+			{
+				TraitName = "ButtonableIcon-" + Iteration;
+				return this;
+			}
+			
 			Text = text;
 			TraitName = text;
 			

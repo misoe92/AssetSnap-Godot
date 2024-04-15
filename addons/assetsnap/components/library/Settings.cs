@@ -340,7 +340,7 @@ namespace AssetSnap.Front.Components.Library
 				
 			Trait<Containerable>()
 				.Select(0)
-				.AddToContainer(Container);
+				.AddToContainer(this);
 		}
 		
 		public override void Sync()
