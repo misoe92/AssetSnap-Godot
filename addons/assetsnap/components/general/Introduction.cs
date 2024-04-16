@@ -24,7 +24,6 @@ namespace AssetSnap.Front.Components
 {
 	using AssetSnap.Component;
 	using Godot;
-	using Godot.Collections;
 
 	[Tool]
 	public partial class Introduction : TraitableComponent
@@ -56,11 +55,6 @@ namespace AssetSnap.Front.Components
 		*/
 		public override void Initialize()
 		{
-			if( Container == null ) 
-			{
-				return;
-			}
-			
 			base.Initialize();
 			
 			Initiated = true;

@@ -23,11 +23,12 @@
 namespace AssetSnap.Front.Modifiers
 {
 	using System.Threading.Tasks;
-	using AssetSnap.Front.Nodes;
 	using Godot;
 
 	public partial class AsScatterModifier
 	{
+		public string Name = "AsScatterModifier";
+		
 		/*
 		** Applies the modifier
 		** 

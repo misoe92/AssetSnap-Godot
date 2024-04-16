@@ -124,49 +124,5 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		{
 			_GlobalExplorer.States.EditingTitle = PrepareModelName(_LabelEditing.Text);
 		}
-
-		/*
-		** Cleans up in references, fields and parameters.
-		** 
-		** @return void
-		*/
-		public override void _ExitTree()
-		{
-			if( IsInstanceValid(_LabelEditing) ) 
-			{
-				_LabelEditing.QueueFree();
-				_LabelEditing = null;
-			}
-			
-			if( IsInstanceValid(_Label) ) 
-			{
-				_Label.QueueFree();
-				_Label = null;
-			}
-			
-			if( IsInstanceValid(_InnerContainer) ) 
-			{
-				_InnerContainer.QueueFree();
-				_InnerContainer = null;
-			}
-			
-			if( IsInstanceValid(_InnerMarginContainer) ) 
-			{
-				_InnerMarginContainer.QueueFree();
-				_InnerMarginContainer = null;
-			}
-			
-			if( IsInstanceValid(_PanelContainer) ) 
-			{
-				_PanelContainer.QueueFree();
-				_PanelContainer = null;
-			}
-			
-			if( IsInstanceValid(_MarginContainer) ) 
-			{
-				_MarginContainer.QueueFree();
-				_MarginContainer = null;
-			}
-		}
 	}
 }

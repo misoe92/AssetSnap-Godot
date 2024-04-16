@@ -27,7 +27,6 @@ namespace AssetSnap.Raycast
 
 	public partial class Base
 	{
-		private string Name = "";
 		private RayCast3D _Node;
 		private Vector3 _TargetPosition;
 		private GodotObject _Collider;
@@ -63,10 +62,7 @@ namespace AssetSnap.Raycast
 			{
 				if( null == _Instance ) 
 				{
-					_Instance = new()
-					{
-						Name = "AssetSnapRaycast",
-					};
+					_Instance = new(){};
 				}
 				
 				return _Instance;

@@ -22,11 +22,12 @@
 
 namespace AssetSnap.Front.Modifiers
 {
-	using AssetSnap.Front.Nodes;
 	using Godot;
 
 	public partial class AsArrayModifier
 	{
+		public string Name = "AsArrayModifier";
+		
 		public bool Apply()
 		{
 			if( HasHandle() == false )

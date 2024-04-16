@@ -24,13 +24,14 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 {
 	using AssetSnap.Component;
 	using Godot;
-    using Godot.Collections;
 
-    [Tool]
+	[Tool]
 	public partial class SnapToZValue : GroupOptionSpinboxableComponent
 	{
 		public SnapToZValue()
 		{
+			Name = "GroupsBuilderGroupOptionsSnapToZValue";
+			
 			UsingTraits = new()
 			{
 				{ typeof(Spinboxable).ToString() },

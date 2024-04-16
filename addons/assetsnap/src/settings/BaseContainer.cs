@@ -40,6 +40,11 @@ namespace AssetSnap.Settings
 		private VBoxContainer SubContainerFour;
 		
 		public bool Initialized = false;
+		
+		public BaseContainer()
+		{
+			Name = "SettingsBaseContainer";
+		}
 
 		/*
 		** Initializes the settings container

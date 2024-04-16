@@ -26,7 +26,6 @@ namespace AssetSnap.Front.Components
 	using AssetSnap.Explorer;
 	using AssetSnap.Static;
 	using Godot;
-	using Godot.Collections;
 
 	[Tool]
 	public partial class SettingsCheckbox : TraitableComponent

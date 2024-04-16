@@ -195,38 +195,5 @@ namespace AssetSnap.Front.Components.Library
 		{
 			_FormattedFileName = Filename.Substring(0, Filename.Length > 18 ? 19 : Filename.Length).Split("_").Join(" ");
 		}
-			
-		/*
-		** Cleans up in references, fields and parameters.
-		** 
-		** @return void
-		*/
-		public override void _ExitTree()
-		{
-			if( IsInstanceValid(_Label) ) 
-			{
-				_Label.QueueFree();
-			}
-			if( IsInstanceValid(_TextureRect) ) 
-			{
-				_TextureRect.QueueFree();
-			}
-			if( IsInstanceValid(_LabelMarginContainer) ) 
-			{
-				_LabelMarginContainer.QueueFree();
-			}
-			if( IsInstanceValid(_InnerContainer) ) 
-			{
-				_InnerContainer.QueueFree();
-			}
-			if( IsInstanceValid(_MarginContainer) ) 
-			{
-				_MarginContainer.QueueFree();
-			}
-			if( IsInstanceValid(_PanelContainer) )
-			{
-				_PanelContainer.QueueFree();
-			}
-		}
 	}
 }

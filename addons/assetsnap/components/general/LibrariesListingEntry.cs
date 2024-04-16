@@ -22,7 +22,6 @@
 
 namespace AssetSnap.Front.Components
 {
-	using System;
 	using AssetSnap.Component;
 	using Godot;
 
@@ -261,11 +260,6 @@ namespace AssetSnap.Front.Components
 			Containerable choiceContainer = Trait<Containerable>()
 				.Select(2);
 			choiceContainer.Hide();
-		}
-		
-		public override void Clear()
-		{
-			base.Clear();
 		}
 	}
 }

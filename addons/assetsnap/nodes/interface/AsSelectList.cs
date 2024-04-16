@@ -52,6 +52,7 @@ namespace AssetSnap.Front.Nodes
 		*/
 		public override void _EnterTree()
 		{
+			Name = "SelectList";
 			ListVisible = false;
 			_Items = new();
 			

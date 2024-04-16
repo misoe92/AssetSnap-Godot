@@ -24,7 +24,6 @@ namespace AssetSnap.Front.Components
 {
 	using AssetSnap.Component;
 	using Godot;
-	using Godot.Collections;
 
 	[Tool]
 	public partial class Contribute : TraitableComponent
@@ -66,11 +65,6 @@ namespace AssetSnap.Front.Components
 		*/
 		public override void Initialize()
 		{
-			if( Container == null ) 
-			{
-				return;
-			}
-			
 			base.Initialize();
 			
 			Initiated = true;
@@ -136,32 +130,6 @@ namespace AssetSnap.Front.Components
 			_ContributorsScrollr.AddChild(_ContributorsInnerContainer);
 			_ContributorsContainer.AddChild(_ContributorsScrollr);
 			AddChild(_ContributorsContainer);
-		}
-			
-		/*
-		** Cleans up in references, fields and parameters.
-		** 
-		** @return void
-		*/
-		public override void _ExitTree()
-		{			
-			if( IsInstanceValid(_ContributorsInnerContainer) ) 
-			{
-				_ContributorsInnerContainer.QueueFree();
-				_ContributorsInnerContainer = null; 
-			}
-			if( IsInstanceValid(_ContributorsScrollr) ) 
-			{
-				_ContributorsScrollr.QueueFree();
-				_ContributorsScrollr = null;
-			}
-			if( IsInstanceValid(_ContributorsContainer) ) 
-			{
-				_ContributorsContainer.QueueFree();
-				_ContributorsContainer = null;
-			}
-				
-			base._ExitTree();
 		}
 	}
 }

@@ -33,13 +33,6 @@ namespace AssetSnap
 	[Tool]
 	public partial class Plugin : EditorPlugin
 	{
-		// ~Plugin()
-		// {
-		// 	// Code to run when object is being finalized (disposed)
-		// 	// This will run automatically when the object is garbage collected
-		// 	Dispose(true);
-		// }
-		
 		[Signal]
 		public delegate void FoldersLoadedEventHandler();
 		
@@ -65,7 +58,7 @@ namespace AssetSnap
 			}
 			set 
 			{
-				GD.Print("Cant be set");
+				// GD.Print("Cant be set");
 			}
 		}
 			
@@ -103,6 +96,7 @@ namespace AssetSnap
 		
 		public Plugin()
 		{	
+			Name = "AssetSnapPlugin";
 			_Instance = this;
 		}
 		
@@ -113,9 +107,7 @@ namespace AssetSnap
 		*/ 
 		public override void _EnterTree() 
 		{
-			Name = "AssetSnapPlugin";
 			AddChild(traitGlobal);
-			
 			if( null == internalNode ) 
 			{
 				internalNode = new()
@@ -127,7 +119,6 @@ namespace AssetSnap
 			}
 			_dock = GD.Load<PackedScene>("res://addons/assetsnap/scenes/dock.tscn").Instantiate<AsBottomDock>();
 			AddControlToBottomPanel(_dock, "Assets");
-			
 			
 			if( null == GlobalExplorer.InitializeExplorer() ) 
 			{
@@ -173,6 +164,11 @@ namespace AssetSnap
 			{
 				RemoveControlFromBottomPanel(_dock);
 				_dock.Free();
+			}
+			
+			if( null != traitGlobal ) 
+			{
+				traitGlobal.Free();
 			}
 		} 
 		 
@@ -310,16 +306,6 @@ namespace AssetSnap
 		{
 			return _Version;
 		}
-		
-		// public void OnBeforeSerialize()
-		// {
-
-		// }
-
-		// public void OnAfterDeserialize()
-		// {
-		// 	GD.Print("We're ready now. Target sprite" + (_dock == null ? " is" : " is not") + " null");
-		// }
 	}
 }
 #endif 

@@ -72,6 +72,7 @@ namespace AssetSnap.GroupBuilder
 		
 		public override void _EnterTree()
 		{
+			Name = "GroupMainScreen";
 			Visible = false;
 
 			SizeFlagsHorizontal = SizeFlags.ExpandFill;

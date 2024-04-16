@@ -25,12 +25,10 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 	using AssetSnap.Component;
 	using AssetSnap.Front.Nodes;
 	using Godot;
-	using Godot.Collections;
 
 	[Tool]
 	public partial class ConcaveCollision : LSCollisionComponent
 	{
-	
 		private readonly string _Title = "Concave Polygon";
 		private readonly string _CheckboxTooltip = "Use with caution, since this method is more expensive than a simple collision shape.";
 
@@ -74,7 +72,7 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 				.SetTooltipText(_CheckboxTooltip)
 				.Instantiate()
 				.Select(0)
-				.AddToContainer( Container );
+				.AddToContainer( this );
 				
 			Plugin.GetInstance().StatesChanged += () => { MaybeUpdateValue(); };
 		}

@@ -42,6 +42,7 @@ namespace AssetSnap.Component
 		*/
 		public Thumbnaileable()
 		{
+			Name = "Thumbnaileable";
 			TypeString = GetType().ToString();
 		}
 		

@@ -32,7 +32,7 @@ namespace AssetSnap
 	using Godot;
 
 	[Tool]
-	public partial class GlobalStates : LoadStates, ISerializationListener 
+	public partial class GlobalStates : LoadStates 
 	{
 	
 		/** Library Enums **/
@@ -663,17 +663,6 @@ namespace AssetSnap
 			}
 
 			StateChanged();
-		}
-		
-		
-		public void OnBeforeSerialize()
-		{
-			
-		}
-		
-		public void OnAfterDeserialize()
-		{
-			// GD.Print("DONE @ Explorer");
 		}
 	}
 }

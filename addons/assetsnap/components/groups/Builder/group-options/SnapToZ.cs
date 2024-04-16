@@ -24,13 +24,14 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 {
 	using AssetSnap.Component;
 	using Godot;
-    using Godot.Collections;
 
-    [Tool]
+	[Tool]
 	public partial class SnapToZ : GroupOptionCheckableComponent
 	{
 		public SnapToZ()
 		{
+			Name = "GroupsBuilderGroupOptionsSnapToZ";
+		
 			UsingTraits = new()
 			{
 				{ typeof(Checkable).ToString() },

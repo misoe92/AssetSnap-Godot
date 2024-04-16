@@ -24,7 +24,6 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 {
 	using AssetSnap.Component;
 	using Godot;
-	using Godot.Collections;
 
 	[Tool]
 	public partial class Origin : GroupObjectComponent
@@ -34,6 +33,8 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 		
 		public Origin()
 		{
+			Name = "GroupsBuilderGroupObjectOrigin";
+		
 			UsingTraits = new()
 			{
 				{ typeof(Containerable).ToString() },
@@ -209,7 +210,7 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 			Trait<Containerable>()
 				.Select(0)
 				.AddToContainer(
-					Container
+					this
 				);
 		}
 		

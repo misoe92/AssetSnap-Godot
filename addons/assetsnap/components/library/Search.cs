@@ -225,34 +225,5 @@ namespace AssetSnap.Front.Components.Library
 			_SearchInput.Clear();
 			value = "";
 		}
-	
-		/*
-		** Cleans up in references, fields and parameters.
-		** 
-		** @return void
-		*/
-		public override void _ExitTree()
-		{
-			
-			if( IsInstanceValid(_SearchInput) && _SearchInput != null && SearchCallable is Callable _callable ) 
-			{
-				if( _SearchInput.IsConnected(LineEdit.SignalName.TextChanged, _callable)) 
-				{
-					_SearchInput.Disconnect(LineEdit.SignalName.TextChanged, _callable);				
-				}
-			}
-		 
-			if( IsInstanceValid(_SearchInput) ) 
-			{
-				_SearchInput.QueueFree();
-				_SearchInput = null;
-			}
-			
-			if( IsInstanceValid(_Label) ) 
-			{
-				_Label.QueueFree();
-				_Label = null;
-			} 
-		}
 	}
 }

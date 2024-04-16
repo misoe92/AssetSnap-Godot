@@ -75,6 +75,7 @@ namespace AssetSnap.Component
 
 		public Buttonable()
 		{
+			Name = "Buttonable";
 			TypeString = GetType().ToString();
 		}
 		

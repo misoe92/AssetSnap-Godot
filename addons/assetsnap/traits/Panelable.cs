@@ -63,6 +63,7 @@ namespace AssetSnap.Component
 		*/
 		public Panelable()
 		{
+			Name = "Panelable";
 			TypeString = GetType().ToString();
 		}
 		

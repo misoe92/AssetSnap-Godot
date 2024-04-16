@@ -24,7 +24,6 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 {
 	using AssetSnap.Component;
 	using Godot;
-	using Godot.Collections;
 
 	[Tool]
 	public partial class SimplePlacement : CheckableComponent
@@ -74,7 +73,7 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 				.SetValue( IsActive() )
 				.Instantiate()
 				.Select(0)
-				.AddToContainer( Container );
+				.AddToContainer( this );
 
 			Plugin.GetInstance().StatesChanged += () => { MaybeUpdateValue(); };
 		}
@@ -161,13 +160,6 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			{
 				_GlobalExplorer.States.PlacingType = GlobalStates.PlacingTypeEnum.Simple;
 			}
-		}
-
-		public override void _ExitTree()
-		{
-			Initiated = false;
-			
-			base._ExitTree();
 		}
 	}
 }

@@ -101,7 +101,6 @@ namespace AssetSnap.Front.Components.Library
 		
 		private void _OnItemCountUpdated(int count )
 		{
-			GD.Print("Count Update found", count);
 			SetItemCount(count);
 		}
 

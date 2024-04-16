@@ -27,7 +27,6 @@ namespace AssetSnap.Front.Components.Groups.Builder
 	using AssetSnap.Front.Components.Groups.Builder.GroupObject;
 	using AssetSnap.Helpers;
 	using Godot;
-	using Godot.Collections;
 
 	[Tool]
 	public partial class EditorGroupObject : LibraryComponent

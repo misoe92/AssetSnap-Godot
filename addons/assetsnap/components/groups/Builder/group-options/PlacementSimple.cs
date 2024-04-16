@@ -24,13 +24,14 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 {
 	using AssetSnap.Component;
 	using Godot;
-	using Godot.Collections;
 
 	[Tool]
 	public partial class PlacementSimple : GroupOptionCheckableComponent
 	{
 		public PlacementSimple()
 		{
+			Name = "GroupsBuilderGroupOptionsPlacementSimple";
+		
 			UsingTraits = new()
 			{
 				{ typeof(Checkable).ToString() },

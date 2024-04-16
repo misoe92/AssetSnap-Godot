@@ -25,7 +25,6 @@ namespace AssetSnap.Front.Components.Groups.Builder
 	using AssetSnap.Component;
 	using AssetSnap.Instance.Input;
 	using Godot;
-	using Godot.Collections;
 
 	[Tool]
 	public partial class EditorPlace : LibraryComponent
@@ -110,7 +109,7 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			Trait<Buttonable>()
 				.Select(0)
 				.AddToContainer(
-					Container
+					this
 				);
 		}
 	}

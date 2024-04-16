@@ -59,6 +59,7 @@ namespace AssetSnap.Component
 		*/
 		public Labelable()
 		{
+			Name = "Labelable";
 			Margin = new()
 			{
 				{"left", 15},
@@ -154,10 +155,9 @@ namespace AssetSnap.Component
 		{
 			base._Select(index);
 
-			GD.Print(debug);
 			if( debug ) 
 			{
-				GD.Print("her", index, TraitName);
+				GD.Print("Selected", index, TraitName);
 			}
 
 			if( false != Dependencies.ContainsKey(TraitName + "_WorkingNode")) 
@@ -166,7 +166,7 @@ namespace AssetSnap.Component
 				Dependencies = dependencies;
 				if( debug ) 
 				{
-					GD.Print("her2", Dependencies);
+					GD.Print("Dependencies", Dependencies);
 				}
 			}
 			else 

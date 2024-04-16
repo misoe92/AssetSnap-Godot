@@ -267,55 +267,5 @@ namespace AssetSnap.Front.Components.Groups.Builder
 				PlaceButton.Initialize();
 			}
 		}
-
-		public override void _ExitTree()
-		{
-			if( null != _TotalItems && IsInstanceValid(_TotalItems) ) 
-			{
-				_TotalItems.QueueFree();
-			}
-			if( null != totalMarginContainer && IsInstanceValid(totalMarginContainer) ) 
-			{
-				totalMarginContainer.QueueFree();
-			}
-			if( null != TitleInput && IsInstanceValid(TitleInput) ) 
-			{
-				TitleInput.QueueFree();
-			}
-			if( null != PlaceButton && IsInstanceValid(PlaceButton) ) 
-			{
-				PlaceButton.QueueFree();
-			}
-			if( null != SaveButton && IsInstanceValid(SaveButton) ) 
-			{
-				SaveButton.QueueFree();
-			}
-			if( null != CloseButton && IsInstanceValid(CloseButton) ) 
-			{
-				CloseButton.QueueFree();
-			}
-
-			if( null != _InnerBoxContainer && IsInstanceValid(_InnerBoxContainer) ) 
-			{
-				_InnerBoxContainer.QueueFree();
-			}
-			
-			if( null != _InnerMarginContainer && IsInstanceValid(_InnerMarginContainer) ) 
-			{
-				_InnerMarginContainer.QueueFree();
-			}
-			
-			if( null != _MarginContainer && IsInstanceValid(_MarginContainer) ) 
-			{
-				_MarginContainer.QueueFree();
-			}
-			
-			if( null != _BoxContainer && IsInstanceValid(_BoxContainer) ) 
-			{
-				_BoxContainer.QueueFree();
-			}
-			
-			base._ExitTree(); 
-		}
 	}
 }

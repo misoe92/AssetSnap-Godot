@@ -453,26 +453,5 @@ namespace AssetSnap.Front.Components.Library
 		{
 			return new Vector3(RotationX, RotationY, RotationZ);
 		}
-		
-		/*
-		** Cleans up in references, fields and parameters.
-		** 
-		** @return void
-		*/
-		public override void _ExitTree()
-		{
-			if( null == _GlobalExplorer || null == _GlobalExplorer.ContextMenu ) 
-			{
-				return;
-			}
-			
-			// ContextMenu.Base ContextMenu = _GlobalExplorer.ContextMenu;
-			
-			// if( StateChangeCallable is Callable callable && ContextMenu.GetInstance().IsConnected(AsSelectList.SignalName.StateChanged, callable) ) 
-			// {
-			// 	ContextMenu.GetInstance().Disconnect(AsContextMenu.SignalName.QuickActionsChanged, callable);
-			// 	StateChangeCallable = null;
-			// }
-		}
 	}
 }

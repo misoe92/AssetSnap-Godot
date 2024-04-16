@@ -48,7 +48,6 @@ namespace AssetSnap.Library
 			set 
 			{
 				_ItemCount = value;
-				GD.Print("Updates: ", value);
 				EmitSignal(SignalName.ItemCountUpdated, value);
 			}
 		}
@@ -117,6 +116,7 @@ namespace AssetSnap.Library
 		
 		public Instance()
 		{
+			Name = "LibraryInstance";
 			SizeFlagsVertical = SizeFlags.ExpandFill;
 			SizeFlagsHorizontal = SizeFlags.ExpandFill;
 		}

@@ -44,6 +44,7 @@ namespace AssetSnap.Component
 		*/
 		public Checkable()
 		{
+			Name = "Checkable";
 			TypeString = GetType().ToString();
 		}
 		

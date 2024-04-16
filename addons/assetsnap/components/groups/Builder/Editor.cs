@@ -143,8 +143,6 @@ namespace AssetSnap.Front.Components.Groups.Builder
 				return;
 			}
 
-			// _GlobalExplorer.Components.End("GroupBuilderEditorListing");
-			
 			Listing.Reset();
 			Listing.Update();
 			
@@ -371,26 +369,6 @@ namespace AssetSnap.Front.Components.Groups.Builder
 				GroupOptions.Container = this;
 				GroupOptions.Initialize();
 			}
-		}
-
-		public override void _ExitTree()
-		{
-			if( null != Listing && IsInstanceValid(Listing) ) 
-			{
-				Listing.QueueFree();
-			}
-			
-			if( null != GroupOptions && IsInstanceValid(GroupOptions) ) 
-			{
-				GroupOptions.QueueFree();
-			}
-			
-			if( null != Topbar && IsInstanceValid(Topbar) ) 
-			{
-				Topbar.QueueFree();
-			}
-			
-			base._ExitTree();
 		}
 	}
 }

@@ -31,7 +31,6 @@ namespace AssetSnap.Front.Components.Groups.Builder
 	[Tool]
 	public partial class ListingEntry : LibraryComponent
 	{
-		
 		public ListingEntry()
 		{
 			Name = "GroupBuilderListingEntry";
@@ -324,66 +323,6 @@ namespace AssetSnap.Front.Components.Groups.Builder
 				Sidebar _Sidebar = Components.Single<Sidebar>();
 				_Sidebar.Update();
 			}
-		}
-
-		public override void _ExitTree()
-		{
-			if( null != Edit && IsInstanceValid(Edit) ) 
-			{
-				Edit.QueueFree();
-			}
-			if( null != Remove && IsInstanceValid(Remove) ) 
-			{
-				Remove.QueueFree();
-			}
-			if( null != Confirm && IsInstanceValid(Confirm) ) 
-			{
-				Confirm.QueueFree();
-			}
-			if( null != Cancel && IsInstanceValid(Cancel) ) 
-			{
-				Cancel.QueueFree();
-			}
-			
-			if( null != Title && IsInstanceValid(Title) ) 
-			{
-				Title.QueueFree();
-			}
-			if( null != InnerRow && IsInstanceValid(InnerRow) ) 
-			{
-				InnerRow.QueueFree();
-			}
-			
-			if( null != Row && IsInstanceValid(Row) ) 
-			{
-				Row.QueueFree();
-			}
-			
-			if( null != RemoveRow && IsInstanceValid(RemoveRow) ) 
-			{
-				RemoveRow.QueueFree();
-			}
-			if( null != RemoveInnerRow && IsInstanceValid(RemoveInnerRow) ) 
-			{
-				RemoveInnerRow.QueueFree();
-			}
-					
-			if( null != _PanelContainer && IsInstanceValid(_PanelContainer) ) 
-			{
-				_PanelContainer.QueueFree();
-			}
-			
-			if( null != InnerMarginContainer && IsInstanceValid(InnerMarginContainer) ) 
-			{
-				InnerMarginContainer.QueueFree();
-			}
-		
-			if( null != OuterMarginContainer && IsInstanceValid(OuterMarginContainer) ) 
-			{
-				OuterMarginContainer.QueueFree();
-			}
-			
-			base._ExitTree();
 		}
 	}
 }

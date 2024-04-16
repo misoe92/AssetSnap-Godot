@@ -27,7 +27,7 @@ namespace AssetSnap.Trait
 	using Godot.Collections;
 
 	[Tool]
-	public partial class TraitGlobal : Node, ISerializationListener
+	public partial class TraitGlobal : Node
 	{
 		private string version = "0.0.1";
 		
@@ -49,15 +49,19 @@ namespace AssetSnap.Trait
 				if( _Instance == null ) 
 				{
 
-					GD.Print("NEUE");
 					_Instance = new()
 					{
-						IsSingleton = true
+						IsSingleton = true,
 					};
 				}
 
 				return _Instance;
 			}
+		}
+		
+		public TraitGlobal()
+		{
+			Name = "TraitGlobal";
 		}
 
 		public bool IsSingleton = false;
@@ -420,10 +424,10 @@ namespace AssetSnap.Trait
 			return Instances.Count;
 		}
 		
-		public int CountOwner( string owner )
+		public int CountOwner( string owner, bool debug = false )
 		{
 			int count = 0;
-			// GD.Print("COUNT::", owner);
+
 			foreach ((string item, Dictionary<string, Dictionary<int, string>> obj) in Names)
 			{
 				if (item == owner)
@@ -434,9 +438,8 @@ namespace AssetSnap.Trait
 					}
 				}
 			}
-			// GD.Print("RESULT::", count);
 
-			if( count == 0 ) 
+			if( debug && count == 0 ) 
 			{
 				GD.Print("MISSINGOWNER::", owner);
 			}
