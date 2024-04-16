@@ -83,7 +83,6 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		{
 			if( IsInstanceValid( _InputField ) ) 
 			{
-				// _InputField.TextChanged -= (string value ) => { _OnMaybeUpdateGroupName( value ); };
 				_InputField.QueueFree();
 			}
 			
