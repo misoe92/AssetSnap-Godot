@@ -30,9 +30,10 @@ namespace AssetSnap.GroupBuilder
 	using Godot;
 	
 	[Tool]
-	public partial class Base : Node
+	public partial class Base
 	{
 		public bool Initialized = false;
+		
 		/*
 		** Public
 		*/
@@ -53,6 +54,7 @@ namespace AssetSnap.GroupBuilder
 		public Front.Components.Groups.Container _GroupContainer;
 		public Sidebar _Sidebar;
 		public Editor _Editor;
+		
 		
 		/*
 		** Private
@@ -214,15 +216,6 @@ namespace AssetSnap.GroupBuilder
 		public bool HasListing()
 		{
 			return null != _Editor;
-		}
-		public void OnBeforeSerialize()
-		{
-
-		}
-
-		public void OnAfterDeserialize()
-		{
-			GD.Print("We're ready now.2 Target sprite" + (Container == null ? " is" : " is not") + " null");
 		}
 		private bool HasGroupContainer()
 		{
