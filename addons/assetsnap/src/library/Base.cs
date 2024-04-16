@@ -51,6 +51,11 @@ namespace AssetSnap.Library
 			get => _Libraries;
 		}
 		
+		public Base()
+		{
+			Name = "LibraryBase";
+		}
+		
 		public void Initialize()
 		{
 			/** Initialize libraries **/
