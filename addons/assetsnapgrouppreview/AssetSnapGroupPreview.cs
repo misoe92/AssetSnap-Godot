@@ -33,7 +33,7 @@ namespace AssetSnapGroupPreview
 	
 		/** Internal data **/
 		private readonly string _Version = "0.1";
-		private readonly string _Name = "Plugin";
+		private readonly string _Name = "AssetSnapGroupPreview";
 
 		private static AssetSnapGroupPreview _Instance;
 		private AssetSnap.GroupBuilder.MainScreen mainScreenContainer;
@@ -51,7 +51,6 @@ namespace AssetSnapGroupPreview
 		*/ 
 		public override void _EnterTree() 
 		{
-			Name = "AssetSnapGroupPreview";
 			AssetSnapGroupPreview._Instance = this; 
 
 			if( null == AssetSnap.GlobalExplorer.GetInstance() ) 
