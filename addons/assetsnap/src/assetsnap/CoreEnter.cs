@@ -20,6 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using AssetSnap.Explorer;
 using Godot;
 
 namespace AssetSnap.Core 
@@ -44,11 +45,12 @@ namespace AssetSnap.Core
 			new ASNode.Types.AsMultiMeshInstanceType().Initialize();
 			new ASNode.Types.AsOptimizedMultiMeshGroupType().Initialize();
 			new ASNode.Types.AsMultiMeshType().Initialize();
+
+			Plugin.Singleton.AddChild(ExplorerUtils.Get().Library);
+			// Plugin.Singleton.AddChild(ExplorerUtils.Get().GroupBuilder);
 			
 			_GlobalExplorer._Plugin.FoldersLoaded += () => { _OnLoadContainers(); };
 
-			_GlobalExplorer._Plugin.GetInternalContainer().AddChild(_GlobalExplorer.GroupBuilder);
- 
 			/** Initialize **/  
 			_GlobalExplorer.Waypoints.Initialize();
 			_GlobalExplorer.ContextMenu.Initialize();
