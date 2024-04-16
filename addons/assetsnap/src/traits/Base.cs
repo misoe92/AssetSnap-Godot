@@ -25,7 +25,7 @@ namespace AssetSnap.Trait
 	using Godot;
 	
 	[Tool]
-	public partial class Base : Node, ISerializationListener
+	public partial class Base : Node
 	{
 		/*
 		** Public
@@ -170,23 +170,6 @@ namespace AssetSnap.Trait
 			Dependencies = new();
 			_select = true;
 
-			// if (
-			// 	false == HasTypeString() ||
-			// 	IsDisposed()
-			// )
-			// {
-			// 	_select = false;
-			// 	if( IsDisposed() ) 
-			// 	{
-			// 		GD.PushError("Node is disposed", Name);
-			// 	}
-			// 	else 
-			// 	{
-			// 		GD.PushError("No type string", Name);
-			// 	}
-			// 	return;
-			// }
-			
 			if( null == Plugin.Singleton ) 
 			{
 				if( debug ) 
@@ -692,8 +675,6 @@ namespace AssetSnap.Trait
 
 		public override void _ExitTree()
 		{
-			// Clear();
-			
 			base._ExitTree();
 		}
 	}
