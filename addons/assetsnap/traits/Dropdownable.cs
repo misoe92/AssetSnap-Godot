@@ -64,6 +64,7 @@ namespace AssetSnap.Component
 		*/
 		public Dropdownable()
 		{
+			Name = "Dropdownable";
 			TypeString = GetType().ToString();
 		}
 		
