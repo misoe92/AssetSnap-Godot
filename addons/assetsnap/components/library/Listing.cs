@@ -150,7 +150,7 @@ namespace AssetSnap.Front.Components.Library
 				{
 					_Library.RemoveAllPanelState();
 					Trait<Containerable>().Select(0).GetInnerContainer().RemoveChild(child);	
-					child.QueueFree();	
+					child.QueueFree();
 				}
 			}
 
