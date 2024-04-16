@@ -32,7 +32,7 @@ namespace AssetSnap
 	using Godot;
 
 	[Tool]
-	public partial class GlobalStates : LoadStates, ISerializationListener 
+	public partial class GlobalStates : LoadStates 
 	{
 	
 		/** Library Enums **/
