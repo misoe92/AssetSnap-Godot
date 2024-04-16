@@ -59,6 +59,7 @@ namespace AssetSnap.Component
 		*/
 		public Labelable()
 		{
+			Name = "Labelable";
 			Margin = new()
 			{
 				{"left", 15},
