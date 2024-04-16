@@ -23,7 +23,6 @@
 #if TOOLS
 namespace AssetSnap.Modifier
 {
-	using Godot;
 	using AssetSnap.Front.Modifiers;
 	
 	public partial class Base
