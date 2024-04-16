@@ -664,17 +664,6 @@ namespace AssetSnap
 
 			StateChanged();
 		}
-		
-		
-		public void OnBeforeSerialize()
-		{
-			
-		}
-		
-		public void OnAfterDeserialize()
-		{
-			// GD.Print("DONE @ Explorer");
-		}
 	}
 }
 #endif
