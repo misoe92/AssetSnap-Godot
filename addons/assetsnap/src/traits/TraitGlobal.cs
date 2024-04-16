@@ -27,7 +27,7 @@ namespace AssetSnap.Trait
 	using Godot.Collections;
 
 	[Tool]
-	public partial class TraitGlobal : Node, ISerializationListener
+	public partial class TraitGlobal : Node
 	{
 		private string version = "0.0.1";
 		
@@ -51,12 +51,17 @@ namespace AssetSnap.Trait
 
 					_Instance = new()
 					{
-						IsSingleton = true
+						IsSingleton = true,
 					};
 				}
 
 				return _Instance;
 			}
+		}
+		
+		public TraitGlobal()
+		{
+			Name = "TraitGlobal";
 		}
 
 		public bool IsSingleton = false;
