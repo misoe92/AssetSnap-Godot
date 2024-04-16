@@ -96,6 +96,7 @@ namespace AssetSnap
 		
 		public Plugin()
 		{	
+			Name = "AssetSnapPlugin";
 			_Instance = this;
 		}
 		
@@ -106,9 +107,7 @@ namespace AssetSnap
 		*/ 
 		public override void _EnterTree() 
 		{
-			Name = "AssetSnapPlugin";
 			AddChild(traitGlobal);
-			
 			if( null == internalNode ) 
 			{
 				internalNode = new()
@@ -120,7 +119,6 @@ namespace AssetSnap
 			}
 			_dock = GD.Load<PackedScene>("res://addons/assetsnap/scenes/dock.tscn").Instantiate<AsBottomDock>();
 			AddControlToBottomPanel(_dock, "Assets");
-			
 			
 			if( null == GlobalExplorer.InitializeExplorer() ) 
 			{
@@ -166,6 +164,11 @@ namespace AssetSnap
 			{
 				RemoveControlFromBottomPanel(_dock);
 				_dock.Free();
+			}
+			
+			if( null != traitGlobal ) 
+			{
+				traitGlobal.Free();
 			}
 		} 
 		 
