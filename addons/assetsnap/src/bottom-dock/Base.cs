@@ -65,7 +65,6 @@ namespace AssetSnap.BottomDock
 		** Private
 		*/
 		private AsBottomDock _Container;
-		private static bool initial = true;
 		private static Base _Instance = null;
 		
 		/*

@@ -626,65 +626,65 @@ namespace AssetSnap.Front.Components.Groups.Builder
 				);
 		}
 		
-		// public void Show()
-		// {
-		// 	Visible = true;
-		// }
+		public void DoShow()
+		{
+			Visible = true;
+		}
 		
-		// public void Hide()
-		// {
-		// 	Visible = false;
-		// }
+		public void DoHide()
+		{
+			Visible = false;
+		}
 
 		public void _UpdateGroupOption(string Name, Variant value ) 
 		{
 			if( true == _GroupBuilderEditorGroupOptionSnapToObject.GetValue()) 
 			{
-				_GroupBuilderEditorGroupOptionSnapToObjectOffsetX.Show();
-				_GroupBuilderEditorGroupOptionSnapToObjectOffsetZ.Show();
+				_GroupBuilderEditorGroupOptionSnapToObjectOffsetX.InputShow();
+				_GroupBuilderEditorGroupOptionSnapToObjectOffsetZ.InputShow();
 			}
 			else
 			{
-				_GroupBuilderEditorGroupOptionSnapToObjectOffsetX.Hide();
-				_GroupBuilderEditorGroupOptionSnapToObjectOffsetZ.Hide();
+				_GroupBuilderEditorGroupOptionSnapToObjectOffsetX.InputHide();
+				_GroupBuilderEditorGroupOptionSnapToObjectOffsetZ.InputHide();
 			}
 			
 			if( true == _GroupBuilderEditorGroupOptionSnapToHeight.GetValue()) 
 			{
-				_GroupBuilderEditorGroupOptionSnapToHeightValue.Show();
+				_GroupBuilderEditorGroupOptionSnapToHeightValue.InputShow();
 			}
 			else
 			{
-				_GroupBuilderEditorGroupOptionSnapToHeightValue.Hide();
+				_GroupBuilderEditorGroupOptionSnapToHeightValue.InputHide();
 			}
 			
 			if( true == _GroupBuilderEditorGroupOptionSnapToX.GetValue()) 
 			{
-				_GroupBuilderEditorGroupOptionSnapToXValue.Show();
+				_GroupBuilderEditorGroupOptionSnapToXValue.InputShow();
 			}
 			else
 			{
-				_GroupBuilderEditorGroupOptionSnapToXValue.Hide();
+				_GroupBuilderEditorGroupOptionSnapToXValue.InputHide();
 			}
 			
 			if( true == _GroupBuilderEditorGroupOptionSnapToZ.GetValue() ) 
 			{
-				_GroupBuilderEditorGroupOptionSnapToZValue.Show();
+				_GroupBuilderEditorGroupOptionSnapToZValue.InputShow();
 			}
 			else
 			{
-				_GroupBuilderEditorGroupOptionSnapToZValue.Hide();
+				_GroupBuilderEditorGroupOptionSnapToZValue.InputHide();
 			}
 			
 			if( true == _GroupBuilderEditorGroupOptionConvexCollision.GetValue() ) 
 			{
-				_GroupBuilderEditorGroupOptionConvexClean.Show();
-				_GroupBuilderEditorGroupOptionConvexSimplify.Show();
+				_GroupBuilderEditorGroupOptionConvexClean.InputShow();
+				_GroupBuilderEditorGroupOptionConvexSimplify.InputShow();
 			}
 			else
 			{
-				_GroupBuilderEditorGroupOptionConvexClean.Hide();
-				_GroupBuilderEditorGroupOptionConvexSimplify.Hide();
+				_GroupBuilderEditorGroupOptionConvexClean.InputHide();
+				_GroupBuilderEditorGroupOptionConvexSimplify.InputHide();
 			}
 		}
 
@@ -722,51 +722,51 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			
 			if( true == _GroupBuilderEditorGroupOptionSnapToObject.GetValue()) 
 			{
-				_GroupBuilderEditorGroupOptionSnapToObjectOffsetX.Show();
-				_GroupBuilderEditorGroupOptionSnapToObjectOffsetZ.Show();
+				_GroupBuilderEditorGroupOptionSnapToObjectOffsetX.InputShow();
+				_GroupBuilderEditorGroupOptionSnapToObjectOffsetZ.InputShow();
 			}
 			else
 			{
-				_GroupBuilderEditorGroupOptionSnapToObjectOffsetX.Hide();
-				_GroupBuilderEditorGroupOptionSnapToObjectOffsetZ.Hide();
+				_GroupBuilderEditorGroupOptionSnapToObjectOffsetX.InputHide();
+				_GroupBuilderEditorGroupOptionSnapToObjectOffsetZ.InputHide();
 			}
 			
 			if( true == _GroupBuilderEditorGroupOptionSnapToHeight.GetValue()) 
 			{
-				_GroupBuilderEditorGroupOptionSnapToHeightValue.Show();
+				_GroupBuilderEditorGroupOptionSnapToHeightValue.InputShow();
 			}
 			else
 			{
-				_GroupBuilderEditorGroupOptionSnapToHeightValue.Hide();
+				_GroupBuilderEditorGroupOptionSnapToHeightValue.InputHide();
 			}
 			
 			if( true == _GroupBuilderEditorGroupOptionSnapToX.GetValue()) 
 			{
-				_GroupBuilderEditorGroupOptionSnapToXValue.Show();
+				_GroupBuilderEditorGroupOptionSnapToXValue.InputShow();
 			}
 			else
 			{
-				_GroupBuilderEditorGroupOptionSnapToXValue.Hide();
+				_GroupBuilderEditorGroupOptionSnapToXValue.InputHide();
 			}
 			
 			if( true == _GroupBuilderEditorGroupOptionSnapToZ.GetValue() ) 
 			{
-				_GroupBuilderEditorGroupOptionSnapToZValue.Show();
+				_GroupBuilderEditorGroupOptionSnapToZValue.InputShow();
 			}
 			else
 			{
-				_GroupBuilderEditorGroupOptionSnapToZValue.Hide();
+				_GroupBuilderEditorGroupOptionSnapToZValue.InputHide();
 			}
 			
 			if( true == _GroupBuilderEditorGroupOptionConvexCollision.GetValue() ) 
 			{
-				_GroupBuilderEditorGroupOptionConvexClean.Show();
-				_GroupBuilderEditorGroupOptionConvexSimplify.Show();
+				_GroupBuilderEditorGroupOptionConvexClean.InputShow();
+				_GroupBuilderEditorGroupOptionConvexSimplify.InputShow();
 			}
 			else
 			{
-				_GroupBuilderEditorGroupOptionConvexClean.Hide();
-				_GroupBuilderEditorGroupOptionConvexSimplify.Hide();
+				_GroupBuilderEditorGroupOptionConvexClean.InputHide();
+				_GroupBuilderEditorGroupOptionConvexSimplify.InputHide();
 			}
 		}
 		
@@ -823,8 +823,8 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		
 		private void _OnCloseOptionsPressed()
 		{
-			Hide();
-			_GlobalExplorer.GroupBuilder._Editor.Listing.Show();
+			DoHide();
+			_GlobalExplorer.GroupBuilder._Editor.Listing.DoShow();
 		}
 	}
 }

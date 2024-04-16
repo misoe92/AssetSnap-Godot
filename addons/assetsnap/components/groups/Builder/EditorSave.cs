@@ -29,12 +29,12 @@ namespace AssetSnap.Front.Components.Groups.Builder
 	public partial class EditorSave : LibraryComponent
 	{
 		private static readonly string Text = "Save"; 
-		private static readonly string TooltipText = "Will save the title and the object values"; 
-		private static readonly Control.CursorShape MouseDefaultCursorShape = Control.CursorShape.PointingHand;
 
 		public EditorSave()
 		{
 			Name = "GroupBuilderEditorSave";
+			TooltipText = "Will save the title and the object values"; 
+			MouseDefaultCursorShape = Control.CursorShape.PointingHand;
 			
 			UsingTraits = new()
 			{
@@ -54,14 +54,14 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			_FinalizeFields();
 		}
 		
-		public void Show()
+		public void DoShow()
 		{
 			Trait<Buttonable>()
 				.Select(0)
 				.SetVisible( true );
 		}
 			
-		public void Hide()
+		public void DoHide()
 		{
 			Trait<Buttonable>()
 				.Select(0)

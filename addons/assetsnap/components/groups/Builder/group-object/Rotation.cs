@@ -24,7 +24,6 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 {
 	using AssetSnap.Component;
 	using Godot;
-	using Godot.Collections;
 
 	[Tool]
 	public partial class Rotation : GroupObjectComponent
@@ -88,7 +87,7 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 				
 			Trait<Spinboxable>()
 				.SetName("GroupObjectsRotationXValue")
-				.SetValue(Parent.Rotation.X)
+				.SetValue(Parent.ObjectRotation.X)
 				.SetStep(0.1f)
 				.SetMinValue(0.0f)
 				.SetMaxValue(360.0f)
@@ -111,7 +110,7 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 				
 			Trait<Spinboxable>()
 				.SetName("GroupObjectsRotationYValue")
-				.SetValue(Parent.Rotation.Y)
+				.SetValue(Parent.ObjectRotation.Y)
 				.SetStep(0.1f)
 				.SetMinValue(0.0f)
 				.SetMaxValue(360.0f)
@@ -134,7 +133,7 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 				
 			Trait<Spinboxable>()
 				.SetName("GroupObjectsRotationZValue")
-				.SetValue(Parent.Rotation.Z)
+				.SetValue(Parent.ObjectRotation.Z)
 				.SetStep(0.1f)
 				.SetMinValue(0.0f)
 				.SetMaxValue(360.0f)

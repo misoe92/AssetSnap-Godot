@@ -31,19 +31,11 @@ namespace AssetSnap.Waypoint
 	
 	public partial class Base
 	{
-		private string Name = "";
 		private GlobalExplorer _GlobalExplorer;
 		private Node _ParentContainer;
 		public WaypointList WaypointList;
 		public float SnapDistance = 1.0f;
-		
 		public Node3D WorkingNode;
-		 
-		public Base()
-		{
-			Name = "AssetSnapWaypoint";
-		}
-		
 		private static Base _Instance;
 		public static Base Singleton 
 		{
@@ -543,6 +535,11 @@ namespace AssetSnap.Waypoint
 			}
 			
 			_model.NotifyPropertyListChanged();
+		}
+		
+		public void SetParentContainer( Node Container ) 
+		{
+			_ParentContainer = Container;
 		}
 		
 		/*

@@ -114,7 +114,7 @@ namespace AssetSnap.Component
 		** @param int index
 		** @return Listable
 		*/
-		public Listable Select( int index, bool debug = false ) 
+		public override Listable Select( int index, bool debug = false ) 
 		{
 			base._Select(index, debug);
 

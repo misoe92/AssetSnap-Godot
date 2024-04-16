@@ -122,15 +122,15 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			{
 				if( IsInstanceValid( SaveButton ) ) 
 				{
-					SaveButton.Hide();
+					SaveButton.DoHide();
 				}
 				if( IsInstanceValid( CloseButton ) ) 
 				{
-					CloseButton.Hide();
+					CloseButton.DoHide();
 				}
 				if( IsInstanceValid( PlaceButton ) ) 
 				{
-					PlaceButton.Hide();
+					PlaceButton.DoHide();
 				}
 				if( IsInstanceValid( TitleInput ) ) 
 				{
@@ -144,15 +144,15 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			
 			if( IsInstanceValid( SaveButton ) ) 
 			{
-				SaveButton.Show();
+				SaveButton.DoShow();
 			}
 			if( IsInstanceValid( CloseButton ) ) 
 			{
-				CloseButton.Show();
+				CloseButton.DoShow();
 			}
 			if( IsInstanceValid( PlaceButton ) ) 
 			{
-				PlaceButton.Show();
+				PlaceButton.DoShow();
 			}
 			if( IsInstanceValid( TitleInput ) ) 
 			{

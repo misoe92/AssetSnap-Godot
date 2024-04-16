@@ -30,12 +30,12 @@ namespace AssetSnap.Front.Components.Groups.Builder
 	public partial class EditorPlace : LibraryComponent
 	{
 		private static readonly string Text = "Place"; 
-		private static readonly string TooltipText = "Will let you place the group of objects in the 3D world"; 
-		private static readonly Control.CursorShape MouseDefaultCursorShape = Control.CursorShape.PointingHand; 
 		
 		public EditorPlace()
 		{
 			Name = "GroupBuilderEditorPlace";
+			TooltipText = "Will let you place the group of objects in the 3D world"; 
+			MouseDefaultCursorShape = Control.CursorShape.PointingHand; 
 			
 			UsingTraits = new()
 			{
@@ -55,14 +55,14 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			_FinalizeFields();
 		}
 		
-		public void Show()
+		public void DoShow()
 		{
 			Trait<Buttonable>()
 				.Select(0)
 				.SetVisible( true );
 		}
 			
-		public void Hide()
+		public void DoHide()
 		{
 			Trait<Buttonable>()
 				.Select(0)

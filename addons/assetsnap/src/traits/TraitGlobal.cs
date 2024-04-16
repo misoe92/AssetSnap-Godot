@@ -396,7 +396,6 @@ namespace AssetSnap.Trait
 		public Godot.Collections.Dictionary<string, Variant> GetDependencies( int index, string typeString, string name )
 		{
 			string typeKey = typeString.Split(".").Join("");
-			// GD.Print(index, name);
 			if( false == InstanceDependencies.ContainsKey( name ) ) 
 			{
 				GD.PushError("No named dependency found: ", name);
@@ -411,8 +410,7 @@ namespace AssetSnap.Trait
 
 			if( false == InstanceDependencies[name][typeKey].ContainsKey(index) )
 			{
-				// GD.Print(InstanceDependencies[name][typeKey].Keys);
-				throw new Exception("No indexed dependency found: " + index);
+				GD.PushError("No indexed dependency found: " + index);
 				return null;
 			}
 

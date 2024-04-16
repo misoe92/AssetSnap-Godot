@@ -162,8 +162,8 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			
 		public void OpenGroupOptions()
 		{
-			GroupOptions.Show();
-			Listing.Hide();
+			GroupOptions.DoShow();
+			Listing.DoHide();
 		}
 		
 		public void AddMeshToGroup( string MeshPath )
@@ -287,8 +287,8 @@ namespace AssetSnap.Front.Components.Groups.Builder
 				ResourceSaver.Save(Group, "res://groups/" + Group.Name + ".tres");
 			}
 			
-			Listing.Show();
-			GroupOptions.Hide(); 
+			Listing.DoShow();
+			GroupOptions.DoHide(); 
 
 			GlobalExplorer.GetInstance().GroupBuilder._Sidebar.RefreshExistingGroups();
 			

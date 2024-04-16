@@ -179,29 +179,13 @@ namespace AssetSnap.Component
 			if( boundTraits.Count == 0 ) 
 			{
 				GD.PushWarning("No traits was found");
-				throw new Exception("");
 				return false;
 			}
 			
 			foreach( string traitString in UsingTraits ) 
 			{
-				// Trait(Type.GetType(traitString)).Iteration = 0;
 				Trait(Type.GetType(traitString)).Clear();
-				// GD.Print("Cleared: ", traitString);
 			}
-
-			// Godot.Collections.Array<AssetSnap.Trait.Base> instances = boundTraits;
-			// if( null != instances && instances.Count != 0 ) 
-			// {
-			// 	foreach(Trait.Base TraitInstance in instances) 
-			// 	{
-			// 		TraitInstance.Clear(0);
-			// 		TraitInstance.Index = 0;
-			// 		GD.Print(TraitInstance.Name, " cleared");
-			// 	}
-
-			// 	// GD.Print(instances, " cleared");
-			// }
 
 			return false;
 		}
