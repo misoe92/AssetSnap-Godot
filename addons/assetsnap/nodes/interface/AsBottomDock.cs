@@ -202,11 +202,11 @@ namespace AssetSnap.Front.Nodes
 		
 		public override void _ExitTree()
 		{
-			// foreach(Node node in GetChildren() ) 
-			// {
-			// 	RemoveChild(node);
-			// 	node.Free();
-			// }
+			foreach(Node node in GetChildren() ) 
+			{
+				RemoveChild(node);
+				node.QueueFree();
+			}
 			 
 			base._ExitTree(); 
 		}
