@@ -37,6 +37,7 @@ namespace AssetSnap.Component
 		
 		public ScrollContainerable()
 		{
+			Name = "ScrollContainerable";
 			TypeString = GetType().ToString();
 		}
 		
