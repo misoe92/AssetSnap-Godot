@@ -24,10 +24,9 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 {
 	using AssetSnap.Component;
 	using Godot;
-	using Godot.Collections;
 
 	[Tool]
-	public partial class SnapOffsetZ : LSObjectComponent, ISerializationListener
+	public partial class SnapOffsetZ : LSObjectComponent
 	{
 		private float _value = 0.0f;
 		protected float value 
@@ -90,7 +89,7 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 				.SetTooltipText(_Tooltip)
 				.Instantiate()
 				.Select(0)
-				.AddToContainer( Container );
+				.AddToContainer( this );
 				
 			Plugin.GetInstance().StatesChanged += () => { MaybeUpdateValue(); };
 		}
@@ -198,23 +197,6 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			}
 			
 			_GlobalExplorer.States.SnapToObjectOffsetXValue = (float)Trait<Spinboxable>().Select(0).GetValue();
-		}
-		
-		public override void _ExitTree()
-		{
-			
-			base._ExitTree();
-		}
-		
-			
-		public void OnBeforeSerialize()
-		{
-			// GD.Print("START @ SnapOffset");
-		}
-		
-		public void OnAfterDeserialize()
-		{
-			// GD.Print("DONE @ SnapOffset");
 		}
 	}
 }

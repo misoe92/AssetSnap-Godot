@@ -24,7 +24,6 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 {
 	using AssetSnap.Component;
 	using Godot;
-	using Godot.Collections;
 
 	[Tool]
 	public partial class SnapObject : LSObjectComponent
@@ -88,29 +87,22 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			Callable _callable = Callable.From(() => { _OnCheckboxPressed(); });
 			
 			Initiated = true;
-			
-			if( Container is VBoxContainer BoxContainer ) 
-			{
-				Trait<Checkable>()
-					.SetName("SnapObjectCheckbox")
-					.SetAction( _callable )
-					.SetDimensions(140, 20)
-					.SetMargin(10, "left")
-					.SetMargin(10, "right")
-					.SetMargin(2, "top")
-					.SetMargin(10, "bottom")
-					.SetText(_CheckboxTitle)
-					.SetTooltipText(_CheckboxTooltip)
-					.Instantiate()
-					.Select(0)
-					.AddToContainer( BoxContainer );
 		
-				Plugin.GetInstance().StatesChanged += () => { MaybeUpdateValue(); };
-			}
-			else
-			{
-				GD.PushWarning("Invalid container @ LSSnapobject");
-			}
+			Trait<Checkable>()
+				.SetName("SnapObjectCheckbox")
+				.SetAction( _callable )
+				.SetDimensions(140, 20)
+				.SetMargin(10, "left")
+				.SetMargin(10, "right")
+				.SetMargin(2, "top")
+				.SetMargin(10, "bottom")
+				.SetText(_CheckboxTitle)
+				.SetTooltipText(_CheckboxTooltip)
+				.Instantiate()
+				.Select(0)
+				.AddToContainer( this );
+	
+			Plugin.GetInstance().StatesChanged += () => { MaybeUpdateValue(); };
 		}
 		
 		/*
@@ -205,12 +197,6 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		public override void Sync() 
 		{
 			_GlobalExplorer.States.SnapToObject = state ? GlobalStates.LibraryStateEnum.Enabled : GlobalStates.LibraryStateEnum.Disabled;
-		}
-		
-		public override void _ExitTree()
-		{
-			
-			base._ExitTree();
 		}
 	}
 }

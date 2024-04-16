@@ -24,7 +24,6 @@ namespace AssetSnap.Front.Components.Library
 {
 	using AssetSnap.Component;
 	using Godot;
-	using Godot.Collections;
 
 	[Tool]
 	public partial class ListTitle : LibraryComponent
@@ -66,7 +65,7 @@ namespace AssetSnap.Front.Components.Library
 				.SetVerticalSizeFlags(Control.SizeFlags.ShrinkCenter)
 				.Instantiate()
 				.Select(0)
-				.AddToContainer(Container);
+				.AddToContainer(this);
 		}
 	}
 }

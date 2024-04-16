@@ -415,12 +415,5 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 				_GlobalExplorer.States.ConvexSimplify = Trait<Checkable>().Select(2).GetValue() ? GlobalStates.LibraryStateEnum.Enabled : GlobalStates.LibraryStateEnum.Disabled;
 			}
 		}
-		
-		public override void _ExitTree()
-		{
-			Initiated = false;
-			
-			base._ExitTree();
-		}
 	}
 }

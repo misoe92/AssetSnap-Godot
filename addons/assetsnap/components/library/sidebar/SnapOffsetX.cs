@@ -24,7 +24,6 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 {
 	using AssetSnap.Component;
 	using Godot;
-	using Godot.Collections;
 
 	[Tool]
 	public partial class SnapOffsetX : LSObjectComponent
@@ -88,7 +87,7 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 				.SetTooltipText(_Tooltip)
 				.Instantiate()
 				.Select(0)
-				.AddToContainer( Container );
+				.AddToContainer( this );
 				
 			Plugin.GetInstance().StatesChanged += () => { MaybeUpdateValue(); };
 		}
@@ -193,12 +192,6 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			}
 			
 			_GlobalExplorer.States.SnapToObjectOffsetXValue = (float)Trait<Spinboxable>().Select(0).GetValue();
-		}
-		
-		public override void _ExitTree()
-		{
-			
-			base._ExitTree();
 		}
 	}
 }

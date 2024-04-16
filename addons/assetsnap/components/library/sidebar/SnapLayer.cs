@@ -24,7 +24,6 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 {
 	using AssetSnap.Component;
 	using Godot;
-	using Godot.Collections;
 
 	[Tool]
 	public partial class SnapLayer : LibraryComponent
@@ -76,7 +75,7 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 				.SetTooltipText(_Tooltip)
 				.Instantiate()
 				.Select(0)
-				.AddToContainer( Container );
+				.AddToContainer( this );
 				
 			Plugin.GetInstance().StatesChanged += () => { MaybeUpdateValue(); };
 		}
@@ -134,13 +133,6 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			}
 			
 			_GlobalExplorer.States.SnapLayer = (int)Trait<Spinboxable>().GetValue();
-		}
-		
-		public override void _ExitTree()
-		{
-			Initiated = false;
-			
-			base._ExitTree();
 		}
 	}
 }

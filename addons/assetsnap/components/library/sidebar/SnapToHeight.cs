@@ -69,14 +69,11 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			
 			Initiated = true;
 			
-			if( Container is VBoxContainer BoxContainer ) 
-			{
-				_InitializeCheckBox(BoxContainer);
-				_InitializeGlue(BoxContainer);
-				_InitializeSpinBox(BoxContainer);
-				
-				Plugin.GetInstance().StatesChanged += () => { MaybeUpdateValue(); };
-			}
+			_InitializeCheckBox(this);
+			_InitializeGlue(this);
+			_InitializeSpinBox(this);
+			
+			Plugin.GetInstance().StatesChanged += () => { MaybeUpdateValue(); };
 		}
 
 		public override void MaybeUpdateValue()
@@ -254,12 +251,6 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			_GlobalExplorer.States.SnapToHeight = Trait<Checkable>().Select(0).GetValue() ? GlobalStates.LibraryStateEnum.Enabled : GlobalStates.LibraryStateEnum.Disabled;
 			_GlobalExplorer.States.SnapToHeightGlue = Trait<Checkable>().Select(1).GetValue() ? GlobalStates.LibraryStateEnum.Enabled : GlobalStates.LibraryStateEnum.Disabled;
 			_GlobalExplorer.States.SnapToHeightValue = (float)Trait<Spinboxable>().GetValue();
-		}
-		
-		public override void _ExitTree()
-		{
-			
-			base._ExitTree();
 		}
 	}
 }

@@ -25,7 +25,6 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 	using AssetSnap.Component;
 	using AssetSnap.Front.Nodes;
 	using Godot;
-	using Godot.Collections;
 
 	[Tool]
 	public partial class SimpleSphereCollision : LSCollisionComponent
@@ -73,7 +72,7 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 				.SetTooltipText(_CheckboxTooltip)
 				.Instantiate()
 				.Select(0)
-				.AddToContainer( Container );
+				.AddToContainer( this );
 				
 			Plugin.GetInstance().StatesChanged += () => { MaybeUpdateValue(); };
 		}
@@ -161,13 +160,6 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			}
 			
 			_GlobalExplorer.States.SphereCollision = Trait<Checkable>().Select(0).GetValue() ? GlobalStates.LibraryStateEnum.Enabled : GlobalStates.LibraryStateEnum.Disabled;
-		}
-
-		public override void _ExitTree()
-		{
-			Initiated = false;
-			
-			base._ExitTree();
 		}
 	}
 }
