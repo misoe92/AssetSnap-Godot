@@ -46,6 +46,7 @@ namespace AssetSnap.Component
 		*/
 		public Spinboxable()
 		{
+			Name = "Spinboxable";
 			TypeString = GetType().ToString();
 		}
 		
