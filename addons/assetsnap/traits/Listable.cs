@@ -49,6 +49,7 @@ namespace AssetSnap.Component
 		*/
 		public Listable()
 		{
+			Name = "Listable";
 			TypeString = GetType().ToString();
 		}
 		
