@@ -26,21 +26,13 @@ namespace AssetSnap
 	using System;
 	using AssetSnap.ASNode.Types;
 	using AssetSnap.Core;
-    using AssetSnap.Explorer;
-    using AssetSnap.Front.Nodes;
+	using AssetSnap.Front.Nodes;
 	using AssetSnap.Trait;
 	using Godot;
 	
 	[Tool]
 	public partial class Plugin : EditorPlugin
 	{
-		// ~Plugin()
-		// {
-		// 	// Code to run when object is being finalized (disposed)
-		// 	// This will run automatically when the object is garbage collected
-		// 	Dispose(true);
-		// }
-		
 		[Signal]
 		public delegate void FoldersLoadedEventHandler();
 		
@@ -175,8 +167,6 @@ namespace AssetSnap
 				RemoveControlFromBottomPanel(_dock);
 				_dock.Free();
 			}
-
-			ExplorerUtils.Get().Components.Dispose(); 
 		} 
 		 
 		/*
@@ -313,16 +303,6 @@ namespace AssetSnap
 		{
 			return _Version;
 		}
-		
-		// public void OnBeforeSerialize()
-		// {
-
-		// }
-
-		// public void OnAfterDeserialize()
-		// {
-		// 	GD.Print("We're ready now. Target sprite" + (_dock == null ? " is" : " is not") + " null");
-		// }
 	}
 }
 #endif 
