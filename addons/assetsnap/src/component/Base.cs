@@ -377,6 +377,7 @@ namespace AssetSnap.Component
 				}
 			}
 		}
+
 		
 		/*
 		** Checks if the given key has a component

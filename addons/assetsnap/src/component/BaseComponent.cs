@@ -202,6 +202,11 @@ namespace AssetSnap.Component
 			// If the type is not supported, return null
 			return null;
 		}
+				
+		public virtual void Clear()
+		{
+			
+		}
 		
 		public override void _ExitTree()
 		{
