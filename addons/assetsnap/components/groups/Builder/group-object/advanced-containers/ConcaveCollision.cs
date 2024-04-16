@@ -25,7 +25,6 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject.AdvancedContaine
 	using AssetSnap.Component;
 	using AssetSnap.Static;
 	using Godot;
-	using Godot.Collections;
 
 	[Tool]
 	public partial class ConcaveCollision : AdvancedGroupComponent

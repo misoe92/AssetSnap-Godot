@@ -31,7 +31,6 @@ namespace AssetSnap.Front.Components.Groups.Builder
 	[Tool]
 	public partial class ListingEntry : LibraryComponent
 	{
-		
 		public ListingEntry()
 		{
 			Name = "GroupBuilderListingEntry";

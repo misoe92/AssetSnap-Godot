@@ -91,7 +91,7 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			Trait<Buttonable>()
 				.Select(0)
 				.AddToContainer(
-					Container
+					this
 				);
 		}
 	}

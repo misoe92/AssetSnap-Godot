@@ -24,7 +24,6 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 {
 	using AssetSnap.Component;
 	using Godot;
-	using Godot.Collections;
 
 	[Tool]
 	public partial class Scale : GroupObjectComponent
@@ -33,6 +32,8 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 		
 		public Scale()
 		{
+			Name = "GroupsBuilderGroupObjectScale";
+			
 			UsingTraits = new()
 			{
 				{ typeof(Containerable).ToString() },
@@ -208,7 +209,7 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 			Trait<Containerable>()
 				.Select(0)
 				.AddToContainer(
-					Container
+					this
 				);
 		}
 		

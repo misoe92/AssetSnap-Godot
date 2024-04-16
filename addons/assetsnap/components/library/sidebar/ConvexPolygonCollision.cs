@@ -25,7 +25,6 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 	using AssetSnap.Component;
 	using AssetSnap.Front.Nodes;
 	using Godot;
-	using Godot.Collections;
 
 	[Tool]
 	public partial class ConvexPolygonCollision : LSCollisionComponent
@@ -110,15 +109,15 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 
 			Trait<Checkable>()
 				.Select(0)
-				.AddToContainer(Container);
+				.AddToContainer( this );
 								
 			Trait<Checkable>()
 				.Select(1)
-				.AddToContainer( Container );
+				.AddToContainer( this );
 								
 			Trait<Checkable>()
 				.Select(2)
-				.AddToContainer( Container );
+				.AddToContainer( this );
 				
 			Plugin.GetInstance().StatesChanged += () => { MaybeUpdateValue(); };
 		}

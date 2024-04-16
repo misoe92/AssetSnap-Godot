@@ -73,32 +73,5 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			
 			AddChild(_MarginContainer);
 		}
-	
-		/*
-		** Cleans up in references, fields and parameters.
-		** 
-		** @return void
-		*/
-		public override void _ExitTree()
-		{
-			Exited = true;
-			if( IsInstanceValid(_Label) ) 
-			{
-				_Label.QueueFree();
-				_Label = null;
-			}
-			
-			if( IsInstanceValid(_InnerContainer) ) 
-			{
-				_InnerContainer.QueueFree();
-				_InnerContainer = null;
-			}
-			
-			if( IsInstanceValid(_MarginContainer) ) 
-			{
-				_MarginContainer.QueueFree();
-				_MarginContainer = null;
-			}
-		}
 	}
 }

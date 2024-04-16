@@ -33,6 +33,7 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 		
 		public Advanced()
 		{
+			Name = "GroupsBuilderGroupObjectAdvanced";
 			UsingTraits = new()
 			{
 				{ typeof(Containerable).ToString() },
@@ -96,7 +97,7 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 			Trait<Containerable>()
 				.Select(0)
 				.AddToContainer(
-					Container
+					this
 				);
 		}
 		

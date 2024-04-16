@@ -50,7 +50,7 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			_InputField.AddThemeConstantOverride("minimum_character_width", 36);
 			_InputField.Connect(LineEdit.SignalName.TextChanged, Callable.From( (string value ) => { _OnMaybeUpdateGroupName( value ); }));
 
-			Container.AddChild(_InputField);
+			AddChild(_InputField);
 		}
 		
 		public void Update()

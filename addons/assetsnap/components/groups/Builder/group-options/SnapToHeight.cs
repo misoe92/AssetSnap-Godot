@@ -30,6 +30,8 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 	{
 		public SnapToHeight()
 		{
+			Name = "GroupsBuilderGroupOptionsSnapToHeight";
+		
 			UsingTraits = new()
 			{
 				{ typeof(Checkable).ToString() },

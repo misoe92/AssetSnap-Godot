@@ -26,7 +26,6 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 	using AssetSnap.Component;
 	using Godot;
 	using AssetSnap.Front.Components.Groups.Builder.GroupObject.AdvancedContainers;
-	using Godot.Collections;
 
 	[Tool]
 	public partial class AdvancedContainer : GroupObjectComponent
@@ -38,6 +37,8 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 		
 		public AdvancedContainer()
 		{
+			Name = "GroupsBuilderGroupObjectAdvancedContainer";
+			
 			UsingTraits = new()
 			{
 				{ typeof(Containerable).ToString() },

@@ -24,13 +24,14 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 {
 	using AssetSnap.Component;
 	using Godot;
-	using Godot.Collections;
 
 	[Tool]
 	public partial class Actions : GroupObjectComponent
 	{
 		public Actions()
 		{
+			Name = "GroupsBuilderGroupObjectActions";
+			
 			UsingTraits = new()
 			{
 				{ typeof(Containerable).ToString() },
@@ -109,7 +110,7 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 			Trait<Containerable>()
 				.Select(0)
 				.AddToContainer(
-					Container
+					this
 				);
 		}
 		
