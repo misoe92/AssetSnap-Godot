@@ -26,6 +26,7 @@ namespace AssetSnap.Component
 	using System;
 	using System.Reflection;
 	using AssetSnap.Abstracts;
+	using AssetSnap.Explorer;
 	using Godot;
 	using Godot.Collections;
 
@@ -36,6 +37,8 @@ namespace AssetSnap.Component
 		public bool _include = true;
 		protected bool Disposed = false;
 		/* -- */
+
+		public string TypeString = "";
 		
 		public Array<string> UsingTraits = new(){};
 		
@@ -78,6 +81,11 @@ namespace AssetSnap.Component
 			}
 
 			Container.AddChild(this);
+			
+			if( Name == "" ) 
+			{
+				throw new Exception("Invalid name for component");
+			}
 		}
 		
 		public virtual Variant GetValueFor( string key )
@@ -195,25 +203,15 @@ namespace AssetSnap.Component
 			return null;
 		}
 		
-		// /*
-		// ** Cleaning of various fields when the component
-		// ** is leaving the tree
-		// **
-		// ** @return void
-		// */
-		// public override void _ExitTree()
-		// {
-		// 	// if( IsInstanceValid(_Container) ) 
-		// 	// {
-		// 	// 	_Container.QueueFree();
-		// 	// }
-		// 	_Container = null;
-		// 	// Disposed = true; 
-		// }
-		
-		public virtual void Clear()
+		public override void _ExitTree()
 		{
+			ExplorerUtils.Get().Components.Remove(this);
+			if( TypeString != "" ) 
+			{
+				ExplorerUtils.Get().Components.RemoveByTypeString(TypeString);
+			}
 			
+			base._ExitTree();
 		}
 	}
 }
