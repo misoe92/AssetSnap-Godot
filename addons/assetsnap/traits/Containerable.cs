@@ -35,6 +35,7 @@ namespace AssetSnap.Component
 		*/
 		public Containerable()
 		{
+			Name = "Containerable";
 			TypeString = GetType().ToString();
 		}
 		
