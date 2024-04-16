@@ -29,12 +29,12 @@ namespace AssetSnap.Front.Components.Groups.Builder
 	public partial class EditorClose : LibraryComponent
 	{
 		private static readonly string Text = "Close"; 
-		private static readonly string TooltipText = "Close the current group and stop editing it."; 
-		private static readonly Control.CursorShape MouseDefaultCursorShape = Control.CursorShape.PointingHand; 
-
+	
 		public EditorClose()
 		{
 			Name = "GroupBuilderEditorClose";
+			TooltipText = "Close the current group and stop editing it.";
+			MouseDefaultCursorShape = Control.CursorShape.PointingHand;
 			
 			UsingTraits = new()
 			{
@@ -55,13 +55,13 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			_FinalizeFields();
 		}
 	
-		public void Show()
+		public void DoShow()
 		{
 			Trait<Buttonable>()
 				.SetVisible(true);
 		}
 			
-		public void Hide()
+		public void DoHide()
 		{
 			Trait<Buttonable>()
 				.SetVisible(false);

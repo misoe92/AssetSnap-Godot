@@ -33,7 +33,7 @@ namespace AssetSnap.Instance.Input
 		private Vector3 DragFrom;
 		private Vector3 DragTo;
 		private float Distance = 0.0f;
-		private float Size = 0.0f;
+		// private float Size = 0.0f;
 		private float SizeX = 0.0f;
 		private float SizeY = 0.0f;
 		private float SizeZ = 0.0f;

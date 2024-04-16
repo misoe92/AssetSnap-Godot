@@ -124,8 +124,6 @@ namespace AssetSnap.Component
 				
 				GD.PushError("AddToContainer::Keys-> ", Dependencies.Keys);
 				GD.PushError("AddToContainer::ADDTO-> ", TraitName + "_MarginContainer");
-				throw new Exception("her");
-				
 				return;
 			}
 			

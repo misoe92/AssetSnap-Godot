@@ -36,9 +36,9 @@ namespace AssetSnap.Front.Components.Groups.Builder
 
 		public Vector3 Origin { get; set; }
 		
-		public Vector3 Rotation { get; set; }
+		public Vector3 ObjectRotation { get; set; }
 		
-		public Vector3 Scale { get; set; }
+		public Vector3 ObjectScale { get; set; }
 		
 		public Godot.Collections.Dictionary<string, Variant> Options { get; set; }
 

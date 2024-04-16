@@ -41,14 +41,14 @@ namespace AssetSnap.Component
 			_FinalizeFields();
 		}
 		
-		public void Show()
+		public void InputShow()
 		{
 			Trait<Spinboxable>()
 				.Select(0)
 				.SetVisible(true);
 		}
 		
-		public void Hide()
+		public void InputHide()
 		{
 			Trait<Spinboxable>()
 				.Select(0)

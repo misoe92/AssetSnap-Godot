@@ -78,14 +78,14 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			_FinalizeFields();
 		}
 		
-		public void Hide()
+		public void DoHide()
 		{
 			Trait<Panelable>()
 				.Select(0)
 				.SetVisible(false);
 		}
 		
-		public void Show()
+		public void DoShow()
 		{
 			Trait<Panelable>()
 				.Select(0)
@@ -319,8 +319,8 @@ namespace AssetSnap.Front.Components.Groups.Builder
 					
 					SingleEntry.Path = path;
 					SingleEntry.Origin = origin;
-					SingleEntry.Scale = scale;
-					SingleEntry.Rotation = rotation;
+					SingleEntry.ObjectScale = scale;
+					SingleEntry.ObjectRotation = rotation;
 					SingleEntry.Options = options;
 					SingleEntry.Index = i;
 					
@@ -375,8 +375,8 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			
 		private void _OnOpenGroupOptions()
 		{
-			_GlobalExplorer.GroupBuilder._Editor.GroupOptions.Show();
-			Hide();
+			_GlobalExplorer.GroupBuilder._Editor.GroupOptions.DoShow();
+			DoHide();
 		}
 	}
 }

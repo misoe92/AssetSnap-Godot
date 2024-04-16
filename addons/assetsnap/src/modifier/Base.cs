@@ -27,7 +27,6 @@ namespace AssetSnap.Modifier
 	
 	public partial class Base
 	{
-		private string Name = "";
 		/** Modifiers **/
 		public AsArrayModifier ArrayModifier = new();
 		public AsScatterModifier ScatterModifier = new();
@@ -40,15 +39,13 @@ namespace AssetSnap.Modifier
 			{
 				if( null == _Instance ) 
 				{
-					_Instance = new()
-					{
-						Name = "AssetSnapModifier",
-					};
+					_Instance = new();
 				}
 				
 				return _Instance;
 			}
 		}
+		
 		public void _Exit()
 		{
 			ArrayModifier = null;

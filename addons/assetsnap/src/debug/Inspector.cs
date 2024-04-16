@@ -30,7 +30,6 @@ namespace AssetSnap.Debug
 
 	public partial class Inspector
 	{
-		private string Name = "Inspector";
 		private static readonly string ThemePath = "res://addons/assetsnap/assets/themes/SnapTheme.tres";
 		private VBoxContainer _Control;
 		private ScrollContainer _ScrollContainer;

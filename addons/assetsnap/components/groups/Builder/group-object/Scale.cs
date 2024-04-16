@@ -87,7 +87,7 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 
 			Trait<Spinboxable>()
 				.SetName("GroupObjectsScaleXValue")
-				.SetValue(Parent.Scale.X)
+				.SetValue(Parent.ObjectScale.X)
 				.SetStep(0.1f)
 				.SetMinValue(0.0f)
 				.SetMaxValue(50.0f)
@@ -110,7 +110,7 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 				
 			Trait<Spinboxable>()
 				.SetName("GroupObjectsScaleYValue")
-				.SetValue(Parent.Scale.Y)
+				.SetValue(Parent.ObjectScale.Y)
 				.SetStep(0.1f)
 				.SetMinValue(0.0f)
 				.SetMaxValue(50.0f)
@@ -133,7 +133,7 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 
 			Trait<Spinboxable>()
 				.SetName("GroupObjectsScaleZValue")
-				.SetValue(Parent.Scale.Z)
+				.SetValue(Parent.ObjectScale.Z)
 				.SetStep(0.1f)
 				.SetMinValue(0.0f)
 				.SetMaxValue(50.0f)

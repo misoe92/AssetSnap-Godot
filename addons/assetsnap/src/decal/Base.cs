@@ -29,7 +29,6 @@ namespace AssetSnap.Decal
 
 	public partial class Base
 	{
-		private string Name = "";
 		private AsDecal3D _Decal;
 		private Mesh _ModelMesh;
 		private MeshInstance3D _ModelMeshInstance;
@@ -80,10 +79,7 @@ namespace AssetSnap.Decal
 			{
 				if( null == _Instance ) 
 				{
-					_Instance = new()
-					{
-						Name = "AssetSnapDecal",
-					};
+					_Instance = new();
 				}
 				
 				return _Instance;

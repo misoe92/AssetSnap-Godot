@@ -68,7 +68,7 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			_SetupExistingGroupList();
 		}
 		
-		public void Show()
+		public void DoShow()
 		{
 			List<string> OuterComponents = new()
 			{
@@ -84,7 +84,7 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			}
 		}
 		
-		public void Hide()
+		public void DoHide()
 		{
 			List<string> OuterComponents = new()
 			{
@@ -110,11 +110,11 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			if( path == "" ) 
 			{
 				// None chosen, show sidebar
-				Show();
+				DoShow();
 			}
 			else 
 			{
-				Hide();
+				DoHide();
 			}
 		}
 		
