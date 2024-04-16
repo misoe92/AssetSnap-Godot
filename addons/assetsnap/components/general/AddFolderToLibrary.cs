@@ -25,13 +25,11 @@ namespace AssetSnap.Front.Components
 	using Godot;
 	using AssetSnap.Component;
 	using AssetSnap.Explorer;
-	using Godot.Collections;
 
 	[Tool]
 	public partial class AddFolderToLibrary : TraitableComponent
 	{
 		private readonly string TitleText = "General actions";
-		// private FileDialog fileDialog;
 
 		/* 
 		** Class Constructor
@@ -61,11 +59,6 @@ namespace AssetSnap.Front.Components
 		*/
 		public override void Initialize()
 		{
-			if( Container == null ) 
-			{ 
-				return;
-			}
-
 			base.Initialize();
 			
 			Initiated = true;
@@ -125,9 +118,9 @@ namespace AssetSnap.Front.Components
 				_GlobalExplorer.Library.Refresh( ExplorerUtils.Get()._Plugin.GetTabContainer() );
 			}
 
-			// fileDialog.DirSelected -= _OnFolderSelected;
-			// fileDialog.QueueFree();
-			// fileDialog = null; 
+			fileDialog.DirSelected -= (string FolderPath) => { _OnFolderSelected(FolderPath,fileDialog); };
+			fileDialog.QueueFree();
+			fileDialog = null; 
 		}
 
 		/* 
@@ -150,6 +143,5 @@ namespace AssetSnap.Front.Components
 			// Show the file dialog
 			fileDialog.PopupCentered();
 		}
-		
 	}
 }

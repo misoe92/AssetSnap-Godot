@@ -24,9 +24,7 @@ namespace AssetSnap.Front.Components
 	using AssetSnap.Component;
 	using AssetSnap.Explorer;
 	using AssetSnap.Settings;
-	using AssetSnap.Trait;
 	using Godot;
-	using Godot.Collections;
 
 	[Tool]
 	public partial class LibrariesListing : TraitableComponent
@@ -93,77 +91,6 @@ namespace AssetSnap.Front.Components
 			}
 			
 			_SetupListTable(); 
-		}
-		
-		/*
-		** Forces the list to update
-		** 
-		** @return void
-		*/
-		public void ForceUpdate()
-		{
-			// if(
-			// 	null != Trait<Labelable>() &&
-			// 	Trait<Labelable>().ContainsIndex(0)
-			// )
-			// {
-			// 	if( false == ClearTrait<Labelable>() ) 
-			// 	{
-			// 		GD.PushError("Container was not cleared");
-			// 	}
-			// }
-			// AddTrait(typeof(Labelable));
-			// if(
-			// 	null != Trait<Panelable>() &&
-			// 	Trait<Panelable>().ContainsIndex(0)
-			// )
-			// {
-			// 	if( false == ClearTrait<Panelable>() ) 
-			// 	{
-			// 		GD.PushError("Container was not cleared");
-			// 	}
-			// }
-			// AddTrait(typeof(Panelable));
-			// if(
-			// 	null != Trait<Containerable>() &&
-			// 	Trait<Containerable>().ContainsIndex(0)
-			// ) 
-			// {
-			// 	if( false == ClearTrait<Containerable>() ) 
-			// 	{ 
-			// 		GD.PushError("Container was not cleared");
-			// 	}
-			// }
-			// AddTrait(typeof(Containerable));
-			
-			// if(
-			// 	null != Trait<Listable>() &&
-			// 	Trait<Listable>().ContainsIndex(0)
-			// )
-			// {
-			// 	if( false == ClearTrait<Listable>() ) 
-			// 	{
-			// 		GD.PushError("Listable was not cleared");
-			// 	}
-			// }
-			 
-			// Trait<Containerable>()
-			// 	.SetName( "ListingBoxContainer" )
-			// 	.SetMargin(115, "left")
-			// 	.SetMargin(35, "right")
-			// 	.SetMargin(0, "top")
-			// 	.SetMargin(0, "bottom")
-			// 	.SetVerticalSizeFlags(Control.SizeFlags.ExpandFill)
-			// 	.Instantiate();
-			
-			// _UpdateListTable();
-			
-			// Trait<Containerable>()
-			// 	.Select(0)
-			// 	.AddToContainer(
-			// 		Container
-			// 	);
-				
 		}
 		
 		/*
@@ -255,12 +182,12 @@ namespace AssetSnap.Front.Components
 		*/
 		private void _ClearList() 
 		{
-			var Children = Container.GetChildren();
+			var Children = GetChildren();
 			for( int i = 0; i < Children.Count; i++) 
 			{
 				var child = Children[i];
 
-				// Container.RemoveChild(child);
+				RemoveChild(child);
 				child.QueueFree();
 			}
 		}
