@@ -51,7 +51,7 @@ namespace AssetSnap.Front.Components.Library
 			
 			//_include = false; 
 		}
-		
+
 		/*
 		** Initializes the component 
 		**
