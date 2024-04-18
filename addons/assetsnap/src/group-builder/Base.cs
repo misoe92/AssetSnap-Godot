@@ -80,7 +80,15 @@ namespace AssetSnap.GroupBuilder
 		
 		public bool HasMenu()
 		{
-			return ExplorerUtils.Get()._Plugin
+			if(
+				null == Plugin.Singleton ||
+				null == Plugin.Singleton.GetInternalContainer()
+			)
+			{
+				return false;				
+			}
+
+			return Plugin.Singleton
 				.GetInternalContainer()
 				.HasNode("GroupContextMenu");
 		}
@@ -193,6 +201,10 @@ namespace AssetSnap.GroupBuilder
 		
 		public void ClearContainer()
 		{
+			_Sidebar.Clear();
+			_Editor.Clear();
+			_GroupContainer.Clear();
+			
 			if( null != Container ) 
 			{
 				if( null != Container.GetParent() ) 
@@ -200,7 +212,7 @@ namespace AssetSnap.GroupBuilder
 					Container.GetParent().RemoveChild(Container);
 				}
 
-				Container.QueueFree();
+				Container.Free();
 			}
 			else 
 			{
