@@ -24,6 +24,7 @@
 namespace AssetSnap.ContextMenu
 {
 	using System.Collections.Generic;
+	using AssetSnap.Explorer;
 	using AssetSnap.Front.Components.Library;
 	using AssetSnap.Front.Nodes;
 	using Godot;
@@ -68,15 +69,15 @@ namespace AssetSnap.ContextMenu
 				return;
 			}
 
-			// if ( HasComponents() ) 
-			// {
-			// 	InitializeComponents();
-			// }  
+			if ( HasComponents() ) 
+			{
+				InitializeComponents();
+			}  
 		}
 		
 		public void _Ready()
 		{
-			// _Initialize();
+			_Initialize();
 		}
 		
 		/*
@@ -226,8 +227,14 @@ namespace AssetSnap.ContextMenu
 			_body.Update( Type, Value );
 		}
 		
-		public Control GetInstance()
-		{
+		public AsContextMenu GetInstance()
+		{	
+			if(	null == _NodeInstance && null != Plugin.Singleton) 
+			{
+				_NodeInstance = _Scene.Instantiate<AsContextMenu>();
+				Plugin.Singleton.GetInternalContainer().AddChild(_NodeInstance);
+			}
+			
 			return _NodeInstance;
 		}
 		
@@ -283,7 +290,7 @@ namespace AssetSnap.ContextMenu
 				return 0;
 			}
 			
-			if( _NodeInstance is AsContextMenu ContextMenu ) 
+			if( GetInstance() is AsContextMenu ContextMenu ) 
 			{
 				return ContextMenu.GetAngleIndex();
 			}
@@ -297,8 +304,8 @@ namespace AssetSnap.ContextMenu
 		*/
 		public void SetVisible(bool state)
 		{
-			_NodeInstance.Visible = state;
-			_NodeInstance.Active = state;
+			GetInstance().Visible = state;
+			GetInstance().Active = state;
 		}
 		
 		/*
@@ -313,7 +320,7 @@ namespace AssetSnap.ContextMenu
 				return true;
 			}
 			
-			return _NodeInstance.Visible == false;
+			return GetInstance().Visible == false;
 		}
 		
 		/*
@@ -323,7 +330,7 @@ namespace AssetSnap.ContextMenu
 		*/
 		public bool IsContextMenuValid()
 		{
-			return EditorPlugin.IsInstanceValid(_NodeInstance) && null != _NodeInstance.GetParent();
+			return EditorPlugin.IsInstanceValid(GetInstance()) && null != GetInstance().GetParent();
 		}
 		
 		/*
@@ -358,10 +365,7 @@ namespace AssetSnap.ContextMenu
 		*/
 		private void _Initialize() 
 		{
-			_NodeInstance = _Scene.Instantiate<AsContextMenu>();
-			SetVisible(false);
-			EditorInterface.Singleton.GetBaseControl().AddChild( _NodeInstance );
-			
+			SetVisible(false);			
 		}
 
 		/*
@@ -372,25 +376,28 @@ namespace AssetSnap.ContextMenu
 		*/
 		public void InitializeComponents()
 		{
-			SnapRotate _LibrarySnapRotate = GlobalExplorer.GetInstance().Components.Single<SnapRotate>();
-			SnapScale _LibrarySnapScale = GlobalExplorer.GetInstance().Components.Single<SnapScale>();
-			SnapGrab _LibrarySnapGrab = GlobalExplorer.GetInstance().Components.Single<SnapGrab>();
+			SnapRotate _LibrarySnapRotate = ExplorerUtils.Get().Components.Single<AssetSnap.Front.Components.Library.SnapRotate>();
+			SnapScale _LibrarySnapScale = ExplorerUtils.Get().Components.Single<AssetSnap.Front.Components.Library.SnapScale>();
+			SnapGrab _LibrarySnapGrab = ExplorerUtils.Get().Components.Single<AssetSnap.Front.Components.Library.SnapGrab>();
 			
 			if( null != _LibrarySnapRotate ) 
 			{
-				_LibrarySnapRotate.Library = GlobalExplorer.GetInstance().CurrentLibrary;
+				_LibrarySnapRotate.Library = ExplorerUtils.Get().CurrentLibrary;
+				_LibrarySnapRotate.Container = Plugin.Singleton.GetInternalContainer();
 				_LibrarySnapRotate.Initialize();
 			}
 			
 			if( null != _LibrarySnapScale ) 
 			{
-				_LibrarySnapScale.Library = GlobalExplorer.GetInstance().CurrentLibrary;
+				_LibrarySnapScale.Library = ExplorerUtils.Get().CurrentLibrary;
+				_LibrarySnapScale.Container = Plugin.Singleton.GetInternalContainer();
 				_LibrarySnapScale.Initialize();
 			}
 			
 			if( null != _LibrarySnapGrab ) 
 			{
-				_LibrarySnapGrab.Library = GlobalExplorer.GetInstance().CurrentLibrary;
+				_LibrarySnapGrab.Library = ExplorerUtils.Get().CurrentLibrary;
+				_LibrarySnapGrab.Container = Plugin.Singleton.GetInternalContainer();
 				_LibrarySnapGrab.Initialize();
 			}
 		}
@@ -402,9 +409,9 @@ namespace AssetSnap.ContextMenu
 		*/
 		private void ClearOverlay() 
 		{
-			if( null != _NodeInstance )  
+			if( null != GetInstance() )  
 			{
-				_NodeInstance.QueueFree();
+				GetInstance().QueueFree();
 			}
 		}
 		
@@ -415,7 +422,7 @@ namespace AssetSnap.ContextMenu
 		*/
 		private bool IsGlobalExplorerConnected()
 		{
-			return null != GlobalExplorer.GetInstance() && null != GlobalExplorer.GetInstance().Settings;
+			return null != ExplorerUtils.Get() && null != ExplorerUtils.Get().Settings;
 		}
 		
 		/*
@@ -425,7 +432,7 @@ namespace AssetSnap.ContextMenu
 		*/
 		public bool HasComponents() 
 		{
-			return GlobalExplorer.GetInstance().Components.HasAll(Components.ToArray());
+			return ExplorerUtils.Get().Components.HasAll(Components.ToArray());
 		}
 		
 		/*
@@ -435,12 +442,12 @@ namespace AssetSnap.ContextMenu
 		*/
 		private bool _ShouldUseOverlay()
 		{
-			if( null == GlobalExplorer.GetInstance() || null ==  GlobalExplorer.GetInstance().Settings ) 
+			if( null == ExplorerUtils.Get() || null ==  ExplorerUtils.Get().Settings ) 
 			{ 
 				return false;
 			}
 
-			bool UseAsOverlay = GlobalExplorer.GetInstance().Settings.GetKey("use_as_overlay").As<bool>();
+			bool UseAsOverlay = ExplorerUtils.Get().Settings.GetKey("use_as_overlay").As<bool>();
 			return UseAsOverlay;
 		}
 	}
