@@ -50,11 +50,6 @@ namespace AssetSnap.Front.Components
 			//_include = false;
 		}
 
-		public override void _EnterTree()
-		{
-			base._EnterTree();
-		}
-
 		/*
 		** Initialization of the component
 		** 
@@ -240,7 +235,7 @@ namespace AssetSnap.Front.Components
 		*/
 		private void _OnConfirm()
 		{
-			Configs.SettingsConfig.Singleton.RemoveFolder(title);
+			Plugin.Singleton.EmitSignal(Plugin.SignalName.OnRemoveFolder, title);
 		}
 		
 		/*
@@ -260,6 +255,11 @@ namespace AssetSnap.Front.Components
 			Containerable choiceContainer = Trait<Containerable>()
 				.Select(2);
 			choiceContainer.Hide();
+		}
+
+		public override void _ExitTree()
+		{
+			base._ExitTree();
 		}
 	}
 }
