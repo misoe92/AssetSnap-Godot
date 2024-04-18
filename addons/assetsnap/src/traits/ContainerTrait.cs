@@ -91,8 +91,12 @@ namespace AssetSnap.Trait
 			
 			if( false == Dependencies.ContainsKey(TraitName + "_WorkingNode")) 
 			{
-				GD.PushError("Node was false @ ContainerTrait -> @", OwnerName, "::", TraitName, "::", TypeString);
-				GD.PushError("KEYS::", Dependencies.Keys);
+				if( debug ) 
+				{
+					GD.PushError("Node was false @ ContainerTrait -> @", OwnerName, "::", TraitName, "::", TypeString);
+					GD.PushError("KEYS::", Dependencies.Keys);
+				}
+
 				return this;
 			}
 			
@@ -308,8 +312,9 @@ namespace AssetSnap.Trait
 		*/
 		public virtual Container GetInnerContainer( int index )
 		{
-			if( null == Dependencies ) 
+			if( null == Dependencies || Dependencies.Count == 0) 
 			{
+				GD.PushError("No dependencies");
 				return null;
 			}
 			
