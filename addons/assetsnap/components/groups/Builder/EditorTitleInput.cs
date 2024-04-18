@@ -78,15 +78,5 @@ namespace AssetSnap.Front.Components.Groups.Builder
 				return;
 			}
 		}
-
-		public override void _ExitTree()
-		{
-			if( IsInstanceValid( _InputField ) ) 
-			{
-				_InputField.QueueFree();
-			}
-			
-			base._ExitTree();
-		}
 	}
 }
