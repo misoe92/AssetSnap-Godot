@@ -238,7 +238,7 @@ namespace AssetSnap.Trait
 				return;
 			}
 
-			Node traitIndex = Plugin.Singleton.traitGlobal.GetInstance(index, TypeString, OwnerName, debug);
+			GodotObject traitIndex = Plugin.Singleton.traitGlobal.GetInstance(index, TypeString, OwnerName, debug);
 			if (EditorPlugin.IsInstanceValid(traitIndex) && traitIndex is Control childNode)
 			{
 				Dependencies[TraitName + "_WorkingNode"] = childNode;
@@ -444,6 +444,11 @@ namespace AssetSnap.Trait
 				return Dependencies[TraitName + "_WorkingNode"].As<GodotObject>() as Node;
 			}
 			
+			if( null != Dependencies && Dependencies.ContainsKey(TraitName + "_Container") ) 
+			{
+				return Dependencies[TraitName + "_Container"].As<GodotObject>() as Container;
+			}
+			
 			if( debug ) 
 			{
 				if( null == Dependencies ) 
@@ -616,7 +621,7 @@ namespace AssetSnap.Trait
 			return null != TypeString && "" != TypeString;
 		}
 		
-		public virtual void Clear(int index = 0, bool debug = false)
+		public virtual void Clear(int index = -1, bool debug = false)
 		{
 			if( null == TypeString || null == OwnerName || null == Plugin.Singleton || null == Plugin.Singleton.traitGlobal ) 
 			{
@@ -624,26 +629,79 @@ namespace AssetSnap.Trait
 				return;
 			}
 
-			Godot.Collections.Dictionary<int, Node> instances = Plugin.Singleton.traitGlobal.AllInstances(TypeString, OwnerName);
+			Godot.Collections.Dictionary<int, GodotObject> instances = Plugin.Singleton.traitGlobal.AllInstances(TypeString, OwnerName, debug);
 			
 			if( null == instances || instances.Count == 0 ) 
 			{
 				Dependencies = new();
 				return;
 			}
-
-			// GD.Print(instances, instances.Count);
-			foreach( (int idx, Node node) in instances )
+			
+			if( debug ) 
 			{
-				if( debug ) 
-				{
-					GD.Print("Index::", idx, TypeString, OwnerName);
-				}
-
-				Plugin.Singleton.traitGlobal.RemoveInstance(idx, TypeString, OwnerName );
+				GD.Print("Keys::", instances.Keys);
 			}
 
-			Dependencies = new();
+			if( -1 != index ) 
+			{
+				if( false == Plugin.Singleton.traitGlobal.HasInstance(index,TypeString,OwnerName,debug) ) 
+				{
+					if( debug ) 
+					{
+						GD.Print("Index::", index, TypeString, OwnerName, "-- Not found");
+					}
+					return;
+				}
+				
+				GodotObject instance = Plugin.Singleton.traitGlobal.GetInstance(index, TypeString, OwnerName, debug);
+				if( EditorPlugin.IsInstanceValid(instance) && instance is Node node ) 
+				{
+					if( debug ) 
+					{
+						GD.Print("Index::", index, TypeString, OwnerName, "--", node.Name);
+					}
+
+					Plugin.Singleton.traitGlobal.RemoveInstance(index, TypeString, OwnerName, debug );
+					Iteration -= 1;
+				} 
+			}
+			else 
+			{
+				int maxCount = instances.Count;
+				for( int idx = 0; idx < maxCount; idx++)
+				{
+					if(debug)
+					{
+						GD.Print("INDEX::", idx, maxCount);
+					}
+					
+					GodotObject node = instances[idx];
+					if( EditorPlugin.IsInstanceValid(node) && node is Node instanceNode ) 
+					{
+						if( debug ) 
+						{
+							GD.Print("Index::", idx, TypeString, OwnerName, "--", instanceNode.Name);
+						}
+
+						Plugin.Singleton.traitGlobal.RemoveInstance(idx, TypeString, OwnerName, debug );
+						
+						if( debug ) 
+						{
+							GD.Print("Instance Count::", Plugin.Singleton.traitGlobal.Count());
+						}
+					}
+					else 
+					{
+						if( debug ) 
+						{
+							GD.Print("Instance Not valid::", idx);
+						}
+					}
+				}
+					
+				Dependencies = new();
+				Iteration = 0;
+			}
 		}
 		
 		public virtual int Count()
@@ -653,7 +711,7 @@ namespace AssetSnap.Trait
 				return 0;
 			}
 			
-			Godot.Collections.Dictionary<int, Node> instances = Plugin.Singleton.traitGlobal.AllInstances(TypeString, OwnerName);
+			Godot.Collections.Dictionary<int, GodotObject> instances = Plugin.Singleton.traitGlobal.AllInstances(TypeString, OwnerName);
 			
 			if( null == instances || instances.Count == 0 ) 
 			{
@@ -671,11 +729,6 @@ namespace AssetSnap.Trait
 		public void OnAfterDeserialize()
 		{
 			Build = false;
-		}
-
-		public override void _ExitTree()
-		{
-			base._ExitTree();
 		}
 	}
 }
