@@ -35,7 +35,7 @@ namespace AssetSnap.Front.Components.Library
 		private double ValueIntervalTimer = 0.0;
 		
 		private	Label _Label;
-		private	AsSearchInput _SearchInput;
+		public AsSearchInput _SearchInput { get; set; }
 
 		private bool _Searching = false;
 		private bool _Searched = false;
@@ -128,6 +128,11 @@ namespace AssetSnap.Front.Components.Library
 		*/
 		public override void _Process(double delta) 
 		{
+			if( null == _SearchInput ) 
+			{
+				return;
+			}
+			
 			if(
 				_Searching == false ||
 				null == Trait<Buttonable>() ||
@@ -219,7 +224,7 @@ namespace AssetSnap.Front.Components.Library
 		{
 			return text.ToLower().Contains(value.ToLower());
 		}
-	
+
 		private void _ClearCurrentQuery()
 		{
 			_SearchInput.Clear();
