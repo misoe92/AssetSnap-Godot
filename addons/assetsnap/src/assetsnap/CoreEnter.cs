@@ -21,6 +21,7 @@
 // SOFTWARE.
 
 using AssetSnap.Explorer;
+using AssetSnap.Settings;
 using Godot;
 
 namespace AssetSnap.Core 
@@ -46,6 +47,7 @@ namespace AssetSnap.Core
 			new ASNode.Types.AsOptimizedMultiMeshGroupType().Initialize();
 			new ASNode.Types.AsMultiMeshType().Initialize();
 
+			Plugin.Singleton.AddChild(ExplorerUtils.Get().Components);
 			Plugin.Singleton.AddChild(ExplorerUtils.Get().Library);
 			// Plugin.Singleton.AddChild(ExplorerUtils.Get().GroupBuilder);
 			
@@ -70,32 +72,45 @@ namespace AssetSnap.Core
 		
 		private void _OnLoadContainers() 
 		{
+			if( _GlobalExplorer.Settings.Initialized ) 
+			{
+				_GlobalExplorer.Settings.Reset();
+			}
+			
 			if( _GlobalExplorer.GroupBuilder.Initialized ) 
 			{
 				_GlobalExplorer.GroupBuilder.ClearContainer();
 			}
 			
-			_GlobalExplorer.GroupBuilder.InitializeContainer();
-			if(
-				null == _GlobalExplorer.GroupBuilder.Container ||
-				false == EditorPlugin.IsInstanceValid( _GlobalExplorer.GroupBuilder.Container )
-			) 
+			if( SettingsUtils.Get().FolderCount != 0 ) 
 			{
-				GD.PushError("Invalid Group Container");
+				_GlobalExplorer.GroupBuilder.InitializeContainer();
+				
+				if(
+					null == _GlobalExplorer.GroupBuilder.Container ||
+					false == EditorPlugin.IsInstanceValid( _GlobalExplorer.GroupBuilder.Container )
+				) 
+				{
+					GD.PushError("Invalid Group Container");
+				}
+			
+				_GlobalExplorer.BottomDock.Add(_GlobalExplorer.GroupBuilder.Container); 
 			}
 			
-			_GlobalExplorer.BottomDock.Add(_GlobalExplorer.GroupBuilder.Container); 
 			_GlobalExplorer.Library.Initialize();
-			_GlobalExplorer.Settings.InitializeContainer();
-			if(
-				null == _GlobalExplorer.Settings.Container ||
-				false == EditorPlugin.IsInstanceValid( _GlobalExplorer.Settings.Container )
-			) 
+			if( SettingsUtils.Get().FolderCount != 0 ) 
 			{
-				GD.PushError("Invalid Group Container");
-			}
+				_GlobalExplorer.Settings.InitializeContainer();
+				if(
+					null == _GlobalExplorer.Settings.Container ||
+					false == EditorPlugin.IsInstanceValid( _GlobalExplorer.Settings.Container )
+				) 
+				{
+					GD.PushError("Invalid Settings Container");
+				}
 			
-			_GlobalExplorer.BottomDock.Add(_GlobalExplorer.Settings.Container);
+				_GlobalExplorer.BottomDock.Add(_GlobalExplorer.Settings.Container);
+			}
 		}
 		
 		public void dispose()
