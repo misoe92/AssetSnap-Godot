@@ -31,13 +31,20 @@ namespace AssetSnap.Component
 	using AssetSnap.Explorer;
 
 	[Tool]
-	public partial class Base
+	public partial class Base : Node, ISerializationListener
 	{
-		private static Godot.Collections.Array<string> _ComponentTypes = new();
-		private static Godot.Collections.Dictionary<string, GodotObject> _Components = new();
-		private static Godot.Collections.Array<GodotObject> _Instances = new();
-		public static Godot.Collections.Dictionary<string, GodotObject> Components { get => _Components; set => _Components = value; }	
-		public static Godot.Collections.Array<GodotObject> Instances { get => _Instances; set => _Instances = value; }	
+		private Godot.Collections.Array<string> _ComponentTypes = new();
+		private Godot.Collections.Array<GodotObject> _DisposeQueue = new();
+		private Godot.Collections.Dictionary<string, GodotObject> _Components = new();
+		private Godot.Collections.Array<GodotObject> _Instances = new();
+		[Export]
+		public Godot.Collections.Array<string> ComponentTypes { get => _ComponentTypes; set => _ComponentTypes = value; }	
+		[Export]
+		public Godot.Collections.Array<GodotObject> DisposeQueue { get => _DisposeQueue; set => _DisposeQueue = value; }	
+		[Export]
+		public Godot.Collections.Dictionary<string, GodotObject> Components { get => _Components; set => _Components = value; }	
+		[Export]
+		public Godot.Collections.Array<GodotObject> Instances { get => _Instances; set => _Instances = value; }	
 		
 		private static Base _Instance = null;
 		public static Base Singleton
@@ -214,24 +221,57 @@ namespace AssetSnap.Component
 			return null;
 		}
 		
-		public void Clear<T>()
+		public void ClearInstance( BaseComponent instance ) 
+		{
+			if( Instances.Contains( instance ) ) 
+			{
+				Instances.Remove(instance);
+			}
+		}
+		
+		public void Clear<T>( bool debug = false)
 		{
 			string key = typeof(T).FullName.Replace("AssetSnap.Front.Components.", "").Split(".").Join("");
 			
 			if( false == Has(key) ) 
 			{
+				if( debug ) 
+				{
+					GD.PushError("Found nothing to clear: ", key);
+				}
+
+				return;
+			}
+			
+			if( false == _Components.ContainsKey(key) ) 
+			{
+				if( debug ) 
+				{
+					GD.PushError("Found nothing to clear: ", key);
+				}
+				
+				return;
+			}
+			
+			if( false == EditorPlugin.IsInstanceValid(_Components[key]) ) 
+			{
+				_Components.Remove(key);
+				if( debug ) 
+				{
+					GD.PushError("Cannot clear disposed object: ", key);
+				}
+				
 				return;
 			}
 			
 			BaseComponent component = _Components[key] as BaseComponent;
-
-			component.Clear();
-			
-			component.GetParent().RemoveChild(component);
-			component.QueueFree();
 			
 			_Components.Remove(key);
-			_Components.Add(key, Activator.CreateInstance<T>() as BaseComponent);
+			_DisposeQueue.Add(component);
+			component.Clear();
+			component.GetParent().RemoveChild(component);
+			
+			// _Components.Add(key, Activator.CreateInstance<T>() as BaseComponent);
 		}
 		
 		/*
@@ -266,7 +306,7 @@ namespace AssetSnap.Component
 							_node.GetParent().RemoveChild(_node);
 						}
 						
-						_node.QueueFree();
+						_node.Free();
 					}
 				} 
 			}
@@ -276,6 +316,7 @@ namespace AssetSnap.Component
 			{
 				BaseComponent component = Activator.CreateInstance<T>() as BaseComponent;
 				component.Name = component.Name + _Instances.Count;
+				component.TypeString = typeof(T).ToString();
 				if( null != component.GetParent() && component.GetParent() == Plugin.Singleton
 				.GetInternalContainer() ) 
 				{
@@ -292,25 +333,27 @@ namespace AssetSnap.Component
 			}
 			else 
 			{
-				BaseComponent component = _Components[key] as BaseComponent;
-				if (component is T typedComponent)
+				if( _Components.ContainsKey(key) && _Components[key] is BaseComponent component) 
 				{
-					if(
-						null != component.GetParent() &&
-						component.GetParent() == Plugin.Singleton.GetInternalContainer()
-					) 
+					if (component is T typedComponent)
 					{
-						Plugin.Singleton
-							.GetInternalContainer()
-							.RemoveChild(component);
+						if(
+							null != component.GetParent() &&
+							component.GetParent() == Plugin.Singleton.GetInternalContainer()
+						) 
+						{
+							Plugin.Singleton
+								.GetInternalContainer()
+								.RemoveChild(component);
+						}
+						
+						return typedComponent;
 					}
-					
-					return typedComponent;
-				}
-				else
-				{
-					// Handle the case where conversion is not possible
-					return default(T);
+					else
+					{
+						// Handle the case where conversion is not possible
+						return default(T);
+					}
 				}
 			} 
 			return default(T);
@@ -359,22 +402,27 @@ namespace AssetSnap.Component
 				Type classType = Type.GetType(key);
 				BaseComponent component = Activator.CreateInstance(classType) as BaseComponent;
 				component.Name = component.Name + _Instances.Count;
+				component.TypeString = classType.ToString();
 				
 				_Instances.Add(component);
 				return component;
 			} 
 			else 
 			{
-				BaseComponent component = _Components[keyName.Split(".").Join("")] as BaseComponent;
-				if (component is BaseComponent typedComponent)
+				if( EditorPlugin.IsInstanceValid( _Components[keyName.Split(".").Join("")] ) && _Components[keyName.Split(".").Join("")] is BaseComponent component ) 
 				{
-					return typedComponent;
+					if (component is BaseComponent typedComponent)
+					{
+						return typedComponent;
+					}
+					else
+					{
+						// Handle the case where conversion is not possible
+						return null;
+					}
 				}
-				else
-				{
-					// Handle the case where conversion is not possible
-					return null;
-				}
+				
+				return null;
 			}
 		}
 
@@ -439,6 +487,16 @@ namespace AssetSnap.Component
 			}
 			
 			return true;
+		}
+		
+		
+		public void OnBeforeSerialize()
+		{
+			//
+		}
+		public void OnAfterDeserialize()
+		{
+			_Instance = this;
 		}
 	}
 }
