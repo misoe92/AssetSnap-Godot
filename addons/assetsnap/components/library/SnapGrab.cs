@@ -25,13 +25,17 @@ namespace AssetSnap.Front.Components.Library
 	using Godot;
 	using AssetSnap.Component;
 	using AssetSnap.Front.Nodes;
+    using AssetSnap.Explorer;
 
-	[Tool]
+    [Tool]
 	public partial class SnapGrab : LibraryComponent
 	{
 		public SnapGrab()
 		{
 			Name = "LibrarySnapGrab";
+			
+			UsingTraits = new(){};
+		
 			//_include = false;  
 		}
 	
@@ -49,8 +53,8 @@ namespace AssetSnap.Front.Components.Library
 			}
 			
 			if(
-				null == _GlobalExplorer ||
-				false == EditorPlugin.IsInstanceValid( _GlobalExplorer.GetHandle() )
+				null == ExplorerUtils.Get() ||
+				false == EditorPlugin.IsInstanceValid( ExplorerUtils.Get().GetHandle() )
 			) 
 			{ 
 				return;
@@ -70,7 +74,7 @@ namespace AssetSnap.Front.Components.Library
 
 				if( _Node is AsMeshInstance3D _MeshInstance3D ) 
 				{
-					CurrentLibrary = _GlobalExplorer.GetLibraryByName( _MeshInstance3D.GetLibraryName() );
+					CurrentLibrary = ExplorerUtils.Get().GetLibraryByName( _MeshInstance3D.GetLibraryName() );
 					if( null == CurrentLibrary ) 
 					{
 						GD.PushWarning("No library");
@@ -88,7 +92,7 @@ namespace AssetSnap.Front.Components.Library
 						return;
 					}
 
-					_GlobalExplorer.SetFocusToNode(_MeshInstance3D);
+					ExplorerUtils.Get().SetFocusToNode(_MeshInstance3D);
 
 					if ( null != Parent && Parent is AsStaticBody3D ) 
 					{
@@ -113,7 +117,7 @@ namespace AssetSnap.Front.Components.Library
 						return;
 					}
 					
-					_GlobalExplorer.SetFocusToNode(newGroup3D);
+					ExplorerUtils.Get().SetFocusToNode(newGroup3D);
 				} 
 			}
 		}
@@ -126,12 +130,12 @@ namespace AssetSnap.Front.Components.Library
 		*/
 		private bool _ShouldGrab()
 		{
-			if( null == _GlobalExplorer || null == _GlobalExplorer.Settings ) 
+			if( null == ExplorerUtils.Get() || null == ExplorerUtils.Get().Settings ) 
 			{
 				return false; 
 			}
 			
-			bool ModelGrab = _GlobalExplorer.Settings.GetKey("allow_model_grab").As<bool>();
+			bool ModelGrab = ExplorerUtils.Get().Settings.GetKey("allow_model_grab").As<bool>();
 			return ModelGrab;
 		}
 	}

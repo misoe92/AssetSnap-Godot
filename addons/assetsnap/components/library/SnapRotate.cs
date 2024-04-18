@@ -25,8 +25,9 @@ namespace AssetSnap.Front.Components.Library
 	using Godot;
 	using AssetSnap.Component;
 	using AssetSnap.Front.Nodes;
+    using AssetSnap.Explorer;
 
-	[Tool]
+    [Tool]
 	public partial class SnapRotate : LibraryComponent
 	{
 		public bool value = false;
@@ -40,6 +41,9 @@ namespace AssetSnap.Front.Components.Library
 		public SnapRotate()
 		{
 			Name = "LibrarySnapRotate";
+			
+			UsingTraits = new(){};
+			
 			//_include = false;  
 		}
 		
@@ -52,17 +56,17 @@ namespace AssetSnap.Front.Components.Library
 		{
 			base.Initialize();
 			
-			if( _GlobalExplorer == null )
+			if( ExplorerUtils.Get() == null )
 			{
 				return;
 			}
 			
-			if( null == _GlobalExplorer.ContextMenu ) 
+			if( null == ExplorerUtils.Get().ContextMenu ) 
 			{
 				return;
 			}
 
-			ContextMenu.Base ContextMenu = _GlobalExplorer.ContextMenu;
+			ContextMenu.Base ContextMenu = ExplorerUtils.Get().ContextMenu;
 			
 			value = false;
 			RotationX = 0.0f;
@@ -84,14 +88,14 @@ namespace AssetSnap.Front.Components.Library
 		*/
 		private void _OnListStateChange( string which ) 
 		{
-			if( null == _GlobalExplorer.ContextMenu ) 
+			if( null == ExplorerUtils.Get().ContextMenu ) 
 			{
 				return;
 			}
 			
 			if( which == "Rotate" )  
 			{
-				Vector3 _Rotation = _GlobalExplorer.ContextMenu.GetRotateValues();
+				Vector3 _Rotation = ExplorerUtils.Get().ContextMenu.GetRotateValues();
 				
 				RotationX = _Rotation.X;
 				RotationY = _Rotation.Y;
@@ -114,9 +118,9 @@ namespace AssetSnap.Front.Components.Library
 		public override void _Input(InputEvent @event)
 		{
 			if(
-				null == _GlobalExplorer ||
-				false == EditorPlugin.IsInstanceValid( _GlobalExplorer.Model )  &&
-				false == EditorPlugin.IsInstanceValid( _GlobalExplorer.HandleNode )
+				null == ExplorerUtils.Get() ||
+				false == EditorPlugin.IsInstanceValid( ExplorerUtils.Get().Model )  &&
+				false == EditorPlugin.IsInstanceValid( ExplorerUtils.Get().HandleNode )
 			) 
 			{ 
 				return;
@@ -126,12 +130,12 @@ namespace AssetSnap.Front.Components.Library
 			InputEvent Event = @event;
 			CurrentEvent = Event;
 			
-			int angle = _GlobalExplorer.ContextMenu.GetCurrentAngle();
+			int angle = ExplorerUtils.Get().ContextMenu.GetCurrentAngle();
 			
-			Node3D Handle = _GlobalExplorer.Model; 
-			if( null == Handle && null != _GlobalExplorer.Model )
+			Node3D Handle = ExplorerUtils.Get().Model; 
+			if( null == Handle && null != ExplorerUtils.Get().Model )
 			{
-				Handle = _GlobalExplorer.HandleNode as Node3D;
+				Handle = ExplorerUtils.Get().HandleNode as Node3D;
 			}
 
 			if( null == Handle ) 
@@ -144,22 +148,22 @@ namespace AssetSnap.Front.Components.Library
 			if( ShouldRotateAll(angle) ) 
 			{
 				DoRotateAll(Value, Handle);
-				_GlobalExplorer.AllowScroll = Abstracts.AbstractExplorerBase.ScrollState.SCROLL_DISABLED;
+				ExplorerUtils.Get().AllowScroll = Abstracts.AbstractExplorerBase.ScrollState.SCROLL_DISABLED;
 			}
 			else if( ShouldRotateX(angle) ) 
 			{
 				DoRotateX(Value, Handle);
-				_GlobalExplorer.AllowScroll = Abstracts.AbstractExplorerBase.ScrollState.SCROLL_DISABLED;
+				ExplorerUtils.Get().AllowScroll = Abstracts.AbstractExplorerBase.ScrollState.SCROLL_DISABLED;
 			}
 			else if( ShouldRotateY(angle) ) 
 			{
 				DoRotateY(Value, Handle);
-				_GlobalExplorer.AllowScroll = Abstracts.AbstractExplorerBase.ScrollState.SCROLL_DISABLED;
+				ExplorerUtils.Get().AllowScroll = Abstracts.AbstractExplorerBase.ScrollState.SCROLL_DISABLED;
 			}
 			else if( ShouldRotateZ(angle) ) 
 			{
 				DoRotateZ(Value, Handle);
-				_GlobalExplorer.AllowScroll = Abstracts.AbstractExplorerBase.ScrollState.SCROLL_DISABLED;
+				ExplorerUtils.Get().AllowScroll = Abstracts.AbstractExplorerBase.ScrollState.SCROLL_DISABLED;
 			}
 		}
 		
@@ -192,7 +196,7 @@ namespace AssetSnap.Front.Components.Library
 				RotationY = _RotationDegrees.Y;
 				RotationZ = _RotationDegrees.Z;
 			}
-			_GlobalExplorer.ContextMenu.SetRotationValues(_RotationDegrees);
+			ExplorerUtils.Get().ContextMenu.SetRotationValues(_RotationDegrees);
 		}
 		
 		/*
@@ -206,13 +210,13 @@ namespace AssetSnap.Front.Components.Library
 			{
 				Vector3 _RotationDegrees = Apply("X", Rotation, RotationX, 0);
 				RotationX = _RotationDegrees.X;
-				_GlobalExplorer.ContextMenu.SetRotationValues(_RotationDegrees);
+				ExplorerUtils.Get().ContextMenu.SetRotationValues(_RotationDegrees);
 			}
 			else if( IsWheelDown() )
 			{
 				Vector3 _RotationDegrees = Apply("X", Rotation, RotationX, 0, true);
 				RotationX = _RotationDegrees.X;
-				_GlobalExplorer.ContextMenu.SetRotationValues(_RotationDegrees);
+				ExplorerUtils.Get().ContextMenu.SetRotationValues(_RotationDegrees);
 			}
 		}
 		
@@ -227,13 +231,13 @@ namespace AssetSnap.Front.Components.Library
 			{
 				Vector3 _RotationDegrees = Apply("Y", Rotation, RotationY, 0);
 				RotationY = _RotationDegrees.Y;
-				_GlobalExplorer.ContextMenu.SetRotationValues(_RotationDegrees);
+				ExplorerUtils.Get().ContextMenu.SetRotationValues(_RotationDegrees);
 			}
 			else if( IsWheelDown() ) 
 			{
 				Vector3 _RotationDegrees = Apply("Y", Rotation, RotationY, 0, true);
 				RotationY = _RotationDegrees.Y;
-				_GlobalExplorer.ContextMenu.SetRotationValues(_RotationDegrees);
+				ExplorerUtils.Get().ContextMenu.SetRotationValues(_RotationDegrees);
 			}
 		}
 		
@@ -248,13 +252,13 @@ namespace AssetSnap.Front.Components.Library
 			{
 				Vector3 _RotationDegrees = Apply("Z", Rotation, RotationZ, 0);
 				RotationZ = _RotationDegrees.Z;
-				_GlobalExplorer.ContextMenu.SetRotationValues(_RotationDegrees);
+				ExplorerUtils.Get().ContextMenu.SetRotationValues(_RotationDegrees);
 			}
 			else if( IsWheelDown() )
 			{
 				Vector3 _RotationDegrees = Apply("Z", Rotation, RotationZ, 0, true);
 				RotationZ = _RotationDegrees.Z;
-				_GlobalExplorer.ContextMenu.SetRotationValues(_RotationDegrees);
+				ExplorerUtils.Get().ContextMenu.SetRotationValues(_RotationDegrees);
 			}
 		}
 		

@@ -25,8 +25,9 @@ namespace AssetSnap.Front.Components.Library
 	using Godot;
 	using AssetSnap.Component;
 	using AssetSnap.Front.Nodes;
+    using AssetSnap.Explorer;
 
-	[Tool]
+    [Tool]
 	public partial class SnapScale : LibraryComponent
 	{ 
 		private float SnapHeight;
@@ -42,6 +43,9 @@ namespace AssetSnap.Front.Components.Library
 		public SnapScale()
 		{
 			Name = "LibrarySnapScale";
+			
+			UsingTraits = new(){};
+			
 			//_include = false; 
 		}
 		
@@ -54,17 +58,17 @@ namespace AssetSnap.Front.Components.Library
 		{
 			base.Initialize();
 			
-			if( _GlobalExplorer == null ) 
+			if( ExplorerUtils.Get() == null ) 
 			{
 				return;
 			}
 			
-			if( null == _GlobalExplorer.ContextMenu ) 
+			if( null == ExplorerUtils.Get().ContextMenu ) 
 			{
 				return;
 			}
 			
-			ContextMenu.Base ContextMenu = _GlobalExplorer.ContextMenu;
+			ContextMenu.Base ContextMenu = ExplorerUtils.Get().ContextMenu;
 			
 			ScaleX = 0.0f;
 			ScaleY = 0.0f; 
@@ -87,7 +91,7 @@ namespace AssetSnap.Front.Components.Library
 		*/
 		private void _OnScaleListStateChange( string which )
 		{
-			if( null == _GlobalExplorer.ContextMenu ) 
+			if( null == ExplorerUtils.Get().ContextMenu ) 
 			{
 				return;
 			}
@@ -96,7 +100,7 @@ namespace AssetSnap.Front.Components.Library
 			{
 				value = true;
 				
-				Vector3 _Scale = GlobalExplorer.GetInstance().ContextMenu.GetScaleValues();
+				Vector3 _Scale = ExplorerUtils.Get().ContextMenu.GetScaleValues();
 				
 				ScaleX = _Scale.X;
 				ScaleY = _Scale.Y;
@@ -122,9 +126,9 @@ namespace AssetSnap.Front.Components.Library
 		public override void _Input(InputEvent @event)
 		{
 			if(
-				null == _GlobalExplorer ||
-				false == EditorPlugin.IsInstanceValid( _GlobalExplorer.Model )  &&
-				false == EditorPlugin.IsInstanceValid( _GlobalExplorer.HandleNode )
+				null == ExplorerUtils.Get() ||
+				false == EditorPlugin.IsInstanceValid( ExplorerUtils.Get().Model )  &&
+				false == EditorPlugin.IsInstanceValid( ExplorerUtils.Get().HandleNode )
 			) 
 			{ 
 				return;
@@ -132,12 +136,12 @@ namespace AssetSnap.Front.Components.Library
 
 			InputEvent Event = @event; 
 			CurrentEvent = Event; 
-			int angle = _GlobalExplorer.ContextMenu.GetCurrentAngle();
-			Node3D Handle = _GlobalExplorer.HandleNode as Node3D;
+			int angle = ExplorerUtils.Get().ContextMenu.GetCurrentAngle();
+			Node3D Handle = ExplorerUtils.Get().HandleNode as Node3D;
 			
-			if( null == Handle && null != _GlobalExplorer.Model )
+			if( null == Handle && null != ExplorerUtils.Get().Model )
 			{ 
-				Handle = _GlobalExplorer.Model;
+				Handle = ExplorerUtils.Get().Model;
 			}
 			
 			if ( null == Handle ) 
@@ -148,22 +152,22 @@ namespace AssetSnap.Front.Components.Library
 			if( ShouldScaleAll(angle) ) 
 			{
 				DoScaleAll(Handle);
-				_GlobalExplorer.AllowScroll = Abstracts.AbstractExplorerBase.ScrollState.SCROLL_DISABLED;
+				ExplorerUtils.Get().AllowScroll = Abstracts.AbstractExplorerBase.ScrollState.SCROLL_DISABLED;
 			}
 			else if( ShouldScaleX(angle) ) 
 			{
 				DoScaleX(Handle);
-				_GlobalExplorer.AllowScroll = Abstracts.AbstractExplorerBase.ScrollState.SCROLL_DISABLED;
+				ExplorerUtils.Get().AllowScroll = Abstracts.AbstractExplorerBase.ScrollState.SCROLL_DISABLED;
 			}
 			else if( ShouldScaleY(angle) ) 
 			{
 				DoScaleY(Handle);
-				_GlobalExplorer.AllowScroll = Abstracts.AbstractExplorerBase.ScrollState.SCROLL_DISABLED;
+				ExplorerUtils.Get().AllowScroll = Abstracts.AbstractExplorerBase.ScrollState.SCROLL_DISABLED;
 			}
 			else if( ShouldScaleZ(angle) ) 
 			{
 				DoScaleZ(Handle);
-				_GlobalExplorer.AllowScroll = Abstracts.AbstractExplorerBase.ScrollState.SCROLL_DISABLED;
+				ExplorerUtils.Get().AllowScroll = Abstracts.AbstractExplorerBase.ScrollState.SCROLL_DISABLED;
 			}
 
 			base._Input(@event);
@@ -176,7 +180,7 @@ namespace AssetSnap.Front.Components.Library
 		*/
 		public void DoScaleAll( Node3D Handle )
 		{
-			Vector3 _Scale = _GlobalExplorer.ContextMenu.GetScaleValues();
+			Vector3 _Scale = ExplorerUtils.Get().ContextMenu.GetScaleValues();
 			if( IsWheelUp() ) 
 			{
 				_Scale = Apply("X", _Scale, ScaleX, 0);
@@ -198,7 +202,7 @@ namespace AssetSnap.Front.Components.Library
 				ScaleZ = _Scale.Z;
 			}
 
-			_GlobalExplorer.ContextMenu.SetScaleValues(_Scale);
+			ExplorerUtils.Get().ContextMenu.SetScaleValues(_Scale);
 				
 			if( Handle is AssetSnap.Front.Nodes.AsMeshInstance3D asMeshInstance3D) 
 			{
@@ -213,7 +217,7 @@ namespace AssetSnap.Front.Components.Library
 		*/
 		public void DoScaleX( Node3D Handle )
 		{
-			Vector3 _Scale = _GlobalExplorer.ContextMenu.GetScaleValues();
+			Vector3 _Scale = ExplorerUtils.Get().ContextMenu.GetScaleValues();
 			
 			if( IsWheelUp() ) 
 			{
@@ -226,7 +230,7 @@ namespace AssetSnap.Front.Components.Library
 				ScaleX = _Scale.X;
 			}
 			
-			_GlobalExplorer.ContextMenu.SetScaleValues(_Scale);
+			ExplorerUtils.Get().ContextMenu.SetScaleValues(_Scale);
 				
 			if( Handle is AssetSnap.Front.Nodes.AsMeshInstance3D asMeshInstance3D) 
 			{
@@ -241,7 +245,7 @@ namespace AssetSnap.Front.Components.Library
 		*/
 		public void DoScaleY( Node3D Handle )
 		{
-			Vector3 _Scale = _GlobalExplorer.ContextMenu.GetScaleValues();
+			Vector3 _Scale = ExplorerUtils.Get().ContextMenu.GetScaleValues();
 			
 			if( IsWheelUp() ) 
 			{
@@ -254,7 +258,7 @@ namespace AssetSnap.Front.Components.Library
 				ScaleY = _Scale.Y;
 			}
 			
-			_GlobalExplorer.ContextMenu.SetScaleValues(_Scale);
+			ExplorerUtils.Get().ContextMenu.SetScaleValues(_Scale);
 				
 			if( Handle is AssetSnap.Front.Nodes.AsMeshInstance3D asMeshInstance3D) 
 			{
@@ -269,7 +273,7 @@ namespace AssetSnap.Front.Components.Library
 		*/
 		public void DoScaleZ( Node3D Handle )
 		{
-			Vector3 _Scale = _GlobalExplorer.ContextMenu.GetScaleValues();
+			Vector3 _Scale = ExplorerUtils.Get().ContextMenu.GetScaleValues();
 			
 			if( IsWheelUp() ) 	
 			{
@@ -282,7 +286,7 @@ namespace AssetSnap.Front.Components.Library
 				ScaleZ = _Scale.Z;
 			}
 			
-			_GlobalExplorer.ContextMenu.SetScaleValues(_Scale);
+			ExplorerUtils.Get().ContextMenu.SetScaleValues(_Scale);
 			
 			if( Handle is AssetSnap.Front.Nodes.AsMeshInstance3D asMeshInstance3D) 
 			{
