@@ -34,6 +34,9 @@ namespace AssetSnap.Library
 		public delegate void ItemCountUpdatedEventHandler( int count );
 		
 		public int Index;
+		
+		[Export]
+		public string _Name;
 
 		[Export]
 		public string _Folder;
@@ -116,9 +119,17 @@ namespace AssetSnap.Library
 		
 		public Instance()
 		{
-			Name = "LibraryInstance";
 			SizeFlagsVertical = SizeFlags.ExpandFill;
 			SizeFlagsHorizontal = SizeFlags.ExpandFill;
+			
+			// if( null != _Name ) 
+			// {
+			// 	Name = _Name;
+			// }
+			// else 
+			// {
+			// 	Name = "Invalid";
+			// }
 		}
 
 		public void Clear(bool debug = false)
@@ -179,7 +190,7 @@ namespace AssetSnap.Library
 			{
 				SizeFlagsVertical = SizeFlags.ExpandFill,
 				SizeFlagsHorizontal = SizeFlags.ExpandFill,
-				Name = _FileName.Capitalize()
+				Name = _FileName.Capitalize(),
 			}; 
 			
 			_SetupLibraryBody();

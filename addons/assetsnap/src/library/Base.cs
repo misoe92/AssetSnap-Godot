@@ -31,7 +31,8 @@ namespace AssetSnap.Library
 	[Tool]
 	public partial class Base : Node
 	{
-		private Instance[] _Libraries = Array.Empty<Instance>();
+		[Export]
+		public Godot.Collections.Array<Instance> _Libraries = new();
 
 		private static Base _Instance;
 		
@@ -46,7 +47,7 @@ namespace AssetSnap.Library
 			}
 		}
 		
-		public Instance[] Libraries 
+		public Godot.Collections.Array<Instance> Libraries 
 		{
 			get => _Libraries;
 		}
@@ -62,8 +63,6 @@ namespace AssetSnap.Library
 			{
 				RemoveLibrary(instance.Folder);
 			}
-			
-			_Libraries = Array.Empty<Instance>();
 			
 			/** Initialize libraries **/
 			if( ExplorerUtils.Get().Settings.FolderCount != 0 ) 
@@ -105,15 +104,10 @@ namespace AssetSnap.Library
 			};
 
 			_Base.Name = _Base.FileName.Capitalize();
+			_Base._Name = _Base.FileName.Capitalize();
 
-			_Base.Initialize(); 
-			
-			List<Instance> _LibrariesList = new(_Libraries)
-			{
-				_Base
-			}; 
-
-			_Libraries = _LibrariesList.ToArray();
+			_Base.Initialize();
+			_Libraries.Remove(_Base);
 		}
 		
 		private bool AlreadyHaveFolder( string Folder )

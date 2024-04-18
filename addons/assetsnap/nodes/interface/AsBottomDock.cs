@@ -47,7 +47,7 @@ namespace AssetSnap.Front.Nodes
 		private readonly Theme _Theme = GD.Load<Theme>(ThemePath);
 		public new Control.SizeFlags SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
 		public new Control.SizeFlags SizeFlagsVertical = Control.SizeFlags.ExpandFill;
-		private readonly Callable _callable = Callable.From((long index) => { _OnTabChanged(index); } );
+		private readonly Callable _callable = Callable.From((int index) => { _OnTabChanged(index); } );
 		
 		public override void _EnterTree()
 		{
@@ -192,7 +192,7 @@ namespace AssetSnap.Front.Nodes
 			}
 		}
 			
-		private static void _OnTabChanged( long index )
+		private static void _OnTabChanged( int index )
 		{
 			if( 
 				null == GlobalExplorer.GetInstance() ||
