@@ -102,30 +102,6 @@ namespace AssetSnap.Front.Components.Groups.Builder
 				);
 		}
 		
-		public override void Clear()
-		{
-			Topbar.Clear();
-			Listing.Clear();
-			GroupOptions.Clear();
-			
-			if( Topbar.GetParent() == this ) 
-			{
-				RemoveChild(Topbar);
-			}
-			
-			if( Listing.GetParent() == this ) 
-			{
-				RemoveChild(Listing);
-			}
-			
-			if( GroupOptions.GetParent() == this ) 
-			{
-				RemoveChild(GroupOptions);
-			}
-
-			base.Clear();
-		}
-		
 		public void Update()
 		{
 			Topbar.Update();
