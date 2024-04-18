@@ -102,9 +102,9 @@ namespace AssetSnap
 			return null;
 		}
 		
-		public Library.Instance GetLibraryByIndex( long index )
+		public Library.Instance GetLibraryByIndex( int index )
 		{
-			if( index > -1 && Library.Libraries.Length > index && EditorPlugin.IsInstanceValid(Library.Libraries[index]) ) 
+			if( index > -1 && Library.Libraries.Count > index && EditorPlugin.IsInstanceValid(Library.Libraries[index]) ) 
 			{
 				return Library.Libraries[index];
 			}
