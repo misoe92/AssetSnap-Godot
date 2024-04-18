@@ -87,7 +87,7 @@ namespace AssetSnap.Front.Components.Library
 			ItemCount = count;
 			
 			if( 
-				HasTrait<Labelable>(true) &&
+				HasTrait<Labelable>() &&
 				Trait<Labelable>().Select(0).IsValid()
 			) 
 			{
