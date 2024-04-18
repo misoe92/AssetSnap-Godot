@@ -67,119 +67,27 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			//_include = false;
 		}
 		
-		public override void Clear()
+		private void RemoveOptionInstance( GroupOptionComponent _object, bool debug = false )
 		{
-			_GroupBuilderEditorGroupOptionSnapToObject.Clear();
-			_GroupBuilderEditorGroupOptionSnapLayer.Clear();
-			_GroupBuilderEditorGroupOptionSnapToObjectOffsetX.Clear();
-			_GroupBuilderEditorGroupOptionSnapToObjectOffsetZ.Clear();
-			_GroupBuilderEditorGroupOptionSnapToHeight.Clear();
-			_GroupBuilderEditorGroupOptionSnapToHeightValue.Clear();
-			_GroupBuilderEditorGroupOptionSnapToX.Clear();
-			_GroupBuilderEditorGroupOptionSnapToXValue.Clear();
-			_GroupBuilderEditorGroupOptionSnapToZ.Clear();
-			_GroupBuilderEditorGroupOptionSnapToZValue.Clear();
-			_GroupBuilderEditorGroupOptionSphereCollision.Clear();
-			_GroupBuilderEditorGroupOptionConcaveCollision.Clear();
-			_GroupBuilderEditorGroupOptionConvexCollision.Clear();
-			_GroupBuilderEditorGroupOptionConvexClean.Clear();
-			_GroupBuilderEditorGroupOptionConvexSimplify.Clear();
-			_GroupBuilderEditorGroupOptionDragOffset.Clear();
-			_GroupBuilderEditorGroupOptionPlacementSimple.Clear();
-			_GroupBuilderEditorGroupOptionPlacementOptimized.Clear();
-			
-						
-			if( _GroupBuilderEditorGroupOptionSnapToObject.GetParent() == this ) 
+			if(
+				EditorPlugin.IsInstanceValid(_object) && 
+				_object.GetParent() == this
+			) 
 			{
-				RemoveChild(_GroupBuilderEditorGroupOptionSnapToObject);
+				_object.Clear(debug);
+				RemoveChild(_object);
 			}
-			
-			if( _GroupBuilderEditorGroupOptionSnapLayer.GetParent() == this ) 
+		}
+		
+		private void ClearOptionInstance( GroupOptionComponent _object, bool debug = false )
+		{
+			if(
+				EditorPlugin.IsInstanceValid(_object) && 
+				_object.GetParent() == this
+			) 
 			{
-				RemoveChild(_GroupBuilderEditorGroupOptionSnapLayer);
+				_object.Free();
 			}
-			
-			if( _GroupBuilderEditorGroupOptionSnapToObjectOffsetX.GetParent() == this ) 
-			{
-				RemoveChild(_GroupBuilderEditorGroupOptionSnapToObjectOffsetX);
-			}
-
-			if( _GroupBuilderEditorGroupOptionSnapToObjectOffsetZ.GetParent() == this ) 
-			{
-				RemoveChild(_GroupBuilderEditorGroupOptionSnapToObjectOffsetZ);
-			}
-			
-			if( _GroupBuilderEditorGroupOptionSnapToHeight.GetParent() == this ) 
-			{
-				RemoveChild(_GroupBuilderEditorGroupOptionSnapToHeight);
-			}
-			
-			if( _GroupBuilderEditorGroupOptionSnapToHeightValue.GetParent() == this ) 
-			{
-				RemoveChild(_GroupBuilderEditorGroupOptionSnapToHeightValue);
-			}
-
-			if( _GroupBuilderEditorGroupOptionSnapToX.GetParent() == this ) 
-			{
-				RemoveChild(_GroupBuilderEditorGroupOptionSnapToX);
-			}
-			
-			if( _GroupBuilderEditorGroupOptionSnapToXValue.GetParent() == this ) 
-			{
-				RemoveChild(_GroupBuilderEditorGroupOptionSnapToXValue);
-			}
-			
-			if( _GroupBuilderEditorGroupOptionSnapToZ.GetParent() == this ) 
-			{
-				RemoveChild(_GroupBuilderEditorGroupOptionSnapToZ);
-			}
-			
-			if( _GroupBuilderEditorGroupOptionSnapToZValue.GetParent() == this ) 
-			{
-				RemoveChild(_GroupBuilderEditorGroupOptionSnapToZValue);
-			}
-
-			if( _GroupBuilderEditorGroupOptionSphereCollision.GetParent() == this ) 
-			{
-				RemoveChild(_GroupBuilderEditorGroupOptionSphereCollision);
-			}
-			
-			if( _GroupBuilderEditorGroupOptionConcaveCollision.GetParent() == this ) 
-			{
-				RemoveChild(_GroupBuilderEditorGroupOptionConcaveCollision);
-			}
-			
-			if( _GroupBuilderEditorGroupOptionConvexCollision.GetParent() == this ) 
-			{
-				RemoveChild(_GroupBuilderEditorGroupOptionConvexCollision);
-			}
-			
-			if( _GroupBuilderEditorGroupOptionConvexClean.GetParent() == this ) 
-			{
-				RemoveChild(_GroupBuilderEditorGroupOptionConvexClean);
-			}
-
-			if( _GroupBuilderEditorGroupOptionConvexSimplify.GetParent() == this ) 
-			{
-				RemoveChild(_GroupBuilderEditorGroupOptionConvexSimplify);
-			}
-			
-			if( _GroupBuilderEditorGroupOptionDragOffset.GetParent() == this ) 
-			{
-				RemoveChild(_GroupBuilderEditorGroupOptionDragOffset);
-			}
-			
-			if( _GroupBuilderEditorGroupOptionPlacementSimple.GetParent() == this ) 
-			{
-				RemoveChild(_GroupBuilderEditorGroupOptionPlacementSimple);
-			}
-			
-			if( _GroupBuilderEditorGroupOptionPlacementOptimized.GetParent() == this ) 
-			{
-				RemoveChild(_GroupBuilderEditorGroupOptionPlacementOptimized);
-			}
-
-			base.Clear();
 		}
 		
 		public override void Initialize()
