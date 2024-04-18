@@ -91,11 +91,6 @@ namespace AssetSnap.Library
 				return;
 			}
 			
-			if( AlreadyHaveFolder( _Folder ) ) 
-			{
-				CleanOldLibrary(_Folder);
-			}
-			
 			Instance _Base = new()
 			{
 				Folder = _Folder,
@@ -107,7 +102,7 @@ namespace AssetSnap.Library
 			_Base._Name = _Base.FileName.Capitalize();
 
 			_Base.Initialize();
-			_Libraries.Remove(_Base);
+			_Libraries.Add(_Base);
 		}
 		
 		private bool AlreadyHaveFolder( string Folder )
