@@ -168,14 +168,6 @@ namespace AssetSnap.Front.Nodes
 					_AddFolderToLibrary.Initialize();
 				}  
 				
-				LibrariesListing _LibrariesListing = GlobalExplorer.GetInstance().Components.Single<LibrariesListing>();
-				
-				if( _LibrariesListing != null ) 
-				{
-					_LibrariesListing.Container = SubContainerTwo;
-					_LibrariesListing.Initialize();
-				}
-				
 				Contribute Contribute = GlobalExplorer.GetInstance().Components.Single<Contribute>();
 				
 				if( Contribute != null )  
@@ -183,6 +175,20 @@ namespace AssetSnap.Front.Nodes
 					Contribute.Container = SubContainerThree;
 					Contribute.Initialize();
 				}
+				
+				Plugin.Singleton.FoldersLoaded += () => { _OnLoadListing(); };
+			}
+		}
+		
+		private void _OnLoadListing()
+		{
+			GlobalExplorer.GetInstance().Components.Clear<LibrariesListing>();
+			LibrariesListing _LibrariesListing = GlobalExplorer.GetInstance().Components.Single<LibrariesListing>();
+			
+			if( _LibrariesListing != null ) 
+			{
+				_LibrariesListing.Container = SubContainerTwo;
+				_LibrariesListing.Initialize();
 			}
 		}
 			
@@ -198,17 +204,6 @@ namespace AssetSnap.Front.Nodes
 			}
 			
 			GlobalExplorer.GetInstance().States.CurrentLibrary = GlobalExplorer.GetInstance().GetLibraryByIndex(index-1);
-		}
-		
-		public override void _ExitTree()
-		{
-			foreach(Node node in GetChildren() ) 
-			{
-				RemoveChild(node);
-				node.QueueFree();
-			}
-			 
-			base._ExitTree(); 
 		}
 	}
 }
