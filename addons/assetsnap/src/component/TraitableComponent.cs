@@ -35,9 +35,6 @@ namespace AssetSnap.Component
 
 		protected bool Initiated = false;
 
-		[Export]
-		public Godot.Collections.Dictionary<string, int> Iterations = new();
-		
 		public TraitableComponent()
 		{
 			boundTraits = new();
@@ -45,23 +42,21 @@ namespace AssetSnap.Component
 
 		public override void Initialize()
 		{
-			foreach( string traitString in UsingTraits ) 
+			if( false == Initiated ) 
 			{
-				AddTrait(Type.GetType(traitString), Container);
+				foreach( string traitString in UsingTraits ) 
+				{
+					AddTrait(Type.GetType(traitString), Container);
+				}
 			}
 			
 			base.Initialize();
 		}
 
-		public override void Clear()
+		public override void Clear(bool debug = false)
 		{
-			foreach( string traitString in UsingTraits ) 
-			{
-				// GD.Print(traitString);
-				ClearTrait(Type.GetType(traitString), Name);
-			}
-
-			base.Clear();
+			ClearTrait( debug );
+			base.Clear(debug);
 		}
 		
 		public void AddTrait(Type traitType, Node container)
@@ -151,7 +146,7 @@ namespace AssetSnap.Component
 			return false;
 		}
 		
-		public bool ClearTrait<T>( string TraitType, string Owner) 
+		public bool ClearTrait<T>(bool debug = false) 
 		{
 			if( boundTraits.Count == 0 ) 
 			{
@@ -161,20 +156,25 @@ namespace AssetSnap.Component
 	
 			foreach( string traitString in UsingTraits ) 
 			{
-				Trait(Type.GetType(traitString))._Select(0);
-				
-				if( Trait(Type.GetType(traitString)).IsValid() ) 
+				if( debug ) 
 				{
-					Trait(Type.GetType(traitString)).Clear();
-					Trait(Type.GetType(traitString)).Iteration = 0;
-					// GD.Print("Cleared: ", traitString);
+					GD.Print("Clearing trait: ", traitString, "::", Name, "->Count(", boundTraits.Count, ")");
+				}
+			
+				Trait(Type.GetType(traitString)).Clear(-1, debug);
+				Trait(Type.GetType(traitString)).Iteration = 0;
+				boundTraits.Remove(Trait(Type.GetType(traitString)));
+				
+				if( debug ) 
+				{
+					GD.Print("Cleared: ", traitString, "->Count(", boundTraits.Count, ")" );
 				}
 			}
 			
 			return false;
 		}
 		
-		public bool ClearTrait(Type traitType, string Owner) 
+		public bool ClearTrait(bool debug = false) 
 		{
 			if( boundTraits.Count == 0 ) 
 			{
@@ -184,9 +184,21 @@ namespace AssetSnap.Component
 			
 			foreach( string traitString in UsingTraits ) 
 			{
-				Trait(Type.GetType(traitString)).Clear();
+				if( debug ) 
+				{
+					GD.Print("Clearing trait: ", traitString, "::", Name, "->Count(", boundTraits.Count, ")");
+				}
+				
+				Trait(Type.GetType(traitString)).Clear(-1, debug);
+				Trait(Type.GetType(traitString)).Iteration = 0;
+				boundTraits.Remove(Trait(Type.GetType(traitString)));
+				
+				if( debug ) 
+				{
+					GD.Print("Cleared: ", traitString, "->Count(", boundTraits.Count, ")" );
+				}
 			}
-
+			
 			return false;
 		}
 		
@@ -242,8 +254,6 @@ namespace AssetSnap.Component
 				}
 			);
 
-			// GD.Print(traitInstance);
-
 			if( null != traitInstance && traitInstance is Trait.Base traitbase) 
 			{
 				string TypeString = traitbase.GetType().ToString();
@@ -253,14 +263,11 @@ namespace AssetSnap.Component
 					
 			return null;
 		}
-		
-		private void ClearTraits()
+
+		public override void _ExitTree()
 		{
-			for( int i = 0; i < boundTraits.Count; i++) 
-			{
-				Trait.Base traitInstance = boundTraits[i];
-				boundTraits.Remove(traitInstance);
-			}
+			// Clear();
+			base._ExitTree();
 		}
 	}
 }
