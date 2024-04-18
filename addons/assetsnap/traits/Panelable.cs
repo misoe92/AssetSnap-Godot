@@ -317,12 +317,12 @@ namespace AssetSnap.Component
 		
 		public MarginContainer GetContainer()
 		{
-			if( false == Dependencies.ContainsKey(TraitName + "_PaddingContainer") ) 
+			if( false == Dependencies.ContainsKey(TraitName + "_PanelPaddingContainer") ) 
 			{
 				return null;
 			}
 			
-			return Dependencies[TraitName + "_PaddingContainer"].As<MarginContainer>();
+			return Dependencies[TraitName + "_PanelPaddingContainer"].As<MarginContainer>();
 		}
 		
 		/*
