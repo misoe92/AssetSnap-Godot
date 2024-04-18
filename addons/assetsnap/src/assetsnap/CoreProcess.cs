@@ -24,7 +24,6 @@ namespace AssetSnap.Core
 {
 	using AssetSnap.Component;
 	using AssetSnap.Explorer;
-	using AssetSnap.Front.Components;
 	using AssetSnap.Front.Components.Library;
 	using AssetSnap.Front.Components.Library.Sidebar;
 
