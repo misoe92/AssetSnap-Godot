@@ -75,7 +75,7 @@ namespace AssetSnap.Component
 		*/
 		public virtual void Initialize()
 		{
-			if( GetParent() == Container ) 
+			if( null != GetParent()) 
 			{
 				return;
 			}
@@ -203,20 +203,13 @@ namespace AssetSnap.Component
 			return null;
 		}
 				
-		public virtual void Clear()
-		{
-			
-		}
-		
-		public override void _ExitTree()
+		public virtual void Clear( bool debug = false )
 		{
 			ExplorerUtils.Get().Components.Remove(this);
 			if( TypeString != "" ) 
 			{
 				ExplorerUtils.Get().Components.RemoveByTypeString(TypeString);
 			}
-			
-			base._ExitTree();
 		}
 	}
 }

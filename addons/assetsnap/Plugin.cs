@@ -26,25 +26,29 @@ namespace AssetSnap
 	using System;
 	using AssetSnap.ASNode.Types;
 	using AssetSnap.Core;
+	using AssetSnap.Explorer;
 	using AssetSnap.Front.Nodes;
 	using AssetSnap.Trait;
 	using Godot;
-	
+
 	[Tool]
-	public partial class Plugin : EditorPlugin
+	public partial class Plugin : EditorPlugin, ISerializationListener
 	{
 		[Signal]
 		public delegate void FoldersLoadedEventHandler();
-		
+
 		[Signal]
 		public delegate void SettingKeyChangedEventHandler();
-		
+
 		[Signal]
-		public delegate void LibraryChangedEventHandler( string name );
-		
+		public delegate void LibraryChangedEventHandler(string name);
+
 		[Signal]
 		public delegate void StatesChangedEventHandler();
 
+		[Signal]
+		public delegate void OnRemoveFolderEventHandler(string folder);
+		
 		/** Internal data **/
 		private bool disposed = false;
 		private readonly string _Version = "0.1.2";
@@ -97,6 +101,15 @@ namespace AssetSnap
 		public Plugin()
 		{	
 			Name = "AssetSnapPlugin";
+		}
+		
+		public void OnBeforeSerialize()
+		{
+			//
+		}
+		
+		public void OnAfterDeserialize()
+		{
 			_Instance = this;
 		}
 		
@@ -107,6 +120,7 @@ namespace AssetSnap
 		*/ 
 		public override void _EnterTree() 
 		{
+			_Instance = this;
 			AddChild(traitGlobal);
 			if( null == internalNode ) 
 			{
@@ -139,6 +153,13 @@ namespace AssetSnap
 		{
 			// Finalize Initialize of plugin 
 			_CoreEnter.InitializeCore();
+			
+			OnRemoveFolder += (string title ) => { CallDeferred("DoRemoveFolder", title); };
+		}
+		
+		private void DoRemoveFolder(string title ) 
+		{
+			ExplorerUtils.Get().Settings.RemoveFolder(title);
 		}
 	
 		public Node GetInternalContainer() 
@@ -159,6 +180,42 @@ namespace AssetSnap
 		public override void _ExitTree()
 		{
 			disposed = true;
+
+			foreach( GodotObject _object in traitGlobal.DisposeQueue ) 
+			{
+				if( IsInstanceValid(_object) && _object is Node node ) 
+				{
+					if( IsInstanceValid(node) && node.HasMethod( Node.MethodName.Free ) ) 
+					{
+						if( null != node.GetParent() ) 
+						{
+							node.GetParent().RemoveChild(node);
+						}
+
+						node.Free();
+					}
+					else 
+					{
+						GD.Print("Could not free", node.Name);
+					}
+				}
+				else 
+				{
+					GD.Print("Not valid");
+				}
+			}
+			
+			if( ExplorerUtils.Get().Components.DisposeQueue.Count != 0 ) 
+			{
+				foreach( GodotObject gobject in ExplorerUtils.Get().Components.DisposeQueue ) 
+				{
+					if( IsInstanceValid(gobject) && gobject is Node node ) 
+					{
+						node.Free();
+					}
+				}
+			}
+		
 			
 			if( null != _dock ) 
 			{

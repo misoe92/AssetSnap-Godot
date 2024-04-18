@@ -23,6 +23,7 @@
 #if TOOLS
 using System;
 using System.Collections.Generic;
+using AssetSnap.Explorer;
 using Godot;
 
 namespace AssetSnap.Component
@@ -40,7 +41,7 @@ namespace AssetSnap.Component
 			{"top", 0},
 			{"bottom", 25},
 		};
-		private Action<int, BaseComponent> OnIterationAction;
+		private Action<int, GodotObject> OnIterationAction;
 		private string ComponentName = "";
 		private int count = 0;
 		
@@ -64,6 +65,7 @@ namespace AssetSnap.Component
 			
 			VBoxContainer _WorkingNode = new()
 			{
+				Name = "Listable-Container",
 				CustomMinimumSize = CustomMinimumSize,
 				Size = Size,
 			};
@@ -82,12 +84,21 @@ namespace AssetSnap.Component
 				
 				if (GlobalExplorer.GetInstance().Components.HasAll( Components.ToArray() )) 
 				{
-					BaseComponent component = GlobalExplorer.GetInstance().Components.Single(ComponentName, true);
+					GodotObject component = GlobalExplorer.GetInstance().Components.Single(ComponentName, true);
 					
-					if( null != component && EditorPlugin.IsInstanceValid( component ) ) 
+					if( null != component && EditorPlugin.IsInstanceValid( component ) && component is BaseComponent baseComponent ) 
 					{
-						component.Container = _WorkingNode;
-						OnIterationAction(i, component);
+						baseComponent.Container = _WorkingNode;
+						
+						if( null != OnIterationAction ) 
+						{
+							OnIterationAction(i, component);
+						}
+						else 
+						{
+							GD.Print("Iteration action invalid");
+						}
+						
 						_components.Add(component);
 						// AddChild(component);
 					}
@@ -155,7 +166,7 @@ namespace AssetSnap.Component
 		** @param Action<int, BaseComponent> OnIteration
 		** @return Listable
 		*/
-		public Listable Each( Action<int, BaseComponent> OnIteration ) 
+		public Listable Each( Action<int, GodotObject> OnIteration ) 
 		{
 			OnIterationAction = OnIteration;
 			
@@ -269,6 +280,62 @@ namespace AssetSnap.Component
 
 		public override void Clear(int index = 0, bool debug = false)
 		{
+			if( null == TypeString || null == OwnerName || null == Plugin.Singleton || null == Plugin.Singleton.traitGlobal ) 
+			{
+				Dependencies = new();
+				return;
+			}
+
+			if( -1 != index ) 
+			{
+				if( false == Plugin.Singleton.traitGlobal.HasInstance( index, TypeString, OwnerName ) ) 
+				{
+					if( debug ) 
+					{
+						GD.Print("Instance not found, or not valid");
+					}
+					
+					return;
+				}
+				
+				if( debug ) 
+				{
+					GD.Print("Index::", index, TypeString, OwnerName);
+				}
+				Select(index);
+				Godot.Collections.Array<BaseComponent> compArray = Dependencies[TraitName + "_Components"].AsGodotArray<BaseComponent>();
+				
+				foreach( BaseComponent component in compArray ) 
+				{
+					ExplorerUtils.Get().Components.Remove(component);
+				}
+			}
+			else 
+			{
+				Godot.Collections.Dictionary<int, GodotObject> instances = Plugin.Singleton.traitGlobal.AllInstances(TypeString, OwnerName);
+	
+				if( null == instances || instances.Count == 0 ) 
+				{
+					Dependencies = new();
+					return;
+				}
+	
+				foreach( (int idx, GodotObject node) in instances )
+				{
+					if( debug ) 
+					{
+						GD.Print("Index::", idx, TypeString, OwnerName);
+					}
+					Select(idx);
+					Godot.Collections.Array<BaseComponent> compArray = Dependencies[TraitName + "_Components"].AsGodotArray<BaseComponent>();
+					
+					foreach( BaseComponent component in compArray ) 
+					{
+						ExplorerUtils.Get().Components.Remove(component);
+					}
+				}
+			}
+			
 			base.Clear(index, debug);
 		}
 
@@ -285,6 +352,8 @@ namespace AssetSnap.Component
 		private void Reset()
 		{
 			count = 0;
+			ComponentName = "";
+			OnIterationAction = null;
 		}
 	}
 }

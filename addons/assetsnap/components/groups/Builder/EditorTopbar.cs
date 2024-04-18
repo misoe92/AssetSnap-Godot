@@ -36,9 +36,13 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			//_include = false;
 		}	
 		
+		[Export]
 		public EditorTitleInput TitleInput { set; get; }
+		[Export]
 		public EditorPlace PlaceButton { set; get; }
+		[Export]
 		public EditorSave SaveButton { set; get; }
+		[Export]
 		public EditorClose CloseButton { set; get; }
 		
 		private MarginContainer _MarginContainer;
@@ -48,36 +52,6 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		private MarginContainer totalMarginContainer;
 		private Label _TotalItems;
 		
-		public override void Clear()
-		{
-			TitleInput.Clear();
-			PlaceButton.Clear();
-			SaveButton.Clear();
-			CloseButton.Clear();
-			
-			if( null != TitleInput.GetParent() ) 
-			{
-				TitleInput.GetParent().RemoveChild(TitleInput);
-			}
-			
-			if( null != PlaceButton.GetParent() ) 
-			{
-				PlaceButton.GetParent().RemoveChild(PlaceButton);
-			}
-			
-			if( null != SaveButton.GetParent() ) 
-			{
-				SaveButton.GetParent().RemoveChild(SaveButton);
-			}
-
-			if( null != CloseButton.GetParent() ) 
-			{
-				CloseButton.GetParent().RemoveChild(CloseButton);
-			}
-			
-			base.Clear();
-		}
-
 		public override void Initialize()
 		{
 			base.Initialize();

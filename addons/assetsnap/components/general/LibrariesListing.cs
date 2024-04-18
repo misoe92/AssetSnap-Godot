@@ -45,15 +45,15 @@ namespace AssetSnap.Front.Components
 			
 			UsingTraits = new()
 			{
-				{ typeof(Listable).ToString() },
 				{ typeof(Labelable).ToString() },
+				{ typeof(Listable).ToString() },
 				{ typeof(Panelable).ToString() },
 				{ typeof(Containerable).ToString() },
 			};
 		
 			//_include = false;
 		}
-
+		
 		/*
 		** Initialization of the component
 		** 
@@ -61,9 +61,7 @@ namespace AssetSnap.Front.Components
 		*/ 
 		public override void Initialize()
 		{		
-			base.Initialize();
-			
-			_GlobalExplorer._Plugin.FoldersLoaded += () => { _OnLoadEntries(); };
+			LoadInEntries();
 		}
 		
 		public void LoadInEntries()
@@ -133,8 +131,11 @@ namespace AssetSnap.Front.Components
 			}
 
 			_SetupNoFolderLabel();
-			
-			if (null == Trait<Containerable>().Select(0).GetNode())
+
+			if (
+				null != Trait<Containerable>().Select(0).GetNode() &&
+				null == Trait<Containerable>().Select(0).GetParentContainer()
+			)
 			{		
 				Trait<Containerable>()
 					.Select(0)
@@ -151,44 +152,30 @@ namespace AssetSnap.Front.Components
 		*/
 		private void _SetupFolderListTable()
 		{
-			if ( null == Trait<Containerable>().Select(0).GetInnerContainer() )
+			if (null == Trait<Containerable>().Select(0).GetNode())
 			{
 				Trait<Containerable>()
 					.SetName( "ListingBoxContainer" )
 					.SetMargin(5, "left")
 					.SetMargin(5, "right")
 					.SetMargin(0, "top")
-					.SetMargin(5, "bottom")
+					.SetMargin(0, "bottom")
 					.SetVerticalSizeFlags(Control.SizeFlags.ExpandFill)
 					.Instantiate();
 			}
 
 			_SetupFolderListing();
 
-			if ( null != Trait<Containerable>().Select(0).GetInnerContainer() &&  null == Trait<Containerable>().Select(0).GetContainerParent() )
+			if (
+				null != Trait<Containerable>().Select(0).GetNode() &&
+				null == Trait<Containerable>().Select(0).GetParentContainer()
+			)
 			{
 				Trait<Containerable>()
 					.Select(0)
 					.AddToContainer(
 						this
 					);
-			}
-		}
-		
-		/*
-		** Clears the current list children
-		** 
-		** @return void
-		*/
-		private void _ClearList() 
-		{
-			var Children = GetChildren();
-			for( int i = 0; i < Children.Count; i++) 
-			{
-				var child = Children[i];
-
-				RemoveChild(child);
-				child.QueueFree();
 			}
 		}
 		
@@ -241,28 +228,19 @@ namespace AssetSnap.Front.Components
 				.Select(0)
 				.GetInnerContainer();
 				
-			if( null != Trait<Listable>().Select(0).GetNode() ) 
-			{
-				Trait<Listable>().Iteration = 0;
-				Trait<Listable>().Clear(0);
-			}
-				
 			Trait<Listable>()
 				.SetName("LibrariesListing") 
 				.SetCount(SettingsUtils.Get().FolderCount)
 				.SetComponent("AssetSnap.Front.Components.LibrariesListingEntry")
 				.SetDimensions(400, 0)
 				.Each(
-					(int index, BaseComponent component) =>
+					(int index, GodotObject component) =>
 					{
 						if (null != component && IsInstanceValid(component) && component is LibrariesListingEntry _component)
 						{
 							string title = _GlobalExplorer.Settings.Folders[index];
 							_component.title = title;
 							_component.Initialize();
-
-							// AddChild(_component, true);
-							// _Entries.Add(_component);
 						}
 					}
 				)
@@ -301,7 +279,7 @@ namespace AssetSnap.Front.Components
 				.SetType(Labelable.TitleType.TextMedium)
 				.SetText(NotFoundText)
 				.SetAutoWrap( TextServer.AutowrapMode.Word )
-				.SetDimensions(500, 0)
+				.SetDimensions(400, 0)
 				.SetHorizontalSizeFlags(Control.SizeFlags.ShrinkBegin)
 				.SetVerticalSizeFlags(Control.SizeFlags.ShrinkBegin)
 				.Instantiate()
@@ -309,25 +287,6 @@ namespace AssetSnap.Front.Components
 				.AddToContainer(
 					panel
 				);
-		}
-		
-		public void _OnLoadEntries()
-		{
-			if( Initiated ) 
-			{
-				// GetParent().RemoveChild(this);
-				// Clear();
-			}
-			
-			Initiated = true;
-			LoadInEntries();	
-		}
-
-		public override void _ExitTree()
-		{
-			_GlobalExplorer._Plugin.FoldersLoaded -= () => { _OnLoadEntries(); };
-			
-			base._ExitTree();
 		}
 	}
 }

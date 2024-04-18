@@ -171,7 +171,10 @@ namespace AssetSnap.Component
 			}
 			else 
 			{
-				GD.Print("NO DEPENDENCIES");
+				if( debug ) 
+				{
+					GD.Print("NO DEPENDENCIES");
+				}
 			}
 
 			return this;

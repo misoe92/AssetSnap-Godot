@@ -191,7 +191,7 @@ namespace AssetSnap.Front.Components.Library
 					string file_name = System.IO.Path.GetFileName(fileName);
 
 					
-					if( null != Library._LibraryTopbar && null != Library._LibraryTopbar._LibrarySearch) 
+					if( IsInstanceValid(Library._LibraryTopbar) && IsInstanceValid(Library._LibraryTopbar._LibrarySearch)) 
 					{
 						bool IsSearching = Library._LibraryTopbar._LibrarySearch.IsSearching();
 						bool SearchValid = Library._LibraryTopbar._LibrarySearch.SearchValid(file_name);

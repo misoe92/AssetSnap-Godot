@@ -68,9 +68,7 @@ namespace AssetSnap.Component
 		*/
 		public override Containerable Select(int index, bool debug = false)
 		{
-			base.Select(index);
-
-			// GD.Print("VALGT: ", WorkingNode.Name);
+			base.Select(index, debug);
 			
 			return this;
 		}

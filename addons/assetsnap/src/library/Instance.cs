@@ -120,13 +120,18 @@ namespace AssetSnap.Library
 			SizeFlagsVertical = SizeFlags.ExpandFill;
 			SizeFlagsHorizontal = SizeFlags.ExpandFill;
 		}
-		
-		public void Clear()
+
+		public void Clear(bool debug = false)
 		{
-			_LibraryBody.Clear();
-			_LibraryTopbar.Clear();
-			_LibrarySettings.Clear();
-			_LibraryListing.Clear();
+			_GlobalExplorer.Components.Remove(_LibraryTopbar);
+			_GlobalExplorer.Components.Remove(_LibrarySettings);
+			_GlobalExplorer.Components.Remove(_LibraryListing);
+			_GlobalExplorer.Components.Remove(_LibraryBody);
+			
+			_LibraryTopbar.Clear(debug);
+			_LibrarySettings.Clear(debug);
+			_LibraryListing.Clear(debug);
+			_LibraryBody.Clear(debug);
 		}
 		
 		/*
@@ -142,11 +147,12 @@ namespace AssetSnap.Library
 			if( Initialized ) 
 			{
 				// Clear the instances first
-				Components.Clear<Topbar>();
-				Components.Clear<Settings>();
-				Components.Clear<Listing>();
-				Components.Clear<Body>();
-
+				// Components.Clear<Topbar>();
+				// Components.Clear<Settings>();
+				// Components.Clear<Listing>();
+				// Components.Clear<Body>();
+				Clear();
+				
 				_LibraryBody = null;
 				_LibraryTopbar = null;
 				_LibraryListing = null;
@@ -158,7 +164,7 @@ namespace AssetSnap.Library
 				// To ensure we reset it's position
 				Dock.RemoveChild(this);
 				// GD.Print("Removed tab entry");
-				Dock.AddChild(this);
+				// Dock.AddChild(this);
 			}
 			else 
 			{
@@ -375,16 +381,6 @@ namespace AssetSnap.Library
 		private bool HasLibraryTopbar()
 		{
 			return null != _LibraryTopbar;
-		}
-				
-		/*
-		** Checks if the library search exists
-		**
-		** @return bool
-		*/
-		private bool HasLibrarySearch()
-		{
-			return null != _LibraryTopbar._LibrarySearch;
 		}
 						
 		/*

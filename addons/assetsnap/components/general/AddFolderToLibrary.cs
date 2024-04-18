@@ -112,15 +112,8 @@ namespace AssetSnap.Front.Components
 		private void _OnFolderSelected( string FolderPath, FileDialog fileDialog )
 		{
 			_GlobalExplorer.Settings.AddFolder(FolderPath);
-			
-			if( null != _GlobalExplorer.Library ) 
-			{
-				_GlobalExplorer.Library.Refresh( ExplorerUtils.Get()._Plugin.GetTabContainer() );
-			}
 
-			fileDialog.DirSelected -= (string FolderPath) => { _OnFolderSelected(FolderPath,fileDialog); };
 			fileDialog.QueueFree();
-			fileDialog = null; 
 		}
 
 		/* 

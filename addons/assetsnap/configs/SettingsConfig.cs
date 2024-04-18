@@ -34,6 +34,7 @@ namespace AssetSnap.Front.Configs
 		private string[] _Folders;
 		private Godot.Collections.Dictionary<string,Variant> _Settings;
 		private BaseContainer _Container;
+		public bool Initialized = false;
 
 		private static SettingsConfig _Instance = null;
 		public static SettingsConfig Singleton { 
@@ -131,8 +132,7 @@ namespace AssetSnap.Front.Configs
 				
 				_Folders = _FolderList.ToArray();
 				_FolderList.Clear();
-
-				// GD.Print(FolderCount);
+				Initialized = true;
 			}
 			else 
 			{
@@ -157,8 +157,6 @@ namespace AssetSnap.Front.Configs
 		*/
 		public void Reset( bool WithContainer = true ) 
 		{
-			_Folders = Array.Empty<string>();
-			_Settings = new();
 			if( null != _Container && WithContainer )  
 			{
 				if( null != _Container.GetParent() && EditorPlugin.IsInstanceValid(_Container) ) 
@@ -168,9 +166,6 @@ namespace AssetSnap.Front.Configs
 
 				_Container.Free();
 			}
-			
-			Initialize();
-			MaybeEmitFoldersLoaded();
 		}
 
 		/*
@@ -242,6 +237,11 @@ namespace AssetSnap.Front.Configs
 			{
 				GD.PushError(result);
 			}
+			
+			LoadOk = false;
+			
+			Initialize();
+			MaybeEmitFoldersLoaded();
 		}
 		
 		/*

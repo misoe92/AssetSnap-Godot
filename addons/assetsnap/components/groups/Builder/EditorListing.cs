@@ -370,7 +370,11 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			};
 
 			NoFoundMargin.AddChild(NoFoundTitle);
-			Trait<Containerable>().Select(2).GetInnerContainer().AddChild(NoFoundMargin);
+
+			Trait<Containerable>()
+				.Select(2)
+				.GetInnerContainer()
+				.AddChild(NoFoundMargin);
 		}
 			
 		private void _OnOpenGroupOptions()

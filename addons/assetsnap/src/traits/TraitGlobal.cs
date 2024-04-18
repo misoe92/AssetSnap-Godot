@@ -22,33 +22,32 @@
 
 namespace AssetSnap.Trait
 {
-	using System;
 	using Godot;
 	using Godot.Collections;
 
 	[Tool]
-	public partial class TraitGlobal : Node
+	public partial class TraitGlobal : Node, ISerializationListener
 	{
 		private string version = "0.0.1";
-		
-		[Export]
 		public static TraitGlobal _Instance = null;
 
 		[Export]
 		public Godot.Collections.Dictionary<string, Godot.Collections.Dictionary<string, Godot.Collections.Dictionary<int, string>>> Names { get; set; } = new();
 		
 		[Export]
-		public Godot.Collections.Dictionary<string, Godot.Collections.Dictionary<string, Godot.Collections.Dictionary<int, Node>>> Instances { get; set; } = new();
+		public Godot.Collections.Dictionary<string, Godot.Collections.Dictionary<string, Godot.Collections.Dictionary<int, GodotObject>>> Instances { get; set; } = new();
 		
 		[Export]
 		public Godot.Collections.Dictionary<string, Godot.Collections.Dictionary<string,Godot.Collections.Dictionary<int, Godot.Collections.Dictionary<string, Variant>>>> InstanceDependencies { get; set; } = new();
+
+		[Export]
+		public Godot.Collections.Array<GodotObject> DisposeQueue = new();
 		
 		public static TraitGlobal Singleton {
 			get
 			{
 				if( _Instance == null ) 
 				{
-
 					_Instance = new()
 					{
 						IsSingleton = true,
@@ -188,7 +187,7 @@ namespace AssetSnap.Trait
 			return TypeString.Split(".").Join("");
 		}
 		
-		public Dictionary<int, Node> AllInstances(string typeString, string owner, bool debug = false)
+		public Dictionary<int, GodotObject> AllInstances(string typeString, string owner, bool debug = false)
 		{
 			if( null == typeString || null == owner ) 
 			{
@@ -223,8 +222,54 @@ namespace AssetSnap.Trait
 
 			return Instances[owner][typeKey];
 		}
+		
+		public bool HasInstance( int index, string typeString, string owner, bool debug = false ) 
+		{
+			if( null == typeString || null == owner ) 
+			{
+				return false;
+			}
+			
+			if( false == Instances.ContainsKey(owner) ) 
+			{
+				if( debug ) 
+				{
+					GD.PushError("No instance at owner: ", owner);
+				}
+
+				return false;
+			}
+
+			string typeKey = FormatTypeString(typeString);
+			if( false == Instances[owner].ContainsKey(typeKey) ) 
+			{
+				if( debug ) 
+				{
+					GD.PushError("No instance at type: ", typeKey, "::", owner, Instances[owner].Keys);
+				}
+				return false;
+			}
+			
+			if( false == Instances[owner][typeKey].ContainsKey(index) ) 
+			{
+				if( debug ) 
+				{
+					GD.PushError("No instance at index: ", index, " :: ", typeKey, "::", owner, Instances[owner][typeKey].Keys, Instances[owner].Keys);
+				}
+				return false;
+			}
+			
+			bool res = EditorPlugin.IsInstanceValid(Instances[owner][typeKey][index]);
+			
+			if( false == res ) 
+			{
+				Instances[owner][typeKey].Remove(index);
+			}
+
+			return res;
+		}
 	
-		public Node GetInstance( int index, string typeString, string owner, bool debug = false )
+		public GodotObject GetInstance( int index, string typeString, string owner, bool debug = false )
 		{
 			if( null == typeString || null == owner ) 
 			{
@@ -260,6 +305,15 @@ namespace AssetSnap.Trait
 				return null;
 			}
 			
+			if( false == IsInstanceValid(Instances[owner][typeKey][index])) 
+			{
+				if( debug ) 
+				{
+					GD.PushError("Instance is invalid: ", index, " :: ", typeKey, "::", owner, Instances[owner][typeKey].Keys, Instances[owner].Keys);
+				}
+				return null;
+			}
+			
 			return Instances[owner][typeKey][index];
 		}
 		
@@ -272,7 +326,7 @@ namespace AssetSnap.Trait
 			
 			string typeKey = FormatTypeString(typeString);
 			
-			Node existing = GetInstance(index, typeString, owner);
+			GodotObject existing = GetInstance(index, typeString, owner);
 			
 			if( existing != null ) 
 			{
@@ -310,7 +364,6 @@ namespace AssetSnap.Trait
 			{
 				InstanceDependencies[owner][typeKey][index] = dependencies;
 			}
-			// GD.Print(_Instance.Count());
 			
 			return true;
 		}
@@ -327,7 +380,7 @@ namespace AssetSnap.Trait
 				return false;
 			}
 
-			Node instance = GetInstance(index, typeString, owner, debug);
+			GodotObject instance = GetInstance(index, typeString, owner, debug);
 			string typeKey = FormatTypeString(typeString);
 			
 			if( null == instance ) 
@@ -339,57 +392,68 @@ namespace AssetSnap.Trait
 				return false;
 			}
 			
-			instance.GetParent().RemoveChild(instance);
-			Instances[owner][typeKey].Remove(index);
-			InstanceDependencies[owner][typeKey].Remove(index);
-			
-			if( Instances[owner][typeKey].Count == 0 ) 
+			if( EditorPlugin.IsInstanceValid(instance) && instance is Node node ) 
 			{
-				Instances[owner].Remove(typeKey);
-				Plugin.Singleton.traitGlobal.RemoveName(index, owner, typeString);
+				DisposeQueue.Add(node);
+				if( null != node.GetParent() ) 
+				{
+					node.GetParent().RemoveChild(node);
+				}
+
+				Instances[owner][typeKey].Remove(index);
+				InstanceDependencies[owner][typeKey].Remove(index);
+				
 				if( debug )
 				{
-					GD.PushError("Removed type: ", typeKey);
-				}				
-			}
-			
-			if( Instances[owner].Count == 0 ) 
-			{
-				Instances.Remove(owner);
-				if( debug ) 
-				{
-					GD.PushError("Removed owner: ", owner);
+					GD.Print("Trait Instance was removed at index(" + index + ")");
 				}
-			}
-			
-			if( InstanceDependencies[owner][typeKey].Count == 0 ) 
-			{
-				InstanceDependencies[owner].Remove(typeKey);
-				if( debug ) 
-				{
-					GD.PushError("Removed dependency type: ", typeKey);
-				}
-			}
-			
-			if( InstanceDependencies[owner].Count == 0 ) 
-			{
-				InstanceDependencies.Remove(owner);
-				if( debug ) 
-				{
-					GD.PushError("Removed dependency owner: ", owner);
-				}
-			}
-		
-			// Godot.Collections.Dictionary<string, Godot.Control> controls = InstanceDependencies[name][typeKey][index];
-			// foreach( (string key, Control control) in controls ) 
-			// {
-			// 	if( null != control.GetParent() ) 
-			// 	{
-			// 		control.GetParent().RemoveChild(control);
-			// 	}
-			// }
 				
-			return true;
+				if( Instances[owner][typeKey].Count == 0 ) 
+				{
+					Instances[owner].Remove(typeKey);
+					Plugin.Singleton.traitGlobal.RemoveName(index, owner, typeString);
+					if( debug )
+					{
+						GD.PushError("Removed type: ", typeKey);
+					}				
+				}
+				
+				if( Instances[owner].Count == 0 ) 
+				{
+					Instances.Remove(owner);
+					if( debug ) 
+					{
+						GD.PushError("Removed owner: ", owner);
+					}
+				}
+				
+				if( InstanceDependencies[owner][typeKey].Count == 0 ) 
+				{
+					InstanceDependencies[owner].Remove(typeKey);
+					if( debug ) 
+					{
+						GD.PushError("Removed dependency type: ", typeKey);
+					}
+				}
+				
+				if( InstanceDependencies[owner].Count == 0 ) 
+				{
+					InstanceDependencies.Remove(owner);
+					if( debug ) 
+					{
+						GD.PushError("Removed dependency owner: ", owner);
+					}
+				}
+
+				if( debug ) 
+				{
+					GD.Print("Trait Instance count(" + Instances.Count + ") => Keys(", Instances.Keys, ")");
+				}
+
+				return true;
+			}
+			
+			return false;
 		}
 		
 		
@@ -452,10 +516,96 @@ namespace AssetSnap.Trait
 
 		public void OnAfterDeserialize()
 		{
-			// GD.Print(_Instance);
 			_Instance = this;
-			// GD.Print(_Instance.Count());
 			// throw new NotImplementedException();
+		}
+
+		public override void _ExitTree()
+		{
+			// foreach( (string key, Godot.Collections.Dictionary<string, Godot.Collections.Dictionary<int, GodotObject>> instance) in Instances) 
+			// {
+			// 	foreach(( string innerKey, Godot.Collections.Dictionary<int, GodotObject> innerInstance) in instance ) 
+			// 	{
+			// 		foreach((int index, GodotObject _object ) in innerInstance ) 
+			// 		{
+			// 			if( IsInstanceValid(_object) && _object is Node node ) 
+			// 			{
+			// 				if( IsInstanceValid(node) && node.HasMethod( Node.MethodName.Free ) ) 
+			// 				{
+			// 					if( null != node.GetParent() ) 
+			// 					{
+			// 						node.GetParent().RemoveChild(node);
+			// 					}
+
+			// 					node.QueueFree();
+			// 				}
+			// 				else 
+			// 				{
+			// 					GD.Print("Could not free", node.Name);
+			// 				}
+			// 			}
+			// 		}
+			// 	}
+			// }
+			
+			// foreach( (string key, Godot.Collections.Dictionary<string,Godot.Collections.Dictionary<int, Godot.Collections.Dictionary<string, Variant>>> instance) in InstanceDependencies) 
+			// {
+			// 	foreach(( string innerKey, Godot.Collections.Dictionary<int, Godot.Collections.Dictionary<string, Variant>> innerInstance) in instance ) 
+			// 	{
+			// 		foreach((int index, Godot.Collections.Dictionary<string, Variant> finalInstance ) in innerInstance ) 
+			// 		{
+			// 			foreach((string finalKey, Variant _object ) in finalInstance ) 
+			// 			{
+			// 				if( IsInstanceValid(_object.AsGodotObject()) && _object.AsGodotObject() is Node node ) 
+			// 				{
+			// 					if( IsInstanceValid(node) && node.HasMethod( Node.MethodName.Free ) ) 
+			// 					{
+			// 						if( null != node.GetParent() ) 
+			// 						{
+			// 							node.GetParent().RemoveChild(node);
+			// 						}
+
+			// 						node.QueueFree();
+			// 					}
+			// 					else 
+			// 					{
+			// 						GD.Print("Could not free", node.Name);
+			// 					}
+			// 				}
+			// 			}
+			// 		}
+			// 	}
+			// }
+
+			// Instances = new();
+			// InstanceDependencies = new();
+			
+
+			// foreach( GodotObject _object in DisposeQueue ) 
+			// {
+			// 	if( IsInstanceValid(_object) && _object is Node node ) 
+			// 	{
+			// 		if( IsInstanceValid(node) && node.HasMethod( Node.MethodName.Free ) ) 
+			// 		{
+			// 			if( null != node.GetParent() ) 
+			// 			{
+			// 				node.GetParent().RemoveChild(node);
+			// 			}
+
+			// 			node.QueueFree();
+			// 		}
+			// 		else 
+			// 		{
+			// 			GD.Print("Could not free", node.Name);
+			// 		}
+			// 	}
+			// 	else 
+			// 	{
+			// 		GD.Print("Not valid");
+			// 	}
+			// }
+			// DisposeQueue = new();
+			base._ExitTree();
 		}
 	}
 }

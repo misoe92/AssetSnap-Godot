@@ -29,7 +29,6 @@ namespace AssetSnap.Front.Components.Groups.Builder
 	using AssetSnap.Front.Nodes;
 	using AssetSnap.Helpers;
 	using Godot;
-	using Godot.Collections;
 
 	[Tool]
 	public partial class Sidebar : LibraryComponent
@@ -48,8 +47,8 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			UsingTraits = new()
 			{
 				{ typeof(Buttonable).ToString() },
-				{ typeof(Containerable).ToString() },
 				{ typeof(Labelable).ToString() },
+				{ typeof(Containerable).ToString() },
 			};
 			
 			SizeFlagsVertical = Control.SizeFlags.ExpandFill;
@@ -61,7 +60,6 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		public override void Initialize()
 		{
 			base.Initialize();
-			
 			Initiated = true;
 			
 			_SetupTopbar();
@@ -259,7 +257,6 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		
 		private void _SetupNewGroupButton( Container container )
 		{
-
 			Trait<Containerable>()
 				.SetName("NewGroupButtonContainer")
 				.SetMargin(4, "top")
@@ -361,6 +358,11 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			{
 				GD.PrintErr("File not found: " + absolutePath);
 			}
+		}
+
+		public override void Clear(bool debug = false)
+		{
+			base.Clear(debug);
 		}
 
 		public override void _ExitTree()
