@@ -23,6 +23,7 @@
 namespace AssetSnap.Front.Components.Library
 {
 	using AssetSnap.Component;
+	using AssetSnap.Nodes;
 	using Godot;
 
 	[Tool]
@@ -37,6 +38,8 @@ namespace AssetSnap.Front.Components.Library
 		private	Label _Label;
 		private VBoxContainer _InnerContainer;
 		private	AsModelViewerRect _TextureRect;
+
+		private int ImageRotation = 0;
 		
 		public string Folder 
 		{
@@ -75,11 +78,10 @@ namespace AssetSnap.Front.Components.Library
 		*/
 		public override void Initialize()
 		{
-			SizeFlagsHorizontal = SizeFlags.ExpandFill;
+			SizeFlagsHorizontal = SizeFlags.ShrinkBegin;
 			SizeFlagsVertical = SizeFlags.ExpandFill;
 			
 			base.Initialize();
-			
 			Initiated = true;
 		
 			if( Filename == null || Folder == null) 
@@ -96,11 +98,37 @@ namespace AssetSnap.Front.Components.Library
 				Library = Library,
 			};
 
+			HBoxContainer outerPanelContainer = new();
+
+			VBoxContainer leftInnerContainer = new()
+			{
+				SizeFlagsHorizontal = SizeFlags.ShrinkBegin,
+				SizeFlagsVertical = SizeFlags.ShrinkCenter,
+			};
+			VBoxContainer middleInnerContainer = new()
+			{
+				SizeFlagsHorizontal = SizeFlags.ExpandFill,
+				SizeFlagsVertical = SizeFlags.ShrinkCenter,
+			};
+			VBoxContainer rightInnerContainer = new()
+			{
+				SizeFlagsHorizontal = SizeFlags.ShrinkBegin,
+				SizeFlagsVertical = SizeFlags.ShrinkCenter,
+			};
+
+			outerPanelContainer.AddChild(leftInnerContainer);
+			outerPanelContainer.AddChild(middleInnerContainer);
+			outerPanelContainer.AddChild(rightInnerContainer);
+
+			_PanelContainer.AddChild(outerPanelContainer);
+			
 			// Now you can use the previewImage as needed
 			// For example, you could display it in your UI or store it for later use
 			_PanelContainer.SetFilePath(Folder + "\\" + Filename);
 
-			_InitializePreviewContainer(Filename, Folder, _PanelContainer);
+			_InitializeLeftArrow(leftInnerContainer, Filename, Folder, Library.GetName());
+			_InitializeRightArrow(rightInnerContainer, Filename, Folder, Library.GetName());
+			_InitializePreviewContainer(Filename, Folder, middleInnerContainer);
 			_InitializeLabelContainer(_PanelContainer);
 			
 			// Add container to parent container
@@ -109,41 +137,151 @@ namespace AssetSnap.Front.Components.Library
 			Library.AddPanel(_PanelContainer);
 		}
 		
+		private void _InitializeLeftArrow(VBoxContainer BoxContainer, string FileName, string FolderPath, string LibraryName)
+		{
+			Texture2D Icon = GD.Load<Texture2D>("res://addons/assetsnap/assets/icons/chevron-left.svg");
+			Button LeftArrowButton = new()
+			{
+				ThemeTypeVariation = "SmallFlatButton",
+				Icon = Icon,
+				Flat = true,
+				TooltipText = "Rotate preview by -90 Degrees",
+				Theme = GD.Load<Theme>("res://addons/assetsnap/assets/themes/SnapTheme.tres"),
+				MouseDefaultCursorShape = CursorShape.PointingHand,
+			};
+
+			LeftArrowButton.Connect(Button.SignalName.Pressed,
+				Callable.From(
+					() => 
+					{
+						if( ImageRotation == -180 ) 
+						{
+							ImageRotation = 90;
+						}
+						else 
+						{
+							ImageRotation -= 90;
+						}
+						
+						Texture2D image = null;
+						if( ImageRotation == 0 ) 
+						{
+							image = GD.Load<Texture2D>("res://assetsnap/previews/" + LibraryName + "/" + FileName.Split(".")[0] + "/default.png");
+						}
+						else if( ImageRotation < 0 ) 
+						{
+							image = GD.Load<Texture2D>("res://assetsnap/previews/" + LibraryName + "/" + FileName.Split(".")[0] + "/default-minus" + ImageRotation + ".png");
+						}
+						else 
+						{
+							image = GD.Load<Texture2D>("res://assetsnap/previews/" + LibraryName + "/" + FileName.Split(".")[0] + "/default-" + ImageRotation + ".png");
+						}
+
+						GD.Print(ImageRotation);
+						_TextureRect._MeshPreviewReady(FolderPath + "/" + FileName, image, image, _TextureRect);
+					}
+				)
+			);
+
+			BoxContainer.AddChild(LeftArrowButton);
+		}
+		
+		private void _InitializeRightArrow(VBoxContainer BoxContainer, string FileName, string FolderPath, string LibraryName)
+		{
+			Texture2D Icon = GD.Load<Texture2D>("res://addons/assetsnap/assets/icons/chevron-right.svg");
+			Button RightArrowButton = new()
+			{
+				ThemeTypeVariation = "SmallFlatButton",
+				Icon = Icon,
+				Flat = true,
+				TooltipText = "Rotate preview by 90 Degrees",
+				Theme = GD.Load<Theme>("res://addons/assetsnap/assets/themes/SnapTheme.tres"),
+				MouseDefaultCursorShape = CursorShape.PointingHand,
+			};
+			
+			RightArrowButton.Connect(Button.SignalName.Pressed,
+				Callable.From(
+					() => 
+					{
+						if( ImageRotation == 180 ) 
+						{
+							ImageRotation = -90;
+						}
+						else 
+						{
+							ImageRotation += 90;
+						}
+						
+						Texture2D image = null;
+						if( ImageRotation == 0 ) 
+						{
+							image = GD.Load<Texture2D>("res://assetsnap/previews/" + LibraryName + "/" + FileName.Split(".")[0] + "/default.png");
+						}
+						else if( ImageRotation < 0 ) 
+						{
+							image = GD.Load<Texture2D>("res://assetsnap/previews/" + LibraryName + "/" + FileName.Split(".")[0] + "/default-minus" + ImageRotation + ".png");
+						}
+						else 
+						{
+							image = GD.Load<Texture2D>("res://assetsnap/previews/" + LibraryName + "/" + FileName.Split(".")[0] + "/default-" + ImageRotation + ".png");
+						}
+
+						GD.Print(ImageRotation);
+						_TextureRect._MeshPreviewReady(FolderPath + "/" + FileName, image, image, _TextureRect);
+					}
+				)
+			);
+			
+			BoxContainer.AddChild(RightArrowButton);
+		}
+		
 		/*
 		** Initializes model preview image and
 		** it's container
 		**
 		** @return void
 		*/
-		private void _InitializePreviewContainer(string FileName, string FolderPath, PanelContainer BoxContainer) 
+		private void _InitializePreviewContainer(string FileName, string FolderPath, VBoxContainer BoxContainer) 
 		{
 			_MarginContainer = new()
 			{
-				CustomMinimumSize = new Vector2(75, 75),
 				SizeFlagsVertical = Control.SizeFlags.ExpandFill,
 				SizeFlagsHorizontal = Control.SizeFlags.ExpandFill
 			};
 			
 			_InnerContainer = new()
 			{
-				CustomMinimumSize = new Vector2(75, 75),
+				CustomMinimumSize = new Vector2(0, 125),
+				SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
 				SizeFlagsVertical = Control.SizeFlags.ShrinkBegin,
-				SizeFlagsHorizontal = Control.SizeFlags.ShrinkCenter
 			};
 			
 			_TextureRect = new()
 			{
 				ExpandMode = TextureRect.ExpandModeEnum.FitHeightProportional,
-				StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered
+				StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered,
+				CustomMinimumSize = new Vector2(120, 120),
+				SizeFlagsHorizontal = Control.SizeFlags.ShrinkBegin,
+				SizeFlagsVertical = Control.SizeFlags.ShrinkBegin,
 			};
 			
-			_MarginContainer.AddThemeConstantOverride("margin_left", 10);
-			_MarginContainer.AddThemeConstantOverride("margin_right", 10);
-			_MarginContainer.AddThemeConstantOverride("margin_top", 15);
-			_MarginContainer.AddThemeConstantOverride("margin_bottom", 0);
+			_MarginContainer.AddThemeConstantOverride("margin_left", 5);
+			_MarginContainer.AddThemeConstantOverride("margin_right", 5);
+			_MarginContainer.AddThemeConstantOverride("margin_top", 0);
+			_MarginContainer.AddThemeConstantOverride("margin_bottom", 5);
+
+			if( true == FileAccess.FileExists("res://assetsnap/previews/"  + Library.GetName() + "/" + FileName.Split(".")[0] + "/default.png") ) 
+			{
+				Texture2D image = GD.Load<Texture2D>("res://assetsnap/previews/" + Library.GetName() + "/" + FileName.Split(".")[0] + "/default.png");
+				_TextureRect._MeshPreviewReady(FolderPath + "/" + FileName, image, image, _TextureRect);
+			}
+			else 
+			{
+				ModelPreviewer.Singleton.AddToQueue(FolderPath + "/" + FileName, _TextureRect, Library.GetName());
+			}
 			
-			var mesh_preview = EditorInterface.Singleton.GetResourcePreviewer();
-			mesh_preview.QueueResourcePreview(FolderPath + "/" + FileName, _TextureRect, "_MeshPreviewReady", _TextureRect);	
+			// var mesh_preview = EditorInterface.Singleton.GetResourcePreviewer();
+			// mesh_preview.QueueResourcePreview(FolderPath + "/" + FileName, _TextureRect, "_MeshPreviewReady", _TextureRect);	
 			
 			_MarginContainer.AddChild(_TextureRect);
 			_InnerContainer.AddChild(_MarginContainer);
