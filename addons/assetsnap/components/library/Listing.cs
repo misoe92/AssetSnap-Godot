@@ -23,8 +23,9 @@
 namespace AssetSnap.Front.Components.Library
 {
 	using System.Collections.Generic;
-    using System.Linq;
-    using AssetSnap.Component;
+	using System.Linq;
+	using AssetSnap.Component;
+	using AssetSnap.Nodes;
 	using Godot;
 
 	[Tool]
@@ -178,7 +179,7 @@ namespace AssetSnap.Front.Components.Library
 
 				HBoxContainer CurrentBoxContainer = _SetupListContainer(BoxContainer);
 				string[] fileNames = System.IO.Directory.GetFiles(folderPath.Split("res://").Join(""));
-
+				
 				Library.ItemCount = fileNames.Length;
 				foreach (string fileName in fileNames)
 				{
@@ -189,7 +190,6 @@ namespace AssetSnap.Front.Components.Library
 					
 					string extension = System.IO.Path.GetExtension(fileName).ToLower();
 					string file_name = System.IO.Path.GetFileName(fileName);
-
 					
 					if( IsInstanceValid(Library._LibraryTopbar) && IsInstanceValid(Library._LibraryTopbar._LibrarySearch)) 
 					{
@@ -201,7 +201,6 @@ namespace AssetSnap.Front.Components.Library
 							continue;
 						}
 					}
-				
 
 					// Check if the file has a supported extension 
 					if ( IsValidExtension( extension ) )
@@ -254,8 +253,8 @@ namespace AssetSnap.Front.Components.Library
 		{
 			HBoxContainer _Con = new()
 			{
-				// SizeFlagsVertical = Control.SizeFlags.ExpandFill,  // Uncheck VSize Flags for fixed height
-				// SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,  // Uncheck HSize Flags for fixed width
+				SizeFlagsVertical = Control.SizeFlags.ShrinkBegin,  // Uncheck VSize Flags for fixed height
+				SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,  // Uncheck HSize Flags for fixed width
 			};
 			
 			BoxContainer.AddChild(_Con);
