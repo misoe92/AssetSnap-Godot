@@ -24,6 +24,7 @@ namespace AssetSnap.Front.Configs
 {
 	using System;
 	using System.Collections.Generic;
+	using System.Linq;
 	using AssetSnap.Settings;
 	using AssetSnap.States;
 	using Godot;
@@ -230,6 +231,12 @@ namespace AssetSnap.Front.Configs
 		*/
 		public void AddFolder( string path )
 		{
+			if( _Folders.Contains( path ) ) 
+			{
+				GD.PushError("Library with the same name already exists, and as such cannot be added.");
+				return;
+			}
+			
 			_Config.SetValue("Folders", "Folder" + ( FolderCount + 1 ), path);
 			Error result = _Config.Save( BasePath + _ConfigPath );
 
