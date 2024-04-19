@@ -22,8 +22,6 @@
 
 #if TOOLS
 using AssetSnap;
-using AssetSnap.Front.Nodes;
-using AssetSnap.Instance.Input;
 using Godot;
 
 [Tool]
@@ -58,8 +56,8 @@ public partial class AsLibraryPanelContainer : PanelContainer
 	public override void _Ready()
 	{
 		SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
-		SizeFlagsVertical = Control.SizeFlags.ExpandFill;
-		CustomMinimumSize = new Vector2(75, 120);
+		SizeFlagsVertical = Control.SizeFlags.ShrinkBegin;
+		CustomMinimumSize = new Vector2(0, 120);
 		MouseDefaultCursorShape = Control.CursorShape.PointingHand;
 		
 		Connect(PanelContainer.SignalName.GuiInput, new Callable(this, "_ForwardGuiInput"));
