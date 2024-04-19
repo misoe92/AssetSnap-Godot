@@ -22,8 +22,6 @@
 
 namespace AssetSnap.Library
 {
-	using System;
-	using System.Collections.Generic;
 	using AssetSnap.Explorer;
 	using AssetSnap.Front.Components;
 	using Godot;
@@ -32,7 +30,7 @@ namespace AssetSnap.Library
 	public partial class Base : Node
 	{
 		[Export]
-		public Godot.Collections.Array<Instance> _Libraries = new();
+		public Godot.Collections.Array<GodotObject> _Libraries = new();
 
 		private static Base _Instance;
 		
@@ -47,7 +45,7 @@ namespace AssetSnap.Library
 			}
 		}
 		
-		public Godot.Collections.Array<Instance> Libraries 
+		public Godot.Collections.Array<GodotObject> Libraries 
 		{
 			get => _Libraries;
 		}
@@ -59,9 +57,24 @@ namespace AssetSnap.Library
 		
 		public void Initialize()
 		{
-			foreach( Instance instance in Libraries ) 
+			if( Libraries.Count > 0 ) 
 			{
-				RemoveLibrary(instance.Folder);
+				GD.Print("Existing: ", Libraries.Count);
+				int MaxCount = Libraries.Count;
+				for( int i = MaxCount - 1; i >= 0; i-- ) 
+				{
+					if(Libraries.Count > i ) 
+					{
+						GodotObject instance = Libraries[i];
+						if( IsInstanceValid(instance) && instance is Instance finalInstance ) 
+						{
+							GD.Print("Removes: ", i);
+							RemoveLibrary(finalInstance);				
+						}
+						
+						_Libraries.Remove(instance);
+					}
+				}
 			}
 			
 			/** Initialize libraries **/
@@ -151,23 +164,13 @@ namespace AssetSnap.Library
 			}
 		}
 		
-		public void RemoveLibrary( string FolderPath )
+		public void RemoveLibrary( Instance library )
 		{
-			List<Library.Instance> list = new(_Libraries);
-			
-			foreach(Instance Library in _Libraries ) 
+			if( _Libraries.Count != 0 ) 
 			{
-				if( Library.Folder == FolderPath ) 
-				{
-					list.Remove(Library);
-					Library.Clear();
-					
-					if( null != Library.GetParent() && EditorPlugin.IsInstanceValid(Library.GetParent()) ) 
-					{
-						Library.GetParent().RemoveChild(Library);
-					}
-					Library.Free();
-				}
+				library.Clear();
+				library.GetParent().RemoveChild(library);
+				library.QueueFree();
 			}
 		}
 		

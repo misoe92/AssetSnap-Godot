@@ -47,6 +47,11 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		
 		public override void Initialize()
 		{
+			if( Initiated ) 
+			{
+				return;
+			}
+			
 			base.Initialize();
 			
 			Initiated = true;

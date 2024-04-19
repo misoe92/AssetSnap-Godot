@@ -106,7 +106,7 @@ namespace AssetSnap
 		{
 			if( index > -1 && Library.Libraries.Count > index && EditorPlugin.IsInstanceValid(Library.Libraries[index]) ) 
 			{
-				return Library.Libraries[index];
+				return Library.Libraries[index] as Library.Instance;
 			}
 			
 			return null;
