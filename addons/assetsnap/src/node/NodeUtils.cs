@@ -20,26 +20,32 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#if TOOLS
 using Godot;
 
-public partial class AsModelViewerRect : TextureRect
+namespace AssetSnap.Nodes
 {
-	/*
-	** Sets the preview texture after it has 
-	** fully loaded
-	** 
-	** @return void
-	*/
-	public void _MeshPreviewReady(string Path, Texture2D preview, Texture2D texture_preview, TextureRect textureRect)
+	public static class NodeUtils
 	{
-		if( null == preview && null == texture_preview ) 
+		public static Aabb CalculateNodeAabb( Node node ) 
 		{
-			GD.Print("Invalid preview: ", Path);
-			return;
+			Aabb aabb = new Aabb();
+
+			if( node is Node3D node3d && false == node3d.Visible) 
+			{
+				return aabb;
+			}
+			
+			else if( node is MeshInstance3D meshInstance3D ) 
+			{
+				aabb = meshInstance3D.GlobalTransform * meshInstance3D.GetAabb();
+			}
+			
+			for( int i = 0; i < node.GetChildCount(); i++ ) 
+			{
+				aabb = aabb.Merge(CalculateNodeAabb(node.GetChild(i)));
+			}
+
+			return aabb;
 		}
-		
-		textureRect.Texture = preview;
 	}
 }
-#endif

@@ -209,6 +209,7 @@ namespace AssetSnap.Library
 			_PanelContainer.SetMeta("FolderPath", _Folder); 
 
 			_GlobalExplorer._Plugin.Connect(Plugin.SignalName.LibraryChanged, Callable.From( ( string name ) => { _OnLibraryChanged( name ); }));
+			Plugin.Singleton.EmitSignal(Plugin.SignalName.OnLibraryPopulized);
 		}
 
 		/*

@@ -28,6 +28,8 @@ namespace AssetSnap
 	using AssetSnap.Core;
 	using AssetSnap.Explorer;
 	using AssetSnap.Front.Nodes;
+	using AssetSnap.Nodes;
+	using AssetSnap.States;
 	using AssetSnap.Trait;
 	using Godot;
 
@@ -48,6 +50,9 @@ namespace AssetSnap
 
 		[Signal]
 		public delegate void OnRemoveFolderEventHandler(string folder);
+		
+		[Signal]
+		public delegate void OnLibraryPopulizedEventHandler();
 		
 		/** Internal data **/
 		private bool disposed = false;
@@ -121,6 +126,8 @@ namespace AssetSnap
 		public override void _EnterTree() 
 		{
 			_Instance = this;
+			Connect(EditorPlugin.SignalName.SceneChanged, Callable.From( (Node scene) => { _OnSceneChanged(scene); } ) );
+			
 			AddChild(traitGlobal);
 			if( null == internalNode ) 
 			{
@@ -140,7 +147,6 @@ namespace AssetSnap
 				return;
 			}
 
-			Connect(SignalName.SceneChanged, Callable.From( (Node scene) => { _OnSceneChanged(scene); } ) );
 			// UpdateHandleCallable = new(this, "UpdateHandle");
 			
 			// if(false == IsUpdateHandleConnected()) 
@@ -155,6 +161,11 @@ namespace AssetSnap
 			_CoreEnter.InitializeCore();
 			
 			OnRemoveFolder += (string title ) => { CallDeferred("DoRemoveFolder", title); };
+
+			GD.Print(ModelPreviewer.Singleton.Count());
+			
+			ModelPreviewer.Singleton.Enter();
+			ModelPreviewer.Singleton.GeneratePreviews();
 		}
 		
 		private void DoRemoveFolder(string title ) 
@@ -169,7 +180,22 @@ namespace AssetSnap
 		
 		private void _OnSceneChanged(Node Scene)
 		{
-			GlobalExplorer.GetInstance().States.CurrentScene = Scene;
+			if( null == StatesUtils.Get().CurrentScene && null != Scene ) 
+			{
+				GD.Print("Scene is set");
+			}
+			
+			if( null != StatesUtils.Get().CurrentScene && null != Scene )
+			{
+				GD.Print("Scene is set");
+			}
+			
+			if( null != StatesUtils.Get().CurrentScene && null == Scene )
+			{
+				GD.Print("Scene is released");
+			}
+			
+			StatesUtils.Get().CurrentScene = Scene;
 		}
 		
 		/*
