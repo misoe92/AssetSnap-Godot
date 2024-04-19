@@ -50,6 +50,11 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			SizeFlagsVertical = Control.SizeFlags.ExpandFill;
 			SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
 			
+			if( Initiated == true ) 
+			{
+				return;
+			}
+			
 			base.Initialize();
 			
 			Initiated = true;

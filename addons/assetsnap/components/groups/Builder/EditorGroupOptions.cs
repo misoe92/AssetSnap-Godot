@@ -92,10 +92,13 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		
 		public override void Initialize()
 		{
-			base.Initialize();
-		
-			Initiated = true;
+			if( Initiated ) 
+			{
+				return;
+			}
 
+			base.Initialize();
+			Initiated = true;
 			Visible = false;
 						
 			_InitializeFields();
