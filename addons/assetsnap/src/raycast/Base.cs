@@ -25,7 +25,7 @@ namespace AssetSnap.Raycast
 {
 	using Godot;
 
-	public partial class Base : Node
+	public partial class Base
 	{
 		private RayCast3D _Node;
 		private Vector3 _TargetPosition;
@@ -55,20 +55,19 @@ namespace AssetSnap.Raycast
 		}
 		
 		private static Base _Instance;
-		
-		public static Base GetInstance()
+	
+		public static Base Singleton 
 		{
-			if( null == _Instance ) 
+			get
 			{
-				_Instance = new()
+				if( null == _Instance ) 
 				{
-					Name = "AssetSnapRaycast",
-				};
+					_Instance = new(){};
+				}
+				
+				return _Instance;
 			}
-
-			return _Instance;
 		}
-		
 		/*
 		** Initializes the raycast handler
 		**
@@ -257,20 +256,20 @@ namespace AssetSnap.Raycast
 			Node.QueueFree();
 		}
 
-		public override void _ExitTree()
-		{
-			if( IsInstanceValid(Node) )
-			{ 
-				Node.QueueFree();
-			}
+		// public override void _ExitTree()
+		// {
+		// 	if( IsInstanceValid(Node) )
+		// 	{ 
+		// 		Node.QueueFree();
+		// 	}
 			
-			// if( IsInstanceValid(_Collider)) 
-			// {
-			// 	_Collider.Free();
-			// }
+		// 	// if( IsInstanceValid(_Collider)) 
+		// 	// {
+		// 	// 	_Collider.Free();
+		// 	// }
 			
-			base._ExitTree();
-		}
+		// 	base._ExitTree();
+		// }
 		
 	}
 }

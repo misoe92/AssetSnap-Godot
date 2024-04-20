@@ -22,45 +22,63 @@
 
 #if TOOLS
 using AssetSnap.Front.Nodes;
+using AssetSnap.Trait;
 using Godot;
 namespace AssetSnap.Component
 {
 	[Tool]
-	public partial class Dropdownable : Trait.Base
+	public partial class Dropdownable : ContainerTrait
 	{
+		/*
+		** Enums
+		*/
 		public enum DropdownState
 		{
 			Hidden,
 			Shown
 		};
 
+		/*
+		** Exports
+		*/
 		[Export]
 		public Godot.Collections.Array<Button> Items = new();
 
-		public string DefaultValue = "";
-		public string PrefixLabel = "";
-
-		public MarginContainer _MarginContainer;
+		/*
+		** Public
+		*/
 		public PanelContainer panelContainer;
 		public MarginContainer _PanelPaddingContainer;
 		public VBoxContainer panelInnerContainer;
 		public DropdownButton SelectedBlock;
 		public VBoxContainer ItemsInnerContainer;
 
+		/*
+		** Private
+		*/
+		private string DefaultValue = "";
+		private string PrefixLabel = "";
+		
+		/*
+		** Public methods
+		*/
+		public Dropdownable()
+		{
+			Name = "Dropdownable";
+			TypeString = GetType().ToString();
+		}
+		
+		/*
+		** Instantiate an instance of the trait
+		**
+		** @return Dropdownable
+		*/
 		public Dropdownable Instantiate(int i)
 		{
-			base._Instantiate( GetType().ToString() );
-			
-			_MarginContainer = new() 
-			{
-				Name = "DropdownMarginPanel",
-			};
-			
-			foreach( (string side, int value ) in Margin ) 
-			{
-				_MarginContainer.AddThemeConstantOverride("margin_" + side, value);
-			}
-			
+			UsePaddingContainer = false;
+			base._Instantiate();
+			base.Instantiate();
+
 			panelContainer = new()
 			{
 				Name = "DropdownPanel",
@@ -78,6 +96,7 @@ namespace AssetSnap.Component
 				_PanelPaddingContainer.AddThemeConstantOverride("margin_" + side, value);
 			}
 			
+			// Setup the dropdown
 			panelInnerContainer = new()
 			{
 				Name = "DropdownPanelContainer",
@@ -103,56 +122,76 @@ namespace AssetSnap.Component
 				SelectedBlock.Text = "None";
 			}
 
-			// Action action = () => { _OnToggleVisibility(i); };
-			// SelectedBlock.Pressed += action;
-			
 			ItemsInnerContainer = new()
 			{
 				Name = "DropdownInnerContainer",
 			};
 
-			WorkingNode = panelContainer; 
-
+			// Setup the layout
 			_PanelPaddingContainer.AddChild(ItemsInnerContainer);
 			panelInnerContainer.AddChild(SelectedBlock);
 			panelInnerContainer.AddChild(_PanelPaddingContainer);
 			panelContainer.AddChild(panelInnerContainer);
-			_MarginContainer.AddChild(panelContainer);
-
-			// Callable _callable = Callable.From(() => { _OnToggleVisibility(i); });
-			// SelectedBlock.Connect( Button.SignalName.Pressed, _callable );
+			base.GetInnerContainer(0).AddChild(panelContainer);
 			
-			Nodes.Add(WorkingNode);
-			// _Actions.Add(action);
+			Dependencies[TraitName + "_WorkingNode"] = panelContainer;
+			Dependencies[TraitName + "_PanelPaddingContainer"] = _PanelPaddingContainer;
+			Dependencies[TraitName + "_PanelInnerContainer"] = panelInnerContainer;
+			Dependencies[TraitName + "_SelectedBlock"] = SelectedBlock;
+			Dependencies[TraitName + "_ItemsInnerContainer"] = ItemsInnerContainer;
+
+			// Add the node to the nodes array
+			Plugin.Singleton.traitGlobal.AddInstance(Iteration, panelContainer, OwnerName, TypeString, Dependencies);
+			Plugin.Singleton.traitGlobal.AddName(Iteration, TraitName, OwnerName, TypeString);
  
+			// Clear the trait
 			Reset();
+			Iteration += 1;
+			Dependencies = new();
 
 			return this;
 		}
 		
-		public Dropdownable Select(int index)
+		/*
+		** Selects an placed button in the
+		** nodes array by index
+		**
+		** @param int index
+		** @return Dropdownable
+		*/
+		public override Dropdownable Select(int index, bool debug = false)
 		{
 			base._Select(index);
 
-			if( null != WorkingNode ) 
+			if( false != Dependencies.ContainsKey(TraitName + "_WorkingNode")) 
 			{
-				_MarginContainer = WorkingNode.GetParent() as MarginContainer;
-				panelInnerContainer = WorkingNode.GetChild(0) as VBoxContainer;
-				SelectedBlock = panelInnerContainer.GetChild(0) as DropdownButton; 
-				_PanelPaddingContainer = panelInnerContainer.GetChild(1) as MarginContainer;
-				ItemsInnerContainer = _PanelPaddingContainer.GetChild(0) as VBoxContainer;
+				Godot.Collections.Dictionary<string, Variant> dependencies = Plugin.Singleton.traitGlobal.GetDependencies(index, TypeString, OwnerName);
+				Dependencies = dependencies;
 			}
 
 			return this; 
 		}
 		
-		public Dropdownable SelectByName(string name)
+		/*
+		** Selects an placed button in the
+		** nodes array by name
+		**
+		** @param string name
+		** @return Dropdownable
+		*/
+		public override Dropdownable SelectByName(string name)
 		{
-			base._SelectByName(name);
+			base.SelectByName(name);
 
 			return this;
 		}
 		
+		/*
+		** Adds an button node to the dropdown
+		**
+		** @param Button button
+		** @return Dropdownable
+		*/
 		public Dropdownable AddItem( Button button )
 		{
 			Items.Add(button);
@@ -160,27 +199,44 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		public Dropdownable SetMargin( int value, string side = "" ) 
+		/*
+		** Adds the currently chosen dropdown
+		** to a specified container
+		**
+		** @param Node Container
+		** @return void
+		*/
+		public void AddToContainer( Node Container ) 
 		{
-			_SetMargin(value, side);
+			if( null == Dependencies || false == Dependencies.ContainsKey(TraitName + "_MarginContainer") ) 
+			{
+				GD.PushError("Container was not found @ AddToContainer");
+				
+				if( null == Dependencies ) 
+				{
+					return;
+				}
+				
+				GD.PushError("AddToContainer::Keys-> ", Dependencies.Keys);
+				GD.PushError("AddToContainer::ADDTO-> ", TraitName + "_MarginContainer");
+				return;
+			}
 			
-			return this;
-		}
-		
-		public Dropdownable SetPadding( int value, string side = "" ) 
-		{
-			_SetPadding(value, side);
-			
-			return this;
-		}
-		
-		public Dropdownable SetPrefix( string text ) 
-		{
-			PrefixLabel = text;
+			base._AddToContainer(Container, Dependencies[TraitName + "_MarginContainer"].As<MarginContainer>(), 0);
 
-			return this;
+			Reset();
 		}
-			
+		
+		/*
+		** Setter Methods
+		*/
+		
+		/*
+		** Sets a name for the current dropdown
+		**
+		** @param string text
+		** @return Dropdownable
+		*/
 		public Dropdownable SetName( string text ) 
 		{
 			base._SetName(text);
@@ -188,36 +244,103 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
+		/*
+		** Sets a prefix for the current dropdown
+		**
+		** @param string text
+		** @return Dropdownable
+		*/
+		public Dropdownable SetPrefix( string text ) 
+		{
+			PrefixLabel = text;
+
+			return this;
+		}
+		
+		/*
+		** Sets the default value for
+		** the dropdown
+		**
+		** @param string value
+		** @return Dropdownable
+		*/
 		public Dropdownable SetDefaultValue(string value) 
 		{
 			DefaultValue = value;
 			
 			return this;
 		}
-			
-		public void AddToContainer( Node Container ) 
+		
+		/*
+		** Sets margin values for 
+		** the currently chosen dropdown
+		**
+		** @param int value
+		** @param string side
+		** @return Dropdownable
+		*/
+		public override Dropdownable SetMargin( int value, string side = "" ) 
 		{
-			base._AddToContainer(Container, _MarginContainer);
+			base.SetMargin(value, side);
+			
+			return this;
 		}
 		
-		public Container GetInnerContainer()
+		/*
+		** Sets padding values for 
+		** the currently chosen dropdown
+		**
+		** @param int value
+		** @param string side
+		** @return Dropdownable
+		*/
+		public override Dropdownable SetPadding( int value, string side = "" ) 
 		{
-			return ItemsInnerContainer;
+			base.SetPadding(value, side);
+			
+			return this;
+		}
+		
+		/*
+		** Getter Methods
+		*/
+		
+		/*
+		** Returns the inner container
+		**
+		** @return Container
+		*/
+		public Container GetDropdownContainer()
+		{
+			if( null == Dependencies || false == Dependencies.ContainsKey(TraitName + "_ItemsInnerContainer") ) 
+			{
+				return null;
+			}
+			
+			return Dependencies[TraitName + "_ItemsInnerContainer"].As<Container>();
 		}
 				
-		private void Reset()
+		/*
+		** Private
+		*/
+		
+		/*
+		** Resets the trait to
+		** a cleared state
+		**
+		** @return void
+		*/
+		protected override void Reset()
 		{
-			WorkingNode = null;
 			panelContainer = null;
 			panelInnerContainer = null;
 			SelectedBlock = null;
 			ItemsInnerContainer = null;
 			_PanelPaddingContainer = null;
-		}
-		
-		public void ExitTree()
-		{
-			Items = null;
+
+			Dependencies = new();
+
+			base.Reset();
 		}
 	}
 }

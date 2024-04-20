@@ -22,10 +22,12 @@
 
 namespace AssetSnap.Core 
 {
+	using AssetSnap.Explorer;
 	using AssetSnap.Front.Components;
 	using AssetSnap.Front.Nodes;
 	using AssetSnap.Instance.Input;
 	using AssetSnap.Library;
+	using AssetSnap.States;
 	using Godot;
 	
 	public class CoreHandles : Core 
@@ -39,7 +41,7 @@ namespace AssetSnap.Core
 		*/
 		public bool Handle( GodotObject _object )
 		{
-			if( null == _GlobalExplorer || null == _GlobalExplorer._Plugin || false == EditorPlugin.IsInstanceValid(_GlobalExplorer.ContextMenu) || null == _object ) 
+			if( null == ExplorerUtils.Get() || null == Plugin.Singleton || null == ExplorerUtils.Get().ContextMenu || null == _object ) 
 			{
 				return true;
 			}
@@ -98,18 +100,18 @@ namespace AssetSnap.Core
 		*/
 		private void _HandleModel( AssetSnap.Front.Nodes.AsMeshInstance3D _Node ) 
 		{
-			_GlobalExplorer.States.PlacingMode = GlobalStates.PlacingModeEnum.Model;
+			StatesUtils.Get().PlacingMode = GlobalStates.PlacingModeEnum.Model;
 
-			if( _GlobalExplorer.ContextMenu.IsHidden() ) 
+			if( ExplorerUtils.Get().ContextMenu.IsHidden() ) 
 			{
-				_GlobalExplorer.ContextMenu.Show();
+				ExplorerUtils.Get().ContextMenu.Show();
 			}
 			
 			if( _Node.IsPlaced() ) 
 			{
-				if( null != _GlobalExplorer.Library ) 
+				if( null != ExplorerUtils.Get().Library ) 
 				{
-					Library.Base LibraryBase = _GlobalExplorer.Library;
+					Library.Base LibraryBase = ExplorerUtils.Get().Library;
 					foreach( Library.Instance instance in LibraryBase.Libraries ) 
 					{
 						instance.ClearAllPanelState();
@@ -117,23 +119,23 @@ namespace AssetSnap.Core
 						instance._LibrarySettings._LSEditing.SetText("None");
 					}
 
-					_GlobalExplorer.Model = null;
+					ExplorerUtils.Get().Model = null;
 				}
-				_GlobalExplorer.States.EditingObject = _Node;
+				StatesUtils.Get().EditingObject = _Node;
 				
 				if( false == _Node.HasLibraryName() ) 
 				{
 					return;
 				}
 
-				Library.Instance Library = _GlobalExplorer.GetLibraryByName(_Node.GetLibraryName());
+				Library.Instance Library = ExplorerUtils.Get().GetLibraryByName(_Node.GetLibraryName());
 				
 				if( null == Library ) 
 				{
 					GD.Print("Library was not found: ", _Node.GetLibraryName());
 				}
 				
-				_GlobalExplorer.BottomDock.SetTab(Library);
+				ExplorerUtils.Get().BottomDock.SetTab(Library);
 				Library._LibrarySettings._LSEditing.SetText(_Node.Name);
 				
 				/** Update library settings **/
@@ -143,10 +145,14 @@ namespace AssetSnap.Core
 				}
 				
 				// Check if drag add is currently active
-				if( _GlobalExplorer.InputDriver is DragAddInputDriver DraggableInputDriver ) 
+				if( ExplorerUtils.Get().InputDriver is DragAddInputDriver DraggableInputDriver ) 
 				{
 					DraggableInputDriver.CalculateObjectSize();
 				}
+			}
+			else 
+			{
+				GD.PushWarning("Node is not placed");
 			}
 		}
 		

@@ -28,29 +28,97 @@ namespace AssetSnap.Component
 	using System.Reflection;
 	using System.Collections.Generic;
 	using Godot;
+	using AssetSnap.Explorer;
 
-	public partial class Base : Node
+	[Tool]
+	public partial class Base : Node, ISerializationListener
 	{
-		private Dictionary<string, BaseComponent> _Components = new();
+		private Godot.Collections.Array<string> _ComponentTypes = new();
+		private Godot.Collections.Array<GodotObject> _DisposeQueue = new();
+		private Godot.Collections.Dictionary<string, GodotObject> _Components = new();
+		private Godot.Collections.Array<GodotObject> _Instances = new();
+		[Export]
+		public Godot.Collections.Array<string> ComponentTypes { get => _ComponentTypes; set => _ComponentTypes = value; }	
+		[Export]
+		public Godot.Collections.Array<GodotObject> DisposeQueue { get => _DisposeQueue; set => _DisposeQueue = value; }	
+		[Export]
+		public Godot.Collections.Dictionary<string, GodotObject> Components { get => _Components; set => _Components = value; }	
+		[Export]
+		public Godot.Collections.Array<GodotObject> Instances { get => _Instances; set => _Instances = value; }	
 		
-		private Godot.Collections.Array<BaseComponent> _Instances = new();
-		
-		public Base()
+		private static Base _Instance = null;
+		public static Base Singleton
 		{
-			Name = "AssetSnapComponents";
+			get
+			{
+				if( null == _Instance ) 
+				{
+					_Instance = new();
+					_Instance.Initialize();
+				}
+
+				return _Instance;
+			}
 		}
 		
 		/*
 		** Initialization of Component BaseHandler
 		*/ 
-		public void Initialize()
+		public void Initialize() 
 		{
 			string TargetNamespace = "AssetSnap.Front.Components";
 			IEnumerable<Type> ClassesInNamespace = GetClassesInNamespace(TargetNamespace);
 
 			EnterClassesInNamespace(ClassesInNamespace);
 		}
-		 
+		
+		public int InstancesCount()
+		{
+			return Instances.Count;	
+		}
+		
+		public int Count()
+		{
+			return Components.Count;
+		}
+		
+		public System.Collections.Generic.ICollection<string> Keys()
+		{
+			return Components.Keys;
+		}
+		
+		public void Remove( BaseComponent component )
+		{
+			if( Instances.Contains(component) ) 
+			{
+				Instances.Remove(component);
+			}
+		}
+		
+		public void RemoveByTypeString( string TypeString ) 
+		{
+			if( Components.ContainsKey(TypeString) ) 
+			{
+				Components.Remove(TypeString);
+			}
+		}
+		
+		public void DisposeSingleComponents()
+		{
+			while( Components.Count > 0 ) 
+			{
+				foreach( (string name, GodotObject _object) in Components ) 
+				{
+					Components.Remove(name);
+				
+					if( EditorPlugin.IsInstanceValid( _object ) && _object is BaseComponent component )
+					{
+						component.QueueFree();
+					}
+				}
+			}
+		}
+		
 		/*
 		** Fetches classes inside a given namespace
 		**
@@ -62,11 +130,14 @@ namespace AssetSnap.Component
 			// Get all types in the current assembly
 			Type[] types = Assembly.GetExecutingAssembly().GetTypes();
 
-			// Filter types by namespace
-			System.Collections.Generic.IEnumerable<System.Type> ClassesInNamespace = types
-				.Where(type => type.Namespace == TargetNamespace && type.IsClass);
+			// Filter types by namespace recursively
+			IEnumerable<Type> classesInNamespace = types
+				.Where(type => type.Namespace != null && 
+							(type.Namespace == TargetNamespace || 
+								type.Namespace.StartsWith(TargetNamespace + ".")) && 
+							type.IsClass);
 
-			return ClassesInNamespace;
+			return classesInNamespace;
 		}
 		
 		/*
@@ -81,25 +152,11 @@ namespace AssetSnap.Component
 		{
 			foreach (Type classType in ClassesInNamespace)
 			{
-				string TypeName = classType.Name;
-				
+				string TypeName = classType.FullName;
+				string TypeKey = TypeName.Replace("AssetSnap.Front.Components.", "").Split(".").Join("");
+
 				// Create an instance of the class
-				object instance = Activator.CreateInstance(classType);
-				if( IsComponent(instance) && ShouldInclude(instance) ) 
-				{
-					EnterComponent(instance, TypeName);
-				}
-				else  
-				{
-					if( instance is Node _node && IsInstanceValid(_node)) 
-					{
-						if( null != _node.GetParent() && IsInstanceValid( _node.GetParent() ))
-						{
-							_node.GetParent().RemoveChild(_node);
-						}
-						_node.QueueFree();
-					}
-				} 
+				_ComponentTypes.Add(TypeKey);
 			}
 		}
 		
@@ -120,18 +177,17 @@ namespace AssetSnap.Component
 				GD.PushWarning("Component was not entered into the array");
 				return;
 			}
-			
-			AddChild(_Component, true);
+				
+			_Component.TypeString = TypeName;
 			_Component.Enter();
 			_Components.Add(TypeName, _Component);
 		}
-
-
+		
 		/*
 		** Checks if given object is a base component
 		**
 		** @param object instance
-		** @return bool 
+		** @return bool  
 		*/
 		private bool IsComponent( object instance )
 		{
@@ -165,6 +221,59 @@ namespace AssetSnap.Component
 			return null;
 		}
 		
+		public void ClearInstance( BaseComponent instance ) 
+		{
+			if( Instances.Contains( instance ) ) 
+			{
+				Instances.Remove(instance);
+			}
+		}
+		
+		public void Clear<T>( bool debug = false)
+		{
+			string key = typeof(T).FullName.Replace("AssetSnap.Front.Components.", "").Split(".").Join("");
+			
+			if( false == Has(key) ) 
+			{
+				if( debug ) 
+				{
+					GD.PushError("Found nothing to clear: ", key);
+				}
+
+				return;
+			}
+			
+			if( false == _Components.ContainsKey(key) ) 
+			{
+				if( debug ) 
+				{
+					GD.PushError("Found nothing to clear: ", key);
+				}
+				
+				return;
+			}
+			
+			if( false == EditorPlugin.IsInstanceValid(_Components[key]) ) 
+			{
+				_Components.Remove(key);
+				if( debug ) 
+				{
+					GD.PushError("Cannot clear disposed object: ", key);
+				}
+				
+				return;
+			}
+			
+			BaseComponent component = _Components[key] as BaseComponent;
+			
+			_Components.Remove(key);
+			_DisposeQueue.Add(component);
+			component.Clear();
+			component.GetParent().RemoveChild(component);
+			
+			// _Components.Add(key, Activator.CreateInstance<T>() as BaseComponent);
+		}
+		
 		/*
 		** Fetches an instance of a single object
 		** and returns it to the querier.
@@ -174,32 +283,80 @@ namespace AssetSnap.Component
 		*/
 		public T Single<T>( bool unique = false )
 		{
-			string key = typeof(T).Name;
-			
+			string key = typeof(T).FullName.Replace("AssetSnap.Front.Components.", "").Split(".").Join("");
+
 			if( false == Has(key) ) 
 			{
 				return default(T);
 			}
+			
+			if( false == _Components.ContainsKey(key) && false == unique ) 
+			{
+				object instance = Activator.CreateInstance(typeof(T));
+				if( IsComponent(instance) && ShouldInclude(instance) ) 
+				{
+					EnterComponent(instance, key);
+				}
+				else  
+				{
+					if( instance is Node _node && EditorPlugin.IsInstanceValid(_node)) 
+					{
+						if( null != _node.GetParent() && EditorPlugin.IsInstanceValid( _node.GetParent() ))
+						{
+							_node.GetParent().RemoveChild(_node);
+						}
+						
+						_node.Free();
+					}
+				} 
+			}
 
-			BaseComponent component = _Components[key];
 			
 			if( unique ) 
 			{
-				component = Activator.CreateInstance<T>() as BaseComponent;
-				AddChild(component, true);
- 
+				BaseComponent component = Activator.CreateInstance<T>() as BaseComponent;
+				component.Name = component.Name + _Instances.Count;
+				component.TypeString = typeof(T).ToString();
+				if( null != component.GetParent() && component.GetParent() == Plugin.Singleton
+				.GetInternalContainer() ) 
+				{
+					Plugin.Singleton
+						.GetInternalContainer()
+						.RemoveChild(component);
+				}
+				
 				_Instances.Add(component);
+				if( component is T instanceTypedComponent ) 
+				{
+					return instanceTypedComponent;
+				}
 			}
-
-			if (component is T typedComponent)
+			else 
 			{
-				return typedComponent;
-			}
-			else
-			{
-				// Handle the case where conversion is not possible
-				return default(T);
-			}
+				if( _Components.ContainsKey(key) && _Components[key] is BaseComponent component) 
+				{
+					if (component is T typedComponent)
+					{
+						if(
+							null != component.GetParent() &&
+							component.GetParent() == Plugin.Singleton.GetInternalContainer()
+						) 
+						{
+							Plugin.Singleton
+								.GetInternalContainer()
+								.RemoveChild(component);
+						}
+						
+						return typedComponent;
+					}
+					else
+					{
+						// Handle the case where conversion is not possible
+						return default(T);
+					}
+				}
+			} 
+			return default(T);
 		}
 		
 		/*
@@ -218,27 +375,57 @@ namespace AssetSnap.Component
 			{
 				return null;
 			}
-
-			BaseComponent component = _Components[keyName];
+			
+			if( false == _Components.ContainsKey(keyName.Split(".").Join("")) && false == unique) 
+			{
+				object instance = Activator.CreateInstance(Type.GetType(keyName));
+				if( IsComponent(instance) && ShouldInclude(instance) ) 
+				{
+					EnterComponent(instance, key);
+				}
+				else  
+				{
+					if( instance is Node _node && EditorPlugin.IsInstanceValid(_node)) 
+					{
+						if( null != _node.GetParent() && EditorPlugin.IsInstanceValid( _node.GetParent() ))
+						{
+							_node.GetParent().RemoveChild(_node);
+						}
+						
+						_node.QueueFree();
+					}
+				} 
+			}
 			
 			if( unique ) 
 			{
 				Type classType = Type.GetType(key);
-				component = Activator.CreateInstance(classType) as BaseComponent;
+				BaseComponent component = Activator.CreateInstance(classType) as BaseComponent;
+				component.Name = component.Name + _Instances.Count;
+				component.TypeString = classType.ToString();
 				
 				_Instances.Add(component);
-			}
-
-			if (component is BaseComponent typedComponent)
+				return component;
+			} 
+			else 
 			{
-				return typedComponent;
-			}
-			else
-			{
-				// Handle the case where conversion is not possible
+				if( EditorPlugin.IsInstanceValid( _Components[keyName.Split(".").Join("")] ) && _Components[keyName.Split(".").Join("")] is BaseComponent component ) 
+				{
+					if (component is BaseComponent typedComponent)
+					{
+						return typedComponent;
+					}
+					else
+					{
+						// Handle the case where conversion is not possible
+						return null;
+					}
+				}
+				
 				return null;
 			}
 		}
+
 		
 		/*
 		** Checks if the given key has a component
@@ -248,7 +435,7 @@ namespace AssetSnap.Component
 		*/
 		public bool Has( string key )
 		{
-			if( false == _Components.ContainsKey(key) ) 
+			if( false == _ComponentTypes.Contains(key.Split(".").Join("")) ) 
 			{
 				return false;
 			}
@@ -262,10 +449,16 @@ namespace AssetSnap.Component
 			{
 				return;
 			}
-
-			RemoveChild(_Components[key]);
-			_Components[key] = new();
-			AddChild(_Components[key]);
+			
+			ExplorerUtils.Get()._Plugin
+				.GetInternalContainer()
+				.RemoveChild(_Components[key.Split(".").Join("")] as BaseComponent);
+				
+			_Components[key.Split(".").Join("")] = new();
+			
+			ExplorerUtils.Get()._Plugin
+				.GetInternalContainer()
+				.AddChild(_Components[key.Split(".").Join("")] as BaseComponent);
 		}
 		
 		/*
@@ -278,15 +471,16 @@ namespace AssetSnap.Component
 		*/
 		public bool HasAll( string[] keys )
 		{
-			if( _Components == null || _Components.Count == 0 ) 
+			if( _ComponentTypes == null || _ComponentTypes.Count == 0 ) 
 			{
+				GD.PushError("No components was found");
 				return false;
 			}
-			
+
 			for( int i = 0; i < keys.Length; i++)
 			{
 				string key = keys[i];
-				if( false == _Components.ContainsKey(key) ) 
+				if( false == _ComponentTypes.Contains(key.Split(".").Join("")) ) 
 				{
 					return false;
 				}
@@ -295,41 +489,14 @@ namespace AssetSnap.Component
 			return true;
 		}
 		
-		public override void _ExitTree()
+		
+		public void OnBeforeSerialize()
 		{
-			// if (_Instances != null && _Instances.Count != 0)
-			// {
-			// 	foreach( BaseComponent _component in _Instances ) 
-			// 	{
-			// 		if( EditorPlugin.IsInstanceValid( _component ) )  
-			// 		{
-			// 			_component.Free();
-			// 		}
-			// 	}
-			// }
-			
-			// if( _Components != null && _Components.Count != 0 ) 
-			// {
-			// 	foreach( (string key, BaseComponent _component) in _Components ) 
-			// 	{
-			// 		if( EditorPlugin.IsInstanceValid( _component ) ) 
-			// 		{
-			// 			_component.QueueFree();
-			// 		} 
-			// 	} 
-			// }  
-
-			// _Instances = null; 
-			// _Components = null; 
-
-			// foreach( Node child in GetChildren() ) 
-			// {
-			// 	if( IsInstanceValid( child ) )  
-			// 	{
-			// 		RemoveChild(child); 
-			// 		child.QueueFree();					
-			// 	}
-			// }
+			//
+		}
+		public void OnAfterDeserialize()
+		{
+			_Instance = this;
 		}
 	}
 }

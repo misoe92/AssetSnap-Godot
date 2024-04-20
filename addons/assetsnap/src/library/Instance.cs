@@ -23,41 +23,64 @@
 namespace AssetSnap.Library
 {
 	using System.Collections.Generic;
-	using AssetSnap.Front.Components;
+	using AssetSnap.Explorer;
+	using AssetSnap.Front.Components.Library;
 	using Godot;
 	
 	[Tool]
-	public partial class Instance : Node
+	public partial class Instance : VBoxContainer
 	{
+		[Signal]
+		public delegate void ItemCountUpdatedEventHandler( int count );
+		
 		public int Index;
-		private string _Folder;
-		private string _FileName; 
+		
+		[Export]
+		public string _Name;
+
+		[Export]
+		public string _Folder;
+		
+		[Export]
+		public string _FileName;
+		
+		[Export]
+		public int ItemCount 
+		{
+			get => _ItemCount;
+			set 
+			{
+				_ItemCount = value;
+				EmitSignal(SignalName.ItemCountUpdated, value);
+			}
+		}
+		
+		public int _ItemCount = 0;
+		
 		private GlobalExplorer _GlobalExplorer;
 		private Godot.Collections.Array<AsLibraryPanelContainer> Panels = new();
-		private TabContainer _Container;
 		private PanelContainer _PanelContainer;
-		private HBoxContainer _BoxContainerRight; 
 		
 		private readonly List<string> BodyComponents = new()
 		{
-			"LibraryBody",
+			"Library.Body",
 		};
 		
 		private readonly List<string> TopbarComponents = new()
 		{
-			"LibraryTopbar",
+			"Library.Topbar",
 		};
 		
 		private readonly List<string> SettingsComponents = new()
 		{
-			"LibraryBody",
-			"LibrarySettings",
+			"Library.Body",
+			"Library.Settings",
 		};
 		
 		private readonly List<string> ListingComponents = new()
 		{
-			"LibraryBody",
-			"LibraryListing",
+			"Library.Body",
+			"Library.Listing",
 		};
 		
 		public string Folder 
@@ -69,15 +92,8 @@ namespace AssetSnap.Library
 				_FileName = AsFileName();
 			}
 		}
-		
-		public TabContainer Container 
-		{
-			get => _Container;
-			set 
-			{
-				_Container = value;
-			}
-		}
+
+		public bool Initialized = false;
 		
 		public PanelContainer PanelContainer 
 		{
@@ -94,14 +110,39 @@ namespace AssetSnap.Library
 		}
 
 		/** Components **/
-		public LibraryBody _LibraryBody;
-		public LibraryTopbar _LibraryTopbar;
-		public LibrarySettings _LibrarySettings;
-		public LibraryListing _LibraryListing;
+		public Body _LibraryBody;
+		public Topbar _LibraryTopbar;
+		public Settings _LibrarySettings;
+		public Listing _LibraryListing;
+
+		public TabContainer Dock;
 		
 		public Instance()
 		{
-			Name = "LibraryInstance";
+			SizeFlagsVertical = SizeFlags.ExpandFill;
+			SizeFlagsHorizontal = SizeFlags.ExpandFill;
+			
+			// if( null != _Name ) 
+			// {
+			// 	Name = _Name;
+			// }
+			// else 
+			// {
+			// 	Name = "Invalid";
+			// }
+		}
+
+		public void Clear(bool debug = false)
+		{
+			_GlobalExplorer.Components.Remove(_LibraryTopbar);
+			_GlobalExplorer.Components.Remove(_LibrarySettings);
+			_GlobalExplorer.Components.Remove(_LibraryListing);
+			_GlobalExplorer.Components.Remove(_LibraryBody);
+			
+			_LibraryTopbar.Clear(debug);
+			_LibrarySettings.Clear(debug);
+			_LibraryListing.Clear(debug);
+			_LibraryBody.Clear(debug);
 		}
 		
 		/*
@@ -112,11 +153,44 @@ namespace AssetSnap.Library
 		*/
 		public void Initialize()
 		{
-			_GlobalExplorer = GlobalExplorer.GetInstance();
+			Component.Base Components = ExplorerUtils.Get().Components;
+			
+			if( Initialized ) 
+			{
+				// Clear the instances first
+				// Components.Clear<Topbar>();
+				// Components.Clear<Settings>();
+				// Components.Clear<Listing>();
+				// Components.Clear<Body>();
+				Clear();
+				
+				_LibraryBody = null;
+				_LibraryTopbar = null;
+				_LibraryListing = null;
+				_LibrarySettings = null;
+				
+				_PanelContainer.GetParent().RemoveChild(_PanelContainer);
+				_PanelContainer.QueueFree();
+				
+				// To ensure we reset it's position
+				Dock.RemoveChild(this);
+				// GD.Print("Removed tab entry");
+				// Dock.AddChild(this);
+			}
+			else 
+			{
+				Dock.AddChild(this);
+			}
+
+			Initialized = true;
+			
+			_GlobalExplorer = ExplorerUtils.Get();
 			
 			_PanelContainer = new()
 			{
-				Name = _FileName.Capitalize()
+				SizeFlagsVertical = SizeFlags.ExpandFill,
+				SizeFlagsHorizontal = SizeFlags.ExpandFill,
+				Name = _FileName.Capitalize(),
 			}; 
 			
 			_SetupLibraryBody();
@@ -131,10 +205,11 @@ namespace AssetSnap.Library
 				GD.PushWarning("Library body failed to build"); 
 			}
 
-			_Container.AddChild(_PanelContainer);
+			AddChild(_PanelContainer);
 			_PanelContainer.SetMeta("FolderPath", _Folder); 
 
 			_GlobalExplorer._Plugin.Connect(Plugin.SignalName.LibraryChanged, Callable.From( ( string name ) => { _OnLibraryChanged( name ); }));
+			Plugin.Singleton.EmitSignal(Plugin.SignalName.OnLibraryPopulized);
 		}
 
 		/*
@@ -229,7 +304,7 @@ namespace AssetSnap.Library
 			Component.Base Components = _GlobalExplorer.Components;
 			if ( Components.HasAll( BodyComponents.ToArray() )) 
 			{
-				_LibraryBody = Components.Single<LibraryBody>(true);
+				_LibraryBody = Components.Single<Body>(true);
 				
 				if( HasLibraryBody() ) 
 				{
@@ -248,10 +323,9 @@ namespace AssetSnap.Library
 		private void _SetupLibraryTopbar()
 		{
 			Component.Base Components = _GlobalExplorer.Components;
-			
 			if ( Components.HasAll( TopbarComponents.ToArray() )) 
 			{
-				_LibraryTopbar = Components.Single<LibraryTopbar>(true);
+				_LibraryTopbar = Components.Single<Topbar>(true);
 				
 				if( HasLibraryTopbar() ) 
 				{
@@ -272,7 +346,7 @@ namespace AssetSnap.Library
 			Component.Base Components = _GlobalExplorer.Components;
 			if (Components.HasAll( SettingsComponents.ToArray() )) 
 			{
-				_LibrarySettings = Components.Single<LibrarySettings>(true);
+				_LibrarySettings = Components.Single<Settings>(true);
 				
 				if( HasLibrarySettings() ) 
 				{
@@ -293,20 +367,14 @@ namespace AssetSnap.Library
 			Component.Base Components = _GlobalExplorer.Components;
 			if (Components.HasAll( ListingComponents.ToArray() )) 
 			{
-				_LibraryListing = Components.Single<LibraryListing>(true);
+				_LibraryListing = Components.Single<Listing>(true);
 				
 				if( HasLibraryListing() ) 
 				{
 					_LibraryListing.Container = _LibraryBody.GetRightInnerContainer();
 					_LibraryListing.Folder = Folder;
 					_LibraryListing.Library = this;
-					
 					_LibraryListing.Initialize();
-					
-					if( null != _LibraryTopbar ) 
-					{
-						_LibraryTopbar.ItemCount = GetPanels().Count;
-					}
 				}
 			}
 		}
@@ -325,16 +393,6 @@ namespace AssetSnap.Library
 		private bool HasLibraryTopbar()
 		{
 			return null != _LibraryTopbar;
-		}
-				
-		/*
-		** Checks if the library search exists
-		**
-		** @return bool
-		*/
-		private bool HasLibrarySearch()
-		{
-			return null != _LibraryTopbar._LibrarySearch;
 		}
 						
 		/*
@@ -390,7 +448,6 @@ namespace AssetSnap.Library
 		
 		private void _OnLibraryChanged( string name )
 		{
-			// GD.Print(GetName());
 			if( name == GetName() && null != _LibrarySettings ) 
 			{
 				// This is the library that was changed to.
@@ -410,11 +467,6 @@ namespace AssetSnap.Library
 			if( null != _PanelContainer && IsInstanceValid(_PanelContainer) ) 
 			{
 				_PanelContainer.QueueFree();
-			}
-
-			if( null != _BoxContainerRight && IsInstanceValid(_BoxContainerRight) ) 
-			{
-				_BoxContainerRight.QueueFree();
 			}
 
 			base._ExitTree();

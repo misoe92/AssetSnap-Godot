@@ -25,8 +25,9 @@ namespace AssetSnap.Config
 	using Godot;
 	
 	[Tool]
-	public partial class BaseConfig : Node
+	public partial class BaseConfig
 	{
+		protected string Name = "AssetSnapConfig"; 
 		protected readonly string BasePath = "res://addons/assetsnap/"; 
 		protected readonly string DefaultConfigSection = "Settings";
 		protected string LoadedConfigFilename;
@@ -38,7 +39,6 @@ namespace AssetSnap.Config
 		*/		
 		public BaseConfig()
 		{
-			Name = "AssetSnapConfig";
 			LoadOk = false;
 		}
 
@@ -85,13 +85,6 @@ namespace AssetSnap.Config
 			_Config.SetValue(Name, _key, _value);
 			_Config.Save(BasePath + LoadedConfigFilename);
 			GlobalExplorer.GetInstance()._Plugin.EmitSignal(Plugin.SignalName.SettingKeyChanged, new Godot.Collections.Array() { _key, _value });
-		}
-
-		public override void _ExitTree()
-		{
-			_Config = null;
-
-			base._ExitTree();
 		}
 	} 
 }

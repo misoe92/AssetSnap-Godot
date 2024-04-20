@@ -37,12 +37,12 @@ namespace AssetSnap.Component
 	   
 		public override void Initialize()
 		{
+			base.Initialize();
+		
 			_RegisterTraits();
 			Initiated = true;
 			_InitializeFields();
 			_FinalizeFields();
-			
-			base.Initialize();
 		}
 	
 		protected virtual void _RegisterTraits(){}

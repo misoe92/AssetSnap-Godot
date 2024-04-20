@@ -22,52 +22,51 @@
 
 #if TOOLS
 using System.Collections.Generic;
+using AssetSnap.Trait;
 using Godot;
 namespace AssetSnap.Component
 {
 	[Tool]
-	public partial class Checkable : Trait.Base
+	public partial class Checkable : ContainerTrait
 	{
+		/*
+		** Private
+		*/
 		private List<Callable?> _Actions = new();
 		private Callable? _Action;
-		private Vector2 Size;
-		private Vector2 CustomMinimumSize;
-
+		
 		private string Text = "";
 		private string TooltipText = "";
-
 		private bool ButtonPressed = false;
-
-		public MarginContainer _marginContainer;
-
-		public VBoxContainer _innerContainer;
 		
-		public Checkable Instantiate()
+		/*
+		** Public methods
+		*/
+		public Checkable()
 		{
-			base._Instantiate( GetType().ToString() );
-
-			_marginContainer = new()
-			{
-				Name="CheckboxMarginContainer",
-				Visible = Visible,
-			};
+			Name = "Checkable";
+			TypeString = GetType().ToString();
+		}
+		
+		/*
+		** Instantiate an instance of the trait
+		**
+		** @return Checkable
+		*/
+		public override Checkable Instantiate()
+		{
+			base._Instantiate();
+			base.Instantiate();
 			
-			_innerContainer = new()
-			{
-				Name="CheckboxBoxContainer",
-			};
-				
-			foreach( (string side, int value ) in Margin ) 
-			{
-				_marginContainer.AddThemeConstantOverride("margin_" + side, value);
-			}
-
+			// Setup the checkbox
 			CheckBox WorkingInput = new()
 			{
-				Name = Name,
+				Name = TraitName,
 				Text = Text,
 				TooltipText = TooltipText,
 				ButtonPressed = ButtonPressed,
+				SizeFlagsHorizontal = SizeFlagsHorizontal,
+				SizeFlagsVertical = SizeFlagsVertical
 			};
 
 			if( Vector2.Zero != CustomMinimumSize ) 
@@ -80,67 +79,67 @@ namespace AssetSnap.Component
 				WorkingInput.Size = Size;
 			}
 
+			// Setup node structure
+			base.GetInnerContainer(0).AddChild(WorkingInput);
+			
+			// Connect the button to it's action
 			if( _Action is Callable _callable ) 
 			{
 				WorkingInput.Connect(CheckBox.SignalName.Pressed, _callable);
 			}
-
-			_innerContainer.AddChild(WorkingInput);
-			_marginContainer.AddChild(_innerContainer);
-			WorkingNode = WorkingInput;
 			
-			Nodes.Add(WorkingNode);
+			Dependencies[TraitName + "_WorkingNode"] = WorkingInput;
+			
+			// Add the button to the nodes array			
+			Plugin.Singleton.traitGlobal.AddInstance(Iteration, WorkingInput, OwnerName, TypeString, Dependencies);
+			Plugin.Singleton.traitGlobal.AddName(Iteration, TraitName, OwnerName, TypeString);
+			
+			// Add the action to the actions array			
 			_Actions.Add(_Action);
 			
+			// Clear the trait
 			Reset();
 			
+			Iteration += 1;
+			Dependencies = new();
+			
 			return this;
 		}
 		
-		public bool HasNodes()
+		/*
+		** Selects an placed checkbox in the
+		** nodes array by index
+		**
+		** @param int index
+		** @return Checkable
+		*/
+		public override Checkable Select(int index, bool debug = false)
 		{
-			return null != Nodes && Nodes.Count != 0;
-		}
-		
-		public Checkable Select(int index)
-		{
-			base._Select(index);
+			base._Select(index, debug);
 			
-			if(
-				false == _select ||
-				false == IsInstanceValid( WorkingNode )
-			) 
+			if( false != Dependencies.ContainsKey(TraitName + "_WorkingNode")) 
 			{
-				return this;
-			}
-
-			if( WorkingNode is CheckBox InputNode )
-			{
-				if( index < _Actions.Count ) 
-				{
-					_Action = _Actions[index];
-				}
-				
-				if( IsInstanceValid( InputNode.GetParent() ) ) 
-				{
-					_innerContainer = InputNode.GetParent() as VBoxContainer;
-					if( IsInstanceValid( _innerContainer.GetParent() ) ) 
-					{
-						_marginContainer = _innerContainer.GetParent() as MarginContainer;
-					}
-				}
+				Godot.Collections.Dictionary<string, Variant> dependencies = Plugin.Singleton.traitGlobal.GetDependencies(index, TypeString, OwnerName);
+				Dependencies = dependencies;
 			}
 			
 			return this;
 		}
 		
-		public Checkable SelectByName( string name ) 
+		/*
+		** Selects an placed checkbox in the
+		** nodes array by name
+		**
+		** @param string name
+		** @return Checkable
+		*/
+		public override Checkable SelectByName( string name ) 
 		{
 			foreach( Button button in Nodes ) 
 			{
 				if( button.Name == name ) 
 				{
-					WorkingNode = button;
+					Dependencies[TraitName + "_WorkingNode"] = button;
 					break;
 				}
 			}
@@ -148,23 +147,36 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		public override bool IsValid()
+		/*
+		** Adds the currently chosen button
+		** to a specified container
+		**
+		** @param Node Container
+		** @return void
+		*/
+		public void AddToContainer( Node Container )
 		{
-			return base.IsValid();
-		}
-
-		public bool IsVisible()
-		{
-			if (null != _marginContainer && IsInstanceValid(_marginContainer))
+			if( false == Dependencies.ContainsKey(TraitName + "_MarginContainer") ) 
 			{
-				return _marginContainer.Visible;
+				GD.PushError("Container was not found @ AddToContainer");
+				GD.PushError("AddToContainer::Keys-> ", Dependencies.Keys);
+				GD.PushError("AddToContainer::ADDTO-> ", TraitName + "_MarginContainer");
+				return;
 			}
-			else 
-			{
-				return false;
-			}
+			
+			_AddToContainer(Container, Dependencies[TraitName + "_MarginContainer"].As<MarginContainer>());
 		}
 		
+		/*
+		** Setter Methods
+		*/
+		
+		/*
+		** Sets the name of the current checkbox
+		**
+		** @param string text
+		** @return Checkable
+		*/
 		public Checkable SetName( string text ) 
 		{
 			base._SetName(text);
@@ -172,6 +184,12 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
+		/*
+		** Sets the text of the current checkbox
+		**
+		** @param string text
+		** @return Checkable
+		*/
 		public Checkable SetText( string text ) 
 		{
 			Text = text;
@@ -179,6 +197,12 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
+		/*
+		** Sets the tooltip text of the current checkbox
+		**
+		** @param string text
+		** @return Checkable
+		*/
 		public Checkable SetTooltipText( string text ) 
 		{
 			TooltipText = text;
@@ -186,71 +210,18 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		public Checkable SetAction( Callable action ) 
-		{
-			_Action = action;			
-			return this;
-		}
-				
-		public Checkable SetVisible( bool state ) 
-		{
-			if( null != _marginContainer && IsInstanceValid( _marginContainer ) )  
-			{
-				_marginContainer.Visible = state;
-			}
-			else 
-			{
-				Visible = state;
-			}
-
-			return this;
-		}
-		
-		public Checkable SetDimensions( int width, int height )
-		{
-			CustomMinimumSize = new Vector2( width, height);
-			Size = new Vector2( width, height);
-
-			return this;
-		}
-		
-		
-		public Checkable SetMargin( int value, string side = "" ) 
-		{
-			if( side == "" ) 
-			{
-				Margin["top"] = value;
-				Margin["bottom"] = value;
-				Margin["left"] = value;
-				Margin["right"] = value;
-			}
-			else 
-			{
-				Margin[side] = value;
-			}
-			
-			if( null != _marginContainer)  
-			{
-				_marginContainer.AddThemeConstantOverride("margin_" + side, value);
-			}
-			
-			return this;
-		}
-		
-		public bool GetValue()
-		{
-			if( IsInstanceValid( WorkingNode ) && WorkingNode is CheckBox WorkingInput) 
-			{
-				// GD.PushError(Name);
-				return WorkingInput.ButtonPressed;
-			}
-			
-			return false;
-		}
-		
+		/*
+		** Sets the value of the current checkbox
+		**
+		** @param bool value
+		** @return Checkable
+		*/
 		public Checkable SetValue( bool value )
 		{
-			if( IsInstanceValid( WorkingNode ) && WorkingNode is CheckBox WorkingInput) 
+			if(
+				false != Dependencies.ContainsKey(TraitName + "_WorkingNode") &&
+				Dependencies[TraitName + "_WorkingNode"].As<GodotObject>() is CheckBox WorkingInput
+			) 
 			{
 				WorkingInput.ButtonPressed = value;
 			}
@@ -262,44 +233,139 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		public void AddToContainer( Node Container )
+		/*
+		** Sets the visibility state of the
+		** currently chosen checkbox
+		**
+		** @param bool state
+		** @return Checkable
+		*/
+		public override Checkable SetVisible( bool state ) 
 		{
-			if( null != WorkingNode ) 
+			base.SetVisible(state);
+
+			return this;
+		}
+		
+		/*
+		** Sets the horizontal size flag, which controls the x
+		** axis, and how it should act.
+		**
+		** @param Control.SizeFlags flag
+		** @return Checkable
+		*/
+		public override Checkable SetHorizontalSizeFlags(Control.SizeFlags flag)
+		{
+			base.SetHorizontalSizeFlags(flag); 
+
+			return this;
+		}
+		
+		/*
+		** Sets the vertical size flag, which controls the y
+		** axis, and how it should act.
+		**
+		** @param Control.SizeFlags flag
+		** @return Checkable
+		*/
+		public override Checkable SetVerticalSizeFlags(Control.SizeFlags flag)
+		{
+			base.SetVerticalSizeFlags(flag); 
+
+			return this;
+		}
+		
+		/*
+		** Sets the callable for the
+		** currently chosen checkbox
+		**
+		** @param Callable action
+		** @return Checkable
+		*/
+		public Checkable SetAction( Callable action ) 
+		{
+			_Action = action;			
+			return this;
+		}
+		
+		/*
+		** Sets margin values for 
+		** the currently chosen checkbox
+		**
+		** @param int value
+		** @param string side
+		** @return Checkable
+		*/
+		public override Checkable SetMargin( int value, string side = "" ) 
+		{
+			base.SetMargin(value, side);
+			return this;
+		}
+		
+		/*
+		** Sets the dimensions for the checkbox
+		**
+		** @param int width
+		** @param int height
+		** @return Checkable
+		*/
+		public override Checkable SetDimensions( int width, int height )
+		{
+			base.SetDimensions(width, height);
+
+			return this;
+		}
+		
+		/*
+		** Getter Methods
+		*/
+		
+		/*
+		** Fetches the value of
+		** the current checkbox
+		**
+		** @return bool
+		*/
+		public bool GetValue()
+		{
+			if( false != Dependencies.ContainsKey(TraitName + "_WorkingNode") && Dependencies[TraitName + "_WorkingNode"].As<GodotObject>() is CheckBox WorkingInput) 
 			{
-				// Single placement
-				Container.AddChild(_marginContainer);
+				// GD.PushError(Name);
+				return WorkingInput.ButtonPressed;
 			}
-			else 
-			{
-				// Multi placement
-				for( int i = 0; i<Nodes.Count;i++ )
-				{
-					Select(i);
-					Container.AddChild(_marginContainer);
-				}
-			}
+			
+			return false;
 		}
 		
-		public void FreeAction( Callable callable ) 
+		/*
+		** Booleans
+		*/
+		
+		/*
+		** Checks if any nodes exists
+		**
+		** @return bool
+		*/
+		public bool HasNodes()
 		{
-			WorkingNode.Disconnect(CheckBox.SignalName.Pressed, callable);
+			return null != Nodes && Nodes.Count != 0;
 		}
 		
-		private void Reset()
-		{
-			WorkingNode = null;
-			_marginContainer = null;
-			_innerContainer = null;
-			_Action = null; 
-		}
+		/*
+		** Private
+		*/
 		
-		public override void _ExitTree()
+		/*
+		** Resets the trait to
+		** a cleared state
+		**
+		** @return void
+		*/
+		protected override void Reset()
 		{
-			Nodes = new();
-			disposed = true;
-			Reset();
-			 
-			base._ExitTree();
+			_Action = null;
+
+			base.Reset();
 		}
 	}
 }

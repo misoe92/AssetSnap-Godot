@@ -23,6 +23,7 @@
 namespace AssetSnap.Front.Nodes
 {
 	using System;
+	using AssetSnap.Explorer;
 	using Godot;
 
 	[Tool]
@@ -67,23 +68,12 @@ namespace AssetSnap.Front.Nodes
 			Action ResizeAction = () => { _OnResize(); };
 			
 			EditorInterface.Singleton.GetBaseControl().Connect(Control.SignalName.Resized, Callable.From(ResizeAction));
-			EditorInterface.Singleton.GetBaseControl().GetNode<Control>("@VBoxContainer@14/@HSplitContainer@17/@HSplitContainer@25/@VSplitContainer@27").Connect(Control.SignalName.Resized, Callable.From(ResizeAction));
+			EditorInterface.Singleton.GetFileSystemDock().GetParent().Connect(Control.SignalName.Resized, Callable.From(ResizeAction));
 
-			// register cleanup code to prevent unloading issues
-			System.Runtime.Loader.AssemblyLoadContext.GetLoadContext(System.Reflection.Assembly.GetExecutingAssembly()).Unloading += alc =>
-			{
-				GD.Print("Cleaning Context"); 
-				if( null != EditorInterface.Singleton.GetBaseControl() && EditorInterface.Singleton.GetBaseControl().IsConnected(Control.SignalName.Resized, Callable.From(ResizeAction)))
-				{
-					EditorInterface.Singleton.GetBaseControl().Disconnect(Control.SignalName.Resized, Callable.From(ResizeAction));
-				}
-				if( null != EditorInterface.Singleton.GetBaseControl() && EditorInterface.Singleton.GetBaseControl().GetNode<Control>("@VBoxContainer@14/@HSplitContainer@17/@HSplitContainer@25/@VSplitContainer@27").IsConnected(Control.SignalName.Resized, Callable.From(ResizeAction)))
-				{
-					EditorInterface.Singleton.GetBaseControl().GetNode<Control>("@VBoxContainer@14/@HSplitContainer@17/@HSplitContainer@25/@VSplitContainer@27").Disconnect(Control.SignalName.Resized, Callable.From(ResizeAction));
-				}
-
-				handle.Free();
-			};
+			ExplorerUtils.Get().ContextMenu.GetInstance().Connect(
+				SignalName.VectorsChanged,
+				new Callable(this, "_OnUpdateVectors")
+			);
 		}
 		
 		public override void _Input(InputEvent @Event) 
@@ -256,7 +246,7 @@ namespace AssetSnap.Front.Nodes
 		private void _OnResize()
 		{
 			Vector2 WindowSize = EditorInterface.Singleton.GetBaseControl().Size;
-			Control DockOne = EditorInterface.Singleton.GetBaseControl().GetNode<Control>("@VBoxContainer@14/@HSplitContainer@17/@HSplitContainer@25/@VSplitContainer@27");
+			Control DockOne = EditorInterface.Singleton.GetFileSystemDock().GetParent<Control>();
 			Vector2 CurrentPosition = Position;
 			
 			if( WindowSize.X < 1300.0f ) 
@@ -290,13 +280,12 @@ namespace AssetSnap.Front.Nodes
 		}
 		public AsSelectList GetQuickActions()
 		{
-			return GetNode<AsSelectList>("HBoxContainer/QuickAction/ModifiersList");
+			return GetNode<AsSelectList>("HBoxContainer/QuickAction/SelectList");
 		}
 		public AsSelectList GetAngles()
 		{
-			return GetNode<AsSelectList>("HBoxContainer/Angle/ModifiersList");
+			return GetNode<AsSelectList>("HBoxContainer/Angle/SelectList");
 		}
-		
 		private SpinBox RotationNodeX()
 		{
 			return GetNode<SpinBox>("HBoxContainer/RotateValues/RotateAngleX/SpinBox");
@@ -323,11 +312,18 @@ namespace AssetSnap.Front.Nodes
 			return GetNode<SpinBox>("HBoxContainer/ScaleValues/ScaleAngleZ/SpinBox");
 		}
 		
-	
-
-		public override void _ExitTree()
+		/*
+		** Updates rotation and scale valus on the current handle
+		** when a change is received from the context menu
+		**
+		** @param Godot.Collections.Dictionary package
+		** @return void
+		*/
+		private void _OnUpdateVectors(Godot.Collections.Dictionary package)
 		{
-			base._ExitTree();
+			Node3D Handle = ExplorerUtils.Get().GetHandle();
+			Handle.RotationDegrees = package["Rotation"].As<Vector3>();
+			Handle.Scale = package["Scale"].As<Vector3>();
 		}
 	}
 }

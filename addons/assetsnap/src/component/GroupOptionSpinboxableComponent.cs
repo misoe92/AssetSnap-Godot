@@ -21,7 +21,7 @@
 // SOFTWARE.
 
 #if TOOLS
-using AssetSnap.Front.Components;
+using AssetSnap.Front.Components.Groups.Builder;
 using Godot;
 
 namespace AssetSnap.Component
@@ -29,27 +29,26 @@ namespace AssetSnap.Component
 	[Tool]
 	public partial class GroupOptionSpinboxableComponent : GroupOptionComponent
 	{
-		public GroupBuilderEditorGroupOptions Parent;
+		public EditorGroupOptions Parent;
 		
 		public override void Initialize()
 		{
-			AddTrait(typeof(Spinboxable));
+			base.Initialize();
+		
 			Initiated = true;
 			
 			_InitializeFields();
 			_FinalizeFields();
-			
-			base.Initialize();
 		}
 		
-		public void Show()
+		public void InputShow()
 		{
 			Trait<Spinboxable>()
 				.Select(0)
 				.SetVisible(true);
 		}
 		
-		public void Hide()
+		public void InputHide()
 		{
 			Trait<Spinboxable>()
 				.Select(0)

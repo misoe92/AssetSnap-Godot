@@ -26,23 +26,57 @@ namespace AssetSnap
 	using System;
 	using AssetSnap.ASNode.Types;
 	using AssetSnap.Core;
+	using AssetSnap.Explorer;
+	using AssetSnap.Front.Nodes;
+	using AssetSnap.Nodes;
+	using AssetSnap.States;
+	using AssetSnap.Trait;
 	using Godot;
 
 	[Tool]
-	public partial class Plugin : EditorPlugin
+	public partial class Plugin : EditorPlugin, ISerializationListener
 	{
 		[Signal]
-		public delegate void SettingKeyChangedEventHandler();
-		
+		public delegate void FoldersLoadedEventHandler();
+
 		[Signal]
-		public delegate void LibraryChangedEventHandler( string name );
-		
+		public delegate void SettingKeyChangedEventHandler();
+
+		[Signal]
+		public delegate void LibraryChangedEventHandler(string name);
+
 		[Signal]
 		public delegate void StatesChangedEventHandler();
 
+		[Signal]
+		public delegate void OnRemoveFolderEventHandler(string folder);
+		
+		[Signal]
+		public delegate void OnLibraryPopulizedEventHandler();
+		
 		/** Internal data **/
-		private readonly string _Version = "0.1.1";
+		private bool disposed = false;
+		private readonly string _Version = "0.1.2";
 		private readonly string _Name = "Plugin";
+		
+		/* Bottom Dock */
+		public TraitGlobal traitGlobal {
+			get
+			{
+				return TraitGlobal.Singleton;
+			}
+			set 
+			{
+				// GD.Print("Cant be set");
+			}
+		}
+			
+		[Export]
+		public Node internalNode;
+		
+		[Export] 
+		public AsBottomDock _dock;
+	
 		protected Callable? UpdateHandleCallable;
 		private bool _initialized = false;
 		
@@ -51,15 +85,37 @@ namespace AssetSnap
 		private CoreInput _CoreInput = new();
 		private CoreProcess _CoreProcess = new();
 		private CoreHandles _CoreHandles = new();
- 
+
 		/** Editor Node Types **/ 
 		public NodeType[] NodeTypes = Array.Empty<NodeType>();
-
 		private static Plugin _Instance;
+		
+		public static Plugin Singleton 
+		{
+			get
+			{
+				return _Instance;
+			}
+		}
 		
 		public static Plugin GetInstance()
 		{
-			return _Instance;
+			return Singleton;
+		}
+		
+		public Plugin()
+		{	
+			Name = "AssetSnapPlugin";
+		}
+		
+		public void OnBeforeSerialize()
+		{
+			//
+		}
+		
+		public void OnAfterDeserialize()
+		{
+			_Instance = this;
 		}
 		
 		/*
@@ -69,56 +125,136 @@ namespace AssetSnap
 		*/ 
 		public override void _EnterTree() 
 		{
-			Name = "AssetSnapPlugin";
-			Plugin._Instance = this;
-
+			_Instance = this;
+			Connect(EditorPlugin.SignalName.SceneChanged, Callable.From( (Node scene) => { _OnSceneChanged(scene); } ) );
+			
+			AddChild(traitGlobal);
+			if( null == internalNode ) 
+			{
+				internalNode = new()
+				{
+					Name = "InternalNode"
+				};
+				
+				AddChild(internalNode);
+			}
+			_dock = GD.Load<PackedScene>("res://addons/assetsnap/scenes/dock.tscn").Instantiate<AsBottomDock>();
+			AddControlToBottomPanel(_dock, "Assets");
+			
 			if( null == GlobalExplorer.InitializeExplorer() ) 
 			{
 				GD.PushError("No explorer is available");
 				return;
 			}
 
-
-			Connect(SignalName.SceneChanged, Callable.From( (Node scene) => { _OnSceneChanged(scene); } ) );
-			
 			// UpdateHandleCallable = new(this, "UpdateHandle");
 			
 			// if(false == IsUpdateHandleConnected()) 
 			// {
 			// 	EditorInterface.Singleton.GetInspector().Connect(EditorInspector.SignalName.EditedObjectChanged, UpdateCallable());
-			// } 
+			// }
 		}
 		
-		public override void _Ready() 
+		public override void _Ready()
 		{
 			// Finalize Initialize of plugin 
 			_CoreEnter.InitializeCore();
+			
+			OnRemoveFolder += (string title ) => { CallDeferred("DoRemoveFolder", title); };
+
+			GD.Print(ModelPreviewer.Singleton.Count());
+			
+			ModelPreviewer.Singleton.Enter();
+			ModelPreviewer.Singleton.GeneratePreviews();
 		}
+		
+		private void DoRemoveFolder(string title ) 
+		{
+			ExplorerUtils.Get().Settings.RemoveFolder(title);
+		}
+	
+		public Node GetInternalContainer() 
+		{
+			return internalNode;
+		} 
 		
 		private void _OnSceneChanged(Node Scene)
 		{
-			GlobalExplorer.GetInstance().States.CurrentScene = Scene;
+			if( null == StatesUtils.Get().CurrentScene && null != Scene ) 
+			{
+				GD.Print("Scene is set");
+			}
+			
+			if( null != StatesUtils.Get().CurrentScene && null != Scene )
+			{
+				GD.Print("Scene is set");
+			}
+			
+			if( null != StatesUtils.Get().CurrentScene && null == Scene )
+			{
+				GD.Print("Scene is released");
+			}
+			
+			StatesUtils.Get().CurrentScene = Scene;
 		}
 		
 		/*
 		** Destruction of our plugin
 		**
 		** @return void 
-		*/ 
+		*/
 		public override void _ExitTree()
 		{
-			// SceneChanged -= (scene) => { _OnSceneChanged(scene); };
-			// RemoveAutoloadSingleton("GlobalExplorer");
+			disposed = true;
 
-			_CoreEnter = null;
-			_CoreInput = null;
-			_CoreProcess = null;
-			_CoreHandles = null;
+			foreach( GodotObject _object in traitGlobal.DisposeQueue ) 
+			{
+				if( IsInstanceValid(_object) && _object is Node node ) 
+				{
+					if( IsInstanceValid(node) && node.HasMethod( Node.MethodName.Free ) ) 
+					{
+						if( null != node.GetParent() ) 
+						{
+							node.GetParent().RemoveChild(node);
+						}
 
-			_Instance = null;
-			UpdateHandleCallable = null; 
-		} 
+						node.Free();
+					}
+					else 
+					{
+						GD.Print("Could not free", node.Name);
+					}
+				}
+				else 
+				{
+					GD.Print("Not valid");
+				}
+			}
+			
+			if( ExplorerUtils.Get().Components.DisposeQueue.Count != 0 ) 
+			{
+				foreach( GodotObject gobject in ExplorerUtils.Get().Components.DisposeQueue ) 
+				{
+					if( IsInstanceValid(gobject) && gobject is Node node ) 
+					{
+						node.Free();
+					}
+				}
+			}
 		
+			
+			if( null != _dock ) 
+			{
+				RemoveControlFromBottomPanel(_dock);
+				_dock.Free();
+			}
+			
+			if( null != traitGlobal ) 
+			{
+				traitGlobal.Free();
+			}
+		} 
+		 
 		/*
 		** Handling of communication with editor handles
 		** 
@@ -126,13 +262,13 @@ namespace AssetSnap
 		*/
 		public override bool _Handles( GodotObject _object ) 
 		{
-			if (_CoreHandles == null)
+			if (_CoreHandles == null || disposed )
 			{
 				return true;
 			}
 			
 			return _CoreHandles.Handle(_object);
-		}
+		} 
 		
 		/*
 		** Handling of GUI Input in the editor.
@@ -142,7 +278,7 @@ namespace AssetSnap
 		public override int _Forward3DGuiInput( Camera3D camera, InputEvent @event ) 
 		{
 			// If internal component is not set
-			if( _CoreInput == null ) 
+			if( _CoreInput == null || disposed ) 
 			{
 				return (int)EditorPlugin.AfterGuiInput.Pass;
 			}
@@ -157,7 +293,7 @@ namespace AssetSnap
 		*/
 		public override void _Process( double delta ) 
 		{
-			if( _CoreProcess == null ) 
+			if( _CoreProcess == null || disposed ) 
 			{
 				return;
 			}
@@ -227,6 +363,12 @@ namespace AssetSnap
 			
 			return false;
 		}
+		 
+		public TabContainer GetTabContainer()
+		{
+			return _dock._TabContainer; 
+			// AsBottomDock; 
+		}
 		
 		/*
 		** Fetches the current plugin version
@@ -247,7 +389,6 @@ namespace AssetSnap
 		{
 			return _Version;
 		}
-		
 	}
 }
-#endif
+#endif 

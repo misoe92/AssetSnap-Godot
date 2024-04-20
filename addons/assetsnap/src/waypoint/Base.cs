@@ -29,18 +29,25 @@ namespace AssetSnap.Waypoint
 	using AssetSnap.Static;
 	using Godot;
 	
-	public partial class Base : Node
+	public partial class Base
 	{
 		private GlobalExplorer _GlobalExplorer;
 		private Node _ParentContainer;
 		public WaypointList WaypointList;
 		public float SnapDistance = 1.0f;
-		
 		public Node3D WorkingNode;
-		
-		public Base()
+		private static Base _Instance;
+		public static Base Singleton 
 		{
-			Name = "AssetSnapWaypoint";
+			get
+			{
+				if( null == _Instance ) 
+				{
+					_Instance = new();
+				}
+
+				return _Instance;
+			}
 		}
 		
 		public void Initialize()
@@ -110,9 +117,9 @@ namespace AssetSnap.Waypoint
 			}
 
 			WorkingNode = model;
-			if (IsInstanceValid(_model))
+			if ( EditorPlugin.IsInstanceValid(_model))
 			{
-				if (IsInstanceValid(_model.GetParent()))
+				if (EditorPlugin.IsInstanceValid(_model.GetParent()))
 				{
 					_model.GetParent().RemoveChild(_model);
 				}
@@ -393,7 +400,7 @@ namespace AssetSnap.Waypoint
 				return;
 			}
 			
-			if( IsInstanceValid( ModelInstance ) ) 
+			if( EditorPlugin.IsInstanceValid( ModelInstance ) ) 
 			{
 				WaypointList.Remove(ModelInstance, Origin);
 			}
@@ -528,6 +535,11 @@ namespace AssetSnap.Waypoint
 			}
 			
 			_model.NotifyPropertyListChanged();
+		}
+		
+		public void SetParentContainer( Node Container ) 
+		{
+			_ParentContainer = Container;
 		}
 		
 		/*

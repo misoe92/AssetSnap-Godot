@@ -25,15 +25,26 @@ namespace AssetSnap.Settings
 	using System.Collections.Generic;
 	using AssetSnap.Front.Components;
 	using AssetSnap.Front.Configs;
+	using AssetSnap.States;
 	using Godot;
 
 	public partial class BaseContainer : PanelContainer
 	{
 		private ScrollContainer _ScrollContainer;
+		private MarginContainer _MarginContainer;
+		private VBoxContainer _VBoxContainer;
 		private HBoxContainer _HBoxContainer;
 		private VBoxContainer SubContainerOne;
 		private VBoxContainer SubContainerTwo;
 		private VBoxContainer SubContainerThree;
+		private VBoxContainer SubContainerFour;
+		
+		public bool Initialized = false;
+		
+		public BaseContainer()
+		{
+			Name = "SettingsBaseContainer";
+		}
 
 		/*
 		** Initializes the settings container
@@ -43,10 +54,36 @@ namespace AssetSnap.Settings
 		*/
 		public void Initialize()
 		{
+			if( Initialized ) 
+			{
+				// Clear the instances first
+				_ScrollContainer.GetParent().RemoveChild(_ScrollContainer);
+				_ScrollContainer.QueueFree();
+			}
+
+			Initialized = true;
+			
 			SettingsConfig _Config = GlobalExplorer.GetInstance().Settings;
 			Name = "Settings";
 			
 			_ScrollContainer = new()
+			{
+				SizeFlagsVertical = Control.SizeFlags.ExpandFill,
+				SizeFlagsHorizontal = Control.SizeFlags.ExpandFill
+			};
+
+			_MarginContainer = new()
+			{
+				SizeFlagsVertical = Control.SizeFlags.ExpandFill,
+				SizeFlagsHorizontal = Control.SizeFlags.ExpandFill
+			};
+
+			_MarginContainer.AddThemeConstantOverride("margin_top", 5);
+			_MarginContainer.AddThemeConstantOverride("margin_left", 5);
+			_MarginContainer.AddThemeConstantOverride("margin_right", 5);
+			_MarginContainer.AddThemeConstantOverride("margin_bottom", 5);
+			
+			_VBoxContainer = new()
 			{
 				SizeFlagsVertical = Control.SizeFlags.ExpandFill,
 				SizeFlagsHorizontal = Control.SizeFlags.ExpandFill
@@ -60,32 +97,39 @@ namespace AssetSnap.Settings
 
 			SubContainerOne = new()
 			{
-				Size = new Vector2(200, 0),
 				SizeFlagsVertical = Control.SizeFlags.ShrinkBegin,
 				SizeFlagsHorizontal = Control.SizeFlags.ExpandFill
 			};
 			
 			SubContainerTwo = new()
 			{
-				Size = new Vector2(200, 0),
 				SizeFlagsVertical = Control.SizeFlags.ShrinkBegin,
 				SizeFlagsHorizontal = Control.SizeFlags.ExpandFill
 			};
 			
 			SubContainerThree = new()
 			{
-				Size = new Vector2(200, 0),
 				SizeFlagsVertical = Control.SizeFlags.ShrinkBegin,
 				SizeFlagsHorizontal = Control.SizeFlags.ExpandFill
 			};
 
+			SubContainerFour = new()
+			{
+				SizeFlagsVertical = Control.SizeFlags.ShrinkBegin,
+				SizeFlagsHorizontal = Control.SizeFlags.ExpandFill
+			};
+			
 			RenderTypes();
 			
 			_HBoxContainer.AddChild(SubContainerOne);
 			_HBoxContainer.AddChild(SubContainerTwo);
 			_HBoxContainer.AddChild(SubContainerThree);
-			_ScrollContainer.AddChild(_HBoxContainer);
+			_HBoxContainer.AddChild(SubContainerFour);
+			_VBoxContainer.AddChild(_HBoxContainer);
+			_MarginContainer.AddChild(_VBoxContainer);
+			_ScrollContainer.AddChild(_MarginContainer);
 			AddChild(_ScrollContainer);
+			StatesUtils.SetLoad("Settings", true);
 		}
  
 		/*
@@ -128,6 +172,11 @@ namespace AssetSnap.Settings
 			if( Iteration == 2 )
 			{
 				EntryContainer = SubContainerThree; 
+			}
+			
+			if( Iteration == 3 )
+			{
+				EntryContainer = SubContainerFour; 
 			}
 
 			return EntryContainer;
@@ -178,7 +227,7 @@ namespace AssetSnap.Settings
 				}
 	
 				Iteration += 1; 
-				if( Iteration > 2 )
+				if( Iteration > 3 )
 				{
 					Iteration = 0;
 				}
@@ -377,77 +426,6 @@ namespace AssetSnap.Settings
 		public string allow_group_builder_type()
 		{
 			return "CheckBox";
-		}
-		
-		/*
-		** Cleans the various references and fields of the class
-		**
-		** @return void
-		*/
-		public override void _ExitTree()
-		{
-			foreach( Node child in SubContainerOne.GetChildren() ) 
-			{
-				if( IsInstanceValid(child) )
-				{
-					// SubContainerOne.RemoveChild(child);
-					child.QueueFree();
-				}
-			}
-			
-			foreach( Node child in SubContainerTwo.GetChildren() ) 
-			{
-				if( IsInstanceValid(child) )
-				{
-					// SubContainerTwo.RemoveChild(child);
-					child.QueueFree();
-				}
-			}
-			
-			foreach( Node child in SubContainerThree.GetChildren() ) 
-			{
-				if( IsInstanceValid(child) )
-				{
-					// SubContainerThree.RemoveChild(child);
-					child.QueueFree();
-				}
-			}
-			
-			if( IsInstanceValid(SubContainerOne) )
-			{
-				// _HBoxContainer.RemoveChild(SubContainerOne);
-				SubContainerOne.QueueFree();
-			}
-			
-			if( IsInstanceValid(SubContainerTwo) )
-			{
-				// _HBoxContainer.RemoveChild(SubContainerTwo);
-				SubContainerTwo.QueueFree();
-			} 
-			
-			if( IsInstanceValid(SubContainerThree) )
-			{
-				// _HBoxContainer.RemoveChild(SubContainerThree);
-				SubContainerThree.QueueFree();
-			}
-			
-			if( IsInstanceValid(_HBoxContainer) )
-			{
-				// _ScrollContainer.RemoveChild(_HBoxContainer);
-				_HBoxContainer.QueueFree();
-			}
-			
-			if( IsInstanceValid(_ScrollContainer) )
-			{
-				// RemoveChild(_ScrollContainer);
-				_ScrollContainer.QueueFree();
-			}
-
-			SubContainerOne = null;
-			SubContainerTwo = null;
-			SubContainerThree = null;
-			_HBoxContainer = null;
-			_ScrollContainer = null;
 		}
 	}
 }

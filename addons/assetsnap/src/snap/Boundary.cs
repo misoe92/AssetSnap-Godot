@@ -23,7 +23,6 @@
 #if TOOLS
 namespace AssetSnap.Snap
 {
-	using System;
 	using Godot;
 	public class Boundary
 	{

@@ -24,15 +24,32 @@ namespace AssetSnap.Front.Configs
 {
 	using System;
 	using System.Collections.Generic;
+	using System.Linq;
 	using AssetSnap.Settings;
+	using AssetSnap.States;
 	using Godot;
-	
+
 	public partial class SettingsConfig : Config.BaseConfig
 	{
 		private string _ConfigPath;
 		private string[] _Folders;
 		private Godot.Collections.Dictionary<string,Variant> _Settings;
 		private BaseContainer _Container;
+		public bool Initialized = false;
+
+		private static SettingsConfig _Instance = null;
+		public static SettingsConfig Singleton { 
+			get
+			{
+				if( _Instance == null ) 
+				{
+					_Instance = new SettingsConfig();
+					_Instance.Initialize();
+				}
+
+				return _Instance;
+			}
+		}
 		
 		public string _Name 
 		{
@@ -76,8 +93,13 @@ namespace AssetSnap.Front.Configs
 		*/
 		public void Initialize() 
 		{
+			if( null == _Instance ) 
+			{
+				_Instance = this;
+			}
+
 			_ConfigPath = "config.cfg";
-			LoadConfig( _ConfigPath ); 
+			LoadConfig( _ConfigPath );
 			
 			// If the file didn't load, ignore it.
 			if (LoadOk)
@@ -111,11 +133,20 @@ namespace AssetSnap.Front.Configs
 				
 				_Folders = _FolderList.ToArray();
 				_FolderList.Clear();
+				Initialized = true;
 			}
 			else 
 			{
 				GD.PushError("Invalid Config @ SettingsConfig");
 				return;
+			}
+		}
+		
+		public void MaybeEmitFoldersLoaded()
+		{
+			if( null != Plugin.GetInstance() ) 
+			{
+				Plugin.GetInstance().EmitSignal(Plugin.SignalName.FoldersLoaded);
 			}
 		}
 		
@@ -127,20 +158,15 @@ namespace AssetSnap.Front.Configs
 		*/
 		public void Reset( bool WithContainer = true ) 
 		{
-			_Folders = Array.Empty<string>();
-			_Settings = new();
-			
-			if( WithContainer ) 
+			if( null != _Container && WithContainer )  
 			{
-				if( null != _Container.GetParent() ) 
+				if( null != _Container.GetParent() && EditorPlugin.IsInstanceValid(_Container) ) 
 				{
 					_Container.GetParent().RemoveChild(_Container);
 				}
 
-				_Container.QueueFree();
+				_Container.Free();
 			}
-			
-			Initialize();
 		}
 
 		/*
@@ -150,9 +176,9 @@ namespace AssetSnap.Front.Configs
 		*/
 		public void InitializeContainer()
 		{
-			if( IsInstanceValid( _Container ) ) 
+			if( EditorPlugin.IsInstanceValid( _Container ) ) 
 			{
-				if( null != _Container.GetParent() ) 
+				if( null != _Container.GetParent() && EditorPlugin.IsInstanceValid(_Container) ) 
 				{
 					_Container.GetParent().RemoveChild(_Container);
 				}
@@ -160,8 +186,15 @@ namespace AssetSnap.Front.Configs
 				_Container.QueueFree();
 			}
 			
+			if( FolderCount == 0 ) 
+			{
+				return;	
+			}
+			
 			_Container = new();
 			_Container.Initialize();
+			
+			StatesUtils.SetLoad("SettingsContainer", true);
 		} 
 		
 		/*
@@ -198,6 +231,12 @@ namespace AssetSnap.Front.Configs
 		*/
 		public void AddFolder( string path )
 		{
+			if( _Folders.Contains( path ) ) 
+			{
+				GD.PushError("Library with the same name already exists, and as such cannot be added.");
+				return;
+			}
+			
 			_Config.SetValue("Folders", "Folder" + ( FolderCount + 1 ), path);
 			Error result = _Config.Save( BasePath + _ConfigPath );
 
@@ -205,6 +244,11 @@ namespace AssetSnap.Front.Configs
 			{
 				GD.PushError(result);
 			}
+			
+			LoadOk = false;
+			
+			Initialize();
+			MaybeEmitFoldersLoaded();
 		}
 		
 		/*
@@ -234,6 +278,10 @@ namespace AssetSnap.Front.Configs
 			{
 				GD.PushError(result);
 			}
+
+			LoadOk = false;
+			Initialize();
+			MaybeEmitFoldersLoaded();
 		}
 
 		/*
@@ -270,25 +318,6 @@ namespace AssetSnap.Front.Configs
 		public Godot.Collections.Dictionary<string,Variant> GetSettings()
 		{
 			return _Settings;
-		}
-		
-		/*
-		** Cleans up references, parameters and fields
-		** 
-		** @return void 
-		*/	
-		public override void _ExitTree()
-		{
-			_ConfigPath = null;
-			_Folders = null;
-			_Settings = null; 
-
-			if( IsInstanceValid(_Container)) 
-			{
-				_Container.QueueFree();
-			}
-
-			base._ExitTree();
 		}
 	}
 }

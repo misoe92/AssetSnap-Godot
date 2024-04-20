@@ -20,7 +20,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using AssetSnap.Front.Nodes;
+using AssetSnap.Explorer;
+using AssetSnap.Settings;
 using Godot;
 
 namespace AssetSnap.Core 
@@ -45,51 +46,76 @@ namespace AssetSnap.Core
 			new ASNode.Types.AsMultiMeshInstanceType().Initialize();
 			new ASNode.Types.AsOptimizedMultiMeshGroupType().Initialize();
 			new ASNode.Types.AsMultiMeshType().Initialize();
-			
-			// Adding base components to the tree
-			_GlobalExplorer._Plugin.AddChild(_GlobalExplorer.Settings);
-			_GlobalExplorer._Plugin.AddChild(_GlobalExplorer.Waypoints);
-			_GlobalExplorer._Plugin.AddChild(_GlobalExplorer.Components);
-			_GlobalExplorer._Plugin.AddChild(_GlobalExplorer.ContextMenu);
-			_GlobalExplorer._Plugin.AddChild(_GlobalExplorer.BottomDock);
-			_GlobalExplorer._Plugin.AddChild(_GlobalExplorer.Inspector);
- 
-			_GlobalExplorer._Plugin.AddChild(_GlobalExplorer.Decal);
-			_GlobalExplorer._Plugin.AddChild(_GlobalExplorer.Raycast);
 
-			_GlobalExplorer._Plugin.AddChild(_GlobalExplorer.Library); 
-			_GlobalExplorer._Plugin.AddChild(_GlobalExplorer.Modifiers);
- 
-			_GlobalExplorer._Plugin.AddChild(_GlobalExplorer.GroupBuilder);
- 
+			Plugin.Singleton.AddChild(ExplorerUtils.Get().Components);
+			Plugin.Singleton.AddChild(ExplorerUtils.Get().Library);
+			// Plugin.Singleton.AddChild(ExplorerUtils.Get().GroupBuilder);
+			
+			_GlobalExplorer._Plugin.FoldersLoaded += () => { _OnLoadContainers(); };
+
 			/** Initialize **/  
-			_GlobalExplorer.Settings.Initialize();
 			_GlobalExplorer.Waypoints.Initialize();
-			_GlobalExplorer.Components.Initialize();
-			_GlobalExplorer.BottomDock.Initialize();  
-			_GlobalExplorer.ContextMenu.Initialize(); 
-			
+			_GlobalExplorer.ContextMenu.Initialize();
 			_GlobalExplorer.Snap.Initialize();
-			 
+			
 			_GlobalExplorer.Decal.Initialize();  
-			_GlobalExplorer.Raycast.Initialize();  
+			_GlobalExplorer.Raycast.Initialize();
 			
-			// Finalize Group builder container  
-			_GlobalExplorer.GroupBuilder.Initialize();
-			_GlobalExplorer.GroupBuilder.InitializeContainer();  
-			_GlobalExplorer.BottomDock.Add(_GlobalExplorer.GroupBuilder.Container); 
-			
-			_GlobalExplorer.Library.Initialize();
- 
+			// Finalize Group builder container 
+			_GlobalExplorer.GroupBuilder.Initialize(); 
+			 
 			_GlobalExplorer.Inspector.Initialize();
-	
 			_GlobalExplorer.Inspector.AddToDock();
 			
-			// Finalize settings container 
-			_GlobalExplorer.Settings.InitializeContainer();  
-			_GlobalExplorer.BottomDock.Add(_GlobalExplorer.Settings.Container); 
+			_GlobalExplorer.Settings.MaybeEmitFoldersLoaded();
+		} 
+		
+		private void _OnLoadContainers() 
+		{
+			if( _GlobalExplorer.Settings.Initialized ) 
+			{
+				_GlobalExplorer.Settings.Reset();
+			}
 			
-			_GlobalExplorer.BottomDock.AddToBottomPanel(); 
+			if( _GlobalExplorer.GroupBuilder.Initialized ) 
+			{
+				_GlobalExplorer.GroupBuilder.ClearContainer();
+			}
+			
+			if( SettingsUtils.Get().FolderCount != 0 ) 
+			{
+				_GlobalExplorer.GroupBuilder.InitializeContainer();
+				
+				if(
+					null == _GlobalExplorer.GroupBuilder.Container ||
+					false == EditorPlugin.IsInstanceValid( _GlobalExplorer.GroupBuilder.Container )
+				) 
+				{
+					GD.PushError("Invalid Group Container");
+				}
+			
+				_GlobalExplorer.BottomDock.Add(_GlobalExplorer.GroupBuilder.Container); 
+			}
+			
+			_GlobalExplorer.Library.Initialize();
+			if( SettingsUtils.Get().FolderCount != 0 ) 
+			{
+				_GlobalExplorer.Settings.InitializeContainer();
+				if(
+					null == _GlobalExplorer.Settings.Container ||
+					false == EditorPlugin.IsInstanceValid( _GlobalExplorer.Settings.Container )
+				) 
+				{
+					GD.PushError("Invalid Settings Container");
+				}
+			
+				_GlobalExplorer.BottomDock.Add(_GlobalExplorer.Settings.Container);
+			}
+		}
+		
+		public void dispose()
+		{
+			_GlobalExplorer._Plugin.FoldersLoaded -= () => { _OnLoadContainers(); };
 		}
 	}
 }

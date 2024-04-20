@@ -22,204 +22,122 @@
 
 #if TOOLS
 using System;
+using AssetSnap.Trait;
 using Godot;
 
 namespace AssetSnap.Component
 {
 	[Tool]
-	public partial class Containerable : Trait.Base
+	public partial class Containerable : ContainerTrait
 	{
-		public enum ContainerLayout 
+		/*
+		** Public methods
+		*/
+		public Containerable()
 		{
-			OneColumn,
-			TwoColumns,
-			ThreeColumns,
-			FourColumns,
-		};
+			Name = "Containerable";
+			TypeString = GetType().ToString();
+		}
 		
-		public enum ContainerOrientation 
+		/*
+		** Instantiate an instance of the trait
+		**
+		** @return Containerable
+		*/	
+		public override Containerable Instantiate()
 		{
-			Horizontal,
-			Vertical,
-		};
-		
-		private Control.SizeFlags SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
-		private Control.SizeFlags SizeFlagsVertical = Control.SizeFlags.ShrinkBegin;
-		
-		public ContainerLayout Layout = ContainerLayout.OneColumn;
-		
-		public ContainerOrientation Orientation = ContainerOrientation.Vertical;
-		
-		public ContainerOrientation InnerOrientation = ContainerOrientation.Horizontal;
-		
-		private MarginContainer _MarginContainer;
-		
-		private Container _InnerContainer;
-		
-		private MarginContainer _PaddingContainer;
-		
-		private Vector2 CustomMinimumSize = Vector2.Zero;
-		private Vector2 Size = Vector2.Zero;
-		
-		public Containerable Instantiate()
-		{
-			try 
-			{
-				base._Instantiate( GetType().ToString() );
-				int ColumnCount = (int)Layout + 1;
-	
-				// Margin Container 
-				// VBox
-				// Padding(Margin) Container
-				// HBox
-				// Inner HBox / VBox
-				
-				_MarginContainer = new()
-				{
-					Name = "ContainerMargin",
-					SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
-					SizeFlagsVertical = SizeFlagsVertical,
-					Visible = Visible,
-				};
-				
-				if( Size != Vector2.Zero ) 
-				{
-					_MarginContainer.Size = Size;	
-				}
-				
-				if( CustomMinimumSize != Vector2.Zero ) 
-				{
-					_MarginContainer.CustomMinimumSize = CustomMinimumSize;	
-				}
-				
-				_PaddingContainer = new()
-				{
-					Name = "ContainerPadding",
-					SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
-					SizeFlagsVertical = SizeFlagsVertical,
-				};
+			base._Instantiate();
+			base.Instantiate();
 
-				if( InnerOrientation == ContainerOrientation.Vertical ) 
-				{
-					_InnerContainer = new VBoxContainer()
-					{
-						Name = "ContainerInner",
-						SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
-						SizeFlagsVertical = SizeFlagsVertical,
-					};
-				}
-				else 
-				{
-					_InnerContainer = new HBoxContainer()
-					{
-						Name = "ContainerInner",
-						SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
-						SizeFlagsVertical = SizeFlagsVertical,
-					};
-				}
+			Plugin.Singleton.traitGlobal.AddInstance(Iteration, Dependencies[TraitName + "_Container"].As<Container>(), OwnerName, TypeString, Dependencies );
+			Plugin.Singleton.traitGlobal.AddName(Iteration, TraitName, OwnerName, TypeString);
 
-				foreach( (string side, int value ) in Margin ) 
-				{
-					_MarginContainer.AddThemeConstantOverride("margin_" + side, value);
-				}
-				
-				VBoxContainer _WorkingNode = new()
-				{
-					Name = Name,
-				};
-
-				foreach( (string side, int value ) in Padding ) 
-				{
-					_PaddingContainer.AddThemeConstantOverride("margin_" + side, value);
-				}
-				
-				for( int i = 0; i < ColumnCount; i++ ) 
-				{
-					Container innerContainer = Orientation == ContainerOrientation.Horizontal ? new HBoxContainer() : new VBoxContainer();
-					innerContainer.SizeFlagsHorizontal = SizeFlagsHorizontal;
-					innerContainer.SizeFlagsVertical = SizeFlagsVertical;
-					innerContainer.Name = "inner-" + i;
-					
-					_InnerContainer.AddChild(innerContainer);
-				}
-
-				_PaddingContainer.AddChild(_InnerContainer);
-				_WorkingNode.AddChild(_PaddingContainer);
-				_MarginContainer.AddChild(_WorkingNode);			
-
-				Nodes.Add(_WorkingNode);
-				WorkingNode = _WorkingNode;
-
-				Reset();
-			}
-			catch(Exception e) 
-			{
-				GD.PushError(e.Message);
-			}
+			Reset();
+			Iteration += 1;
+			Dependencies = new();
 			
 			return this;
 		}
 		
-		public void Show()
+		/*
+		** Selects an placed container in the
+		** nodes array by index
+		**
+		** @param int index
+		** @return Containerable
+		*/
+		public override Containerable Select(int index, bool debug = false)
 		{
-			_MarginContainer.Visible = true;
-		}
-		
-		public void Hide()
-		{
-			_MarginContainer.Visible = false;
-		}
-		
-		public Containerable SetMargin( int value, string side = "" ) 
-		{
-			_SetMargin(value, side);
-			
-			if( side == "" ) 
-			{
-				if( null != WorkingNode ) 
-				{
-					foreach( (string marginSide, int marginValue ) in Margin ) 
-					{
-						_MarginContainer.AddThemeConstantOverride("margin_" + marginSide, marginValue);
-					}
-				}
-			}
-			else 
-			{
-				if( null != WorkingNode ) 
-				{
-					_MarginContainer.AddThemeConstantOverride("margin_" + side, value);
-				}
-			}
+			base.Select(index, debug);
 			
 			return this;
 		}
 		
-		public Containerable SetPadding( int value, string side = "" ) 
+		/*
+		** Selects an placed container in the
+		** nodes array by name
+		**
+		** @param string name
+		** @return Containerable
+		*/
+		public override Containerable SelectByName( string name ) 
 		{
-			_SetPadding(value, side);
-			
-			if( side == "" ) 
-			{
-				if( null != WorkingNode ) 
-				{
-					foreach( (string marginSide, int marginValue ) in Margin ) 
-					{
-						_PaddingContainer.AddThemeConstantOverride("margin_" + marginSide, marginValue);
-					}
-				}
-			}
-			else 
-			{
-				if( null != WorkingNode ) 
-				{
-					_PaddingContainer.AddThemeConstantOverride("margin_" + side, value);
-				}
-			}
+			base.SelectByName(name);
 			
 			return this;
 		}
 		
+		/*
+		** Adds the currently chosen container
+		** to a specified container
+		**
+		** @param Node Container
+		** @param int|null index
+		** @return void
+		*/
+		public virtual void AddToContainer( Node Container, int? index = null ) 
+		{
+			if( null == Dependencies || false == Dependencies.ContainsKey(TraitName + "_MarginContainer") ) 
+			{
+				GD.PushError("Container was not found @ AddToContainer");
+				
+				if( null == Dependencies ) 
+				{
+					return;
+				}
+				
+				GD.PushError("AddToContainer::Keys-> ", Dependencies.Keys);
+				GD.PushError("AddToContainer::ADDTO-> ", TraitName + "_MarginContainer");
+				return;
+			}
+			
+			if( null != Dependencies[TraitName + "_MarginContainer"].As<MarginContainer>().GetParent() ) 
+			{
+				GD.PushError("Container already has a parent @ AddToContainer - ", TraitName, Dependencies[TraitName + "_MarginContainer"].As<MarginContainer>().GetParent().Name);
+				
+				if( null == Dependencies ) 
+				{
+					return;
+				}
+				
+				GD.PushError("AddToContainer::Keys-> ", Dependencies.Keys);
+				GD.PushError("AddToContainer::ADDTO-> ", TraitName + "_MarginContainer");
+				return;
+			}
+			
+			base._AddToContainer(Container, Dependencies[TraitName + "_MarginContainer"].As<MarginContainer>(), index);
+		}
+		
+		/*
+		** Setter Methods
+		*/
+		
+		/*
+		** Sets the name of the current container
+		**
+		** @param string text
+		** @return Containerable
+		*/
 		public Containerable SetName( string text ) 
 		{
 			base._SetName(text);
@@ -227,218 +145,174 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		public Containerable SetLayout( ContainerLayout layout ) 
+		/*
+		** Sets the layout of the container
+		**
+		** @param ContainerLayout layout
+		** @return Containerable
+		*/
+		public override Containerable SetLayout( ContainerLayout layout ) 
 		{
-			Layout = layout;
+			base.SetLayout(layout);
 			
 			return this;
 		}
 		
-		public Containerable SetDimensions( int width, int height )
+		/*
+		** Sets the visibility state of the
+		** currently chosen container
+		**
+		** @param bool state
+		** @return Containerable
+		*/
+		public override Containerable SetVisible( bool state ) 
 		{
-			CustomMinimumSize = new Vector2( width, height);
-			Size = new Vector2( width, height);
-
-			return this;
-		}
-		
-		public Containerable SetHorizontalSizeFlags(Control.SizeFlags flag)
-		{
-			SizeFlagsHorizontal = flag;
-
-			return this;
-		}
-		
-		public Containerable SetVerticalSizeFlags(Control.SizeFlags flag)
-		{
-			SizeFlagsVertical = flag;
-
-			return this;
-		}
-		
-		public Containerable SetOrientation(ContainerOrientation orientation) 
-		{
-			Orientation = orientation;
-			return this;
-		}
-		
-		public Containerable SetInnerOrientation(ContainerOrientation orientation) 
-		{
-			InnerOrientation = orientation;
-			return this;
-		}
-		
-		public Containerable SetVisible( bool state ) 
-		{
-			Visible = state;
-			
-			if( EditorPlugin.IsInstanceValid(_MarginContainer))  
-			{
-				_MarginContainer.Visible = state;
-			}
-
-			return this;
-		}
-		
-		public Containerable ToggleVisible() 
-		{
-			if( EditorPlugin.IsInstanceValid(_MarginContainer))  
-			{
-				_MarginContainer.Visible = !_MarginContainer.Visible;
-			}
-			else 
-			{
-				GD.PushError("MarginContainer is invalid");
-			}
-
-			return this;
-		}
-		
-		public bool IsVisible() 
-		{
-			if( EditorPlugin.IsInstanceValid(_MarginContainer))  
-			{
-				return _MarginContainer.Visible == true;
-			}
-			else 
-			{
-				GD.PushError("MarginContainer is invalid");
-			}
-
-			return false;
-		}
-		
-		public Containerable Select(int index)
-		{
-			base._Select(index);
-			
-			if( EditorPlugin.IsInstanceValid(WorkingNode) && EditorPlugin.IsInstanceValid(WorkingNode.GetParent()) ) 
-			{
-				_MarginContainer = WorkingNode.GetParent() as MarginContainer;
-			}
-			else 
-			{
-				GD.PushError("MarginContainer is invalid");
-			}
-			
-			if( EditorPlugin.IsInstanceValid(WorkingNode) && EditorPlugin.IsInstanceValid(WorkingNode.GetChild(0)) ) 
-			{
-				_PaddingContainer = WorkingNode.GetChild(0) as MarginContainer;
-			}
-			else 
-			{
-				GD.PushError("PaddingContainer is invalid");
-			}
-			
-			if( EditorPlugin.IsInstanceValid(_PaddingContainer) && EditorPlugin.IsInstanceValid(_PaddingContainer.GetChild(0)) ) 
-			{
-				_InnerContainer = _PaddingContainer.GetChild(0) as Container;
-			}
-			else 
-			{
-				GD.PushError("InnerContainer is invalid");
-			}
+			base.SetVisible(state);
 			
 			return this;
 		}
 		
-		public Containerable SelectByName( string name ) 
+		/*
+		** Toggles the visibility state of the
+		** currently chosen container
+		**
+		** @return Containerable
+		*/
+		public override Containerable ToggleVisible() 
 		{
-			foreach( Container container in Nodes ) 
-			{
-				if( container.Name == name ) 
-				{
-					WorkingNode = container;
-					break;
-				}
-			}
+			base.ToggleVisible();
+			
+			return this;
+		}
+		
+		/*
+		** Sets the size of the container
+		**
+		** @param int width
+		** @param int height
+		** @return Containerable
+		*/
+		public override Containerable SetDimensions( int width, int height )
+		{
+			base.SetDimensions(width, height);
+			
+			return this;
+		}
+		
+		/*
+		** Sets the orientation of the container
+		**
+		** @param ContainerOrientation orientation
+		** @return Containerable
+		*/
+		public override Containerable SetOrientation(ContainerOrientation orientation) 
+		{
+			base.SetOrientation(orientation);
+			
+			return this;
+		}
+		
+		/*
+		** Sets the inner orientation of the container
+		**
+		** @param ContainerOrientation orientation
+		** @return Containerable
+		*/
+		public override Containerable SetInnerOrientation(ContainerOrientation orientation) 
+		{
+			base.SetInnerOrientation(orientation);
+			
+			return this;
+		}
+		
+		/*
+		** Sets the horizontal size flag, which controls the x
+		** axis, and how it should act.
+		**
+		** @param Control.SizeFlags flag
+		** @return Containerable
+		*/
+		public override Containerable SetHorizontalSizeFlags(Control.SizeFlags flag)
+		{
+			base.SetHorizontalSizeFlags(flag);
 
 			return this;
 		}
 		
-		public Container GetOuterContainer()
+		/*
+		** Sets the horizontal size flag, which controls the y
+		** axis, and how it should act.
+		**
+		** @param Control.SizeFlags flag
+		** @return Containerable
+		*/
+		public override Containerable SetVerticalSizeFlags(Control.SizeFlags flag)
 		{
-			if( null != WorkingNode && null != _InnerContainer) 
-			{
-				// Single placement
-				return _InnerContainer;
-			}
-			else 
-			{
-				GD.PushWarning("Invalid outer container");
-			}
-
-			return null;
-		}
-		
-		public Container GetInnerContainer( int index = 0)
-		{
-			if( null != WorkingNode && null != _InnerContainer.GetChild( index )) 
-			{
-				// Single placement
-				return _InnerContainer.GetChild( index ) as Container;
-			}
-			else 
-			{
-				GD.PushWarning("Invalid inner container");
-			}
-
-			return null;
-		}
-		
-		private void Reset()
-		{
-			WorkingNode = null;
-			_InnerContainer = null;
-			_MarginContainer = null;
-			_PaddingContainer = null;
-			Layout = ContainerLayout.OneColumn;
-			Orientation = ContainerOrientation.Vertical;
-			InnerOrientation = ContainerOrientation.Vertical;
-			Size = Vector2.Zero;
-			CustomMinimumSize = Vector2.Zero;
-		}
-
-		public void AddToContainer( Node Container, int? index = null ) 
-		{
-			base._AddToContainer(Container, _MarginContainer, index);
-		}
-		
-		
-		public override void _ExitTree()
-		{
-			Reset();
+			base.SetVerticalSizeFlags(flag);
 			
-			// if( Nodes.Count > 0 ) {
-			// 	for( int i = 0; i < Nodes.Count; i++ ) 
-			// 	{
-			// 		Select(i);
-					
-			// 		if( EditorPlugin.IsInstanceValid( _InnerContainer ) ) 
-			// 		{
-			// 			_InnerContainer.QueueFree();
-			// 		}
-					
-			// 		if( EditorPlugin.IsInstanceValid( _PaddingContainer ) ) 
-			// 		{
-			// 			_PaddingContainer.QueueFree();
-			// 		}
-					
-			// 		if( EditorPlugin.IsInstanceValid( WorkingNode ) ) 
-			// 		{
-			// 			WorkingNode.QueueFree();
-			// 		} 
-					
-			// 		if( EditorPlugin.IsInstanceValid( _MarginContainer ) ) 
-			// 		{
-			// 			_MarginContainer.QueueFree();
-			// 		}
-			// 	}
-			// }
+			return this;
+		}
+		
+		/*
+		** Sets margin values for 
+		** the currently chosen container
+		**
+		** @param int value
+		** @param string side
+		** @return Containerable
+		*/
+		public override Containerable SetMargin( int value, string side = "" ) 
+		{
+			base.SetMargin(value, side);
 			
-			// Reset();
-
-			// base._ExitTree();
+			return this;
+		}
+		
+		/*
+		** Sets padding values for 
+		** the currently chosen container
+		**
+		** @param int value
+		** @param string side
+		** @return Containerable
+		*/
+		public override Containerable SetPadding( int value, string side = "" ) 
+		{
+			base.SetPadding(value, side);
+			
+			return this;
+		}
+		
+		/*
+		** Getter Methods
+		*/
+		
+		/*
+		** Returns the outer container
+		** of the container layout
+		**
+		** @return Container
+		*/
+		public override Container GetOuterContainer()
+		{
+			return base.GetOuterContainer();
+		}
+		
+		/*
+		** Returns a inner container
+		** depending on a specified index
+		**
+		** @param int(0) index
+		** @return Container
+		*/
+		public override Container GetInnerContainer( int index = 0 )
+		{
+			return base.GetInnerContainer( index );
+		}
+		
+		public Node GetContainerParent() 
+		{
+			return GetParentContainer();
 		}
 	}
 }

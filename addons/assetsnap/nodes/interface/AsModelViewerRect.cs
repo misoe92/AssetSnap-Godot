@@ -33,6 +33,12 @@ public partial class AsModelViewerRect : TextureRect
 	*/
 	public void _MeshPreviewReady(string Path, Texture2D preview, Texture2D texture_preview, TextureRect textureRect)
 	{
+		if( null == preview && null == texture_preview ) 
+		{
+			GD.Print("Invalid preview: ", Path);
+			return;
+		}
+		
 		textureRect.Texture = preview;
 	}
 }

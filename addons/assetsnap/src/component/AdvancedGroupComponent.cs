@@ -28,13 +28,7 @@ namespace AssetSnap.Component
 {
 	[Tool]
 	public partial class AdvancedGroupComponent : GroupObjectComponent
-	{
-		protected override void _RegisterTraits()
-		{
-			AddTrait(typeof(Containerable));
-			AddTrait(typeof(Labelable));
-		}
-		
+	{	
 		protected override void _InitializeFields()
 		{
 			Trait<Containerable>()

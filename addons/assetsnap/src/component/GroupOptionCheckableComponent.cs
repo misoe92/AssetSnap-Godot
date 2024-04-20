@@ -21,7 +21,7 @@
 // SOFTWARE.
 
 #if TOOLS
-using AssetSnap.Front.Components;
+using AssetSnap.Front.Components.Groups.Builder;
 using Godot;
 
 namespace AssetSnap.Component
@@ -29,27 +29,26 @@ namespace AssetSnap.Component
 	[Tool]
 	public partial class GroupOptionCheckableComponent : GroupOptionComponent
 	{
-		public GroupBuilderEditorGroupOptions Parent;
+		public EditorGroupOptions Parent;
 		
 		public override void Initialize()
 		{
-			AddTrait(typeof(Checkable));
+			base.Initialize();
+			
 			Initiated = true;
 			
 			_InitializeFields();
 			_FinalizeFields();
-			
-			base.Initialize();
 		}
 		
-		public void Show()
+		public void InputShow()
 		{
 			Trait<Checkable>()
 				.Select(0)
 				.SetVisible(true);
 		}
 		
-		public void Hide()
+		public void InputHide()
 		{
 			Trait<Checkable>()
 				.Select(0)
@@ -96,7 +95,7 @@ namespace AssetSnap.Component
 			Trait<Checkable>()
 				.Select(0)
 				.AddToContainer(
-					Container
+					this
 				);
 		}
 	}

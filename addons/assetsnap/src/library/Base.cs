@@ -22,134 +22,131 @@
 
 namespace AssetSnap.Library
 {
-	using System;
-	using System.Collections.Generic;
+	using AssetSnap.Explorer;
 	using AssetSnap.Front.Components;
 	using Godot;
 	
 	[Tool]
 	public partial class Base : Node
 	{
-		private GlobalExplorer _GlobalExplorer;
-		
-		private Instance[] _Libraries = Array.Empty<Instance>();
+		[Export]
+		public Godot.Collections.Array<GodotObject> _Libraries = new();
 
 		private static Base _Instance;
 		
-		public static Base GetInstance()
-		{
-			if( null == _Instance ) 
-			{
-				_Instance = new()
+		public static Base Singleton {
+			get {
+				if( _Instance == null ) 
 				{
-					Name = "AssetSnapLibraries",
-				};
+					_Instance = new();
+				} 
+				
+				return _Instance;
 			}
-
-			return _Instance;
 		}
 		
-		public Instance[] Libraries 
+		public Godot.Collections.Array<GodotObject> Libraries 
 		{
 			get => _Libraries;
 		}
 		
+		public Base()
+		{
+			Name = "LibraryBase";
+		}
+		
 		public void Initialize()
 		{
-			_GlobalExplorer = GlobalExplorer.GetInstance();
+			if( Libraries.Count > 0 ) 
+			{
+				GD.Print("Existing: ", Libraries.Count);
+				int MaxCount = Libraries.Count;
+				for( int i = MaxCount - 1; i >= 0; i-- ) 
+				{
+					if(Libraries.Count > i ) 
+					{
+						GodotObject instance = Libraries[i];
+						if( IsInstanceValid(instance) && instance is Instance finalInstance ) 
+						{
+							GD.Print("Removes: ", i);
+							RemoveLibrary(finalInstance);				
+						}
+						
+						_Libraries.Remove(instance);
+					}
+				}
+			}
 			
 			/** Initialize libraries **/
-			if( _GlobalExplorer.Settings.FolderCount != 0 ) 
+			if( ExplorerUtils.Get().Settings.FolderCount != 0 ) 
 			{
-				string[] Folders = _GlobalExplorer.Settings.Folders; 
+				string[] Folders = ExplorerUtils.Get().Settings.Folders; 
 				
-				for( int i = 0; i < _GlobalExplorer.Settings.FolderCount; i++)  
+				for( int i = 0; i < ExplorerUtils.Get().Settings.FolderCount; i++)  
 				{
 					string Folder = Folders[i];
-					_GlobalExplorer.Library.New(_GlobalExplorer.BottomDock, Folder, i); 
+					New(ExplorerUtils.Get()._Plugin.GetTabContainer(), Folder, i); 
 				}
 			} 
 		}
 		
-		/*
+		/* 
 		** Creates a new instance of Library
 		**
 		** @param TabContainer _Container
 		** @param string _Folder
 		** @return void
 		*/
-		public void New( BottomDock.Base Dock,  string _Folder, int index )
+		public void New( TabContainer Dock,  string _Folder, int index )
 		{
-			if( false == Is_GlobalExplorerValid() ) 
+			if( false == IsGlobalExplorerValid() ) 
 			{
 				return;
 			}
 			
 			Instance _Base = new()
 			{
-				Container = Dock.Container,
 				Folder = _Folder,
 				Index = index,
+				Dock = Dock,
 			};
 
-			AddChild(_Base);
- 
-			_Base.Initialize(); 
-			
-			List<Instance> _LibrariesList = new(_Libraries)
-			{
-				_Base
-			};
+			_Base.Name = _Base.FileName.Capitalize();
+			_Base._Name = _Base.FileName.Capitalize();
 
-			_Libraries = _LibrariesList.ToArray();
+			_Base.Initialize();
+			_Libraries.Add(_Base);
 		}
 		
-		/*
-		** Refreshes current libraries
-		**
-		** @param TabContainer _Container
-		*/
-		public void Refresh(BottomDock.Base Dock)
+		private bool AlreadyHaveFolder( string Folder )
 		{
-			if( false == Is_GlobalExplorerValid() ) 
+			foreach( Library.Instance instance in _Libraries ) 
 			{
-				return;
-			}
-			
-			// Resets current settings
-			_GlobalExplorer.Settings.Reset();
-
-			if( HasFolders() ) 
-			{
-				string[] Folders = _GlobalExplorer.Settings.Folders;
-				
-				for( int i = 0; i < _GlobalExplorer.Settings.FolderCount; i++) 
+				if( Folder == instance._Folder ) 
 				{
-					string Folder = Folders[i];
-					bool exist = false;
-					 
-					foreach(Instance Library in _Libraries ) 
-					{ 
-						if( Library.Folder == Folder ) 
-						{
-							exist = true;
-						}  
-					}
-					 
-					if( false == exist ) 
-					{
-						New(Dock, Folder, i);
-					}
+					return true;
 				}
-			} 
-			
-			if( HasLibraryListing() ) 
-			{
-				LibrariesListing _LibrariesListing = GetLibraryListing();
-				_LibrariesListing.ForceUpdate();
 			}
-			
-			RebindSettingsContainer();
+
+			return false;
+		}
+		
+		private bool CleanOldLibrary( string Folder )
+		{
+			foreach( Library.Instance instance in _Libraries ) 
+			{
+				if( Folder == instance._Folder ) 
+				{
+					instance.Clear();
+					
+					instance.GetParent().RemoveChild(instance);
+					instance.QueueFree();
+					
+					return true;
+				}
+			}
+
+			return false;
 		}
 		
 		/*
@@ -159,27 +156,21 @@ namespace AssetSnap.Library
 		*/  
 		private void RebindSettingsContainer()
 		{
-			_GlobalExplorer.Settings.InitializeContainer();
-			_GlobalExplorer.Settings.Container.Name = "Settings";
-			_GlobalExplorer.BottomDock.Add(_GlobalExplorer.Settings.Container);
+			ExplorerUtils.Get().Settings.InitializeContainer();
+			if( EditorPlugin.IsInstanceValid(ExplorerUtils.Get().Settings.Container)) 
+			{
+				ExplorerUtils.Get().Settings.Container.Name = "Settings";
+				ExplorerUtils.Get().BottomDock.Add(ExplorerUtils.Get().Settings.Container);
+			}
 		}
 		
-		public void RemoveLibrary( string FolderPath )
+		public void RemoveLibrary( Instance library )
 		{
-			List<Library.Instance> list = new(_Libraries);
-			
-			foreach(Instance Library in _Libraries ) 
+			if( _Libraries.Count != 0 ) 
 			{
-				if( Library.Folder == FolderPath ) 
-				{
-					list.Remove(Library);
-					
-					if( null != Library.GetParent() && IsInstanceValid(Library.GetParent()) ) 
-					{
-						Library.GetParent().RemoveChild(Library);
-					}
-					Library.QueueFree();
-				}
+				library.Clear();
+				library.GetParent().RemoveChild(library);
+				library.QueueFree();
 			}
 		}
 		
@@ -191,7 +182,7 @@ namespace AssetSnap.Library
 				Library._LibrarySettings.ClearAll();
 			}
 		}
-		
+				
 		/*
 		** Get library listing
 		**
@@ -199,7 +190,7 @@ namespace AssetSnap.Library
 		*/
 		private LibrariesListing GetLibraryListing()
 		{
-			LibrariesListing _LibrariesListing = _GlobalExplorer.Components.Single<LibrariesListing>();
+			LibrariesListing _LibrariesListing = ExplorerUtils.Get().Components.Single<LibrariesListing>();
 			return _LibrariesListing;
 		}
 		
@@ -208,7 +199,7 @@ namespace AssetSnap.Library
 		*/
 		private bool HasFolders()
 		{
-			return _GlobalExplorer.Settings.FolderCount != 0;
+			return ExplorerUtils.Get().Settings.FolderCount != 0;
 		}
 						
 		/*
@@ -218,7 +209,7 @@ namespace AssetSnap.Library
 		*/
 		private bool HasLibraryListing()
 		{
-			LibrariesListing _LibrariesListing = _GlobalExplorer.Components.Single<LibrariesListing>();
+			LibrariesListing _LibrariesListing = ExplorerUtils.Get().Components.Single<LibrariesListing>();
 			return null != _LibrariesListing;
 		}
 		
@@ -228,31 +219,9 @@ namespace AssetSnap.Library
 		**
 		** @return bool
 		*/
-		private bool Is_GlobalExplorerValid()
+		private bool IsGlobalExplorerValid()
 		{
-			return null != _GlobalExplorer && null != _GlobalExplorer.Settings;
-		}
-
-		public override void _ExitTree()
-		{
-			for( int i = 0; i < _Libraries.Length; i++ ) 
-			{
-				if( null != _Libraries[i] && IsInstanceValid( _Libraries[i] ) )
-				{
-					if( null != _Libraries[i].GetParent() && IsInstanceValid(_Libraries[i].GetParent())) 
-					{
-						_Libraries[i].GetParent().RemoveChild(_Libraries[i]);
-					}
-					
-					_Libraries[i].QueueFree();
-				} 
-			}
-			
-			_Libraries = Array.Empty<Instance>();
-			_GlobalExplorer = null;
-			_Instance = null; 
-
-			base._ExitTree();
+			return ExplorerUtils.IsValid();
 		}
 	}
 }

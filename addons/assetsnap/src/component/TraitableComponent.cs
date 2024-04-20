@@ -30,29 +30,52 @@ namespace AssetSnap.Component
 	[Tool]
 	public partial class TraitableComponent : BaseComponent
 	{
-		protected Godot.Collections.Array boundTraits = new();
+		[Export]
+		public Godot.Collections.Array<Trait.Base> boundTraits;
 
 		protected bool Initiated = false;
 
+		public TraitableComponent()
+		{
+			boundTraits = new();
+		}
+
 		public override void Initialize()
 		{
+			if( false == Initiated ) 
+			{
+				foreach( string traitString in UsingTraits ) 
+				{
+					AddTrait(Type.GetType(traitString), Container);
+				}
+			}
+			
 			base.Initialize();
 		}
 
-		public void AddTrait(Type traitType)
+		public override void Clear(bool debug = false)
+		{
+			ClearTrait( debug );
+			base.Clear(debug);
+		}
+		
+		public void AddTrait(Type traitType, Node container)
 		{
 			object instance = Activator.CreateInstance(traitType);
 			if( instance is Trait.Base trait ) 
 			{
-				AddChild(trait);
+				trait.OwnerName = Name;
+
+				container.AddChild(trait);
 				// Check if the trait is already bound
 				if (!boundTraits.Contains(trait))
 				{
 					boundTraits.Add(trait);
 				}
-				else 
-				{ 
-					trait.Free();
+				else
+				{
+					container.RemoveChild(trait);
+					trait.QueueFree();	
 				}
 			}
 			else 
@@ -61,19 +84,23 @@ namespace AssetSnap.Component
 			}
 		}
 		
-		public bool HasTrait<T>()
+		public bool HasTrait<T>( bool debug = false)
 		{
 			if( boundTraits.Count == 0 ) 
 			{
+				if (debug)
+				{
+					GD.PushError("No traits found");
+				}
+				
 				return false;
 			}
 
-			Variant traitInstance = boundTraits.FirstOrDefault(
+			Trait.Base traitInstance = boundTraits.FirstOrDefault(
 				(t) =>
 				{
 					if (
-						IsInstanceValid(t.AsGodotObject()) &&
-						t.AsGodotObject().GetType() == typeof(T)
+						t.GetType() == typeof(T)
 					)
 					{
 						return true;
@@ -83,76 +110,111 @@ namespace AssetSnap.Component
 				}
 			);
 			
-			if( traitInstance.VariantType == Variant.Type.Object ) 
+			if(
+				null != traitInstance &&
+				IsInstanceValid(traitInstance) &&
+				traitInstance.Select(0).IsValid() &&
+				traitInstance.Build == false
+			) 
 			{
 				return true;
+			}
+			
+			if( debug )
+			{
+				if( null == traitInstance ) 
+				{
+					GD.PushError("No trait instance was set");
+				}
+				
+				if( null != traitInstance && false == IsInstanceValid(traitInstance) ) 
+				{
+					GD.PushError("Trait instance was invalid");
+				}
+				
+				if( null != traitInstance && false == traitInstance.Select(0).IsValid() ) 
+				{
+					GD.PushError("Trait is not valid: ", traitInstance.Select(0).IsValid());
+				}
+				
+				if( null != traitInstance && true == traitInstance.Build ) 
+				{
+					GD.PushError("Trait instance was building");
+				}
 			}
 			
 			return false;
 		}
 		
-		public bool ClearTrait<T>() 
+		public bool ClearTrait<T>(bool debug = false) 
 		{
 			if( boundTraits.Count == 0 ) 
 			{
 				GD.PushWarning("No traits was found");
 				return false;
 			}
-
-			Variant traitInstance = boundTraits.FirstOrDefault(
-				(t) =>
-				{
-					if( false == IsInstanceValid(t.AsGodotObject()) ) 
-					{
-						return false;
-					}
-					
-					if (t.AsGodotObject().GetType() == typeof(T))
-					{
-						return true;
-					}
-
-					return false;
-				}
-			);
-			
-			switch (traitInstance.VariantType)
+	
+			foreach( string traitString in UsingTraits ) 
 			{
-				case Variant.Type.Object:
-					boundTraits.Remove(traitInstance);
-					if( traitInstance.AsGodotObject().GetType() == typeof(T) ) 
-					{
-						Trait.Base trait = traitInstance.AsGodotObject() as Trait.Base;
-						if( null != trait.GetParent() ) 
-						{
-							trait.GetParent().RemoveChild(trait);
-						}
-
-						trait.disposed = true;
-						trait.QueueFree();
-					}
-					return true;
+				if( debug ) 
+				{
+					GD.Print("Clearing trait: ", traitString, "::", Name, "->Count(", boundTraits.Count, ")");
+				}
+			
+				Trait(Type.GetType(traitString)).Clear(-1, debug);
+				Trait(Type.GetType(traitString)).Iteration = 0;
+				boundTraits.Remove(Trait(Type.GetType(traitString)));
 				
-				default :
-					GD.PushWarning("Invalid type", traitInstance.VariantType);
-					break;
-
+				if( debug ) 
+				{
+					GD.Print("Cleared: ", traitString, "->Count(", boundTraits.Count, ")" );
+				}
 			}
+			
+			return false;
+		}
+		
+		public bool ClearTrait(bool debug = false) 
+		{
+			if( boundTraits.Count == 0 ) 
+			{
+				GD.PushWarning("No traits was found");
+				return false;
+			}
+			
+			foreach( string traitString in UsingTraits ) 
+			{
+				if( debug ) 
+				{
+					GD.Print("Clearing trait: ", traitString, "::", Name, "->Count(", boundTraits.Count, ")");
+				}
+				
+				Trait(Type.GetType(traitString)).Clear(-1, debug);
+				Trait(Type.GetType(traitString)).Iteration = 0;
+				boundTraits.Remove(Trait(Type.GetType(traitString)));
+				
+				if( debug ) 
+				{
+					GD.Print("Cleared: ", traitString, "->Count(", boundTraits.Count, ")" );
+				}
+			}
+			
 			return false;
 		}
 		
 		public T Trait<T>() where T : class
 		{
-		
 			if( boundTraits.Count == 0 ) 
 			{
 				return null;
 			}
 			
-			Variant traitInstance = boundTraits.FirstOrDefault(
+			Trait.Base traitInstance = boundTraits.FirstOrDefault(
 				(t) =>
 				{
-					if (IsInstanceValid(t.AsGodotObject()) && t.AsGodotObject().GetType() == typeof(T))
+					if (
+						t.GetType() == typeof(T)
+					)
 					{
 						return true;
 					}
@@ -161,77 +223,50 @@ namespace AssetSnap.Component
 				}
 			);
 
-			switch (traitInstance.VariantType)
+			if( null != traitInstance && traitInstance is Trait.Base traitbase) 
 			{
-				case Variant.Type.Nil:
-					return null;
-				case Variant.Type.Object:
-					if(
-						IsInstanceValid(traitInstance.AsGodotObject()) &&
-						traitInstance.AsGodotObject().GetType() == typeof(T)
-					) 
-					{
-						return traitInstance.AsGodotObject() as T;
-					}
-					
-					return null;
+				string TypeString = traitbase.GetType().ToString();
+				
+				return traitbase as T;
 			}
+					
 			return null;
 		}
 		
-		private void ClearTraits()
+		public Trait.Base Trait( Type type )
 		{
-			for( int i = 0; i < boundTraits.Count; i++) 
+			if( boundTraits.Count == 0 ) 
 			{
-				Variant traitInstance = boundTraits[i].AsGodotObject();
-				
-				boundTraits.Remove(traitInstance);
-				if( traitInstance.AsGodotObject() is Trait.Base ) 
-				{
-					Trait.Base trait = traitInstance.AsGodotObject() as Trait.Base;
-					if( null != trait.GetParent() ) 
-					{
-						trait.GetParent().RemoveChild(trait);
-					}
-					
-					trait.Free();
-				}
+				return null;
 			}
+			
+			Trait.Base traitInstance = boundTraits.FirstOrDefault(
+				(t) =>
+				{
+					if (
+						t.GetType() == type
+					)
+					{
+						return true;
+					}
+
+					return false;
+				}
+			);
+
+			if( null != traitInstance && traitInstance is Trait.Base traitbase) 
+			{
+				string TypeString = traitbase.GetType().ToString();
+				
+				return traitbase;
+			}
+					
+			return null;
 		}
 
 		public override void _ExitTree()
 		{
-			// if( null != boundTraits && boundTraits.Count != 0 ) 
-			// {
-			// 	for( int i = 0; i < boundTraits.Count; i++ ) 
-			// 	{
-			// 		if( null != boundTraits[i] && IsInstanceValid(boundTraits[i]) ) 
-			// 		{
-			// 			GodotObject inst = boundTraits[i];
-			// 			inst.Free();
-
-			// 			if( null != inst && IsInstanceValid(inst) ) 
-			// 			{
-			// 				if( inst is Trait.Base trait ) 
-			// 				{
-			// 					GD.Print("Failed trait unload index: " + i + ", " + Name + ", " + trait.Name );
-			// 				}
-			// 				else
-			// 				{
-			// 					GD.Print("Failed trait unload index: " + i + ", " + Name + ", " + inst.GetType() );
-			// 				} 
-			// 			}
-			// 			else 
-			// 			{
-			// 				GD.Print("Unloaded: " + i + ", " + Name + ", " + inst.GetType() );
-			// 			}
-			// 		}
-			// 	}
-
-			// 	// boundTraits = null;
-			// }
-
-			// boundTraits = new();
+			// Clear();
 			base._ExitTree();
 		}
 	}

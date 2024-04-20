@@ -353,9 +353,9 @@ corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_q4ia3"]
-content_margin_left = 15.0
+content_margin_left = 10.0
 content_margin_top = 5.0
-content_margin_right = 15.0
+content_margin_right = 10.0
 content_margin_bottom = 5.0
 bg_color = Color(0.0509804, 0.0509804, 0.0509804, 0.529412)
 border_width_left = 1
@@ -371,9 +371,9 @@ corner_radius_bottom_left = 3
 shadow_color = Color(0, 0, 0, 0)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fnqds"]
-content_margin_left = 15.0
+content_margin_left = 10.0
 content_margin_top = 5.0
-content_margin_right = 15.0
+content_margin_right = 10.0
 content_margin_bottom = 5.0
 bg_color = Color(0.0509804, 0.0509804, 0.0509804, 0.529412)
 border_width_left = 1
@@ -389,9 +389,9 @@ corner_radius_bottom_left = 3
 shadow_color = Color(0, 0, 0, 0)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_n3kwy"]
-content_margin_left = 15.0
+content_margin_left = 10.0
 content_margin_top = 5.0
-content_margin_right = 15.0
+content_margin_right = 10.0
 content_margin_bottom = 5.0
 bg_color = Color(0.0941176, 0.0941176, 0.0941176, 0.529412)
 border_width_left = 1
@@ -407,9 +407,9 @@ corner_radius_bottom_left = 3
 shadow_color = Color(0, 0, 0, 0)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1i0l1"]
-content_margin_left = 15.0
+content_margin_left = 10.0
 content_margin_top = 5.0
-content_margin_right = 15.0
+content_margin_right = 10.0
 content_margin_bottom = 5.0
 bg_color = Color(0.0509804, 0.0509804, 0.0509804, 0.529412)
 border_width_left = 1
@@ -991,6 +991,10 @@ SmallFlatButton/colors/font_color = Color(1, 1, 1, 1)
 SmallFlatButton/colors/font_focus_color = Color(1, 1, 1, 0.54902)
 SmallFlatButton/colors/font_hover_color = Color(1, 1, 1, 0.54902)
 SmallFlatButton/colors/font_hover_pressed_color = Color(1, 1, 1, 0.54902)
+SmallFlatButton/colors/icon_focus_color = Color(1, 1, 1, 1)
+SmallFlatButton/colors/icon_hover_color = Color(1, 1, 1, 1)
+SmallFlatButton/colors/icon_hover_pressed_color = Color(1, 1, 1, 1)
+SmallFlatButton/colors/icon_normal_color = Color(1, 1, 1, 0.34902)
 SmallFlatButton/font_sizes/font_size = 10
 SmallFlatButton/styles/focus = SubResource("StyleBoxFlat_dcdk0")
 SmallFlatButton/styles/hover = SubResource("StyleBoxFlat_4fsg1")
@@ -1002,3 +1006,9 @@ SmallSuccesButton/styles/focus = SubResource("StyleBoxFlat_yxqhi")
 SmallSuccesButton/styles/hover = SubResource("StyleBoxFlat_f4mbh")
 SmallSuccesButton/styles/normal = SubResource("StyleBoxFlat_6txbs")
 SmallSuccesButton/styles/pressed = SubResource("StyleBoxFlat_1wwsn")
+TextExtraSmall/base_type = &"Label"
+TextExtraSmall/font_sizes/font_size = 10
+TextMedium/base_type = &"Label"
+TextMedium/font_sizes/font_size = 15
+TextSmall/base_type = &"Label"
+TextSmall/font_sizes/font_size = 12

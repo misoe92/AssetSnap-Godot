@@ -28,7 +28,7 @@ namespace AssetSnap.Debug
 	using System.Reflection;
 	using Godot;
 
-	public partial class Inspector : Node
+	public partial class Inspector
 	{
 		private static readonly string ThemePath = "res://addons/assetsnap/assets/themes/SnapTheme.tres";
 		private VBoxContainer _Control;
@@ -37,11 +37,26 @@ namespace AssetSnap.Debug
 		private GlobalExplorer _GlobalExplorer;
 
 		private List<string> Categories = new List<string>();
+				
+		private static Inspector _Instance;
+		public static Inspector Singleton 
+		{
+			get
+			{
+				if( null == _Instance ) 
+				{
+					_Instance = new();
+				}
+				
+				return _Instance;
+			}
+		}
 		
 		public Inspector()
 		{
-			Name = "Inspector";
-		}		
+			_Instance = this;
+		}
+
 		public void Initialize()
 		{
 			_GlobalExplorer = GlobalExplorer.GetInstance();
@@ -364,7 +379,7 @@ namespace AssetSnap.Debug
 					}
 					else if( null != value ) 
 					{
-						GD.Print(field.Name);
+						// GD.Print(field.Name);
 					}
 				}
 			}
@@ -409,7 +424,7 @@ namespace AssetSnap.Debug
 					}
 					else if( value is Node NodeValue )
 					{
-						if( IsInstanceValid( NodeValue ) ) 
+						if( EditorPlugin.IsInstanceValid( NodeValue ) ) 
 						{
 							AddLabelBox(property.Name, NodeValue.Name);
 						}

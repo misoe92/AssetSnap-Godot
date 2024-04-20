@@ -22,8 +22,7 @@
 #if TOOLS
 namespace AssetSnap.Front.Nodes
 {
-using System;
-using Godot;
+	using Godot;
 
 	[Tool] 
 	public partial class DropdownButton : Button
@@ -46,7 +45,7 @@ using Godot;
 			VBoxContainer InnerContainer = GetParent() as VBoxContainer;
 			MarginContainer container = InnerContainer.GetChild(1) as MarginContainer;
 			PanelContainer panel = InnerContainer.GetParent() as PanelContainer;
-			MarginContainer _MarginContainer = panel.GetParent() as MarginContainer;
+			MarginContainer _MarginContainer = panel.GetParent().GetParent().GetParent().GetParent().GetParent() as MarginContainer;
 
 			container.Visible = !container.Visible;
 			
