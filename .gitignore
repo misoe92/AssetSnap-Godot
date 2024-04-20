@@ -1,2 +1,9 @@
 # Godot 4+ specific ignores
 .godot/
+assetsnap/
+*.godot
+icon.svg
+icon.svg.import
+Working Project.csproj
+Working Project.sln
+images/*.import
