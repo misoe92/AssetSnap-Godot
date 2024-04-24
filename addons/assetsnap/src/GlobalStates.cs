@@ -32,53 +32,53 @@ namespace AssetSnap
 	using Godot;
 
 	[Tool]
-	public partial class GlobalStates : LoadStates 
+	public partial class GlobalStates : LoadStates
 	{
-	
+
 		/** Library Enums **/
-		public enum LibraryStateEnum 
+		public enum LibraryStateEnum
 		{
 			Disabled,
 			Enabled,
 		}
-		
+
 		/** Snap Enums **/
 		public enum SpawnStateEnum
 		{
 			Null,
 			Spawned,
 		}
-		public enum SnapPosition 
+		public enum SnapPosition
 		{
 			Top,
 			Middle,
 			Bottom,
 		}
-		public enum VisibilityStateEnum 
+		public enum VisibilityStateEnum
 		{
 			Hidden,
 			Visible,
 		}
-		
+
 		public enum SnapAngleEnums
 		{
 			Y,
 			X,
 			Z,
 		}
-		
+
 		public enum PlacingModeEnum
 		{
 			Model,
 			Group,
 		}
-		
+
 		public enum PlacingTypeEnum
 		{
 			Simple, // Simple mesh instances
 			Optimized, // Multimesh
 		}
-		
+
 		/** Decal States **/
 		private SpawnStateEnum _DecalSpawned = SpawnStateEnum.Null;
 		private VisibilityStateEnum _DecalVisible = VisibilityStateEnum.Hidden;
@@ -86,47 +86,87 @@ namespace AssetSnap
 		private PlacingTypeEnum _PlacingType = PlacingTypeEnum.Simple;
 		private string _EditingTitle = "None";
 		private Node3D _EditingObject = null;
+		private bool _EditingObjectIsPlaced = false;
+		private bool _MultiDrop = false;
 		private Node _CurrentScene = null;
 		private Library.Instance _CurrentLibrary = null;
-	
+
 		[ExportCategory("General")]
 		[Export]
-		public string EditingTitle 
+		public string EditingTitle
 		{
 			get => _EditingTitle;
-			set 
+			set
 			{
 				// if( value != _EditingTitle ) 
 				// {
-					_EditingTitle = value;
-					StateChanged();
+				_EditingTitle = value;
+				StateChanged("EditingTitle", value);
 				// }
 			}
 		}
+
 		[Export]
 		public Node3D EditingObject
 		{
 			get => _EditingObject;
-			set 
+			set
 			{
-				if( value != _EditingObject ) 
+				if (value != _EditingObject)
 				{
 					_EditingObject = value;
-					StateChanged();
+					StateChanged("EditingObject", value);
+
+					if (_EditingObject is Node3D)
+					{
+						EditingObjectIsPlaced = null != _EditingObject.GetParent();
+					}
+					else
+					{
+						EditingObjectIsPlaced = false;
+					}
 				}
 			}
 		}
-		
+
+		[Export]
+		public bool EditingObjectIsPlaced
+		{
+			get => _EditingObjectIsPlaced;
+			set
+			{
+				if (value != _EditingObjectIsPlaced)
+				{
+					_EditingObjectIsPlaced = value;
+					StateChanged("EditingObjectIsPlaced", value);
+				}
+			}
+		}
+
+		[Export]
+		public bool MultiDrop
+		{
+			get => _MultiDrop;
+			set
+			{
+				if (value != _MultiDrop)
+				{
+					_MultiDrop = value;
+					StateChanged("MultiDrop", value);
+				}
+			}
+		}
+
 		[Export]
 		public Node CurrentScene
 		{
 			get => _CurrentScene;
-			set 
+			set
 			{
-				if( value != _CurrentScene ) 
+				if (value != _CurrentScene)
 				{
 					_CurrentScene = value;
-					StateChanged();
+					StateChanged("CurrentScene", value);
 				}
 			}
 		}
@@ -135,15 +175,15 @@ namespace AssetSnap
 		public Library.Instance CurrentLibrary
 		{
 			get => _CurrentLibrary;
-			set 
+			set
 			{
-				if( value != _CurrentLibrary ) 
+				if (value != _CurrentLibrary)
 				{
 					_CurrentLibrary = value;
-					StateChanged();
-					
+					StateChanged("CurrentLibrary", value);
+
 					GlobalExplorer _GlobalExplorer = GlobalExplorer.GetInstance();
-					if( null != _GlobalExplorer && null != _GlobalExplorer._Plugin && null != value ) 
+					if (null != _GlobalExplorer && null != _GlobalExplorer._Plugin && null != value)
 					{
 						Plugin _plugin = _GlobalExplorer._Plugin;
 						_plugin.EmitSignal(Plugin.SignalName.LibraryChanged, value.GetName());
@@ -151,59 +191,59 @@ namespace AssetSnap
 				}
 			}
 		}
-		
+
 		[Export]
 		public SpawnStateEnum DecalSpawned
 		{
 			get => _DecalSpawned;
 			set
 			{
-				if( value != _DecalSpawned ) 
+				if (value != _DecalSpawned)
 				{
 					_DecalSpawned = value;
-					StateChanged();	
+					StateChanged("DecalSpawned", value.ToString());
 				}
 			}
 		}
-		
+
 		[Export]
 		public VisibilityStateEnum DecalVisible
 		{
 			get => _DecalVisible;
 			set
 			{
-				if( value != _DecalVisible ) 
+				if (value != _DecalVisible)
 				{
 					_DecalVisible = value;
-					StateChanged();	
+					StateChanged("DecalVisible", value.ToString());
 				}
 			}
 		}
-		
+
 		[Export]
 		public PlacingModeEnum PlacingMode
 		{
 			get => _PlacingMode;
 			set
 			{
-				if( value != _PlacingMode ) 
+				if (value != _PlacingMode)
 				{
 					_PlacingMode = value;
-					StateChanged();	
+					StateChanged("PlacingMode", value.ToString());
 				}
 			}
 		}
-		
+
 		[Export]
 		public PlacingTypeEnum PlacingType
 		{
 			get => _PlacingType;
 			set
 			{
-				if( value != _PlacingType ) 
+				if (value != _PlacingType)
 				{
 					_PlacingType = value;
-					StateChanged();	
+					StateChanged("PlacingType", value.ToString());
 				}
 			}
 		}
@@ -223,7 +263,7 @@ namespace AssetSnap
 		private LibraryStateEnum _ConvexCollision = LibraryStateEnum.Disabled;
 		private LibraryStateEnum _ConvexClean = LibraryStateEnum.Disabled;
 		private LibraryStateEnum _ConvexSimplify = LibraryStateEnum.Disabled;
-		
+
 		[ExportCategory("Placement States & Values")]
 		[Export]
 		public LibraryStateEnum SnapToObject
@@ -231,172 +271,172 @@ namespace AssetSnap
 			get => _SnapToObject;
 			set
 			{
-				if( value != _SnapToObject ) 
+				if (value != _SnapToObject)
 				{
 					_SnapToObject = value;
-					StateChanged();	
+					StateChanged("SnapToObject", value.ToString());
 				}
 			}
 		}
-		
+
 		[Export]
 		public LibraryStateEnum SnapToHeight
 		{
 			get => _SnapToHeight;
 			set
 			{
-				if( value != _SnapToHeight ) 
+				if (value != _SnapToHeight)
 				{
 					_SnapToHeight = value;
-					StateChanged();	
+					StateChanged("SnapToHeight", value.ToString());
 				}
 			}
 		}
-		
+
 		[Export]
 		public LibraryStateEnum SnapToHeightGlue
 		{
 			get => _SnapToHeightGlue;
 			set
 			{
-				if( value != _SnapToHeightGlue ) 
+				if (value != _SnapToHeightGlue)
 				{
 					_SnapToHeightGlue = value;
-					StateChanged();	
+					StateChanged("SnapToHeightGlue", value.ToString());
 				}
 			}
 		}
-		
+
 		[Export]
 		public LibraryStateEnum SnapToX
 		{
 			get => _SnapToX;
 			set
 			{
-				if( value != _SnapToX ) 
+				if (value != _SnapToX)
 				{
 					_SnapToX = value;
-					StateChanged();	
+					StateChanged("SnapToX", value.ToString());
 				}
 			}
 		}
-		
+
 		[Export]
 		public LibraryStateEnum SnapToXGlue
 		{
 			get => _SnapToXGlue;
 			set
 			{
-				if( value != _SnapToXGlue ) 
+				if (value != _SnapToXGlue)
 				{
 					_SnapToXGlue = value;
-					StateChanged();	
+					StateChanged("SnapToXGlue", value.ToString());
 				}
 			}
 		}
-		
+
 		[Export]
 		public LibraryStateEnum SnapToZ
 		{
 			get => _SnapToZ;
 			set
 			{
-				if( value != _SnapToZ ) 
+				if (value != _SnapToZ)
 				{
 					_SnapToZ = value;
-					StateChanged();	
+					StateChanged("SnapToZ", value.ToString());
 				}
 			}
 		}
-		
+
 		[Export]
 		public LibraryStateEnum SnapToZGlue
 		{
 			get => _SnapToZGlue;
 			set
 			{
-				if( value != _SnapToZGlue ) 
+				if (value != _SnapToZGlue)
 				{
 					_SnapToZGlue = value;
-					StateChanged();	
+					StateChanged("SnapToZGlue", value.ToString());
 				}
 			}
 		}
-		
+
 		[Export]
 		public LibraryStateEnum SphereCollision
 		{
 			get => _SphereCollision;
 			set
 			{
-				if( value != _SphereCollision ) 
+				if (value != _SphereCollision)
 				{
 					_SphereCollision = value;
-					StateChanged();	
+					StateChanged("SphereCollision", value.ToString());
 				}
 			}
 		}
-		
+
 		[Export]
 		public LibraryStateEnum ConcaveCollision
 		{
 			get => _ConcaveCollision;
 			set
 			{
-				if( value != _ConcaveCollision ) 
+				if (value != _ConcaveCollision)
 				{
 					_ConcaveCollision = value;
-					StateChanged();	
+					StateChanged("ConcaveCollision", value.ToString());
 				}
 			}
 		}
-		
+
 		[Export]
 		public LibraryStateEnum ConvexCollision
 		{
 			get => _ConvexCollision;
 			set
 			{
-				if( value != _ConvexCollision ) 
+				if (value != _ConvexCollision)
 				{
 					_ConvexCollision = value;
-					StateChanged();	
+					StateChanged("ConvexCollision", value.ToString());
 				}
 			}
 		}
-		
+
 		[Export]
 		public LibraryStateEnum ConvexClean
 		{
 			get => _ConvexClean;
 			set
 			{
-				if( value != _ConvexClean ) 
+				if (value != _ConvexClean)
 				{
 					_ConvexClean = value;
-					StateChanged();	
+					StateChanged("ConvexClean", value.ToString());
 				}
 			}
 		}
-		
+
 		[Export]
 		public LibraryStateEnum ConvexSimplify
 		{
 			get => _ConvexSimplify;
 			set
 			{
-				if( value != _ConvexSimplify ) 
+				if (value != _ConvexSimplify)
 				{
 					_ConvexSimplify = value;
-					StateChanged();	
+					StateChanged("ConvexSimplify", value.ToString());
 				}
 			}
 		}
-		
+
 
 		/** Group States **/
-		
-		
+
+
 		/** Library Values **/
 		private int _SnapLayer = 0;
 		private float _SnapToObjectOffsetXValue = 0;
@@ -405,109 +445,109 @@ namespace AssetSnap
 		private float _SnapToXValue = 0;
 		private float _SnapToZValue = 0;
 		private float _DragSizeOffset = 0;
-		
-	
-		
+
+
+
 		[Export]
 		public int SnapLayer
 		{
 			get => _SnapLayer;
 			set
 			{
-				if( value != _SnapLayer ) 
+				if (value != _SnapLayer)
 				{
 					_SnapLayer = value;
-					StateChanged();
+					StateChanged("SnapLayer", value);
 				}
 			}
 		}
-		
+
 		[Export]
 		public float SnapToObjectOffsetXValue
 		{
 			get => _SnapToObjectOffsetXValue;
 			set
 			{
-				if( value != _SnapToObjectOffsetXValue ) 
+				if (value != _SnapToObjectOffsetXValue)
 				{
 					_SnapToObjectOffsetXValue = value;
-					StateChanged();
+					StateChanged("SnapToObjectOffsetXValue", value);
 				}
 			}
 		}
-		
+
 		[Export]
 		public float SnapToObjectOffsetZValue
 		{
 			get => _SnapToObjectOffsetZValue;
 			set
 			{
-				if( value != _SnapToObjectOffsetZValue ) 
+				if (value != _SnapToObjectOffsetZValue)
 				{
 					_SnapToObjectOffsetZValue = value;
-					StateChanged();
+					StateChanged("SnapToObjectOffsetZValue", value);
 				}
 			}
 		}
-		
+
 		[Export]
 		public float SnapToHeightValue
 		{
 			get => _SnapToHeightValue;
 			set
 			{
-				if( value != _SnapToHeightValue ) 
+				if (value != _SnapToHeightValue)
 				{
 					_SnapToHeightValue = value;
-					StateChanged();
+					StateChanged("SnapToHeightValue", value);
 				}
 			}
 		}
-		
+
 		[Export]
 		public float SnapToXValue
 		{
 			get => _SnapToXValue;
 			set
 			{
-				if( value != _SnapToXValue ) 
+				if (value != _SnapToXValue)
 				{
 					_SnapToXValue = value;
-					StateChanged();
+					StateChanged("SnapToXValue", value);
 				}
 			}
 		}
-		
+
 		[Export]
 		public float SnapToZValue
 		{
 			get => _SnapToZValue;
 			set
 			{
-				if( value != _SnapToZValue ) 
+				if (value != _SnapToZValue)
 				{
 					_SnapToZValue = value;
-					StateChanged();
+					StateChanged("SnapToZValue", value);
 				}
 			}
 		}
-		
+
 		[Export]
-		public float DragSizeOffset 
+		public float DragSizeOffset
 		{
 			get => _DragSizeOffset;
-			set 
+			set
 			{
-				if( value != _DragSizeOffset ) 
+				if (value != _DragSizeOffset)
 				{
 					_DragSizeOffset = value;
-					StateChanged();
+					StateChanged("DragSizeOffset", value);
 				}
 			}
 		}
 		/** Snap States **/
 		private SpawnStateEnum _BoundarySpawned = SpawnStateEnum.Null;
-		
+
 		[ExportCategory("Boundary")]
 		[Export]
 		public SpawnStateEnum BoundarySpawned
@@ -515,14 +555,14 @@ namespace AssetSnap
 			get => _BoundarySpawned;
 			set
 			{
-				if( value != _BoundarySpawned ) 
+				if (value != _BoundarySpawned)
 				{
 					_BoundarySpawned = value;
-					StateChanged();	
+					StateChanged("BoundarySpawned", value.ToString());
 				}
 			}
 		}
-		
+
 		public List<SnapAngleEnums> BoundaryActiveAngles { get; set; } = new List<SnapAngleEnums>();
 
 		/** Group Values **/
@@ -530,49 +570,49 @@ namespace AssetSnap
 		private GroupResource _Group;
 		private AsGrouped3D _GroupedObject;
 		private Godot.Collections.Dictionary<string, Godot.Collections.Array<AsGrouped3D>> _GroupedObjects = new();
-		
+
 		[ExportCategory("Group")]
 		[Export]
 		public SnapPosition GroupSnapsTo
 		{
 			get => _GroupSnapsTo;
-			set 
+			set
 			{
 				_GroupSnapsTo = value;
-				StateChanged();
+				StateChanged("GroupSnapsTo", value.ToString());
 			}
 		}
-		
+
 		[Export]
 		public GroupResource Group
 		{
 			get => _Group;
-			set 
+			set
 			{
 				_Group = value;
-				StateChanged();
+				StateChanged("Group", value);
 			}
 		}
-		
+
 		[Export]
 		public AsGrouped3D GroupedObject
 		{
 			get => _GroupedObject;
-			set 
+			set
 			{
 				_GroupedObject = value;
-				StateChanged();
+				StateChanged("GroupedObject", value);
 			}
 		}
-		
+
 		[Export]
 		public Godot.Collections.Dictionary<string, Godot.Collections.Array<AsGrouped3D>> GroupedObjects
 		{
 			get => _GroupedObjects;
-			set 
+			set
 			{
 				_GroupedObjects = value;
-				StateChanged();
+				StateChanged("GroupedObjects", value);
 			}
 		}
 
@@ -581,11 +621,11 @@ namespace AssetSnap
 		public string Name = "GlobalStates";
 
 		private static GlobalStates _Instance;
-		public static GlobalStates Singleton 
+		public static GlobalStates Singleton
 		{
 			get
 			{
-				if( null == _Instance )
+				if (null == _Instance)
 				{
 					_Instance = new();
 				}
@@ -593,8 +633,8 @@ namespace AssetSnap
 				return _Instance;
 			}
 		}
-		
-		public bool Has( string name ) 
+
+		public bool Has(string name)
 		{
 			// Get all fields and properties of the class
 			FieldInfo[] fields = GetType().GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
@@ -615,29 +655,29 @@ namespace AssetSnap
 
 			return false;
 		}
-		
-		public void Set( string name, Variant value ) 
+
+		public void Set(string name, Variant value)
 		{
 			// Get the type of the class
 			Type type = GetType();
-			
+
 			// Get the field or property with the provided name
 			FieldInfo field = type.GetField(name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
 			PropertyInfo property = type.GetProperty(name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
 
-			if( value.VariantType == Variant.Type.Bool ) 
+			if (value.VariantType == Variant.Type.Bool)
 			{
 				bool boolVal = value.As<bool>();
-				if( boolVal ) 
+				if (boolVal)
 				{
 					LibraryStateEnum EnumVal = LibraryStateEnum.Enabled;
 					property.SetValue(this, EnumVal);
 				}
-				else 
+				else
 				{
 					LibraryStateEnum EnumVal = LibraryStateEnum.Disabled;
 					property.SetValue(this, EnumVal);
-				}			
+				}
 			}
 			else
 			{
@@ -654,7 +694,7 @@ namespace AssetSnap
 						GD.Print("Unsupported variant type for property: " + name);
 						return;
 				}
-				
+
 				// Set the value of the field or property
 				if (field != null)
 					field.SetValue(this, typedValue);
@@ -662,7 +702,7 @@ namespace AssetSnap
 					property.SetValue(this, typedValue);
 			}
 
-			StateChanged();
+			StateChanged(name, value);
 		}
 	}
 }
