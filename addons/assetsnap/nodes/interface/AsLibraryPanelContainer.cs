@@ -22,6 +22,9 @@
 
 #if TOOLS
 using AssetSnap;
+using AssetSnap.Explorer;
+using AssetSnap.Front.Nodes;
+using AssetSnap.States;
 using Godot;
 
 [Tool]
@@ -29,17 +32,17 @@ public partial class AsLibraryPanelContainer : PanelContainer
 {
 	private AssetSnap.Library.Instance _Library;
 	private Mesh _Mesh;
-	private AssetSnap.Front.Nodes.AsMeshInstance3D _Instance;
+	private Node3D _Instance;
 	private bool _Active = false;
 	private string _FileName = "";
 	private string _Path = "";
 	private Resource _Ressource;
 	private bool _isMouseOver = false;
-   	private Color _targetColor = new Color(1.0f, 1.0f, 1.0f, 1.0f);
+	private Color _targetColor = new Color(1.0f, 1.0f, 1.0f, 1.0f);
 	private float _transitionSpeed = 6.0f; // Adjust the transition speed as needed
-	
+
 	[Export]
-	public AssetSnap.Library.Instance Library 
+	public AssetSnap.Library.Instance Library
 	{
 		get => _Library;
 		set
@@ -57,99 +60,107 @@ public partial class AsLibraryPanelContainer : PanelContainer
 	{
 		SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
 		SizeFlagsVertical = Control.SizeFlags.ShrinkBegin;
-		CustomMinimumSize = new Vector2(0, 120);
+		CustomMinimumSize = new Vector2(0, 140);
 		MouseDefaultCursorShape = Control.CursorShape.PointingHand;
-		
+
 		Connect(PanelContainer.SignalName.GuiInput, new Callable(this, "_ForwardGuiInput"));
 		Connect(Control.SignalName.MouseEntered, new Callable(this, "_OnMouseEntered"));
 		Connect(Control.SignalName.MouseExited, new Callable(this, "_OnMouseExited"));
-		
-		GlobalExplorer.GetInstance()._Plugin.Connect(Plugin.SignalName.LibraryChanged, Callable.From( (string name) => { _OnLibraryChange(name); } ) ); 
+
+		Plugin.Singleton.Connect(Plugin.SignalName.LibraryChanged, Callable.From((string name) => { _OnLibraryChange(name); }));
 	}
-	
+
 	/*
 	** Handles smooth transition of background color
 	** 
 	** @return void
-	*/	
- 	public override void _Process(double delta)
+	*/
+	public override void _Process(double delta)
 	{
 		// Smoothly interpolate the modulate property toward the target color
 		SelfModulate = SelfModulate.Lerp(_targetColor, (float)delta * _transitionSpeed);
 	}
-	
+
 	/*
 	** Handles click event on the panel, which
 	** enables the active state of the panel
 	** 
 	** @param InputEvent _event
 	** @return void
-	*/	
+	*/
 	public void _ForwardGuiInput(InputEvent _event)
 	{
-		GlobalExplorer explorer = GlobalExplorer.GetInstance();
-		if( _event is InputEventMouseButton _buttonEvent ) 
+		if (_event is InputEventMouseButton _buttonEvent && _buttonEvent.Position.X > 29 && _buttonEvent.Position.X < 161)
 		{
 			if (false == _buttonEvent.Pressed && _buttonEvent.ButtonIndex == MouseButton.Left && _Active == false)
 			{
-				if( _FileName == null || _FileName == "" ) 
+				if (_FileName == null || _FileName == "")
 				{
 					GD.PushError("Filename was not available, hence model could not be selected");
 					return;
 				}
-				
-				if( _Ressource == null )  
+
+				if (_Ressource == null)
 				{
 					GD.PushError("Ressource was not available, hence model could not be selected");
 					return;
 				}
-				
-				if( Library == null ) 
+
+				if (Library == null)
 				{
 					GD.PushError("Library was not available, hence model could not be selected");
 					return;
 				}
-				
+
 				Library.ClearActivePanelState(this);
 				SetState(true);
-				
+
 				Library._LibrarySettings._LSSnapToHeight.SetState(true);
 				Library._LibrarySettings._LSSnapToHeight.Sync();
 
 				PrepareMeshInstance();
-				
-				explorer.SetFocusToNode(_Instance);
-				explorer.CurrentLibrary._LibrarySettings.UpdateSpawnSettings("_LSSnapToHeight.state", true);
-				explorer.CurrentLibrary._LibrarySettings.UpdateSpawnSettings("_LSSnapToHeight.UsingGlue", true);
-				explorer.States.GroupedObject = null;
-				explorer.States.Group = null;
+
+				ExplorerUtils.Get().SetFocusToNode(_Instance);
+
+				StatesUtils.Get().GroupedObject = null;
+				StatesUtils.Get().Group = null;
 			}
-			else if( false == _buttonEvent.Pressed && _buttonEvent.ButtonIndex == MouseButton.Left && _Active == true) 
+			else if (false == _buttonEvent.Pressed && _buttonEvent.ButtonIndex == MouseButton.Left && _Active == true)
 			{
-				explorer.SetFocusToNode(null);
+				ExplorerUtils.Get().SetFocusToNode(null);
 				SetState(false);
 			}
 			else if (false == _buttonEvent.Pressed && _buttonEvent.ButtonIndex == MouseButton.Right)
 			{
-				explorer.GroupBuilder.ShowMenu(_buttonEvent.GlobalPosition, _Path);
+				ExplorerUtils.Get().GroupBuilder.ShowMenu(_buttonEvent.GlobalPosition, _Path);
 			}
 		}
 	}
-	
-	private void _OnLibraryChange( string LibraryName )
+
+	private void _OnLibraryChange(string LibraryName)
 	{
-		if( IsActive() && Library.GetName() == LibraryName ) 
+		if (IsActive() && Library.GetName() == LibraryName)
 		{
-			GlobalExplorer.GetInstance().SetFocusToNode(_Instance);
+			if (_Instance == StatesUtils.Get().EditingObject)
+			{
+				return;
+			}
+
+			if (StatesUtils.Get().MultiDrop)
+			{
+				return;
+			}
+
+			ExplorerUtils.Get().SetFocusToNode(_Instance);
 		}
 	}
-			
+
 	/*
 	** Sets the file path for the Library Panel
 	** 
 	** @param string path
 	** @return void
-	*/		
+	*/
 	public void SetFilePath(string path)
 	{
 		_Path = path;
@@ -157,7 +168,7 @@ public partial class AsLibraryPanelContainer : PanelContainer
 		_FileName = _FileNameArr[_FileNameArr.Length - 1].Split('.')[0];
 		_Ressource = GD.Load(_Path);
 	}
-	
+
 	/*
 	** Sets the state of the library panel
 	**
@@ -168,18 +179,18 @@ public partial class AsLibraryPanelContainer : PanelContainer
 	{
 		_Active = state;
 		_targetColor = new Color(1.0f, 1.0f, 1.0f, 1.0f);
-		
-		if( state == true ) 
+
+		if (state == true)
 		{
 			Theme = GD.Load<Theme>("res://addons/assetsnap/assets/themes/ActivePanelContainer.tres");
 		}
-		else 
+		else
 		{
 			// Remove active theme
 			Theme = null;
 		}
 	}
-	
+
 	/*
 	** Checks if the library panel's
 	** state is active
@@ -188,54 +199,103 @@ public partial class AsLibraryPanelContainer : PanelContainer
 	*/
 	public bool IsActive()
 	{
-		if( _Active == true ) 
+		if (_Active == true)
 		{
 			return true;
 		}
-		
+
 		return false;
 	}
-	
+
 	private void PrepareMeshInstance()
 	{
-		_Mesh = (Mesh)_Ressource;
-		var FileNameSplit = _FileName.Split("\\");
-		_Instance = new()
+		if (_Ressource is Mesh _Mesh)
 		{
-			Floating = true,
-			Mesh = _Mesh,
-			Name = FileNameSplit[ FileNameSplit.Length - 1 ],
-			SpawnSettings = new(),
-			LibraryName = Library.GetName(),
-		};
+			var FileNameSplit = _FileName.Split("\\");
+			AssetSnap.Front.Nodes.AsMeshInstance3D instance = new()
+			{
+				Floating = true,
+				Mesh = _Mesh,
+				Name = FileNameSplit[FileNameSplit.Length - 1],
+				SpawnSettings = new(),
+				LibraryName = Library.GetName(),
+			};
+
+			_Instance = instance;
+		}
+		else if (_Ressource is PackedScene _Scene)
+		{
+			var FileNameSplit = _FileName.Split("\\");
+
+			Variant sceneInstance = _Scene.Instantiate();
+			Node3D node = sceneInstance.As<Node3D>();
+
+			AsNode3D AsNode = new()
+			{
+				Floating = true,
+				Name = FileNameSplit[FileNameSplit.Length - 1],
+				SpawnSettings = new(),
+				Transform = node.Transform,
+				LibraryName = Library.GetName(),
+			};
+
+			if (node.GetChildCount() > 0)
+			{
+				foreach (Node child in node.GetChildren())
+				{
+					if (child is MeshInstance3D meshinstance3D)
+					{
+						AsMeshInstance3D meshinstanceChild = new AsMeshInstance3D()
+						{
+							Name = meshinstance3D.Name,
+							Mesh = meshinstance3D.Mesh,
+							Transform = meshinstance3D.Transform,
+							SpawnSettings = new(),
+							LibraryName = Library.GetName(),
+						};
+
+						Transform3D transform = meshinstance3D.Transform;
+						transform.Origin.Y = meshinstance3D.GetAabb().Size.Y / 2;
+						meshinstance3D.Transform = transform;
+
+						AsNode.AddChild(
+							meshinstanceChild
+						);
+					}
+				}
+			}
+
+			_Instance = AsNode;
+			node.QueueFree();
+		}
 	}
-	
+
 	/*
 	** Handles mouse enter of the
 	** hover functionality
 	** 
 	** @return void
-	*/	
+	*/
 	private void _OnMouseEntered()
 	{
 		_isMouseOver = true;
-		
-		if( _Active == false ) 
+
+		if (_Active == false)
 		{
 			_targetColor = new Color(0.25f, 0.25f, 0.25f, 1.0f);
 		}
-		else 
+		else
 		{
 			_targetColor = new Color(1.0f, 1.0f, 1.0f, 1.0f);
 		}
 	}
-	
+
 	/*
 	** Handles mouse exit of the
 	** hover functionality
 	** 
 	** @return void
-	*/	
+	*/
 	private void _OnMouseExited()
 	{
 		_isMouseOver = false;
@@ -246,34 +306,34 @@ public partial class AsLibraryPanelContainer : PanelContainer
 	** Cleans up references, parameters and fields
 	** 
 	** @return void 
-	*/	
+	*/
 	public override void _ExitTree()
 	{
 		_Active = false;
 		_Library = null;
 		_Mesh = null;
 		_Ressource = null;
-		
-		if(null != GlobalExplorer.GetInstance() && null != GlobalExplorer.GetInstance()._Plugin && GlobalExplorer.GetInstance()._Plugin.IsConnected(Plugin.SignalName.LibraryChanged, Callable.From( (string name) => { _OnLibraryChange(name); } ) )) 
+
+		if (null != GlobalExplorer.GetInstance() && null != GlobalExplorer.GetInstance()._Plugin && GlobalExplorer.GetInstance()._Plugin.IsConnected(Plugin.SignalName.LibraryChanged, Callable.From((string name) => { _OnLibraryChange(name); })))
 		{
-			GlobalExplorer.GetInstance()._Plugin.Disconnect(Plugin.SignalName.LibraryChanged, Callable.From( (string name) => { _OnLibraryChange(name); } ) ); 
+			GlobalExplorer.GetInstance()._Plugin.Disconnect(Plugin.SignalName.LibraryChanged, Callable.From((string name) => { _OnLibraryChange(name); }));
 		}
-		
-		if( IsConnected(PanelContainer.SignalName.GuiInput, new Callable(this, "_ForwardGuiInput"))) 
+
+		if (IsConnected(PanelContainer.SignalName.GuiInput, new Callable(this, "_ForwardGuiInput")))
 		{
 			Disconnect(PanelContainer.SignalName.GuiInput, new Callable(this, "_ForwardGuiInput"));
-		}		
-		if( IsConnected(Control.SignalName.MouseEntered, new Callable(this, "_OnMouseEntered"))) 
+		}
+		if (IsConnected(Control.SignalName.MouseEntered, new Callable(this, "_OnMouseEntered")))
 		{
 			Disconnect(Control.SignalName.MouseEntered, new Callable(this, "_OnMouseEntered"));
-		}		
-		if( IsConnected(Control.SignalName.MouseExited, new Callable(this, "_OnMouseExited"))) 
+		}
+		if (IsConnected(Control.SignalName.MouseExited, new Callable(this, "_OnMouseExited")))
 		{
 			Disconnect(Control.SignalName.MouseExited, new Callable(this, "_OnMouseExited"));
-		}		
+		}
 
-		if( IsInstanceValid(_Instance) ) 
-		{ 
+		if (IsInstanceValid(_Instance))
+		{
 			_Instance.QueueFree();
 		}
 	}
