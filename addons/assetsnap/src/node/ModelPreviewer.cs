@@ -1,27 +1,30 @@
 namespace AssetSnap.Nodes
 {
 	using System.Threading.Tasks;
+	using AssetSnap.Explorer;
 	using AssetSnap.States;
+	using AssetSnap.Static;
 	using Godot;
 
 	class ModelPreviewer
 	{
-		public static ModelPreviewer Singleton {
+		public static ModelPreviewer Singleton
+		{
 			get
 			{
-				if( _Instance == null ) 
+				if (_Instance == null)
 				{
 					_Instance = new();
 				}
-				
-				return _Instance;				
+
+				return _Instance;
 			}
 		}
-		
-		
+
+
 		private static ModelPreviewer _Instance;
-		
-		public Vector2I Size = new Vector2I(512,512);
+
+		public Vector2I Size = new Vector2I(SettingsStatic.PreviewImageSize(), SettingsStatic.PreviewImageSize());
 
 		public Godot.Collections.Array<string> Queue = new();
 		public Godot.Collections.Array<string> QueueSignals = new();
@@ -30,7 +33,7 @@ namespace AssetSnap.Nodes
 
 		private SubViewport _viewport;
 		private Camera3D Camera;
-		
+
 		/*
 		** Prepare conditions for preview image extraction
 		*/
@@ -45,17 +48,17 @@ namespace AssetSnap.Nodes
 			{
 				Size = Size,
 				World3D = world,
-				
+
 				// DebugDraw = Viewport.DebugDrawEnum.Disabled,
 				RenderTargetUpdateMode = SubViewport.UpdateMode.Always,
 				// ProcessMode = Node.ProcessModeEnum.Disabled,
 				// GuiDisableInput = true,
 				TransparentBg = true,
 				// PhysicsObjectPicking = false,
-				
+
 				CanvasItemDefaultTextureFilter = Viewport.DefaultCanvasItemTextureFilter.NearestWithMipmaps,
 				CanvasItemDefaultTextureRepeat = Viewport.DefaultCanvasItemTextureRepeat.Disabled,
-				
+
 				Msaa3D = ProjectSettings.GetSetting("rendering/anti_aliasing/quality/msaa_3d").As<Viewport.Msaa>(),
 				// FsrSharpness = ProjectSettings.GetSetting("rendering/scaling_3d/fsr_sharpness").As<float>(),
 				// PositionalShadowAtlas16Bits = ProjectSettings.GetSetting("rendering/lights_and_shadows/positional_shadow/atlas_16_bits").As<bool>(),
@@ -64,10 +67,10 @@ namespace AssetSnap.Nodes
 				// PositionalShadowAtlasQuad2 = ProjectSettings.GetSetting("rendering/lights_and_shadows/positional_shadow/atlas_quadrant_2_subdiv").As<Viewport.PositionalShadowAtlasQuadrantSubdiv>(),
 				// PositionalShadowAtlasQuad3 = ProjectSettings.GetSetting("rendering/lights_and_shadows/positional_shadow/atlas_quadrant_3_subdiv").As<Viewport.PositionalShadowAtlasQuadrantSubdiv>(),
 				// PositionalShadowAtlasSize = ProjectSettings.GetSetting("rendering/lights_and_shadows/positional_shadow/atlas_size").As<int>(),
-				
+
 				// Scaling3DMode = ProjectSettings.GetSetting("rendering/scaling_3d/mode").As<Viewport.Scaling3DModeEnum>(),
 				// Scaling3DScale = ProjectSettings.GetSetting("rendering/scaling_3d/scale").As<float>(),
-				
+
 				// ScreenSpaceAA = ProjectSettings.GetSetting("rendering/anti_aliasing/quality/screen_space_aa").As<Viewport.ScreenSpaceAAEnum>(),
 				// TextureMipmapBias = ProjectSettings.GetSetting("rendering/textures/default_filters/texture_mipmap_bias").As<float>(),
 			};
@@ -75,7 +78,7 @@ namespace AssetSnap.Nodes
 			Plugin.Singleton
 				.GetInternalContainer()
 				.AddChild(_viewport, true);
-				
+
 			// Setup Camera + Scene Light
 			DirectionalLight3D SceneLight = new DirectionalLight3D()
 			{
@@ -97,14 +100,53 @@ namespace AssetSnap.Nodes
 
 			_viewport.AddChild(Camera);
 		}
-		
-		public void AddToQueue( string FilePath, TextureRect _TextureRect, string LibraryName )
+
+		public static void ClearPreviewImages(string AbsolutePath)
 		{
-			Queue.Add( FilePath );
-			QueueTextures.Add( _TextureRect );
+			if (DirAccess.DirExistsAbsolute(AbsolutePath))
+			{
+				DirAccess folder = DirAccess.Open(AbsolutePath);
+				folder.IncludeHidden = false;
+				folder.IncludeNavigational = false;
+				folder.ListDirBegin();
+
+				while (true)
+				{
+					string fileName = folder.GetNext();
+					if (fileName == "")
+					{
+						break;
+					}
+
+					string filePath = $"{AbsolutePath}/{fileName}";
+
+					if (DirAccess.DirExistsAbsolute(filePath))
+					{
+						// Recursively clear subdirectories
+						ClearPreviewImages(filePath);
+						DirAccess.RemoveAbsolute(filePath);
+					}
+					else
+					{
+						DirAccess.RemoveAbsolute(filePath);
+					}
+				}
+
+				folder.ListDirEnd();
+			}
+			else
+			{
+				GD.PushWarning("Path not found");
+			}
+		}
+
+		public void AddToQueue(string FilePath, TextureRect _TextureRect, string LibraryName)
+		{
+			Queue.Add(FilePath);
+			QueueTextures.Add(_TextureRect);
 			QueueLibrary.Add(LibraryName);
 		}
-		
+
 		/*
 		** Cleanup after usage
 		*/
@@ -113,32 +155,32 @@ namespace AssetSnap.Nodes
 			Plugin.Singleton
 				.GetInternalContainer()
 				.RemoveChild(_viewport);
-				
+
 			_viewport.QueueFree();
 			_viewport = null;
 		}
-		
+
 		public int Count()
 		{
 			return Queue.Count;
 		}
-		
+
 		public async void GeneratePreviews()
 		{
 			int MaxCount = Queue.Count;
-			
-			for( int i = MaxCount - 1; i >= 0; i-- ) 
+
+			for (int i = MaxCount - 1; i >= 0; i--)
 			{
 				string path = Queue[i];
 				TextureRect _TextureRect = QueueTextures[i];
 				string LibraryName = QueueLibrary[i];
-				
+
 				Texture2D image = await GeneratePreviewTexture(path, Size.X, Size.Y, LibraryName);
-				if( _TextureRect is AsModelViewerRect modelViewerRect ) 
+				if (_TextureRect is AsModelViewerRect modelViewerRect)
 				{
 					modelViewerRect._MeshPreviewReady(path, image, image, modelViewerRect);
 				}
-				else 
+				else
 				{
 					GD.PushWarning("Invalid ModelViewerRect");
 				}
@@ -146,7 +188,7 @@ namespace AssetSnap.Nodes
 				Queue.RemoveAt(i);
 			}
 		}
-		
+
 		public async Task<Texture2D> GeneratePreviewTexture(string fbxPath, int width, int height, string LibraryName)
 		{
 			// Generate the preview image
@@ -157,7 +199,7 @@ namespace AssetSnap.Nodes
 
 			return imageTexture;
 		}
-		
+
 		public async Task<Image> GeneratePreviewImage(string path, int width, int height, string LibraryName)
 		{
 			string[] pathSplit = path.Split("/");
@@ -166,15 +208,15 @@ namespace AssetSnap.Nodes
 
 			// Load the FBX scene
 			Node3D node = null;
-			if( path.Contains(".fbx") || path.Contains(".gltf") || path.Contains(".glb") ) 
+			if (path.Contains(".fbx") || path.Contains(".gltf") || path.Contains(".glb"))
 			{
 				PackedScene fbxScene = GD.Load<PackedScene>(path);
 				node = fbxScene.Instantiate<Node3D>();
 			}
-			else if( path.Contains(".obj") ) 
+			else if (path.Contains(".obj"))
 			{
 				node = new();
-				
+
 				Mesh mesh = GD.Load<Mesh>(path);
 				MeshInstance3D meshinstance3D = new()
 				{
@@ -183,13 +225,13 @@ namespace AssetSnap.Nodes
 
 				node.AddChild(meshinstance3D);
 			}
-			
-			if( node == null ) 
+
+			if (node == null)
 			{
 				GD.PushError("No model was found");
 				return null;
 			}
-			
+
 			// Add the model to the viewport
 			_viewport.AddChild(node);
 
@@ -206,7 +248,7 @@ namespace AssetSnap.Nodes
 			// -90
 			node.RotationDegrees = new Vector3(0, -90, 0);
 			await Plugin.Singleton.ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
-			
+
 			preview = _MakePreview();
 			// Save camera image
 			_SavePreview(FilenameWithoutExt, preview, "minus-90", LibraryName);
@@ -214,35 +256,37 @@ namespace AssetSnap.Nodes
 			// -180
 			node.RotationDegrees = new Vector3(0, -180, 0);
 			await Plugin.Singleton.ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
-			
+
 			preview = _MakePreview();
 			// Save camera image
 			_SavePreview(FilenameWithoutExt, preview, "minus-180", LibraryName);
-			
+
 			// 90
 			node.RotationDegrees = new Vector3(0, 90, 0);
 			await Plugin.Singleton.ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
-			
+
 			preview = _MakePreview();
 			// Save camera image
 			_SavePreview(FilenameWithoutExt, preview, "90", LibraryName);
-			
+
 			// 180
 			node.RotationDegrees = new Vector3(0, 180, 0);
 			await Plugin.Singleton.ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
-			
+
 			preview = _MakePreview();
 			// Save camera image
 			_SavePreview(FilenameWithoutExt, preview, "180", LibraryName);
-			
+
+			Aabb aabb = NodeUtils.CalculateNodeAabb(node);
+			ExplorerUtils.Get().Settings.AddModelSizeToCache(FilenameWithoutExt, aabb.Size);
 			_viewport.RemoveChild(node);
 			node.QueueFree();
-			
+
 			// Return saved image
 			return preview;
 		}
-		
-		private void _AdjustCameraFocus( Node node )
+
+		private void _AdjustCameraFocus(Node node)
 		{
 			Transform3D transform = new Transform3D(Basis.Identity, Vector3.Zero);
 			transform.Basis *= new Basis(Vector3.Up, Mathf.DegToRad(40.0f));
@@ -250,16 +294,16 @@ namespace AssetSnap.Nodes
 
 			Aabb aabb = NodeUtils.CalculateNodeAabb(node);
 			float distance = aabb.GetLongestAxisSize() / Mathf.Tan(Mathf.DegToRad(Camera.Fov) * 0.5f);
-			
+
 			transform.Origin = transform * (Vector3.Back * distance) + aabb.GetCenter();
 			Camera.GlobalTransform = transform.Orthonormalized();
 		}
-		
+
 		private Image _MakePreview()
 		{
 			// Set the viewport size to the specified Size
 			// _viewport.Size = Size;
-			
+
 			// Render the viewport to the Image
 			Image preview = _viewport.GetTexture().GetImage();
 
@@ -268,37 +312,37 @@ namespace AssetSnap.Nodes
 
 			return preview;
 		}
-		
-		private void _SavePreview( string name, Image preview, string suffix = "", string LibraryName = "")
+
+		private void _SavePreview(string name, Image preview, string suffix = "", string LibraryName = "")
 		{
-			if( false == DirAccess.DirExistsAbsolute("res://assetsnap") ) 
+			if (false == DirAccess.DirExistsAbsolute("res://assetsnap"))
 			{
 				DirAccess.MakeDirAbsolute("res://assetsnap");
 			}
-			
-			if( false == DirAccess.DirExistsAbsolute("res://assetsnap/previews") ) 
+
+			if (false == DirAccess.DirExistsAbsolute("res://assetsnap/previews"))
 			{
 				DirAccess.MakeDirAbsolute("res://assetsnap/previews");
 			}
-			
-			if( false == DirAccess.DirExistsAbsolute("res://assetsnap/previews/" + LibraryName) ) 
+
+			if (false == DirAccess.DirExistsAbsolute("res://assetsnap/previews/" + LibraryName))
 			{
 				DirAccess.MakeDirAbsolute("res://assetsnap/previews/" + LibraryName);
 			}
-			
-			if( false == DirAccess.DirExistsAbsolute("res://assetsnap/previews/" + LibraryName + "/" + name) ) 
+
+			if (false == DirAccess.DirExistsAbsolute("res://assetsnap/previews/" + LibraryName + "/" + name))
 			{
 				DirAccess.MakeDirAbsolute("res://assetsnap/previews/" + LibraryName + "/" + name);
 			}
-			
-			if( true == FileAccess.FileExists("res://assetsnap/previews/" + LibraryName + "/" + name + "/default" + ( suffix != "" ? "-" + suffix : "" ) + ".png") ) 
+
+			if (true == FileAccess.FileExists("res://assetsnap/previews/" + LibraryName + "/" + name + "/default" + (suffix != "" ? "-" + suffix : "") + ".png"))
 			{
 				return;
 			}
-			
-			Error result = preview.SavePng("assetsnap/previews/" + LibraryName + "/" + name + "/default" + ( suffix != "" ? "-" + suffix : "" ) + ".png");
 
-			if( result != Error.Ok ) 
+			Error result = preview.SavePng("assetsnap/previews/" + LibraryName + "/" + name + "/default" + (suffix != "" ? "-" + suffix : "") + ".png");
+
+			if (result != Error.Ok)
 			{
 				GD.Print("Something went wrong: ", name);
 				return;
