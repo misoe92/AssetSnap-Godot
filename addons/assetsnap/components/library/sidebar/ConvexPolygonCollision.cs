@@ -119,7 +119,7 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 				.Select(2)
 				.AddToContainer( this );
 				
-			Plugin.GetInstance().StatesChanged += () => { MaybeUpdateValue(); };
+			Plugin.GetInstance().StatesChanged += (Godot.Collections.Array data) => { MaybeUpdateValue(data); };
 		}
 
 		/*
@@ -128,45 +128,48 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		**
 		** @return void
 		*/
-		public override void MaybeUpdateValue()
+		public override void MaybeUpdateValue(Godot.Collections.Array data)
 		{
-			if(
-				false == IsValid()
-			) 
+			if( data[0].As<string>() == "ConvexCollision" || data[0].As<string>() == "ConvexClean" || data[0].As<string>() == "ConvexSimplify" ) 
 			{
-				return;
+				if(
+					false == IsValid()
+				) 
+				{
+					return;
+				}
+				
+				if( IsActive() ) 
+				{
+					SetCleanCheckboxVisibility(true);
+					SetSimplifyCheckboxVisibility(true);
+				}
+				else
+				{
+					SetCleanCheckboxVisibility(false);
+					SetSimplifyCheckboxVisibility(false);
+				}
+				
+				if( IsCleanActive() && false == CleanCheckboxChecked() ) 
+				{
+					SetCleanCheckboxState(true);
+				}
+				else if( false == IsCleanActive() && true == CleanCheckboxChecked() ) 
+				{
+					SetCleanCheckboxState(false);
+				}
+				
+				if( IsSimplifyActive() && false == SimplifyCheckboxChecked() ) 
+				{
+					SetSimplifyCheckboxState(true);
+				}
+				else if( false == IsSimplifyActive() && true == SimplifyCheckboxChecked() ) 
+				{
+					SetSimplifyCheckboxState(false);
+				}
+				
+				base.MaybeUpdateValue(data);
 			}
-			
-			if( IsActive() ) 
-			{
-				SetCleanCheckboxVisibility(true);
-				SetSimplifyCheckboxVisibility(true);
-			}
-			else
-			{
-				SetCleanCheckboxVisibility(false);
-				SetSimplifyCheckboxVisibility(false);
-			}
-			
-			if( IsCleanActive() && false == CleanCheckboxChecked() ) 
-			{
-				SetCleanCheckboxState(true);
-			}
-			else if( false == IsCleanActive() && true == CleanCheckboxChecked() ) 
-			{
-				SetCleanCheckboxState(false);
-			}
-			
-			if( IsSimplifyActive() && false == SimplifyCheckboxChecked() ) 
-			{
-				SetSimplifyCheckboxState(true);
-			}
-			else if( false == IsSimplifyActive() && true == SimplifyCheckboxChecked() ) 
-			{
-				SetSimplifyCheckboxState(false);
-			}
-			
-			base.MaybeUpdateValue();
 		}
 		
 		public void SetCleanCheckboxState( bool state ) 
