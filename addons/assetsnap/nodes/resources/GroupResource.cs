@@ -199,14 +199,14 @@ namespace AssetSnap.Front.Nodes
 				AsStaticBody3D staticBody3D = new()
 				{
 					Name = _Paths[i] + "/" + i,
-					Mesh = mesh,
-					MeshName = mesh.ResourceName,
+					// Mesh = mesh,
+					// MeshName = mesh.ResourceName,
 					Transform = transform,
-					InstanceTransform = transform,
-					InstanceRotation = Rotation,
-					InstanceScale = Scale,
-					InstanceOwner = null != group.Owner ? group.Owner : null,
-					InstanceSpawnSettings = childOptions[i]
+					// InstanceTransform = transform,
+					// InstanceRotation = Rotation,
+					// InstanceScale = Scale,
+					// InstanceOwner = null != group.Owner ? group.Owner : null,
+					// InstanceSpawnSettings = childOptions[i]
 				};
 
 				group.AddChild(staticBody3D);
@@ -282,7 +282,7 @@ namespace AssetSnap.Front.Nodes
 					TypeState = 3;
 				}
 				
-				staticBody3D.Initialize(TypeState, CollisionType);
+				staticBody3D.Initialize();
 			}
 		}
 		
