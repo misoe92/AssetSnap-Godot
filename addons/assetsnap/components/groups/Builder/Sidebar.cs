@@ -32,47 +32,47 @@ namespace AssetSnap.Front.Components.Groups.Builder
 
 	[Tool]
 	public partial class Sidebar : LibraryComponent
-	{	
+	{
 		private readonly string TitleText = "Current Groups";
 		private readonly string ButtonText = "Create new Group";
 
 		private VBoxContainer GroupContainer;
 
-		private Godot.Collections.Dictionary<string, ListingEntry> _Instances; 
-		
+		private Godot.Collections.Dictionary<string, ListingEntry> _Instances;
+
 		public Sidebar()
 		{
 			Name = "GroupBuilderSidebar";
-			
+
 			UsingTraits = new()
 			{
 				{ typeof(Buttonable).ToString() },
 				{ typeof(Labelable).ToString() },
 				{ typeof(Containerable).ToString() },
 			};
-			
+
 			SizeFlagsVertical = Control.SizeFlags.ExpandFill;
 			SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
-			
+
 			//_include = false;
 		}
-		
+
 		public override void Initialize()
 		{
 			base.Initialize();
 			Initiated = true;
-			
+
 			_SetupTopbar();
 			_SetupExistingGroupList();
 		}
-		
+
 		public void DoShow()
 		{
 			List<string> OuterComponents = new()
 			{
 				"Groups.Container",
 			};
-		
+
 			/** Add the tab item if settings is turned on **/
 			Component.Base Components = _GlobalExplorer.Components;
 			if (Components.HasAll(OuterComponents.ToArray()))
@@ -81,14 +81,14 @@ namespace AssetSnap.Front.Components.Groups.Builder
 				_GroupContainer.GetLeftInnerContainer().Visible = true;
 			}
 		}
-		
+
 		public void DoHide()
 		{
 			List<string> OuterComponents = new()
 			{
 				"Groups.Container",
 			};
-		
+
 			/** Add the tab item if settings is turned on **/
 			Component.Base Components = _GlobalExplorer.Components;
 			if (Components.HasAll(OuterComponents.ToArray()))
@@ -97,73 +97,73 @@ namespace AssetSnap.Front.Components.Groups.Builder
 				_GroupContainer.GetLeftInnerContainer().Visible = false;
 			}
 		}
-		
+
 		public void Update()
 		{
 			string path = ExplorerUtils.Get()
 				.GroupBuilder
 				._Editor
 				.GroupPath;
-			
-			if( path == "" ) 
+
+			if (path == "")
 			{
 				// None chosen, show sidebar
 				DoShow();
 			}
-			else 
+			else
 			{
 				DoHide();
 			}
 		}
-		
-		public void FocusGroup(string FilePath) 
+
+		public void FocusGroup(string FilePath)
 		{
-			foreach( (string fp, ListingEntry _Instance ) in _Instances ) 
+			foreach ((string fp, ListingEntry _Instance) in _Instances)
 			{
-				if( fp == FilePath ) 
+				if (fp == FilePath)
 				{
 					_Instance.Focus();
 				}
-				else 
+				else
 				{
 					_Instance.Unfocus();
 				}
 			}
 		}
-		
-		public void UnFocusGroup(string FilePath) 
+
+		public void UnFocusGroup(string FilePath)
 		{
-			foreach( (string fp, ListingEntry _Instance ) in _Instances ) 
+			foreach ((string fp, ListingEntry _Instance) in _Instances)
 			{
-				if( fp == FilePath ) 
+				if (fp == FilePath)
 				{
 					_Instance.Unfocus();
 				}
 			}
 		}
-		
-		public void SelectGroup(string FilePath) 
+
+		public void SelectGroup(string FilePath)
 		{
-			foreach( (string fp, ListingEntry _Instance ) in _Instances ) 
+			foreach ((string fp, ListingEntry _Instance) in _Instances)
 			{
-				if( fp == FilePath ) 
+				if (fp == FilePath)
 				{
 					_Instance.SelectGroup();
 				}
 			}
 		}
-		
+
 		public void DeselectGroup(string FilePath)
 		{
-			foreach( (string fp, ListingEntry _Instance ) in _Instances ) 
+			foreach ((string fp, ListingEntry _Instance) in _Instances)
 			{
-				if( fp == FilePath ) 
+				if (fp == FilePath)
 				{
 					_Instance.DeselectGroup();
 				}
 			}
 		}
-		
+
 		private void _SetupTopbar()
 		{
 			Trait<Containerable>()
@@ -176,23 +176,23 @@ namespace AssetSnap.Front.Components.Groups.Builder
 				.SetMargin(4, "bottom")
 				.SetOrientation(Containerable.ContainerOrientation.Horizontal)
 				.Instantiate();
-				
+
 			Container InnerContainerLeft = Trait<Containerable>()
 				.Select(0)
 				.GetInnerContainer(0);
-				
+
 			Container InnerContainerRight = Trait<Containerable>()
 				.Select(0)
 				.GetInnerContainer(1);
-				
-			if( null == InnerContainerLeft || null == InnerContainerRight ) 
+
+			if (null == InnerContainerLeft || null == InnerContainerRight)
 			{
 				GD.PushError("No inner container was found @ group topbar");
 			}
 
 			InnerContainerLeft.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
 			InnerContainerRight.SizeFlagsHorizontal = Control.SizeFlags.ShrinkEnd;
-			
+
 			_SetupListTitle(InnerContainerLeft);
 			_SetupNewGroupButton(InnerContainerRight);
 
@@ -202,25 +202,39 @@ namespace AssetSnap.Front.Components.Groups.Builder
 					this
 				);
 		}
-		
+
 		private void _SetupExistingGroupList()
 		{
 			_Instances = new();
 
 			string[] Groups = _GetCurrentGroupPaths();
 
-			foreach( string path in Groups ) 
+			if (Groups.Length == 0)
+			{
+				Trait<Labelable>()
+					.SetName("NotFound-Group")
+					.SetType(Labelable.TitleType.TextSmall)
+					.SetText("No groups was found. Click on 'Create new' to create a new group and to get started.")
+					.SetAutoWrap(TextServer.AutowrapMode.Word)
+					.Instantiate()
+					.Select(1)
+					.AddToContainer(this);
+
+				return;
+			}
+
+			foreach (string path in Groups)
 			{
 				string title = path;
 				List<string> Components = new()
 				{
 					"Groups.Builder.ListingEntry",
 				};
-				
-				if (GlobalExplorer.GetInstance().Components.HasAll( Components.ToArray() )) 
+
+				if (GlobalExplorer.GetInstance().Components.HasAll(Components.ToArray()))
 				{
 					ListingEntry SingleEntry = GlobalExplorer.GetInstance().Components.Single<ListingEntry>(true);
-					
+
 					SingleEntry.title = title;
 					SingleEntry.Container = this;
 					SingleEntry.Initialize();
@@ -230,16 +244,25 @@ namespace AssetSnap.Front.Components.Groups.Builder
 				}
 			}
 		}
-		
+
 		public void RefreshExistingGroups()
 		{
-			GroupContainer.GetParent().RemoveChild(GroupContainer);
-			GroupContainer.QueueFree();
+			Trait<Labelable>()
+				.Clear(1);
+
+			if (_Instances.Count > 0)
+			{
+				foreach ((string title, ListingEntry entry) in _Instances)
+				{
+					entry.GetParent().RemoveChild(entry);
+					entry.QueueFree();
+				}
+			}
 
 			_SetupExistingGroupList();
 		}
-		
-		private void _SetupListTitle( Container container ) 
+
+		private void _SetupListTitle(Container container)
 		{
 			Trait<Labelable>()
 				.SetName("GroupBuilderSidebarTitle")
@@ -254,8 +277,8 @@ namespace AssetSnap.Front.Components.Groups.Builder
 					container
 				);
 		}
-		
-		private void _SetupNewGroupButton( Container container )
+
+		private void _SetupNewGroupButton(Container container)
 		{
 			Trait<Containerable>()
 				.SetName("NewGroupButtonContainer")
@@ -281,7 +304,7 @@ namespace AssetSnap.Front.Components.Groups.Builder
 						.GetInnerContainer()
 				);
 		}
-		
+
 		private string[] _GetCurrentGroupPaths()
 		{
 			// Directory path of the 'res://groups' folder
@@ -289,17 +312,17 @@ namespace AssetSnap.Front.Components.Groups.Builder
 
 			// Get an array of file paths inside the directory
 			string[] filePaths = _GetFilePathsInDirectory(directoryPath);
-			
+
 			return filePaths;
 		}
-		
+
 		private string[] _GetFilePathsInDirectory(string directoryPath)
 		{
 			// Initialize an empty list to store file paths
 			var filePaths = new List<string>();
 			Godot.DirAccess files = Godot.DirAccess.Open(directoryPath);
 			// Ensure the directory exists
-			if ( null != files )
+			if (null != files)
 			{
 				// Iterate through each file path
 				foreach (string file in files.GetFiles())
@@ -318,7 +341,7 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			// Convert the list to an array and return
 			return filePaths.ToArray();
 		}
-		
+
 		private void _SetupNewGroup()
 		{
 			string Name = "Group-" + UniqueHelper.GenerateId();
@@ -326,7 +349,7 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			{
 				Name = Name
 			};
-			
+
 			string savePath = "res://groups/" + Name + ".tres";
 			// Save the texture to the specified path
 			Error success = ResourceSaver.Save(_Resource, savePath);
@@ -342,8 +365,8 @@ namespace AssetSnap.Front.Components.Groups.Builder
 
 			RefreshExistingGroups();
 		}
-		
-		public void RemoveGroup( string filepath )
+
+		public void RemoveGroup(string filepath)
 		{
 			string absolutePath = ProjectSettings.GlobalizePath(filepath);
 			// Check if the file exists
@@ -367,7 +390,7 @@ namespace AssetSnap.Front.Components.Groups.Builder
 
 		public override void _ExitTree()
 		{
-			_Instances = null; 
+			_Instances = null;
 			base._ExitTree();
 		}
 	}
