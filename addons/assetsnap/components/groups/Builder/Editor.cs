@@ -97,7 +97,7 @@ namespace AssetSnap.Front.Components.Groups.Builder
 				.Connect(
 					Plugin.SignalName.StatesChanged,
 					Callable.From(
-						() => { GroupOptions._UpdateGroupOptions();  }
+						(Godot.Collections.Array data) => { GroupOptions._UpdateGroupOptions();  }
 					)
 				);
 		}
