@@ -205,8 +205,6 @@ namespace AssetSnap.Instance.Input
 						}
 					}
 
-
-					GD.Print("her");
 					// Focus the selected node in the editor
 					// EditorInterface.Singleton.GetSelection().Clear();
 					if (SettingsStatic.ShouldFocusAsset() && false == ExplorerUtils.Get().InputDriver.IsMulti)
