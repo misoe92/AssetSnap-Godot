@@ -38,27 +38,27 @@ namespace AssetSnap.Component
 			Name = "Containerable";
 			TypeString = GetType().ToString();
 		}
-		
+
 		/*
 		** Instantiate an instance of the trait
 		**
 		** @return Containerable
-		*/	
+		*/
 		public override Containerable Instantiate()
 		{
 			base._Instantiate();
 			base.Instantiate();
 
-			Plugin.Singleton.traitGlobal.AddInstance(Iteration, Dependencies[TraitName + "_Container"].As<Container>(), OwnerName, TypeString, Dependencies );
+			Plugin.Singleton.traitGlobal.AddInstance(Iteration, Dependencies[TraitName + "_Container"].As<Container>(), OwnerName, TypeString, Dependencies);
 			Plugin.Singleton.traitGlobal.AddName(Iteration, TraitName, OwnerName, TypeString);
 
 			Reset();
 			Iteration += 1;
 			Dependencies = new();
-			
+
 			return this;
 		}
-		
+
 		/*
 		** Selects an placed container in the
 		** nodes array by index
@@ -69,10 +69,10 @@ namespace AssetSnap.Component
 		public override Containerable Select(int index, bool debug = false)
 		{
 			base.Select(index, debug);
-			
+
 			return this;
 		}
-		
+
 		/*
 		** Selects an placed container in the
 		** nodes array by name
@@ -80,13 +80,13 @@ namespace AssetSnap.Component
 		** @param string name
 		** @return Containerable
 		*/
-		public override Containerable SelectByName( string name ) 
+		public override Containerable SelectByName(string name)
 		{
 			base.SelectByName(name);
-			
+
 			return this;
 		}
-		
+
 		/*
 		** Adds the currently chosen container
 		** to a specified container
@@ -95,69 +95,69 @@ namespace AssetSnap.Component
 		** @param int|null index
 		** @return void
 		*/
-		public virtual void AddToContainer( Node Container, int? index = null ) 
+		public virtual void AddToContainer(Node Container, int? index = null)
 		{
-			if( null == Dependencies || false == Dependencies.ContainsKey(TraitName + "_MarginContainer") ) 
+			if (null == Dependencies || false == Dependencies.ContainsKey(TraitName + "_MarginContainer"))
 			{
 				GD.PushError("Container was not found @ AddToContainer");
-				
-				if( null == Dependencies ) 
+
+				if (null == Dependencies)
 				{
 					return;
 				}
-				
+
 				GD.PushError("AddToContainer::Keys-> ", Dependencies.Keys);
 				GD.PushError("AddToContainer::ADDTO-> ", TraitName + "_MarginContainer");
 				return;
 			}
-			
-			if( null != Dependencies[TraitName + "_MarginContainer"].As<MarginContainer>().GetParent() ) 
+
+			if (null != Dependencies[TraitName + "_MarginContainer"].As<MarginContainer>().GetParent())
 			{
 				GD.PushError("Container already has a parent @ AddToContainer - ", TraitName, Dependencies[TraitName + "_MarginContainer"].As<MarginContainer>().GetParent().Name);
-				
-				if( null == Dependencies ) 
+
+				if (null == Dependencies)
 				{
 					return;
 				}
-				
+
 				GD.PushError("AddToContainer::Keys-> ", Dependencies.Keys);
 				GD.PushError("AddToContainer::ADDTO-> ", TraitName + "_MarginContainer");
 				return;
 			}
-			
+
 			base._AddToContainer(Container, Dependencies[TraitName + "_MarginContainer"].As<MarginContainer>(), index);
 		}
-		
+
 		/*
 		** Setter Methods
 		*/
-		
+
 		/*
 		** Sets the name of the current container
 		**
 		** @param string text
 		** @return Containerable
 		*/
-		public Containerable SetName( string text ) 
+		public Containerable SetName(string text)
 		{
 			base._SetName(text);
-			
+
 			return this;
 		}
-		
+
 		/*
 		** Sets the layout of the container
 		**
 		** @param ContainerLayout layout
 		** @return Containerable
 		*/
-		public override Containerable SetLayout( ContainerLayout layout ) 
+		public override Containerable SetLayout(ContainerLayout layout)
 		{
 			base.SetLayout(layout);
-			
+
 			return this;
 		}
-		
+
 		/*
 		** Sets the visibility state of the
 		** currently chosen container
@@ -165,26 +165,26 @@ namespace AssetSnap.Component
 		** @param bool state
 		** @return Containerable
 		*/
-		public override Containerable SetVisible( bool state ) 
+		public override Containerable SetVisible(bool state)
 		{
 			base.SetVisible(state);
-			
+
 			return this;
 		}
-		
+
 		/*
 		** Toggles the visibility state of the
 		** currently chosen container
 		**
 		** @return Containerable
 		*/
-		public override Containerable ToggleVisible() 
+		public override Containerable ToggleVisible()
 		{
 			base.ToggleVisible();
-			
+
 			return this;
 		}
-		
+
 		/*
 		** Sets the size of the container
 		**
@@ -192,39 +192,46 @@ namespace AssetSnap.Component
 		** @param int height
 		** @return Containerable
 		*/
-		public override Containerable SetDimensions( int width, int height )
+		public override Containerable SetDimensions(int width, int height)
 		{
 			base.SetDimensions(width, height);
-			
+
 			return this;
 		}
-		
+
 		/*
 		** Sets the orientation of the container
 		**
 		** @param ContainerOrientation orientation
 		** @return Containerable
 		*/
-		public override Containerable SetOrientation(ContainerOrientation orientation) 
+		public override Containerable SetOrientation(ContainerOrientation orientation)
 		{
 			base.SetOrientation(orientation);
-			
+
 			return this;
 		}
-		
+
+		public override Containerable SetSeparation(int seperation)
+		{
+			base.SetSeparation(seperation);
+
+			return this;
+		}
+
 		/*
 		** Sets the inner orientation of the container
 		**
 		** @param ContainerOrientation orientation
 		** @return Containerable
 		*/
-		public override Containerable SetInnerOrientation(ContainerOrientation orientation) 
+		public override Containerable SetInnerOrientation(ContainerOrientation orientation)
 		{
 			base.SetInnerOrientation(orientation);
-			
+
 			return this;
 		}
-		
+
 		/*
 		** Sets the horizontal size flag, which controls the x
 		** axis, and how it should act.
@@ -238,7 +245,7 @@ namespace AssetSnap.Component
 
 			return this;
 		}
-		
+
 		/*
 		** Sets the horizontal size flag, which controls the y
 		** axis, and how it should act.
@@ -249,10 +256,10 @@ namespace AssetSnap.Component
 		public override Containerable SetVerticalSizeFlags(Control.SizeFlags flag)
 		{
 			base.SetVerticalSizeFlags(flag);
-			
+
 			return this;
 		}
-		
+
 		/*
 		** Sets margin values for 
 		** the currently chosen container
@@ -261,13 +268,13 @@ namespace AssetSnap.Component
 		** @param string side
 		** @return Containerable
 		*/
-		public override Containerable SetMargin( int value, string side = "" ) 
+		public override Containerable SetMargin(int value, string side = "")
 		{
 			base.SetMargin(value, side);
-			
+
 			return this;
 		}
-		
+
 		/*
 		** Sets padding values for 
 		** the currently chosen container
@@ -276,17 +283,17 @@ namespace AssetSnap.Component
 		** @param string side
 		** @return Containerable
 		*/
-		public override Containerable SetPadding( int value, string side = "" ) 
+		public override Containerable SetPadding(int value, string side = "")
 		{
 			base.SetPadding(value, side);
-			
+
 			return this;
 		}
-		
+
 		/*
 		** Getter Methods
 		*/
-		
+
 		/*
 		** Returns the outer container
 		** of the container layout
@@ -297,7 +304,7 @@ namespace AssetSnap.Component
 		{
 			return base.GetOuterContainer();
 		}
-		
+
 		/*
 		** Returns a inner container
 		** depending on a specified index
@@ -305,12 +312,12 @@ namespace AssetSnap.Component
 		** @param int(0) index
 		** @return Container
 		*/
-		public override Container GetInnerContainer( int index = 0 )
+		public override Container GetInnerContainer(int index = 0)
 		{
-			return base.GetInnerContainer( index );
+			return base.GetInnerContainer(index);
 		}
-		
-		public Node GetContainerParent() 
+
+		public Node GetContainerParent()
 		{
 			return GetParentContainer();
 		}
