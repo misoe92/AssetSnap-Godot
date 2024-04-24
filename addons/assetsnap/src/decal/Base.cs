@@ -23,6 +23,7 @@
 #if TOOLS
 namespace AssetSnap.Decal
 {
+	using AssetSnap.Explorer;
 	using AssetSnap.Front.Nodes;
 	using AssetSnap.Instance.Input;
 	using Godot;
@@ -118,6 +119,11 @@ namespace AssetSnap.Decal
 			Hide();
 		}
 		
+		public Vector3 GetPosition()
+		{
+			return GetNode().Transform.Origin;
+		}
+		
 		/*
 		** Updates the preview model shown in the decal
 		**
@@ -149,13 +155,13 @@ namespace AssetSnap.Decal
 			
 			if( _GlobalExplorer.States.PlacingMode == GlobalStates.PlacingModeEnum.Model )
 			{
-				AsMeshInstance3D model = _GlobalExplorer.GetHandle() as AssetSnap.Front.Nodes.AsMeshInstance3D;
-				AsMeshInstance3D Model = null;
+				Node model = _GlobalExplorer.GetHandle();
+				Node Model = null;
 				bool ChildFound = false;
-							
+
 				if (_Decal.GetChildCount() > 0)
 				{
-					Model = _Decal.GetChild(0) as AssetSnap.Front.Nodes.AsMeshInstance3D;
+					Model = _Decal.GetChild(0);
 					ChildFound = true;
 		
 					ClearCurrentChildren(Model, model);
@@ -178,18 +184,25 @@ namespace AssetSnap.Decal
 		{
 			/** Only show if we have an actual model to show **/
 			if(
-				_GlobalExplorer.GetHandle() == null ||
-				_GlobalExplorer.GetHandle() is AsMeshInstance3D meshInstance3D &&
+				ExplorerUtils.Get().GetHandle() == null ||
+				ExplorerUtils.Get().GetHandle() is AsMeshInstance3D meshInstance3D &&
 				meshInstance3D.IsPlaced() ||
-				_GlobalExplorer.GetHandle() is AsGrouped3D grouped3d &&
+				ExplorerUtils.Get().GetHandle() is AsGrouped3D grouped3d &&
 				grouped3d.IsPlaced() ||
-				_GlobalExplorer.InputDriver is DragAddInputDriver _input &&
+				ExplorerUtils.Get().GetHandle() is AsNode3D asnode3d && asnode3d.IsPlaced() ||
+				ExplorerUtils.Get().InputDriver is DragAddInputDriver _input &&
 				_input.IsDragging()
 			)
 			{
 				return;
 			}
 
+			if( null == _Decal ) 
+			{
+				GD.PushError("Decal not instantiated");
+				return;
+			}
+			
 			_Decal.Visible = true;
 			_GlobalExplorer.States.DecalVisible = GlobalStates.VisibilityStateEnum.Visible;
 		}
@@ -201,7 +214,7 @@ namespace AssetSnap.Decal
 		*/
 		public void Hide()
 		{
-			if( _Decal == null ) 
+			if( _Decal == null || false == _Decal.Visible ) 
 			{
 				return;
 			}
