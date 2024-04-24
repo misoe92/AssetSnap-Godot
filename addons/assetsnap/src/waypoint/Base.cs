@@ -162,9 +162,18 @@ namespace AssetSnap.Waypoint
 			if (model is AsMeshInstance3D meshInstance3D)
 			{
 				int InstanceId = _OptimizedSpawn(meshInstance3D, Origin, Rotation, Scale);
-
 				GlobalExplorer.GetInstance().States.EditingObject = null;
 				meshInstance3D.Free();
+			}
+
+			if (model is AsNode3D node3D)
+			{
+				foreach (AsMeshInstance3D child in node3D.GetChildren())
+				{
+					int InstanceId = _OptimizedSpawn(child, Origin, Rotation, Scale);
+					GlobalExplorer.GetInstance().States.EditingObject = null;
+				}
+				node3D.Free();
 			}
 
 			if (model is AsGrouped3D grouped3D)
