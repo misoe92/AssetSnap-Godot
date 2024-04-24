@@ -89,7 +89,7 @@ namespace AssetSnap.Component
 							type = 3;
 						}
 						
-						asStaticBody3D.UpdateCollision(type, state);
+						// asStaticBody3D.UpdateCollision(type, state);
 					}
 				}
 			}

@@ -22,7 +22,8 @@
 
 namespace AssetSnap.Component
 {
-	using Godot;
+    using AssetSnap.States;
+    using Godot;
 
 	public partial class LSSnapComponent : LibraryComponent
 	{
@@ -41,7 +42,7 @@ namespace AssetSnap.Component
 			//_include = false;
 		}
 		
-		public virtual void MaybeUpdateValue()
+		public virtual void MaybeUpdateValue(Godot.Collections.Array data)
 		{
 			if( IsSnapTo() && false == IsSnapToChecked() ) 
 			{
@@ -195,8 +196,7 @@ namespace AssetSnap.Component
 		public bool IsValid()
 		{
 			return
-				null != _GlobalExplorer &&
-				null != _GlobalExplorer.States &&
+				null != StatesUtils.Get() &&
 				false != Initiated &&
 				null != Trait<Checkable>() &&
 				false != HasTrait<Checkable>();
