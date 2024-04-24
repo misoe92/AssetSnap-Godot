@@ -2,7 +2,7 @@
 .vscode/
 .godot/
 groups/*.tres
-assetsnap/previews/*.*
+assetsnap/previews/*
 *.godot
 icon.svg
 icon.svg.import
