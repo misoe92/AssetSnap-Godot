@@ -59,16 +59,14 @@ namespace AssetSnap.States
 			LoadedState EnumVal = value;
 			field.SetValue(this, EnumVal);
 			
-			StateChanged();
+			StateChanged( key, (int)value );
 		}
 		
-		protected void StateChanged()
+		protected void StateChanged( string key, Variant value )
 		{
-			GlobalExplorer _GlobalExplorer = GlobalExplorer.GetInstance();
-			if( null != _GlobalExplorer._Plugin ) 
+			if( null != Plugin.Singleton ) 
 			{
-				Plugin _plugin = _GlobalExplorer._Plugin;
-				_plugin.EmitSignal(Plugin.SignalName.StatesChanged);
+				Plugin.Singleton.EmitSignal(Plugin.SignalName.StatesChanged, new Godot.Collections.Array(){ key, value });
 			}
 		}
 	}
