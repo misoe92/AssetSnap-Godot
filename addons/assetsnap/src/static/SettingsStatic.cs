@@ -37,7 +37,7 @@ namespace AssetSnap.Static
 			bool PushToScene = GlobalExplorer.GetInstance().Settings.GetKey("push_to_scene").As<bool>();
 			return PushToScene;
 		}
-		
+
 		/*
 		** Checks if collisions should be added
 		**
@@ -48,7 +48,7 @@ namespace AssetSnap.Static
 			bool AddCollisions = GlobalExplorer.GetInstance().Settings.GetKey("add_collisions").As<bool>();
 			return AddCollisions;
 		}
-		
+
 		/*
 		** Checks if Multi drop is allowed
 		**
@@ -59,7 +59,51 @@ namespace AssetSnap.Static
 			GlobalExplorer _GlobalExplorer = GlobalExplorer.GetInstance();
 			return _GlobalExplorer.Settings.GetKey("allow_multi_drop").As<bool>();
 		}
-		
+
+		/*
+		** Checks if Multi drop is allowed
+		**
+		** @returns bool
+		*/
+		public static bool ModelTransparencyActive()
+		{
+			GlobalExplorer _GlobalExplorer = GlobalExplorer.GetInstance();
+			return _GlobalExplorer.Settings.GetKey("enable_model_spawn_in").As<bool>();
+		}
+
+		/*
+		** Checks if Multi drop is allowed
+		**
+		** @returns bool
+		*/
+		public static float TransparencyLevel()
+		{
+			GlobalExplorer _GlobalExplorer = GlobalExplorer.GetInstance();
+			return _GlobalExplorer.Settings.GetKey("initial_model_spawn_in_level").As<float>();
+		}
+
+		/*
+		** Checks if Multi drop is allowed
+		**
+		** @returns bool
+		*/
+		public static float TransparencyFadeDuration()
+		{
+			GlobalExplorer _GlobalExplorer = GlobalExplorer.GetInstance();
+			return _GlobalExplorer.Settings.GetKey("model_spawn_in_duration").As<float>();
+		}
+
+		/*
+		** Checks if Multi drop is allowed
+		**
+		** @returns bool
+		*/
+		public static int PreviewImageSize()
+		{
+			GlobalExplorer _GlobalExplorer = GlobalExplorer.GetInstance();
+			return _GlobalExplorer.Settings.GetKey("model_preview_size").As<int>();
+		}
+
 		/*
 		** Checks if a asset should be focused after placement
 		**
@@ -68,8 +112,8 @@ namespace AssetSnap.Static
 		public static bool ShouldFocusAsset()
 		{
 			bool value = GlobalExplorer.GetInstance().Settings.GetKey("focus_placed_asset").As<bool>();
-			
-			if( value is bool valueBool ) 
+
+			if (value is bool valueBool)
 			{
 				return valueBool;
 			}
