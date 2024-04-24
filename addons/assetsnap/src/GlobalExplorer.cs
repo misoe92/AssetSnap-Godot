@@ -27,28 +27,30 @@ namespace AssetSnap
 	using System.Reflection;
 	using AssetSnap.Front.Nodes;
 	using AssetSnap.Instance.Input;
+	using AssetSnap.States;
 	using Godot;
 
 	[Tool]
 	public partial class GlobalExplorer : NodeExplorer
 	{
 		private static GlobalExplorer Instance;
-		public static GlobalExplorer Singleton {
-			get 
+		public static GlobalExplorer Singleton
+		{
+			get
 			{
-				if( Instance == null ) 
+				if (Instance == null)
 				{
 					Instance = new();
 				}
-				
-				return Instance;	
+
+				return Instance;
 			}
 		}
-		
+
 		/*
 		** The input driver which are currently in use
 		*/
-		public Instance.Input.BaseInputDriver InputDriver 
+		public Instance.Input.BaseInputDriver InputDriver
 		{
 			get => DragIsAllowed() ? DragAddInputDriver.GetInstance() : BaseInputDriver.GetInstance();
 		}
@@ -57,21 +59,21 @@ namespace AssetSnap
 		** Fetches singleton instance of the GlobalExplorer
 		**
 		** @return GlobalExplorer  
-		*/ 
+		*/
 		public static GlobalExplorer InitializeExplorer()
 		{
-			if( null == Instance ) 
+			if (null == Instance)
 			{
 				Instance = new GlobalExplorer()
 				{
 					_Settings = Front.Configs.SettingsConfig.Singleton,
 					_Waypoints = new(),
 					_Components = Component.Base.Singleton,
-					_ContextMenu = AssetSnap.ContextMenu.Base.Singleton, 
+					_ContextMenu = AssetSnap.ContextMenu.Base.Singleton,
 					_BottomDock = AssetSnap.BottomDock.Base.Singleton,
 					_Decal = new(),
-					_Raycast = new(), 
-					_Modifiers = new(),  
+					_Raycast = new(),
+					_Modifiers = new(),
 					_Library = AssetSnap.Library.Base.Singleton,
 					_GroupBuilder = AssetSnap.GroupBuilder.Base.Singleton,
 					_Snap = AssetSnap.Snap.Base.Singleton,
@@ -80,58 +82,58 @@ namespace AssetSnap
 					_Snappable = AssetSnap.Snap.SnappableBase.Singleton,
 				};
 			}
-			
+
 			return Instance;
 		}
-		
+
 		public static GlobalExplorer GetInstance()
 		{
 			return Singleton;
 		}
-		 
-		public Library.Instance GetLibraryByName( string name )
+
+		public Library.Instance GetLibraryByName(string name)
 		{
-			foreach( Library.Instance instance in Library.Libraries ) 
+			foreach (Library.Instance instance in Library.Libraries)
 			{
-				if( EditorPlugin.IsInstanceValid( instance ) && instance.GetName() == name ) 
+				if (EditorPlugin.IsInstanceValid(instance) && instance.GetName() == name)
 				{
 					return instance;
 				}
 			}
-			
+
 			return null;
 		}
-		
-		public Library.Instance GetLibraryByIndex( int index )
+
+		public Library.Instance GetLibraryByIndex(int index)
 		{
-			if( index > -1 && Library.Libraries.Count > index && EditorPlugin.IsInstanceValid(Library.Libraries[index]) ) 
+			if (index > -1 && Library.Libraries.Count > index && EditorPlugin.IsInstanceValid(Library.Libraries[index]))
 			{
 				return Library.Libraries[index] as Library.Instance;
 			}
-			
+
 			return null;
-		} 
-		
-		public void PrintChildNames( Node which ) 
+		}
+
+		public void PrintChildNames(Node which)
 		{
-			foreach( Node child in which.GetChildren() ) 
+			foreach (Node child in which.GetChildren())
 			{
-				if( child is Control childControl && HasProperty(childControl, "Text")) 
+				if (child is Control childControl && HasProperty(childControl, "Text"))
 				{
 					string text = "";
 					TryGetProperty(childControl, "Text", out text);
 				}
 
-				if( 0 != child.GetChildCount() ) 
+				if (0 != child.GetChildCount())
 				{
 					PrintChildNames(child);
 				}
 			}
 		}
-		
-		public void SetFocusToNode( Node3D Node ) 
+
+		public void SetFocusToNode(Node3D Node)
 		{
-			if( null == Node ) 
+			if (null == Node)
 			{
 				CurrentLibrary.ClearActivePanelState(null);
 				CurrentLibrary._LibrarySettings._LSEditing.SetText("None");
@@ -143,49 +145,65 @@ namespace AssetSnap
 
 				return;
 			}
-		
+
 			EditorInterface.Singleton.EditNode(Node);
 			States.EditingObject = Node;
-			
-			if( Node is AsMeshInstance3D _instance ) 
+
+			if (Node is AsMeshInstance3D _instance)
 			{
 				HandleNode = _instance;
 				Model = _instance;
-				
+
 				Library.Instance Library = GetLibraryByName(_instance.GetLibraryName());
-				CurrentLibrary = Library;
 				Library._LibrarySettings._LSEditing.SetText(Node.Name);
-								
-				if( InputDriver is DragAddInputDriver DraggableInputDriver ) 
+				CurrentLibrary = Library;
+				StatesUtils.Get().CurrentLibrary = Library;
+
+				if (InputDriver is DragAddInputDriver DraggableInputDriver)
 				{
 					DraggableInputDriver.CalculateObjectSize();
 				}
 			}
-			
-			if( Node is AsGrouped3D _Grouped3D ) 
+
+			if (Node is AsNode3D _nodeInstance)
+			{
+				HandleNode = _nodeInstance;
+
+				Library.Instance Library = GetLibraryByName(_nodeInstance.GetLibraryName());
+				Library._LibrarySettings._LSEditing.SetText(Node.Name);
+				CurrentLibrary = Library;
+				StatesUtils.Get().CurrentLibrary = Library;
+
+				if (InputDriver is DragAddInputDriver DraggableInputDriver)
+				{
+					DraggableInputDriver.CalculateObjectSize();
+				}
+			}
+
+			if (Node is AsGrouped3D _Grouped3D)
 			{
 				States.PlacingMode = GlobalStates.PlacingModeEnum.Group;
-				
+
 				Transform3D transform = _Grouped3D.Transform;
 				transform.Origin = new Vector3(0, 0, 0);
 				_Grouped3D.Transform = transform;
-				
+
 				States.GroupedObject = _Grouped3D;
-				
-				if( InputDriver is DragAddInputDriver DraggableInputDriver ) 
+
+				if (InputDriver is DragAddInputDriver DraggableInputDriver)
 				{
 					DraggableInputDriver.CalculateObjectSize();
 				}
 			}
 		}
-		
+
 		public static bool HasProperty(Control control, string propertyName)
 		{
 			Type type = control.GetType();
 			PropertyInfo propertyInfo = type.GetProperty(propertyName);
 			return propertyInfo != null;
 		}
-		
+
 		public static bool TryGetProperty<T>(Control control, string propertyName, out T value)
 		{
 			value = default(T);
@@ -209,7 +227,7 @@ namespace AssetSnap
 				return false;
 			}
 		}
-		
+
 		public void PrintFields(Node which)
 		{
 			Type type = which.GetType();
@@ -223,7 +241,7 @@ namespace AssetSnap
 				GD.Print($"{field.Name}: {value}");
 			}
 		}
-		
+
 		/*
 		** Checks whether or not it's allowed to perform drag adding of models
 		**
@@ -231,10 +249,10 @@ namespace AssetSnap
 		*/
 		private bool DragIsAllowed()
 		{
-			bool value = Settings.GetKey("allow_drag_add").As<bool>(); 
+			bool value = Settings.GetKey("allow_drag_add").As<bool>();
 			return value;
 		}
-		
+
 	}
 }
 #endif
