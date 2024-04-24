@@ -22,7 +22,8 @@
 
 namespace AssetSnap.Front.Nodes.Hoverable
 {
-	using Godot;
+    using AssetSnap.Explorer;
+    using Godot;
 
 	[Tool]
 	public partial class ArrayMarginContainer : HoverableMarginContainer
@@ -39,7 +40,7 @@ namespace AssetSnap.Front.Nodes.Hoverable
 			{
 				if( EventMouseButton.ButtonIndex == MouseButton.Left && EventMouseButton.Pressed ) 
 				{
-					GlobalExplorer.GetInstance().Modifiers.ArrayModifier.Apply();
+					ExplorerUtils.Get().Modifiers.ArrayModifier.Apply();
 					
 					var _parent = GetParent();
 					if( _parent is AsSelectList _parentSelect ) 
