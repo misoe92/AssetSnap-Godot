@@ -237,11 +237,11 @@ public partial class AsGrouped3D : AsGroup3D
 			{
 				Transform = _Trans,
 				UsingMultiMesh = true,
-				Mesh = _Meshes[i],
-				MeshName = _Meshes[i].ResourceName,
-				InstanceTransform = _Trans,
-				InstanceScale = _Scales[i],
-				InstanceRotation = _Rotations[i],
+				// Mesh = _Meshes[i],
+				// MeshName = _Meshes[i].ResourceName,
+				// InstanceTransform = _Trans,
+				// InstanceScale = _Scales[i],
+				// InstanceRotation = _Rotations[i],
 			};
 
 			grouped3D.AddChild(_Body);
@@ -318,7 +318,7 @@ public partial class AsGrouped3D : AsGroup3D
 				typeState = 3;
 			}
 
-			_Body.Initialize(typeState, argState);
+			_Body.Initialize();
 		}
 	}
 	

@@ -23,7 +23,7 @@
 namespace AssetSnap.Front.Nodes
 {
 	using System;
-	using AssetSnap.Front.Components;
+	using AssetSnap.Explorer;
 	using Godot;
 
 	[Tool]
@@ -32,331 +32,327 @@ namespace AssetSnap.Front.Nodes
 		private bool IsModelPlaced { get; set; } = false;
 
 		[ExportGroup("Settings")]
-		[ExportSubgroup("Mesh")]
+
 		[Export]
-		public string InstanceLibrary { get; set; }
-	
+		public Node3D Parent { get; set; }
+
 		[Export]
-		public string MeshName { get; set; }
-		
+		public Aabb ModelAabb { get; set; }
+
 		[Export]
-		public Mesh Mesh { get; set; }
-		
+		public AssetSnap.Nodes.ModelCollision.Type CollisionType { get; set; }
+
 		[Export]
-		public Transform3D InstanceTransform { get; set; }
-		
-		[Export]
-		public Node InstanceOwner { get; set; }
-		
-		[Export]
-		public Vector3 InstanceRotation { get; set; }
-		
-		[Export]
-		public Vector3 InstanceScale { get; set; }
-		
-		[Export]
-		public Godot.Collections.Dictionary<string, Variant> InstanceSpawnSettings { get; set; }
+		public AssetSnap.Nodes.ModelCollision.ConvexType CollisionSubType { get; set; } = AssetSnap.Nodes.ModelCollision.ConvexType.None;
 
 		[Export]
 		public bool UsingMultiMesh { get; set; } = false;
+
+		private Vector3 InstanceOrigin;
 
 		public AsStaticBody3D()
 		{
 			SetMeta("AsBody", true);
 		}
-		
+
 		public bool IsPlaced()
 		{
 			return GetParent() != null;
 		}
 
-		public void Initialize(int TypeState = -1, int ArgState = -1)
+		public void Initialize()
 		{
-			try 
+			try
 			{
-				GlobalExplorer _GlobalExplorer = GlobalExplorer.GetInstance();
-
-				if( _GlobalExplorer == null ) 
+				if (null == ExplorerUtils.Get() || null == Plugin.Singleton)
 				{
 					return;
 				}
-				
-				if( null == Mesh ) 
-				{
-					throw new Exception("No mesh available");
-				}
-				
-				SceneTree Tree = _GlobalExplorer._Plugin.GetTree();
-				
-				if( false == UsingMultiMesh ) 
-				{
-					Transform3D Trans = InstanceTransform;
-					Trans.Origin = new Vector3(0.0f, 0.0f, 0.0f);
 
-					AsMeshInstance3D _Instance = new()
-					{
-						Name = MeshName,
-						LibraryName = InstanceLibrary,
-						Transform = Trans,
-						Mesh = Mesh,
-						Scale = InstanceScale,
-						RotationDegrees = InstanceRotation,
-						SpawnSettings = InstanceSpawnSettings,
-						Floating = true,
-					};
-	
-					AddChild(_Instance);
-					_Instance.Owner = null != InstanceOwner ? InstanceOwner : Tree.EditedSceneRoot;
-					_Instance.SetIsFloating(false);
-				}
-
-				if( _GlobalExplorer.States.ConvexCollision == GlobalStates.LibraryStateEnum.Enabled && TypeState == -1 || TypeState == 1) 
+				if (UsingMultiMesh)
 				{
-					int state = 0;
-					
-					if(
-						_GlobalExplorer.States.ConvexClean == GlobalStates.LibraryStateEnum.Enabled && TypeState == -1 &&
-						_GlobalExplorer.States.ConvexSimplify == GlobalStates.LibraryStateEnum.Disabled && TypeState == -1 ||
-						ArgState == 1
-					) 
+					AsMultiMeshInstance3D asMultiMeshInstance3D = Parent as AsMultiMeshInstance3D;
+					for (int i = 0; i < asMultiMeshInstance3D.Multimesh.InstanceCount; i++)
 					{
-						state = 1;
-					} 
-					
-					if(
-						_GlobalExplorer.States.ConvexClean == GlobalStates.LibraryStateEnum.Disabled && TypeState == -1 &&
-						_GlobalExplorer.States.ConvexSimplify == GlobalStates.LibraryStateEnum.Enabled && TypeState == -1 ||
-						ArgState == 2
-					) 
-					{
-						state = 2;
-					} 
-					
-					if(
-						_GlobalExplorer.States.ConvexClean == GlobalStates.LibraryStateEnum.Enabled && TypeState == -1 &&
-						_GlobalExplorer.States.ConvexSimplify == GlobalStates.LibraryStateEnum.Enabled && TypeState == -1 ||
-						ArgState == 3
-					) 
-					{
-						state = 3;
-					} 
-					
-					_ConvexCollisions(Mesh, this, Tree, state);	
+						InstanceOrigin = asMultiMeshInstance3D.Multimesh.GetInstanceTransform(i).Origin;
+						_InitializeCollisionInstance();
+					}
 				}
-				else if( _GlobalExplorer.States.ConcaveCollision == GlobalStates.LibraryStateEnum.Enabled && TypeState == -1 || TypeState == 2 ) 
+				else
 				{
-					_ConcaveCollisions(Mesh, this, Tree);	
-				}
-				else 
-				{
-					_SimpleCollisions(Mesh, this, Tree, TypeState == 3 );	
+					_InitializeCollisionInstance();
 				}
 			}
-			catch(Exception e ) 
+			catch (Exception e)
 			{
 				GD.PushWarning(e.Message);
 			}
 		}
-		
-		public AsMeshInstance3D GetInstance() 
+
+		public void Update(string Type, Vector3 Value)
 		{
-			return GetChild(0) as AsMeshInstance3D;
-		}
-		
-		public void Update( string Type, Vector3 Value )
-		{
-			if( "Scale" == Type ) 
+			if ("Scale" == Type)
 			{
 				Scale = Value;
 			}
-			else if( "Rotation" == Type ) 
+			else if ("Rotation" == Type)
 			{
 				RotationDegrees = Value;
 			}
 		}
-		 
-		public void UpdateCollision(int TypeState = 0, int ArgState = 0)
-		{
-			GlobalExplorer _GlobalExplorer = GlobalExplorer.GetInstance();
 
-			if( _GlobalExplorer == null ) 
+		public void UpdateCollision()
+		{
+			// Remove current collisions and free them
+			foreach (Node child in GetChildren())
 			{
-				return;
+				RemoveChild(child);
+				child.QueueFree();
 			}
-			
-			if( HasNode("AsCollision") ) 
+
+			// Initialize the collisions again
+			Initialize();
+		}
+
+		private void _InitializeCollisionInstance()
+		{
+			SceneTree Tree = Plugin.Singleton.GetTree();
+			switch (CollisionType)
 			{
-				CollisionShape3D OldCol = GetNode("AsCollision") as CollisionShape3D;
-				
-				if( IsInstanceValid( OldCol ) ) 
-				{
-					RemoveChild(OldCol);
-					OldCol.QueueFree();
-				}
-			}
- 
-			SceneTree Tree = _GlobalExplorer._Plugin.GetTree();
-			if( _GlobalExplorer.States.ConvexCollision == GlobalStates.LibraryStateEnum.Enabled && TypeState == 0 || TypeState == 1) 
-			{
-				int state = 0;
-				
-				if(
-					_GlobalExplorer.States.ConvexClean == GlobalStates.LibraryStateEnum.Enabled &&
-					_GlobalExplorer.States.ConvexSimplify == GlobalStates.LibraryStateEnum.Disabled &&
-					ArgState == 0 ||
-					ArgState == 1
-				) 
-				{
-					state = 1;
-				} 
-				
-				if(
-					_GlobalExplorer.States.ConvexClean == GlobalStates.LibraryStateEnum.Disabled &&
-					_GlobalExplorer.States.ConvexSimplify == GlobalStates.LibraryStateEnum.Enabled &&
-					ArgState == 0  ||
-					ArgState == 2
-				) 
-				{
-					state = 2;
-				} 
-				
-				if(
-					_GlobalExplorer.States.ConvexClean == GlobalStates.LibraryStateEnum.Enabled &&
-					_GlobalExplorer.States.ConvexSimplify == GlobalStates.LibraryStateEnum.Enabled &&
-					ArgState == 0  ||
-					ArgState == 3
-				) 
-				{
-					state = 3;
-				} 
-				
-				_ConvexCollisions(Mesh, this, Tree, state);	
-			}
-			else if( _GlobalExplorer.States.ConcaveCollision == GlobalStates.LibraryStateEnum.Enabled && TypeState == 0 || TypeState == 2 ) 
-			{
-				_ConcaveCollisions(Mesh, this, Tree);	
-			}
-			else 
-			{
-				_SimpleCollisions(Mesh, this, Tree, TypeState == 3 );	
+				case AssetSnap.Nodes.ModelCollision.Type.Box:
+					_SimpleCollisions(Tree, false);
+					break;
+
+				case AssetSnap.Nodes.ModelCollision.Type.Sphere:
+					_SimpleCollisions(Tree, true);
+					break;
+
+				case AssetSnap.Nodes.ModelCollision.Type.Concave:
+					_ConcaveCollisions(Tree);
+					break;
+
+				case AssetSnap.Nodes.ModelCollision.Type.Convex:
+					_ConvexCollisions(Tree);
+					break;
+
+				default:
+					GD.PushWarning("Invalid Collision type");
+					return;
 			}
 		}
-			
-		private void _SimpleCollisions(Mesh model, StaticBody3D _Body, SceneTree Tree, bool IsSphere = false )
-		{
-			try 
-			{
-				GlobalExplorer _GlobalExplorer = GlobalExplorer.GetInstance();
 
-				if( _GlobalExplorer == null ) 
+		private void _SimpleCollisions(SceneTree Tree, bool IsSphere = false)
+		{
+			try
+			{
+				Aabb _aabb = ModelAabb;
+				Shape3D _Shape = CreateSimpleShape(IsSphere);
+				CollisionShape3D _Collision = new()
 				{
-					throw new Exception("GlobalExplorer not set");
-				}
-				
-				Aabb _aabb = model.GetAabb();
-			
-				if( IsSphere == false ) 
-				{
-					IsSphere = _GlobalExplorer.States.SphereCollision == GlobalStates.LibraryStateEnum.Enabled;
-				}
-				
-				Shape3D _Shape = new BoxShape3D()
-				{
-					Size = new Vector3(_aabb.Size.X * InstanceScale.X, _aabb.Size.Y * InstanceScale.Y, _aabb.Size.Z * InstanceScale.Z),
+					Name = "Collision",
+					Shape = _Shape,
+					// RotationDegrees = InstanceRotation,
 				};
-			
-				if( IsSphere ) 
+
+				_ApplyCollisionMeta(_Collision);
+
+				AddChild(_Collision, true);
+				_ApplyCollisionTransform(_Collision);
+				_Collision.Owner = Tree.EditedSceneRoot;
+
+			}
+			catch (Exception e)
+			{
+				GD.PushWarning(e.Message);
+			}
+		}
+
+		private Shape3D CreateSimpleShape(bool IsSphere)
+		{
+			Shape3D _Shape = null;
+
+			if (false == UsingMultiMesh)
+			{
+				Aabb aabb = ((AsMeshInstance3D)Parent).Mesh.GetAabb();
+
+				_Shape = new BoxShape3D()
 				{
-					float radius = MathF.Max(Math.Max(_aabb.Size.X * InstanceScale.X, _aabb.Size.Y * InstanceScale.Y), _aabb.Size.Z * InstanceScale.Z) * 0.5f;
+					Size = new Vector3(aabb.Size.X, aabb.Size.Y, aabb.Size.Z),
+				};
+
+				if (IsSphere)
+				{
+					float radius = MathF.Max(Math.Max(aabb.Size.X, aabb.Size.Y), aabb.Size.Z) * 0.5f;
 					_Shape = new SphereShape3D()
 					{
 						Radius = radius,
 					};
 				}
-				
-				CollisionShape3D _Collision = new()
+			}
+
+			if (UsingMultiMesh)
+			{
+				Aabb aabb = ((AsMultiMeshInstance3D)Parent).Multimesh.Mesh.GetAabb();
+
+				_Shape = new BoxShape3D()
 				{
-					Name = "AsCollision",
-					Shape = _Shape,
-					RotationDegrees = InstanceRotation,
+					Size = new Vector3(aabb.Size.X, aabb.Size.Y, aabb.Size.Z),
 				};
 
-				Transform3D ColTrans = _Collision.Transform;
-				ColTrans.Origin.Y += _aabb.Size.Y * InstanceScale.Y / 2;
-				_Collision.Transform = ColTrans;
+				if (IsSphere)
+				{
+					float radius = MathF.Max(Math.Max(aabb.Size.X, aabb.Size.Y), aabb.Size.Z) * 0.5f;
+					_Shape = new SphereShape3D()
+					{
+						Radius = radius,
+					};
+				}
+			}
 
-				_Collision.SetMeta("AsCollision", true);
-					
-				_Body.AddChild(_Collision, true);
-				_Collision.Owner = null != InstanceOwner ? InstanceOwner : Tree.EditedSceneRoot;
-			}
-			catch( Exception e ) 
-			{
-				GD.PushWarning(e.Message);
-			}
+			return _Shape;
 		}
-		
-		private void _ConvexCollisions( Mesh model, StaticBody3D _Body, SceneTree Tree, int state = 0) 
+
+		private void _ConvexCollisions(SceneTree Tree)
 		{
-			Aabb _aabb = model.GetAabb();
-		
-			bool clean = false;
-			bool simplify = false;
-			
-			if( state == 1 ) 
+			ConvexPolygonShape3D _Shape = new();
+
+			if (false == UsingMultiMesh)
 			{
-				clean = true;
+				_Shape = ((MeshInstance3D)Parent).Mesh.CreateConvexShape(
+					_IsClean(
+						(int)CollisionSubType
+					),
+					_IsSimplify(
+						(int)CollisionSubType
+					)
+				);
 			}
-			
-			if( state == 2 ) 
+
+			if (UsingMultiMesh)
 			{
-				simplify = true;
+				_Shape = ((MultiMeshInstance3D)Parent).Multimesh.Mesh.CreateConvexShape(
+					_IsClean(
+						(int)CollisionSubType
+					),
+					_IsSimplify(
+						(int)CollisionSubType
+					)
+				);
 			}
-			
-			if( state == 3 ) 
-			{
-				clean = true;
-				simplify = true;
-			}
-			
-			ConvexPolygonShape3D _Shape = model.CreateConvexShape(clean, simplify);
+
 			CollisionShape3D _Collision = new()
 			{
-				Name = "AsCollision",
+				Name = "Collision",
 				Shape = _Shape,
-				Scale = InstanceScale,
-				RotationDegrees = InstanceRotation,
+				// Scale = InstanceScale,
+				// RotationDegrees = InstanceRotation,
 			};
-			
+
+			_ApplyCollisionMeta(_Collision);
+
 			Transform3D ColTrans = _Collision.Transform;
-			// ColTrans.Origin.Y += _aabb.Size.Y / 2;
+
+			if (UsingMultiMesh)
+			{
+				ColTrans.Origin.X = InstanceOrigin.X;
+				ColTrans.Origin.Y = InstanceOrigin.Y;
+				ColTrans.Origin.Z = InstanceOrigin.Z;
+			}
+
 			_Collision.Transform = ColTrans;
 
-			_Collision.SetMeta("AsCollision", true);
-	
-			_Body.AddChild(_Collision, true);
-			_Collision.Owner = null != InstanceOwner ? InstanceOwner : Tree.EditedSceneRoot;
+			AddChild(_Collision, true);
+			_Collision.Owner = Tree.EditedSceneRoot;
 		}
-		
-		private void _ConcaveCollisions(Mesh model, StaticBody3D _Body, SceneTree Tree)
+
+		private bool _IsClean(int state)
 		{
-			ConcavePolygonShape3D _Shape = model.CreateTrimeshShape();
+			return state == 1 || state == 3;
+		}
+
+		private bool _IsSimplify(int state)
+		{
+			return state == 2 || state == 3;
+		}
+
+		private void _ConcaveCollisions(SceneTree Tree)
+		{
+			// We merely need to add it to our main node
+			// since we have no children
+			CollisionShape3D _Collision = CreateConcaveCollision();
+
+			AddChild(_Collision, true);
+			_Collision.Owner = Tree.EditedSceneRoot;
+
+		}
+
+		private CollisionShape3D CreateConcaveCollision()
+		{
+			ConcavePolygonShape3D _Shape = new();
+
+			if (false == UsingMultiMesh)
+			{
+				_Shape = ((MeshInstance3D)Parent).Mesh.CreateTrimeshShape();
+			}
+
+			if (UsingMultiMesh)
+			{
+				_Shape = ((MultiMeshInstance3D)Parent).Multimesh.Mesh.CreateTrimeshShape();
+			}
+
 			CollisionShape3D _Collision = new()
 			{
-				Name = "AsCollision",
+				Name = "Collision",
 				Shape = _Shape,
-				Scale = InstanceScale,
-				RotationDegrees = InstanceRotation,
+				// Scale = InstanceScale,
+				// RotationDegrees = InstanceRotation,
 			};
-			
-			// Transform3D ColTrans = _Collision.Transform;
-			// ColTrans.Origin.Y += _aabb.Size.Y / 2; 
-			// _Collision.Transform = ColTrans;
 
+			_ApplyCollisionMeta(_Collision);
+
+			Transform3D ColTrans = _Collision.Transform;
+
+			if (UsingMultiMesh)
+			{
+				ColTrans.Origin.X = InstanceOrigin.X;
+				ColTrans.Origin.Y = InstanceOrigin.Y;
+				ColTrans.Origin.Z = InstanceOrigin.Z;
+			}
+
+			_Collision.Transform = ColTrans;
+
+			return _Collision;
+		}
+
+		private void _ApplyCollisionTransform(CollisionShape3D _Collision)
+		{
+			Aabb aabb = new();
+			if (!UsingMultiMesh)
+			{
+				aabb = ((AsMeshInstance3D)Parent).Mesh.GetAabb();
+			}
+
+			if (UsingMultiMesh)
+			{
+				aabb = ((AsMultiMeshInstance3D)Parent).Multimesh.Mesh.GetAabb();
+			}
+
+			Transform3D ColTrans = _Collision.Transform;
+
+			if (UsingMultiMesh)
+			{
+				ColTrans.Origin.X = InstanceOrigin.X;
+				ColTrans.Origin.Y = InstanceOrigin.Y;
+				ColTrans.Origin.Z = InstanceOrigin.Z;
+			}
+
+			ColTrans.Origin.Y += aabb.Size.Y / 2;
+			_Collision.Transform = ColTrans;
+		}
+
+		private void _ApplyCollisionMeta(CollisionShape3D _Collision)
+		{
 			_Collision.SetMeta("AsCollision", true);
-				
-			_Body.AddChild(_Collision, true);
-			_Collision.Owner = null != InstanceOwner ? InstanceOwner : Tree.EditedSceneRoot;
 		}
 
 		public override void _ExitTree()
