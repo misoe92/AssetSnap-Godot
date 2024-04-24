@@ -22,119 +22,91 @@
 
 namespace AssetSnap.Front.Modifiers
 {
+	using System;
+	using AssetSnap.Explorer;
+	using AssetSnap.Front.Nodes;
+	using AssetSnap.States;
 	using Godot;
-
 	public partial class AsArrayModifier
 	{
 		public string Name = "AsArrayModifier";
-		
+
 		public bool Apply()
 		{
-			if( HasHandle() == false )
+			if (HasHandle() == false)
 			{
 				return false;
 			}
-			
-			if( IsAsBody(GetHandle().GetParent())) 
-			{
-				ApplyWithBody();
-			}
-			else 
-			{
-				ApplySimple();
-			}
+
+			ApplySimple();
 
 			return true;
 		}
-		
-		
+
 		public bool ApplySimple()
 		{
-			GlobalExplorer _GlobalExplorer = GlobalExplorer.GetInstance();
-			AssetSnap.Front.Nodes.AsMeshInstance3D Handle = _GlobalExplorer.HandleNode as AssetSnap.Front.Nodes.AsMeshInstance3D;
+			Node3D Handle = GetHandle() as Node3D;
+
+			if (null == Handle)
+			{
+				GD.PushWarning("No handle was found");
+				return false;
+			}
+
+			if (null == Handle.GetTree())
+			{
+				GD.PushWarning("No tree was found");
+				return false;
+			}
+
+			if (null == Handle.GetTree().EditedSceneRoot)
+			{
+				GD.PushWarning("No scene root was found");
+				return false;
+			}
+
 			AsArrayModifier3D Group = new()
 			{
-				Name = "ArrayModifier-" + Handle.GetTree().EditedSceneRoot.GetChildCount(),
-				Mesh = Handle.Mesh,
-				InstanceLibrary = Handle.GetLibraryName(),
-				InstanceScale = Handle.Scale,
-				InstanceTransform = Handle.Transform,
-				InstanceRotation = Handle.RotationDegrees,
+				ArrayName = "ArrayModifier-" + Handle.GetTree().EditedSceneRoot.GetChildCount(),
+				DuplicateType = Handle is AsMeshInstance3D ? "AsMeshInstance3D" : "AsNode3D",
+				Duplicates = Handle,
 			};
-			
-			_GlobalExplorer.Waypoints.Spawn(Group, Handle.Transform.Origin, Handle.RotationDegrees, Handle.Scale);
-			Node3D GroupInstance = _GlobalExplorer.Waypoints.GetWorkingNode();
-			_GlobalExplorer.Waypoints.Remove(Handle, Handle.Transform.Origin);
-			
+
 			Handle.GetParent().RemoveChild(Handle);
-			
-			_GlobalExplorer.SetFocusToNode(GroupInstance);
-			
-			return true;
-		}
-		
-		public bool ApplyWithBody()
-		{
-			GlobalExplorer _GlobalExplorer = GlobalExplorer.GetInstance();
-			AssetSnap.Front.Nodes.AsMeshInstance3D Handle = _GlobalExplorer.HandleNode as AssetSnap.Front.Nodes.AsMeshInstance3D;
-			
-			if( Handle == null || Handle.GetParent() == null ) 
-			{
-				GD.PushWarning("No valid handle to apply with");
-				return false;
-			}
-			
-			AsArrayModifier3D Group = new()
-			{
-				Name = "ArrayModifier-" + Handle.GetTree().EditedSceneRoot.GetChildCount(),
-				Mesh = Handle.Mesh,
-				InstanceLibrary = Handle.GetLibraryName(),
-				InstanceScale = Handle.Scale,
-				InstanceTransform = Handle.Transform,
-				InstanceRotation = Handle.RotationDegrees,
-			};
-			
-			Transform3D Transform = Handle.GetParent<StaticBody3D>().Transform;
-			_GlobalExplorer.Waypoints.Remove(Handle, Handle.Transform.Origin);
-			_GlobalExplorer.Waypoints.Spawn(Group, Handle.Transform.Origin, Handle.RotationDegrees, Handle.Scale);
-			Node3D GroupInstance = _GlobalExplorer.Waypoints.GetWorkingNode();
-			Handle.GetParent().GetParent().RemoveChild(Handle.GetParent());
-			
-			GroupInstance.Transform = Transform;
-			GroupInstance.ForceUpdateTransform();
-			
-			_GlobalExplorer.SetFocusToNode(GroupInstance);
+			ExplorerUtils.Get().Waypoints.Remove(Handle, Handle.Transform.Origin);
+			ExplorerUtils.Get().Waypoints.Spawn(Group, Handle.Transform.Origin, Handle.RotationDegrees, Handle.Scale);
 
-			Group.Update();
-			
-			return true;
-		}
-		
-		
-		public bool HasHandle()
-		{
-			GlobalExplorer _GlobalExplorer = GlobalExplorer.GetInstance();
-			AssetSnap.Front.Nodes.AsMeshInstance3D Handle = _GlobalExplorer.HandleNode as AssetSnap.Front.Nodes.AsMeshInstance3D;
-			
-			if( Handle == null ) 
-			{
-				return false;
-			}
+			Node3D GroupInstance = ExplorerUtils.Get().Waypoints.GetWorkingNode();
+			ExplorerUtils.Get().SetFocusToNode(GroupInstance);
 
 			return true;
 		}
-		
+
+		/*
+		** Fetches the current handle
+		** 
+		** @return Node
+		*/
 		public Node GetHandle()
 		{
-			GlobalExplorer _GlobalExplorer = GlobalExplorer.GetInstance();
-			AssetSnap.Front.Nodes.AsMeshInstance3D Handle = _GlobalExplorer.HandleNode as AssetSnap.Front.Nodes.AsMeshInstance3D;
-			
-			return Handle;
+			return StatesUtils.Get().EditingObject;
 		}
-		
-		public bool IsAsBody( Node Node)
+
+		/*
+		** Checks if handle exists
+		** 
+		** @return bool
+		*/
+		public bool HasHandle()
 		{
-			return Node.HasMeta( "AsBody" ) == true;
+			Node3D Handle = StatesUtils.Get().EditingObject;
+
+			if (Handle == null)
+			{
+				return false;
+			}
+
+			return true;
 		}
 	}
 }
