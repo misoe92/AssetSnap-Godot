@@ -39,12 +39,12 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		public OptimizedPlacement()
 		{
 			Name = "LSOptimizedPlacement";
-			
+
 			UsingTraits = new()
 			{
 				{ typeof(Checkable).ToString() },
 			};
-			
+
 			// _include = false;
 		}
 
@@ -58,7 +58,7 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			base.Initialize();
 			Callable _callable = Callable.From(() => { _OnCheckboxPressed(); });
 			Initiated = true;
-			
+
 			Trait<Checkable>()
 				.SetName("OptimizedPlacementCheckbox")
 				.SetAction(_callable)
@@ -69,33 +69,31 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 				.SetMargin(10, "bottom")
 				.SetText(_Title)
 				.SetTooltipText(_CheckboxTooltip)
-				.SetValue( IsActive() )
+				.SetValue(IsActive())
 				.Instantiate()
 				.Select(0)
-				.AddToContainer( this );
-				
-			Plugin.GetInstance().StatesChanged += () => { MaybeUpdateValue(); };
+				.AddToContainer(this);
+
+			Plugin.GetInstance().StatesChanged += (Godot.Collections.Array data) => { MaybeUpdateValue(data); };
 		}
 
-		public void MaybeUpdateValue()
+		public void MaybeUpdateValue(Godot.Collections.Array data)
 		{
-			if(
-				false == IsValid()
-			) 
+			GD.Print("Going", data[0].As<string>());
+			if (data[0].As<string>() == "PlacingType")
 			{
-				return;
-			}
-			
-			if( IsActive() && false == Trait<Checkable>().Select(0).GetValue() ) 
-			{
-				Trait<Checkable>().Select(0).SetValue(true);
-			}
-			else if( IsSimple() && true == Trait<Checkable>().Select(0).GetValue() )
-			{
-				Trait<Checkable>().Select(0).SetValue(false);	
+				GD.Print("Going");
+				if (
+					false == IsValid()
+				)
+				{
+					return;
+				}
+
+				Trait<Checkable>().Select(0).SetValue(data[1].As<string>() == "Optimized");
 			}
 		}
-		
+
 		/*
 		** Updates collisions and spawn settings
 		** of the model
@@ -104,20 +102,8 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		*/
 		private void _OnCheckboxPressed()
 		{
-			if( false == IsValid() ) 
-			{
-				return;
-			}
-
-			if( Trait<Checkable>().Select(0).GetValue() ) 
-			{
-				_GlobalExplorer.States.PlacingType = GlobalStates.PlacingTypeEnum.Optimized;
-				UpdateSpawnSettings("OptimizedPlacement", true);
-			}
-			else 
-			{
-				UpdateSpawnSettings("OptimizedPlacement", false);
-			}
+			_GlobalExplorer.States.PlacingType = GlobalStates.PlacingTypeEnum.Optimized;
+			UpdateSpawnSettings("PlacingType", "Optimized");
 		}
 
 		/*
@@ -126,34 +112,34 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		** 
 		** @return bool
 		*/
-		public bool IsActive() 
+		public bool IsActive()
 		{
 			return _GlobalExplorer.States.PlacingType == GlobalStates.PlacingTypeEnum.Optimized;
 		}
-		
+
 		/*
 		** Checks if the component state
 		** is simple
 		** 
 		** @return bool
-		*/ 
-		public bool IsSimple() 
+		*/
+		public bool IsSimple()
 		{
 			return _GlobalExplorer.States.PlacingType == GlobalStates.PlacingTypeEnum.Simple;
 		}
-		
+
 		/*
 		** Syncronizes it's value to a global
 		** central state controller
 		**
 		** @return void
 		*/
-		public override void Sync() 
+		public override void Sync()
 		{
-			if(
+			if (
 				IsValid() &&
 				Trait<Checkable>().Select(0).GetValue()
-			) 
+			)
 			{
 				_GlobalExplorer.States.PlacingType = GlobalStates.PlacingTypeEnum.Optimized;
 			}
