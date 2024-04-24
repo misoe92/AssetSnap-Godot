@@ -1012,3 +1012,6 @@ TextMedium/base_type = &"Label"
 TextMedium/font_sizes/font_size = 15
 TextSmall/base_type = &"Label"
 TextSmall/font_sizes/font_size = 12
+TextTinyDiffused/base_type = &"Label"
+TextTinyDiffused/colors/font_color = Color(1, 1, 1, 0.294118)
+TextTinyDiffused/font_sizes/font_size = 10
