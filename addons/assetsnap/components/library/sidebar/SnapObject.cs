@@ -102,7 +102,7 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 				.Select(0)
 				.AddToContainer( this );
 	
-			Plugin.GetInstance().StatesChanged += () => { MaybeUpdateValue(); };
+			Plugin.GetInstance().StatesChanged += (Godot.Collections.Array data) => { MaybeUpdateValue(); };
 		}
 		
 		/*
