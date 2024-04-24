@@ -25,6 +25,9 @@ namespace AssetSnap.Snap
 {
 	using System.Collections.Generic;
 	using AssetSnap.Explorer;
+	using AssetSnap.Settings;
+
+	using AssetSnap.States;
 
 	public class Base
 	{
@@ -48,6 +51,8 @@ namespace AssetSnap.Snap
 		private float CurrentX = 0;
 		private float CurrentY = 0;
 		private float CurrentZ = 0;
+
+		private float BoundaryOpacity = 0;
 		
 		public void Initialize()
 		{
@@ -60,6 +65,24 @@ namespace AssetSnap.Snap
 			CurrentX = ExplorerUtils.Get().States.SnapToXValue;
 			CurrentY = ExplorerUtils.Get().States.SnapToHeightValue;
 			CurrentZ = ExplorerUtils.Get().States.SnapToZValue;
+		
+			BoundaryOpacity = SettingsUtils.Get().GetKey("boundary_box_opacity").As<float>();
+
+			Plugin.Singleton.SettingKeyChanged += (Godot.Collections.Array data) => { _MaybeUpdateOpacity(data); };
+		}
+		
+		public void _MaybeUpdateOpacity( Godot.Collections.Array data )
+		{
+			if( data[0].As<string>() == "boundary_box_opacity" ) 
+			{
+				SetBoxOpacity(data[1].As<float>());
+			}
+		}
+		
+		public void SetBoxOpacity( float value )
+		{
+			BoundaryOpacity = value;
+			UpdateOpacity( value );
 		}
 		
 		public void Tick( double delta )
@@ -69,15 +92,10 @@ namespace AssetSnap.Snap
 				return;
 			} 
 			
-			if( ShouldUpdateOpacity() ) 
-			{
-				UpdateOpacity();				
-			}
-			
-			if( ShouldUpdateTransform() ) 
-			{
+			// if( ShouldUpdateTransform() ) 
+			// {
 				UpdateTransform();
-			}
+			// }
 			
 			if( ShouldShowBoundary() ) 
 			{
@@ -150,7 +168,7 @@ namespace AssetSnap.Snap
 				}
 			}
 			
-			if( null == removed ) 
+			if( null != removed ) 
 			{
 				boundaries.Remove(removed);
 			}
@@ -164,13 +182,13 @@ namespace AssetSnap.Snap
 			}
 
 			boundaries = new();
-			ExplorerUtils.Get().States.BoundarySpawned = GlobalStates.SpawnStateEnum.Null;
-			ExplorerUtils.Get().States.BoundaryActiveAngles = new();
+			StatesUtils.Get().BoundarySpawned = GlobalStates.SpawnStateEnum.Null;
+			StatesUtils.Get().BoundaryActiveAngles = new();
 		}
 		
 		private bool ShouldUpdateOpacity()
 		{
-			float BoundaryOpacity = ExplorerUtils.Get().Settings.GetKey("boundary_box_opacity").As<float>();
+			float BoundaryOpacity = SettingsUtils.Get().GetKey("boundary_box_opacity").As<float>();
 
 			return
 				BoundaryOpacity != CurrentOpacity;
@@ -182,20 +200,19 @@ namespace AssetSnap.Snap
 		** @param float value
 		** @return void
 		*/
-		private void UpdateOpacity()
+		private void UpdateOpacity( float value )
 		{
 			if( boundaries.Count == 0 ) 
 			{
 				return;
 			}
 			
-			float BoundaryOpacity = ExplorerUtils.Get().Settings.GetKey("boundary_box_opacity").As<float>();
 			foreach( Boundary boundary in boundaries ) 
 			{
-				boundary.UpdateOpacity(BoundaryOpacity);
+				boundary.UpdateOpacity(value);
 			}
 			
-			CurrentOpacity = BoundaryOpacity;
+			CurrentOpacity = value;
 		}
 		
 		private void UpdateTransform()
@@ -210,61 +227,64 @@ namespace AssetSnap.Snap
 				boundary.UpdateTransform();
 			}
 			
-			CurrentX = ExplorerUtils.Get().States.SnapToXValue;
-			CurrentY = ExplorerUtils.Get().States.SnapToHeightValue;
-			CurrentZ = ExplorerUtils.Get().States.SnapToZValue;
+			CurrentX = StatesUtils.Get().SnapToXValue;
+			CurrentY = StatesUtils.Get().SnapToHeightValue;
+			CurrentZ = StatesUtils.Get().SnapToZValue;
 		}
 		
 		private bool ShouldUpdateTransform()
 		{
 			return
-				ExplorerUtils.Get().States.SnapToXValue != CurrentX ||
-				ExplorerUtils.Get().States.SnapToHeightValue != CurrentY ||
-				ExplorerUtils.Get().States.SnapToZValue != CurrentZ;
+				StatesUtils.Get().SnapToXValue != CurrentX ||
+				StatesUtils.Get().SnapToHeightValue != CurrentY ||
+				StatesUtils.Get().SnapToZValue != CurrentZ;
 		}
 		
 		private bool IsBoundaryShown()
 		{
 			return
-				ExplorerUtils.Get().States.BoundarySpawned == GlobalStates.SpawnStateEnum.Spawned;
+				StatesUtils.Get().BoundarySpawned == GlobalStates.SpawnStateEnum.Spawned;
 		}
 		
 		private bool HasActiveAngle()
 		{
 			return
-				ExplorerUtils.Get().States.BoundaryActiveAngles.Count != 0;
+				StatesUtils.Get().BoundaryActiveAngles.Count != 0;
 		}
 		
 		private bool IsAngleActive( GlobalStates.SnapAngleEnums angle )
 		{
 			return
-				true == ExplorerUtils.Get().States.BoundaryActiveAngles.Contains(angle);
+				true == StatesUtils.Get().BoundaryActiveAngles.Contains(angle);
 		}
 		
 		private bool ShouldSnapToHeight()
 		{
 			return 
-				ExplorerUtils.Get().States.SnapToHeight == GlobalStates.LibraryStateEnum.Enabled;
+				StatesUtils.Get().SnapToHeight == GlobalStates.LibraryStateEnum.Enabled &&
+				false == StatesUtils.Get().EditingObjectIsPlaced;
 		}
 		
 		private bool ShouldSnapToX()
 		{
 			return 
-				ExplorerUtils.Get().States.SnapToX == GlobalStates.LibraryStateEnum.Enabled;
+				StatesUtils.Get().SnapToX == GlobalStates.LibraryStateEnum.Enabled &&
+				false == StatesUtils.Get().EditingObjectIsPlaced;
 		}
 		
 		private bool ShouldSnapToZ()
 		{
 			return 
-				ExplorerUtils.Get().States.SnapToZ == GlobalStates.LibraryStateEnum.Enabled;
+				StatesUtils.Get().SnapToZ == GlobalStates.LibraryStateEnum.Enabled &&
+				false == StatesUtils.Get().EditingObjectIsPlaced;
 		}
 		
 		private bool ShouldShowBoundary()
 		{
 			return
-				ExplorerUtils.Get().States.SnapToHeight == GlobalStates.LibraryStateEnum.Enabled ||
-				ExplorerUtils.Get().States.SnapToX == GlobalStates.LibraryStateEnum.Enabled ||
-				ExplorerUtils.Get().States.SnapToZ == GlobalStates.LibraryStateEnum.Enabled;
+				StatesUtils.Get().SnapToHeight == GlobalStates.LibraryStateEnum.Enabled ||
+				StatesUtils.Get().SnapToX == GlobalStates.LibraryStateEnum.Enabled ||
+				StatesUtils.Get().SnapToZ == GlobalStates.LibraryStateEnum.Enabled;
 		}
 	}
 }
