@@ -23,7 +23,8 @@
 namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 {
 	using AssetSnap.Component;
-	using Godot;
+    using AssetSnap.States;
+    using Godot;
 
 	[Tool]
 	public partial class SnapToHeight : GroupOptionCheckableComponent
@@ -52,13 +53,13 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 		{
 			_GlobalExplorer.GroupBuilder._Editor.Group.SnapToHeight = !_GlobalExplorer.GroupBuilder._Editor.Group.SnapToHeight;
 			
-			if( true == _GlobalExplorer.GroupBuilder._Editor.Group.SnapToHeight && _GlobalExplorer.States.PlacingMode == GlobalStates.PlacingModeEnum.Group )
+			if( true == _GlobalExplorer.GroupBuilder._Editor.Group.SnapToHeight && StatesUtils.Get().PlacingMode == GlobalStates.PlacingModeEnum.Group )
 			{
-				_GlobalExplorer.States.SnapToHeight = GlobalStates.LibraryStateEnum.Enabled;
+				StatesUtils.Get().SnapToHeight = GlobalStates.LibraryStateEnum.Enabled;
 			}
-			else if( _GlobalExplorer.States.PlacingMode == GlobalStates.PlacingModeEnum.Group )
+			else if( StatesUtils.Get().PlacingMode == GlobalStates.PlacingModeEnum.Group )
 			{
-				_GlobalExplorer.States.SnapToHeight = GlobalStates.LibraryStateEnum.Disabled;
+				StatesUtils.Get().SnapToHeight = GlobalStates.LibraryStateEnum.Disabled;
 			}
 						
 			Parent._UpdateGroupOptions();
