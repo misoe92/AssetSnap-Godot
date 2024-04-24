@@ -33,15 +33,16 @@ namespace AssetSnap.Front.Configs
 	{
 		private string _ConfigPath;
 		private string[] _Folders;
-		private Godot.Collections.Dictionary<string,Variant> _Settings;
+		private Godot.Collections.Dictionary<string, Variant> _Settings;
 		private BaseContainer _Container;
 		public bool Initialized = false;
 
 		private static SettingsConfig _Instance = null;
-		public static SettingsConfig Singleton { 
+		public static SettingsConfig Singleton
+		{
 			get
 			{
-				if( _Instance == null ) 
+				if (_Instance == null)
 				{
 					_Instance = new SettingsConfig();
 					_Instance.Initialize();
@@ -50,117 +51,117 @@ namespace AssetSnap.Front.Configs
 				return _Instance;
 			}
 		}
-		
-		public string _Name 
+
+		public string _Name
 		{
 			get => "Settings";
 		}
-		
+
 		public ConfigFile Config
 		{
-			get => _Config;	
+			get => _Config;
 		}
-		
-		public int FolderCount 
+
+		public int FolderCount
 		{
 			get => _Folders.Length;
 		}
-		
-		public string[] Folders 
+
+		public string[] Folders
 		{
 			get => _Folders;
 		}
-		
-		public Godot.Collections.Dictionary<string,Variant> Settings 
+
+		public Godot.Collections.Dictionary<string, Variant> Settings
 		{
 			get => _Settings;
 		}
-		
-		public BaseContainer Container 
+
+		public BaseContainer Container
 		{
 			get => _Container;
 		}
-		
+
 		public SettingsConfig()
-		{ 
+		{
 			Name = "AssetSnapConfig";
 		}
-		
+
 		/* 
 		** Initializes settings config
 		** 
 		** @return void
 		*/
-		public void Initialize() 
+		public void Initialize()
 		{
-			if( null == _Instance ) 
+			if (null == _Instance)
 			{
 				_Instance = this;
 			}
 
 			_ConfigPath = "config.cfg";
-			LoadConfig( _ConfigPath );
-			
+			LoadConfig(_ConfigPath);
+
 			// If the file didn't load, ignore it.
 			if (LoadOk)
 			{
 				List<string> _FolderList = new();
 				_Settings = new();
-				
-				if( _Config.HasSection( "Folders") ) 
+
+				if (_Config.HasSection("Folders"))
 				{
 					string[] FoldersSections = _Config.GetSectionKeys("Folders");
-					
-					for( int i = 0; i < FoldersSections.Length; i++) 
+
+					for (int i = 0; i < FoldersSections.Length; i++)
 					{
 						var Section = FoldersSections[i];
 						var Value = _Config.GetValue("Folders", Section);
 						_FolderList.Add(Value.ToString());
 					}
 				}
-				
-				if( _Config.HasSection(_Name) ) 
+
+				if (_Config.HasSection(_Name))
 				{
 					string[] SettingsSections = _Config.GetSectionKeys(_Name);
-					for( int i = 0; i < SettingsSections.Length; i++) 
+					for (int i = 0; i < SettingsSections.Length; i++)
 					{
 						var Section = SettingsSections[i];
 						var Value = _Config.GetValue(_Name, Section);
-						
-						_Settings.Add(Section, Value); 
+
+						_Settings.Add(Section, Value);
 					}
 				}
-				
+
 				_Folders = _FolderList.ToArray();
 				_FolderList.Clear();
 				Initialized = true;
 			}
-			else 
+			else
 			{
 				GD.PushError("Invalid Config @ SettingsConfig");
 				return;
 			}
 		}
-		
+
 		public void MaybeEmitFoldersLoaded()
 		{
-			if( null != Plugin.GetInstance() ) 
+			if (null != Plugin.GetInstance())
 			{
 				Plugin.GetInstance().EmitSignal(Plugin.SignalName.FoldersLoaded);
 			}
 		}
-		
+
 		/*
 		** Resets the settings config
 		** 
 		** @param bool WithContainer[true]
 		** @return void
 		*/
-		public void Reset( bool WithContainer = true ) 
+		public void Reset(bool WithContainer = true)
 		{
-			if( null != _Container && WithContainer )  
+			if (null != _Container && WithContainer)
 			{
-				if( null != _Container.GetParent() && EditorPlugin.IsInstanceValid(_Container) ) 
+				if (null != _Container.GetParent() && EditorPlugin.IsInstanceValid(_Container))
 				{
 					_Container.GetParent().RemoveChild(_Container);
 				}
@@ -176,27 +177,27 @@ namespace AssetSnap.Front.Configs
 		*/
 		public void InitializeContainer()
 		{
-			if( EditorPlugin.IsInstanceValid( _Container ) ) 
+			if (EditorPlugin.IsInstanceValid(_Container))
 			{
-				if( null != _Container.GetParent() && EditorPlugin.IsInstanceValid(_Container) ) 
+				if (null != _Container.GetParent() && EditorPlugin.IsInstanceValid(_Container))
 				{
 					_Container.GetParent().RemoveChild(_Container);
 				}
-	
+
 				_Container.QueueFree();
 			}
-			
-			if( FolderCount == 0 ) 
+
+			if (FolderCount == 0)
 			{
-				return;	
+				return;
 			}
-			
+
 			_Container = new();
 			_Container.Initialize();
-			
+
 			StatesUtils.SetLoad("SettingsContainer", true);
-		} 
-		
+		}
+
 		/*
 		** Sets a config key value
 		** 
@@ -204,77 +205,105 @@ namespace AssetSnap.Front.Configs
 		** @param Variant _value
 		** @return void
 		*/
-		public override void SetKey( string _key, Variant _Value )
+		public override void SetKey(string _key, Variant _Value)
 		{
-			if( _Settings.ContainsKey(_key) == false ) 
+			if (_Settings.ContainsKey(_key) == false)
 			{
-				return; 
+				return;
 			}
-			
+
 			_Config.SetValue(_Name, _key, _Value);
 			_Settings[_key] = _Value;
 			GlobalExplorer.GetInstance()._Plugin.EmitSignal(Plugin.SignalName.SettingKeyChanged, new Godot.Collections.Array() { _key, _Value });
-			Error result = _Config.Save( BasePath + _ConfigPath );
+			Error result = _Config.Save(BasePath + _ConfigPath);
 
-			if( result != Error.Ok ) 
+			if (result != Error.Ok)
 			{
 				GD.PushError(result);
 			}
 
 			Reset(false);
 		}
-		
+
 		/*
 		** Adds a folder to the array
 		** 
 		** @return void
 		*/
-		public void AddFolder( string path )
+		public void AddFolder(string path)
 		{
-			if( _Folders.Contains( path ) ) 
+			if (_Folders.Contains(path))
 			{
 				GD.PushError("Library with the same name already exists, and as such cannot be added.");
 				return;
 			}
-			
-			_Config.SetValue("Folders", "Folder" + ( FolderCount + 1 ), path);
-			Error result = _Config.Save( BasePath + _ConfigPath );
 
-			if( result != Error.Ok ) 
+			_Config.SetValue("Folders", "Folder" + (FolderCount + 1), path);
+			Error result = _Config.Save(BasePath + _ConfigPath);
+
+			if (result != Error.Ok)
 			{
 				GD.PushError(result);
 			}
-			
+
 			LoadOk = false;
-			
+
 			Initialize();
 			MaybeEmitFoldersLoaded();
 		}
-		
+
+		public void AddModelSizeToCache(string name, Vector3 Size)
+		{
+			_Config.SetValue("ModelSizes", name, Size);
+			Error result = _Config.Save(BasePath + _ConfigPath);
+
+			if (result != Error.Ok)
+			{
+				GD.PushError(result);
+			}
+
+			Plugin.Singleton.EmitSignal(Plugin.SignalName.ModelSizeCacheChanged, new Variant[] { name, Size });
+		}
+
+		public bool HasModelSize(string name)
+		{
+			return _Config.HasSection("ModelSizes") && _Config.GetSectionKeys("ModelSizes").Contains(name);
+		}
+
+		public Vector3 GetModelSize(string name)
+		{
+			if (HasModelSize(name))
+			{
+				return _Config.GetValue("ModelSizes", name).As<Vector3>();
+			}
+
+			return Vector3.Zero;
+		}
+
 		/*
 		** Removes an folder from the array
 		** 
 		** @return void
 		*/
-		public void RemoveFolder( string path )
+		public void RemoveFolder(string path)
 		{
 			string[] keys = _Config.GetSectionKeys("Folders");
-			
-			if( keys.Length != 0 ) 
+
+			if (keys.Length != 0)
 			{
-				foreach( string key in keys ) 
+				foreach (string key in keys)
 				{
 					string _Path = _Config.GetValue("Folders", key).As<string>();
-					if( _Path == path ) 
+					if (_Path == path)
 					{
 						_Config.EraseSectionKey("Folders", key);
 					}
 				}
 			}
-			
-			Error result = _Config.Save( BasePath + _ConfigPath );
 
-			if( result != Error.Ok ) 
+			Error result = _Config.Save(BasePath + _ConfigPath);
+
+			if (result != Error.Ok)
 			{
 				GD.PushError(result);
 			}
@@ -289,33 +318,33 @@ namespace AssetSnap.Front.Configs
 		** 
 		** @return void
 		*/
-		public override Variant GetKey( string _key )
+		public override Variant GetKey(string _key)
 		{
-			if( null == _Settings ||  false == _Settings.ContainsKey(_key) ) 
+			if (null == _Settings || false == _Settings.ContainsKey(_key))
 			{
 				return false;
 			}
-			
+
 			return _Settings[_key];
 		}
-		
+
 		/*
 		** Converts key to label
 		** 
 		** @param string _key
 		** @return string
 		*/
-		public string KeyToLabel( string key ) 
+		public string KeyToLabel(string key)
 		{
 			return key.Capitalize().Split('_').Join(" ");
 		}
-		
+
 		/*
 		** Fetches the settings
 		** 
 		** @return Godot.Collections.Dictionary<string,Variant>
 		*/
-		public Godot.Collections.Dictionary<string,Variant> GetSettings()
+		public Godot.Collections.Dictionary<string, Variant> GetSettings()
 		{
 			return _Settings;
 		}
