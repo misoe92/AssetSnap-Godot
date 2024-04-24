@@ -24,17 +24,19 @@
 namespace AssetSnap.Front.Nodes
 {
 	using System.Collections.Generic;
+	using AssetSnap.Component;
 	using AssetSnap.Front.Components;
 	using Godot;
 
 	[Tool]
 	public partial class AsBottomDock : VBoxContainer
 	{
+		public VBoxContainer _LoadingContainer;
 		public TabContainer _TabContainer;
 		private List<string> GeneralComponents = new()
 		{
 			"Introduction",
-			"AddFolderToLibrary", 
+			"Actions",
 			"LibrariesListing",
 			"Contribute",
 		};
@@ -47,17 +49,17 @@ namespace AssetSnap.Front.Nodes
 		private readonly Theme _Theme = GD.Load<Theme>(ThemePath);
 		public new Control.SizeFlags SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
 		public new Control.SizeFlags SizeFlagsVertical = Control.SizeFlags.ExpandFill;
-		private readonly Callable _callable = Callable.From((int index) => { _OnTabChanged(index); } );
-		
+		private readonly Callable _callable = Callable.From((int index) => { _OnTabChanged(index); });
+
 		public override void _EnterTree()
 		{
 			Name = "BottomDock";
 			Theme = _Theme;
-		
+
 			// CustomMinimumSize = new Vector2(0, 205);
 			SetupGeneralTab();
 		}
-		
+
 		/*
 		** Configure and initialize the "General" tab.
 		**
@@ -65,16 +67,48 @@ namespace AssetSnap.Front.Nodes
 		*/
 		private void SetupGeneralTab()
 		{
+			SetupLoadingContainers();
 			SetupGeneralTabContainers();
 			PlaceGeneralTabContainers();
- 
+
 			InitializeGeneralTabComponents();
-			
+
 			_TabContainer.Connect(TabContainer.SignalName.TabChanged, _callable);
 
 			AddChild(_TabContainer);
+			AddChild(_LoadingContainer);
 		}
-		
+
+		private void SetupLoadingContainers()
+		{
+			_LoadingContainer = new();
+
+			MarginContainer margin = new();
+
+			margin.AddThemeConstantOverride("margin_top", 10);
+			margin.AddThemeConstantOverride("margin_bottom", 10);
+			margin.AddThemeConstantOverride("margin_left", 10);
+			margin.AddThemeConstantOverride("margin_right", 10);
+
+			VBoxContainer inner = new();
+
+			Label label = new()
+			{
+				ThemeTypeVariation = Labelable.TitleType.HeaderMedium.ToString(),
+				Text = "No scene is currently active"
+			};
+
+			Label description = new()
+			{
+				Text = "This addon requires an active scene for it to work."
+			};
+
+			inner.AddChild(label);
+			inner.AddChild(description);
+			margin.AddChild(inner);
+			_LoadingContainer.AddChild(margin);
+		}
+
 		/*
 		** Initialies the containers which will be used
 		** in our general tab..
@@ -85,11 +119,12 @@ namespace AssetSnap.Front.Nodes
 		{
 			_TabContainer = new()
 			{
+				Visible = false,
 				Name = "ASTabContainer",
 				SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
 				SizeFlagsVertical = Control.SizeFlags.ExpandFill,
 			};
-			
+
 			_PanelContainer = new()
 			{
 				Name = "General",
@@ -97,27 +132,27 @@ namespace AssetSnap.Front.Nodes
 				SizeFlagsVertical = Control.SizeFlags.ExpandFill,
 			};
 
-			MainContainer = new() 
+			MainContainer = new()
 			{
 				Name = "GeneralMainContainer",
 				SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
 				SizeFlagsVertical = Control.SizeFlags.ExpandFill,
 			};
-			
+
 			SubContainerOne = new()
 			{
 				Name = "GeneralSubContainerOne",
 				SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
 				SizeFlagsVertical = Control.SizeFlags.ExpandFill,
 			};
-			 
+
 			SubContainerTwo = new()
 			{
 				Name = "GeneralSubContainerTwo",
 				SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
 				SizeFlagsVertical = Control.SizeFlags.ExpandFill,
 			};
-			
+
 			SubContainerThree = new()
 			{
 				Name = "GeneralSubContainerThree",
@@ -125,7 +160,7 @@ namespace AssetSnap.Front.Nodes
 				SizeFlagsVertical = Control.SizeFlags.ExpandFill,
 			};
 		}
-		
+
 		/*
 		** Places our containers in the tabcontainer
 		** so it becomes visible and useable.
@@ -141,7 +176,7 @@ namespace AssetSnap.Front.Nodes
 			_PanelContainer.AddChild(MainContainer);
 			_TabContainer.AddChild(_PanelContainer);
 		}
-		 
+
 		/*
 		** Initializes the various components that the general tab
 		** need to display it's content
@@ -150,62 +185,61 @@ namespace AssetSnap.Front.Nodes
 		*/
 		private void InitializeGeneralTabComponents()
 		{
-			if (GlobalExplorer.GetInstance().Components.HasAll( GeneralComponents.ToArray() )) 
+			if (GlobalExplorer.GetInstance().Components.HasAll(GeneralComponents.ToArray()))
 			{
 				Introduction _Introduction = GlobalExplorer.GetInstance().Components.Single<Introduction>();
-				
-				if( _Introduction != null ) 
+
+				if (_Introduction != null)
 				{
 					_Introduction.Container = SubContainerOne;
 					_Introduction.Initialize();
 				}
-				 
-				AddFolderToLibrary _AddFolderToLibrary = GlobalExplorer.GetInstance().Components.Single<AddFolderToLibrary>();
-				
-				if( _AddFolderToLibrary != null )  
+
+				Actions _Actions = GlobalExplorer.GetInstance().Components.Single<Actions>();
+
+				if (_Actions != null)
 				{
-					_AddFolderToLibrary.Container = SubContainerOne;
-					_AddFolderToLibrary.Initialize();
-				}  
-				
+					_Actions.Container = SubContainerOne;
+					_Actions.Initialize();
+				}
+
 				Contribute Contribute = GlobalExplorer.GetInstance().Components.Single<Contribute>();
-				
-				if( Contribute != null )  
+
+				if (Contribute != null)
 				{
 					Contribute.Container = SubContainerThree;
 					Contribute.Initialize();
 				}
-				
+
 				Plugin.Singleton.FoldersLoaded += () => { _OnLoadListing(); };
 			}
 		}
-		
+
 		private void _OnLoadListing()
 		{
 			GlobalExplorer.GetInstance().Components.Clear<LibrariesListing>();
 			LibrariesListing _LibrariesListing = GlobalExplorer.GetInstance().Components.Single<LibrariesListing>();
-			
-			if( _LibrariesListing != null ) 
+
+			if (_LibrariesListing != null)
 			{
 				_LibrariesListing.Container = SubContainerTwo;
 				_LibrariesListing.Initialize();
 			}
 		}
-			
-		private static void _OnTabChanged( int index )
+
+		private static void _OnTabChanged(int index)
 		{
-			if( 
+			if (
 				null == GlobalExplorer.GetInstance() ||
 				null == GlobalExplorer.GetInstance().States ||
-				null == GlobalExplorer.GetInstance().GetLibraryByIndex(index-1)
-			) 
-			{ 
-				return; 
+				null == GlobalExplorer.GetInstance().GetLibraryByIndex(index - 1)
+			)
+			{
+				return;
 			}
-			
-			GlobalExplorer.GetInstance().States.CurrentLibrary = GlobalExplorer.GetInstance().GetLibraryByIndex(index-1);
+
+			GlobalExplorer.GetInstance().States.CurrentLibrary = GlobalExplorer.GetInstance().GetLibraryByIndex(index - 1);
 		}
 	}
 }
 #endif
-		
