@@ -23,7 +23,7 @@
 namespace AssetSnap.ASNode.Types
 {
 	using Godot;
-	
+
 	[Tool]
 	public class AsMultiMeshInstanceType : NodeType
 	{
@@ -38,7 +38,7 @@ namespace AssetSnap.ASNode.Types
 
 			ScriptPath = "res://addons/assetsnap/nodes/3d/AsMultiMeshInstance3D.cs";
 
-			IconPath = "res://addons/assetsnap/assets/icons/Node.svg";
+			IconPath = "res://addons/assetsnap/assets/icons/MultiMeshInstance3D.svg";
 		}
 	}
 }
