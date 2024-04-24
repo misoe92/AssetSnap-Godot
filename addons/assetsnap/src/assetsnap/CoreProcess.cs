@@ -29,6 +29,7 @@ namespace AssetSnap.Core
 
 	using AssetSnap.Front.Nodes;
 	using AssetSnap.Settings;
+	using AssetSnap.States;
 	using AssetSnap.Static;
 	using Godot;
 	
@@ -46,8 +47,6 @@ namespace AssetSnap.Core
 			{
 				return;
 			}
-
-			ExplorerUtils.Get().Snap.Tick(delta);
 			
 			if( null != ExplorerUtils.Get().GroupBuilder && EditorPlugin.IsInstanceValid(Plugin.Singleton))
 			{
@@ -115,22 +114,30 @@ namespace AssetSnap.Core
 				{
 					ExplorerUtils.Get().Decal.Hide();
 				}
-
-				return;
 			}
-	
-			// Checks if current handle is a model
-			if( HasDecal() && HandleIsGroup() ) 
+			else 
 			{
-				// If so we handle model specific operations
-				ProcessGroupHandle(); 
+				// Checks if current handle is a model
+				if( HasDecal() && HandleIsGroup() ) 
+				{
+					// If so we handle model specific operations
+					ProcessGroupHandle(); 
+				}
+				// Checks if current handle is a model
+				else if( HasDecal() && HandleIsModel() && false == HandleIsGroup() ) 
+				{
+					// If so we handle model specific operations
+					ProcessModelHandle();
+				}
+				// Checks if current handle is a node3d
+				else if( HasDecal() && HandleIsNode3D() && false == HandleIsModel() && false == HandleIsGroup() ) 
+				{
+					// If so we handle model specific operations
+					ProcessModelHandle();
+				}
 			}
-			// Checks if current handle is a model
-			else if( HasDecal() && HandleIsModel() && false == HandleIsGroup() ) 
-			{
-				// If so we handle model specific operations
-				ProcessModelHandle();
-			}
+			
+			ExplorerUtils.Get().Snap.Tick(delta);
 		}
 		
 		private bool ShouldHideContextMenu()
@@ -218,7 +225,7 @@ namespace AssetSnap.Core
 		** @return void
 		*/		
 		private void ProcessModelHandle()
-		{ 
+		{
 			// Checks if our decal is hidden
 			if( ExplorerUtils.Get().Decal.IsHidden() ) 
 			{
@@ -242,19 +249,19 @@ namespace AssetSnap.Core
 					ItemTransform.Origin = HandleObjectSnap(ItemTransform.Origin);
 					
 					// Checks if glue is used and applies it
-					if( UsesGlue(ExplorerUtils.Get().CurrentLibrary._LibrarySettings._LSSnapToHeight) ) 
+					if( UsesGlue(StatesUtils.Get().CurrentLibrary._LibrarySettings._LSSnapToHeight) ) 
 					{
-						ItemTransform.Origin = ApplyGlue(ItemTransform.Origin,ExplorerUtils.Get().CurrentLibrary._LibrarySettings._LSSnapToHeight);
+						ItemTransform.Origin = ApplyGlue(ItemTransform.Origin,StatesUtils.Get().CurrentLibrary._LibrarySettings._LSSnapToHeight);
 					}
 					
-					if( UsesGlue(ExplorerUtils.Get().CurrentLibrary._LibrarySettings._LSSnapToX) ) 
+					if( UsesGlue(StatesUtils.Get().CurrentLibrary._LibrarySettings._LSSnapToX) ) 
 					{
-						ItemTransform.Origin = ApplyGlue(ItemTransform.Origin,ExplorerUtils.Get().CurrentLibrary._LibrarySettings._LSSnapToX);
+						ItemTransform.Origin = ApplyGlue(ItemTransform.Origin,StatesUtils.Get().CurrentLibrary._LibrarySettings._LSSnapToX);
 					}
 					
-					if( UsesGlue(ExplorerUtils.Get().CurrentLibrary._LibrarySettings._LSSnapToZ) ) 
+					if( UsesGlue(StatesUtils.Get().CurrentLibrary._LibrarySettings._LSSnapToZ) ) 
 					{
-						ItemTransform.Origin = ApplyGlue(ItemTransform.Origin,ExplorerUtils.Get().CurrentLibrary._LibrarySettings._LSSnapToZ);
+						ItemTransform.Origin = ApplyGlue(ItemTransform.Origin,StatesUtils.Get().CurrentLibrary._LibrarySettings._LSSnapToZ);
 					}
 					
 					// Updates decal preview
@@ -348,12 +355,20 @@ namespace AssetSnap.Core
 			{
 				Node Handle = GetHandle();
 				
-				if( HasLibrarySettings() && Handle is AssetSnap.Front.Nodes.AsMeshInstance3D asMeshInstance3D) 
+				if( Handle is AssetSnap.Front.Nodes.AsMeshInstance3D asMeshInstance3D && HasLibrarySettings()) 
 				{
 					int SnapLayer = asMeshInstance3D.GetSetting<int>("_LSSnapLayer.value");
 					if ( ShouldSnap() && SnapStatic.CanSnap(Origin,SnapLayer)) 
 					{
 						Origin = SnapStatic.Snap(Origin, asMeshInstance3D.GetAabb(), SnapLayer);
+					}
+				}
+				else if( Handle is AsNode3D asNode3D && HasLibrarySettings()) 
+				{
+					int SnapLayer = asNode3D.GetSetting<int>("_LSSnapLayer.value");
+					if ( ShouldSnap() && SnapStatic.CanSnap(Origin,SnapLayer)) 
+					{
+						Origin = SnapStatic.Snap(Origin, asNode3D.GetAabb(), SnapLayer);
 					}
 				}
 			}
@@ -370,6 +385,10 @@ namespace AssetSnap.Core
 						Origin = SnapStatic.Snap(Origin, aabb, asGrouped3D.SnapLayer);
 					}
 				}
+			}
+			else 
+			{
+				
 			}
 
 			return Origin;
@@ -486,6 +505,11 @@ namespace AssetSnap.Core
 			return ExplorerUtils.Get().GetHandle() is MeshInstance3D && ExplorerUtils.Get().States.PlacingMode == GlobalStates.PlacingModeEnum.Model;
 		}
 		
+		private bool HandleIsNode3D()
+		{
+			return ExplorerUtils.Get().GetHandle() is AsNode3D node3d && false == node3d.IsPlaced();
+		}
+		
 		private bool HandleIsGroup()
 		{
 			return ExplorerUtils.Get().GetHandle() is AsGrouped3D && ExplorerUtils.Get().States.PlacingMode == GlobalStates.PlacingModeEnum.Group;
@@ -551,7 +575,7 @@ namespace AssetSnap.Core
 				return false;
 			}
 			
-			return ExplorerUtils.Get().CurrentLibrary._LibrarySettings != null;
+			return StatesUtils.Get().CurrentLibrary._LibrarySettings != null;
 		}
 		
 		/*
@@ -561,7 +585,7 @@ namespace AssetSnap.Core
 		*/
 		private bool HasLibrary()
 		{
-			return null != ExplorerUtils.Get().CurrentLibrary;
+			return null != StatesUtils.Get().CurrentLibrary;
 		}
 		
 		/*
