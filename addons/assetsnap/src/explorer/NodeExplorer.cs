@@ -23,8 +23,9 @@
 #if TOOLS
 namespace AssetSnap
 {
-    using AssetSnap.Explorer;
-    using AssetSnap.Front.Nodes;
+	using AssetSnap.Explorer;
+	using AssetSnap.Front.Nodes;
+	using AssetSnap.States;
 	using Godot;
 
 	[Tool]
@@ -96,7 +97,7 @@ namespace AssetSnap
 		*/
 		public bool HasModel
 		{
-			get => Model != null;
+			get => StatesUtils.Get().EditingObject != null;
 		}
 				
 		/*
@@ -104,7 +105,15 @@ namespace AssetSnap
 		*/
 		public bool IsModelPlaced
 		{
-			get => Model.IsPlaced();
+			get
+			{
+				if( StatesUtils.Get().EditingObject is AsMeshInstance3D meshInstance3D ) 
+				{
+					return meshInstance3D.IsPlaced();				
+				}
+
+				return false;
+			}
 		}
 		
 		/*
@@ -227,13 +236,8 @@ namespace AssetSnap
 		*/
 		public bool HandleIsModel()
 		{
-			Node3D Handle = Model;
+			Node3D Handle = StatesUtils.Get().EditingObject;
 
-			if (Handle == null)
-			{
-				Handle = HandleNode as Node3D;
-			}
-			
 			if (Handle == null)
 			{
 				return false;
