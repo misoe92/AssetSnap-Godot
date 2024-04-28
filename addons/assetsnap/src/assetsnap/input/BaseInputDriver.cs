@@ -99,8 +99,18 @@ namespace AssetSnap.Instance.Input
 			{
 				if (IsKeyReset(_KeyEvent))
 				{
-					// _Parent.CurrentLibrary.ClearAllPanelState();
-					// CoreHandles.GetInstance<CoreHandles>().ResetHandle();
+					StatesUtils.Get().EditingTitle = "";
+					StatesUtils.Get().EditingObject = null;
+					StatesUtils.Get().Group = null;
+					StatesUtils.Get().GroupedObject = null;
+					StatesUtils.Get().SnapToHeight = GlobalStates.LibraryStateEnum.Disabled;
+					StatesUtils.Get().SnapToHeightGlue = GlobalStates.LibraryStateEnum.Disabled;
+					StatesUtils.Get().SnapToObject = GlobalStates.LibraryStateEnum.Disabled;
+					StatesUtils.Get().SnapToX = GlobalStates.LibraryStateEnum.Disabled;
+					StatesUtils.Get().SnapToXGlue = GlobalStates.LibraryStateEnum.Disabled;
+					StatesUtils.Get().SnapToZ = GlobalStates.LibraryStateEnum.Disabled;
+					StatesUtils.Get().SnapToZGlue = GlobalStates.LibraryStateEnum.Disabled;
+					StatesUtils.Get().CurrentLibrary.ClearAllPanelState();
 				}
 			}
 		}
