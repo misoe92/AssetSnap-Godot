@@ -90,17 +90,17 @@ namespace AssetSnap.Front.Nodes
 					Visible = true;
 				}
 			}
-
+			
 			if( Input.IsKeyPressed(Key.Shift) && Input.IsKeyPressed(Key.Alt) ) 
 			{
 				GlobalExplorer.GetInstance().AllowScroll = Abstracts.AbstractExplorerBase.ScrollState.SCROLL_DISABLED;	
 			}
 			
-			if( @Event is InputEventKey KeyEvent && HasNode("HBoxContainer/QuickAction/ModifiersList")) 
+			if( @Event is InputEventKey KeyEvent && HasNode("HBoxContainer/QuickAction/SelectList")) 
 			{
 				if ( Input.IsKeyPressed(Key.Shift) && Input.IsKeyPressed(Key.Alt) && KeyEvent.Keycode == Key.Q) 
 				{
-					AsSelectList List = GetNode<AsSelectList>("HBoxContainer/QuickAction/ModifiersList");
+					AsSelectList List = GetNode<AsSelectList>("HBoxContainer/QuickAction/SelectList");
 					Control _Control = List.GetNode<MarginContainer>("None");
 					
 					List.SetActive( _Control );
@@ -108,7 +108,7 @@ namespace AssetSnap.Front.Nodes
 				
 				if ( Input.IsKeyPressed(Key.Shift) && Input.IsKeyPressed(Key.Alt) && KeyEvent.Keycode == Key.R) 
 				{
-					AsSelectList List = GetNode<AsSelectList>("HBoxContainer/QuickAction/ModifiersList");
+					AsSelectList List = GetNode<AsSelectList>("HBoxContainer/QuickAction/SelectList");
 					Control _Control = List.GetNode<MarginContainer>("Rotate");
 					
 					List.SetActive(_Control); 
@@ -116,7 +116,7 @@ namespace AssetSnap.Front.Nodes
 				
 				if ( Input.IsKeyPressed(Key.Shift) && Input.IsKeyPressed(Key.Alt) && KeyEvent.Keycode == Key.S) 
 				{
-					AsSelectList List = GetNode<AsSelectList>("HBoxContainer/QuickAction/ModifiersList");
+					AsSelectList List = GetNode<AsSelectList>("HBoxContainer/QuickAction/SelectList");
 					Control _Control = List.GetNode<MarginContainer>("Scale");
 
 					List.SetActive(_Control);
