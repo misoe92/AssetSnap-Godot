@@ -13,3 +13,7 @@ assets/*.*
 assets/*/*.*
 assets/*/*/*.*
 addons\assetsnap\config.cfg
+*.sln
+*.csproj
+*.csproj.old
+*.tscn
