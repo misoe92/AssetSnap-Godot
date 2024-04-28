@@ -156,7 +156,6 @@ namespace AssetSnap.Front.Components
 
 		private void _OnClearImages()
 		{
-			GD.Print("Go");
 			ModelPreviewer.ClearPreviewImages("res://assetsnap/previews");
 		}
 	}

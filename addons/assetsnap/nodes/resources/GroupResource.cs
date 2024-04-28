@@ -25,86 +25,86 @@ namespace AssetSnap.Front.Nodes
 	using System;
 	using System.Reflection;
 	using Godot;
-	
+
 	[Tool]
 	public partial class GroupResource : Resource
 	{
 		[Export]
 		public string Name { get; set; } = "";
-		
+
 		[Export]
 		public string Title { get; set; } = "";
-		
+
 		[Export]
 		public Godot.Collections.Array<string> _Paths { get; set; } = new();
-		
+
 		[Export]
 		public Godot.Collections.Dictionary<int, Vector3> _Origins { get; set; } = new();
-		
+
 		[Export]
 		public Godot.Collections.Dictionary<int, Vector3> _Rotations { get; set; } = new();
-		
+
 		[Export]
 		public Godot.Collections.Dictionary<int, Vector3> _Scales { get; set; } = new();
-		
+
 		[Export]
 		public Godot.Collections.Array<Godot.Collections.Dictionary<string, Variant>> _Options { get; set; } = new();
-		
+
 		[Export]
 		public int SnapLayer { get; set; } = 0;
-		
+
 		[Export]
-		public float ObjectOffsetX { get; set; } = 0.0f;
-		
+		public float SnapToObjectOffsetXValue { get; set; } = 0.0f;
+
 		[Export]
-		public float ObjectOffsetZ { get; set; } = 0.0f;
-		
+		public float SnapToObjectOffsetZValue { get; set; } = 0.0f;
+
 		[Export]
-		public float SnapHeightValue { get; set; } = 0.0f;
-		
+		public float SnapToHeightValue { get; set; } = 0.0f;
+
 		[Export]
-		public float SnapXValue { get; set; } = 0.0f;
-		
+		public float SnapToXValue { get; set; } = 0.0f;
+
 		[Export]
-		public float SnapZValue { get; set; } = 0.0f;
-		
+		public float SnapToZValue { get; set; } = 0.0f;
+
 		[Export]
 		public bool SphereCollision { get; set; } = false;
-		
+
 		[Export]
 		public bool ConvexCollision { get; set; } = false;
-		
+
 		[Export]
 		public bool ConvexClean { get; set; } = false;
-		
+
 		[Export]
 		public bool ConvexSimplify { get; set; } = false;
-		
+
 		[Export]
 		public bool ConcaveCollision { get; set; } = false;
-		
+
 		[Export]
 		public bool SnapToObject { get; set; } = false;
-		
+
 		[Export]
 		public bool SnapToHeight { get; set; } = false;
-		
+
 		[Export]
 		public bool SnapToX { get; set; } = false;
-		
+
 		[Export]
 		public bool SnapToZ { get; set; } = false;
-		
-		public void EachProperty( Action<string, Variant> action ) 
+
+		public void EachProperty(Action<string, Variant> action)
 		{
 			Godot.Collections.Array<string> properties = new()
 			{
 				"SnapLayer",
-				"ObjectOffsetX",
-				"ObjectOffsetZ",
-				"SnapHeightValue",
-				"SnapXValue",
-				"SnapZValue",
+				"SnapToObjectOffsetXValue",
+				"SnapToObjectOffsetZValue",
+				"SnapToHeightValue",
+				"SnapToXValue",
+				"SnapToZValue",
 				"SphereCollision",
 				"ConvexCollision",
 				"ConvexClean",
@@ -116,8 +116,8 @@ namespace AssetSnap.Front.Nodes
 				"SnapToZ",
 			};
 			Type type = GetType();
-			
-			foreach( string propertyName in properties ) 
+
+			foreach (string propertyName in properties)
 			{
 				// Get the property info using reflection
 				PropertyInfo property = type.GetProperty(propertyName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
@@ -126,20 +126,18 @@ namespace AssetSnap.Front.Nodes
 				{
 					// Get the value of the property
 					object value = property.GetValue(this);
-					
-					if( value is bool boolVal ) 
+
+					if (value is bool boolVal)
 					{
 						// Call the provided action with the property name and its value
 						action(propertyName, boolVal);
 					}
-
-					if( value is float floatVal ) 
+					else if (value is float floatVal)
 					{
 						// Call the provided action with the property name and its value
 						action(propertyName, floatVal);
 					}
-					
-					if( value is float intVal ) 
+					else if (value is float intVal)
 					{
 						// Call the provided action with the property name and its value
 						action(propertyName, intVal);
@@ -151,39 +149,10 @@ namespace AssetSnap.Front.Nodes
 				}
 			}
 		}
-		
-		public void AddChildren( AsGrouped3D group, Godot.Collections.Array<Godot.Collections.Dictionary<string, Variant>> childOptions ) 
-		{
-			for( int i = 0; i < _Paths.Count; i++ ) 
-			{
-				Vector3 Origin = _Origins[i];
-				Vector3 Rotation = _Rotations[i];
-				Vector3 Scale = _Scales[i];
 
-				Transform3D transform = new(Basis.Identity, Vector3.Zero)
-				{
-					Origin = Origin,
-				};
-				
-				AsMeshInstance3D asMeshInstance3D = new()
-				{
-					Name = _Paths[i] + "/" + i,
-					Mesh = GD.Load<Mesh>(_Paths[i]),
-					Transform = transform,
-					RotationDegrees = Rotation,
-					Scale = Scale,
-					Floating = true,
-					SpawnSettings = childOptions[i]
-				};
-
-				group.AddChild(asMeshInstance3D);
-				asMeshInstance3D.Owner = null != group.Owner ? group.Owner : null;
-			}
-		}
-		
-		public void AddCollidingChildren( AsGrouped3D group, Godot.Collections.Array<Godot.Collections.Dictionary<string, Variant>> childOptions) 
+		public void AddChildren(AsGrouped3D group, Godot.Collections.Array<Godot.Collections.Dictionary<string, Variant>> childOptions)
 		{
-			for( int i = 0; i < _Paths.Count; i++ ) 
+			for (int i = 0; i < _Paths.Count; i++)
 			{
 				Vector3 Origin = _Origins[i];
 				Vector3 Rotation = _Rotations[i];
@@ -194,98 +163,139 @@ namespace AssetSnap.Front.Nodes
 					Origin = Origin,
 				};
 
-				Mesh mesh = GD.Load<Mesh>(_Paths[i]);
-				
-				AsStaticBody3D staticBody3D = new()
-				{
-					Name = _Paths[i] + "/" + i,
-					// Mesh = mesh,
-					// MeshName = mesh.ResourceName,
-					Transform = transform,
-					// InstanceTransform = transform,
-					// InstanceRotation = Rotation,
-					// InstanceScale = Scale,
-					// InstanceOwner = null != group.Owner ? group.Owner : null,
-					// InstanceSpawnSettings = childOptions[i]
-				};
+				GodotObject resource = GD.Load(_Paths[i]);
 
-				group.AddChild(staticBody3D);
-				staticBody3D.Owner = null != group.Owner ? group.Owner : null;
-				int TypeState = 0;
-				int CollisionType = 0;
-				
-				bool IsChildConvex = childOptions[i].ContainsKey("ConvexCollision") ? childOptions[i]["ConvexCollision"].As<bool>() : false;
-				bool IsChildConvexClean = childOptions[i].ContainsKey("ConvexClean") ? childOptions[i]["ConvexClean"].As<bool>() : false;
-				bool IsChildConvexSimplify = childOptions[i].ContainsKey("ConvexSimplify") ? childOptions[i]["ConvexSimplify"].As<bool>() : false;
-				bool IsChildConcave = childOptions[i].ContainsKey("ConcaveCollision") ? childOptions[i]["ConcaveCollision"].As<bool>() : false;
-				bool IsChildSphere = childOptions[i].ContainsKey("SphereCollision") ? childOptions[i]["SphereCollision"].As<bool>() : false;
-
-				if (
-					true == group.ConvexCollision &&
-					false == IsChildConvex &&
-					false == IsChildConcave &&
-					false == IsChildSphere ||
-					true == IsChildConvex	
-				) 
+				if (resource is Mesh mesh)
 				{
-					TypeState = 1;
+					AsMeshInstance3D asMeshInstance3D = new()
+					{
+						Name = _Paths[i] + "/" + i,
+						Mesh = mesh,
+						Transform = transform,
+						RotationDegrees = Rotation,
+						Scale = Scale,
+						Floating = true,
+						SpawnSettings = _Options[i]
+					};
+
+					group.AddChild(asMeshInstance3D);
+					asMeshInstance3D.Owner = null != group.Owner ? group.Owner : null;
+				}
+				else if (resource is PackedScene _scene)
+				{
+					Node node = _scene.Instantiate();
+					node.Owner = null;
 					
-					if(
-						true == group.ConvexClean &&
-						false == group.ConvexSimplify &&
-						false == IsChildConvex ||
-						true == IsChildConvexClean &&
-						true == IsChildConvexSimplify
-					) 
+					AsNode3D node3D = new()
 					{
-						CollisionType = 1;	
-					}
-					else if( 
-						false == group.ConvexClean &&
-						true == group.ConvexSimplify &&
-						false == IsChildConvex ||
-						false == IsChildConvexClean &&
-						true == IsChildConvexSimplify
-					) 
+						Name = _Paths[i] + "/" + i,
+						Transform = transform,
+						RotationDegrees = Rotation,
+						Scale = Scale,
+						Floating = true,
+						SpawnSettings = _Options[i]
+					};
+					
+					group.AddChild(node3D);
+					node3D.Owner = group.Owner;
+					
+					foreach (MeshInstance3D child in node.GetChildren())
 					{
-						CollisionType = 2;	
+						child.Owner = null;
+						node.RemoveChild(child);
+						
+						AsMeshInstance3D asMeshInstance3D = new()
+						{
+							Name = child.Name,
+							Mesh = child.Mesh,
+							Transform = child.Transform,
+							RotationDegrees = child.Rotation,
+							Scale = child.Scale,
+							Floating = true,
+							SpawnSettings = _Options[i],
+						};
+						
+						node3D.AddChild(asMeshInstance3D);
+						asMeshInstance3D.Owner = group.Owner;
 					}
-					else if( 
-						true == group.ConvexClean &&
-						true == group.ConvexSimplify &&
-						false == IsChildConvex ||
-						true == IsChildConvexClean &&
-						true == IsChildConvexSimplify
-					) 
-					{
-						CollisionType = 3;	
-					}
-				}
-				else if( 
-					true == group.ConcaveCollision &&
-					false == IsChildConvex &&
-					false == IsChildConcave &&
-					false == IsChildSphere ||
-					true == IsChildConcave	
-				) 
-				{
-					TypeState = 2;
-				}
-				else if(
-					true == group.SphereCollision &&
-					false == IsChildConvex &&
-					false == IsChildConcave &&
-					false == IsChildSphere ||
-					true == IsChildSphere	
-				) 
-				{
-					TypeState = 3;
+
+					node.QueueFree();
 				}
 				
-				staticBody3D.Initialize();
 			}
 		}
-		
+
+		public void AddCollidingChildren(AsGrouped3D group, Godot.Collections.Array<Godot.Collections.Dictionary<string, Variant>> childOptions)
+		{
+			// Add all children
+			for (int i = 0; i < _Paths.Count; i++)
+			{
+				Vector3 Origin = _Origins[i];
+				Vector3 Rotation = _Rotations[i];
+				Vector3 Scale = _Scales[i];
+
+				Transform3D transform = new(Basis.Identity, Vector3.Zero)
+				{
+					Origin = Origin,
+				};
+
+				GodotObject resource = GD.Load(_Paths[i]);
+
+				if (resource is Mesh mesh)
+				{
+					AsMeshInstance3D asMeshInstance3D = new()
+					{
+						Name = _Paths[i] + "/" + i,
+						Mesh = mesh,
+						Transform = transform,
+						RotationDegrees = Rotation,
+						Scale = Scale,
+						Floating = true,
+						SpawnSettings = _Options[i]
+					};
+
+					group.AddChild(asMeshInstance3D);
+				}
+				else if (resource is PackedScene _scene)
+				{
+					Node node = _scene.Instantiate();
+					node.Owner = null;
+					
+					AsNode3D node3D = new()
+					{
+						Name = _Paths[i] + "/" + i,
+						Transform = transform,
+						RotationDegrees = Rotation,
+						Scale = Scale,
+						Floating = true,
+						SpawnSettings = _Options[i]
+					};
+					
+					group.AddChild(node3D);
+					
+					foreach (MeshInstance3D child in node.GetChildren())
+					{
+						child.Owner = null;
+						node.RemoveChild(child);
+						
+						AsMeshInstance3D asMeshInstance3D = new()
+						{
+							Name = child.Name,
+							Mesh = child.Mesh,
+							Transform = child.Transform,
+							RotationDegrees = child.Rotation,
+							Scale = child.Scale,
+							Floating = true,
+							SpawnSettings = _Options[i],
+						};
+						
+						node3D.AddChild(asMeshInstance3D);
+						asMeshInstance3D.Owner = group.Owner;
+					}
+				}
+			}
+		}
+
 		public AsGrouped3D Build()
 		{
 			// Initialize variables to store distances
@@ -295,40 +305,40 @@ namespace AssetSnap.Front.Nodes
 			float bottomDistance = 0.0f;
 
 			// Iterate through each child node (assumed to be MeshInstance)
-			foreach ( ( int i, Vector3 child ) in _Origins)
+			foreach ((int i, Vector3 child) in _Origins)
 			{
-				if( child.X < leftDistance ) 
+				if (child.X < leftDistance)
 				{
 					leftDistance = child.X;
 				}
-				
-				if( child.X > rightDistance ) 
+
+				if (child.X > rightDistance)
 				{
 					rightDistance = child.X;
 				}
-				
-				if( child.Z < bottomDistance ) 
+
+				if (child.Z < bottomDistance)
 				{
 					bottomDistance = child.Z;
 				}
-				
-				if( child.Z > topDistance ) 
+
+				if (child.Z > topDistance)
 				{
 					topDistance = child.Z;
 				}
 			}
-			
+
 			AsGrouped3D group = new()
 			{
 				Name = "GroupedObjects",
 				GroupPath = "res://groups/" + Name + ".tres",
 				ChildOptions = _Options,
 				SnapLayer = SnapLayer,
-				ObjectOffsetX = ObjectOffsetX,
-				ObjectOffsetZ = ObjectOffsetZ,
-				SnapHeightValue = SnapHeightValue,
-				SnapXValue = SnapXValue,
-				SnapZValue = SnapZValue,
+				ObjectOffsetX = SnapToObjectOffsetXValue,
+				ObjectOffsetZ = SnapToObjectOffsetZValue,
+				SnapHeightValue = SnapToHeightValue,
+				SnapXValue = SnapToXValue,
+				SnapZValue = SnapToZValue,
 				SphereCollision = SphereCollision,
 				ConvexCollision = ConvexCollision,
 				ConvexClean = ConvexClean,
@@ -343,9 +353,9 @@ namespace AssetSnap.Front.Nodes
 				DistanceToRight = rightDistance,
 				DistanceToTop = topDistance,
 			};
-			
+
 			// Add all children
-			for( int i = 0; i < _Paths.Count; i++ ) 
+			for (int i = 0; i < _Paths.Count; i++)
 			{
 				Vector3 Origin = _Origins[i];
 				Vector3 Rotation = _Rotations[i];
@@ -355,19 +365,56 @@ namespace AssetSnap.Front.Nodes
 				{
 					Origin = Origin,
 				};
-				
-				AsMeshInstance3D asMeshInstance3D = new()
-				{
-					Name = _Paths[i] + "/" + i,
-					Mesh = GD.Load<Mesh>(_Paths[i]),
-					Transform = transform,
-					RotationDegrees = Rotation,
-					Scale = Scale,
-					Floating = true,
-					SpawnSettings = _Options[i]
-				};
 
-				group.AddChild(asMeshInstance3D);
+				GodotObject resource = GD.Load(_Paths[i]);
+
+				if (resource is Mesh mesh)
+				{
+					AsMeshInstance3D asMeshInstance3D = new()
+					{
+						Name = _Paths[i] + "/" + i,
+						Mesh = mesh,
+						Transform = transform,
+						RotationDegrees = Rotation,
+						Scale = Scale,
+						Floating = true,
+						SpawnSettings = _Options[i]
+					};
+
+					group.AddChild(asMeshInstance3D);
+				}
+				else if (resource is PackedScene _scene)
+				{
+					Node node = _scene.Instantiate();
+					AsNode3D node3D = new()
+					{
+						Name = _Paths[i] + "/" + i,
+						Transform = transform,
+						RotationDegrees = Rotation,
+						Scale = Scale,
+						Floating = true,
+						SpawnSettings = _Options[i]
+					};
+					group.AddChild(node3D);
+
+					foreach (MeshInstance3D child in node.GetChildren())
+					{
+						child.Owner = null;
+						node.RemoveChild(child);
+						
+						AsMeshInstance3D asMeshInstance3D = new()
+						{
+							Name = child.Name,
+							Mesh = child.Mesh,
+							Floating = true,
+							SpawnSettings = new()
+						};
+						
+						node3D.AddChild(asMeshInstance3D);
+						asMeshInstance3D.Owner = group.Owner;
+					}
+
+				}
 			}
 
 			return group;

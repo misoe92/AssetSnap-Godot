@@ -2,10 +2,10 @@ namespace AssetSnap.Nodes
 {
 	using System.Threading.Tasks;
 	using AssetSnap.Explorer;
-	using AssetSnap.States;
 	using AssetSnap.Static;
 	using Godot;
 
+	[Tool]
 	class ModelPreviewer
 	{
 		public static ModelPreviewer Singleton

@@ -20,7 +20,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 using AssetSnap.Explorer;
-using AssetSnap.Front.Nodes;
 using AssetSnap.Library;
 using AssetSnap.Nodes;
 using AssetSnap.States;
@@ -29,25 +28,28 @@ using Godot;
 [Tool]
 public partial class AsNode3D : Node3D, IDriverableModel
 {
-	public AsNode3D()
-	{
-		SetMeta("AsModel", true);
-	}
-
 	[Export]
 	public string LibraryName { get; set; }
 
 	[Export]
-	public Godot.Collections.Dictionary<string, Variant> SpawnSettings { get; set; } = new();
+	public Godot.Collections.Dictionary<string, Variant> SpawnSettings { get => _SpawnSettings; set { _SpawnSettings = value; } }
 
 	[Export]
-	public bool Floating { get; set; } = false;
+	public bool Floating { get => _Floating; set{ _Floating = value; } }
 
 	[Export]
-	public bool WaypointAdded { get; set; } = false;
-
+	public bool WaypointAdded { get => _WaypointAdded; set{ _WaypointAdded = value; } }
+	
+	private Godot.Collections.Dictionary<string, Variant> _SpawnSettings = new(); 
 	private ModelDriver Driver;
+	private bool _Floating = false; 
+	private bool _WaypointAdded = false; 
 
+	public AsNode3D()
+	{
+		SetMeta("AsModel", true);
+	}
+	
 	public override void _EnterTree()
 	{
 		Driver = new();
@@ -61,10 +63,13 @@ public partial class AsNode3D : Node3D, IDriverableModel
 
 		base._Ready();
 	}
-
-	public override void _Ready()
+	
+	public void SetChildOwner(Node owner)
 	{
-		base._Ready();
+		foreach( Node child in GetChildren()) 
+		{
+			child.Owner = owner;
+		}
 	}
 
 	public void SetIsFloating(bool state)
@@ -215,21 +220,16 @@ public partial class AsNode3D : Node3D, IDriverableModel
 
 	public override void _ExitTree()
 	{
-		if (null != ExplorerUtils.Get() && null != ExplorerUtils.Get().Waypoints)
-		{
-			if (IsInstanceValid(this))
-			{
-				// ExplorerUtils.Get().Waypoints.Remove(this, Transform.Origin);
-			}
-		}
+		// if (null != ExplorerUtils.Get() && null != ExplorerUtils.Get().Waypoints)
+		// {
+		// 	if (IsInstanceValid(this))
+		// 	{
+		// 		// ExplorerUtils.Get().Waypoints.Remove(this, Transform.Origin);
+		// 	}
+		// }
 
 		Floating = true;
 		WaypointAdded = false;
-
-		// StatesUtils.Get().EditingTitle = "N/A";
-
-		// StatesUtils.Get().EditingObject = null;
-		// StatesUtils.Get().CurrentLibrary = null;
 
 		base._ExitTree();
 	}

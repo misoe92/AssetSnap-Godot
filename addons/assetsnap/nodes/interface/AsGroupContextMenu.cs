@@ -23,21 +23,21 @@
 namespace AssetSnap.Front.Nodes
 {
 	using AssetSnap.Explorer;
-    using AssetSnap.States;
-    using Godot;
+	using AssetSnap.States;
+	using Godot;
 
 	[Tool]
 	public partial class AsGroupContextMenu : Control
 	{
 		private readonly Theme _Theme = GD.Load<Theme>("res://addons/assetsnap/assets/themes/SnapMenu.tres");
-		
+
 		public PanelContainer MenuPanelContainer;
 		public Button AddToCurrentGroup;
 		private string FocusedMesh = "";
-		
-		public void ShowMenu( Vector2 Coordinates, string MeshPath ) 
+
+		public void ShowMenu(Vector2 Coordinates, string MeshPath)
 		{
-			if( EditorPlugin.IsInstanceValid( MenuPanelContainer ) && EditorPlugin.IsInstanceValid(StatesUtils.Get().Group) ) 
+			if (EditorPlugin.IsInstanceValid(MenuPanelContainer) && EditorPlugin.IsInstanceValid(StatesUtils.Get().Group))
 			{
 				MenuPanelContainer.Visible = true;
 				MenuPanelContainer.Position = Coordinates;
@@ -45,33 +45,38 @@ namespace AssetSnap.Front.Nodes
 				FocusedMesh = MeshPath;
 			}
 		}
-		
-		public void MaybeHideMenu( Vector2 Coordinates ) 
+
+		public void MaybeHideMenu(Vector2 Coordinates)
 		{
-			if( EditorPlugin.IsInstanceValid( MenuPanelContainer ) &&  true == MenuPanelContainer.Visible ) 
+			if (EditorPlugin.IsInstanceValid(MenuPanelContainer) && true == MenuPanelContainer.Visible)
 			{
-				if( false == GlobalExplorer.GetInstance().BottomDock.Container.Visible ) 
+				if (null != ExplorerUtils.Get().BottomDock.Container && false == ExplorerUtils.Get().BottomDock.Container.Visible)
 				{
 					HideMenu();
 					return;
 				}
-				
+
 				Vector2 CurrentPosition = MenuPanelContainer.Position;
-				if( CurrentPosition.X + MenuPanelContainer.Size.X + 20  < Coordinates.X || CurrentPosition.X - 20 > Coordinates.X || CurrentPosition.Y + MenuPanelContainer.Size.Y + 20 < Coordinates.Y || CurrentPosition.Y - 20 > Coordinates.Y ) 
+				if (CurrentPosition.X + MenuPanelContainer.Size.X + 20 < Coordinates.X || CurrentPosition.X - 20 > Coordinates.X || CurrentPosition.Y + MenuPanelContainer.Size.Y + 20 < Coordinates.Y || CurrentPosition.Y - 20 > Coordinates.Y)
 				{
 					HideMenu();
 					return;
 				}
 			}
 		}
-		
+
 		public void HideMenu()
 		{
 			MenuPanelContainer.Visible = false;
 			MenuPanelContainer.Position = new Vector2(-400, -400);
 			FocusedMesh = "";
 		}
-		
+
+		public bool IsVisible()
+		{
+			return MenuPanelContainer.Visible;
+		}
+
 		public void Initialize()
 		{
 			MenuPanelContainer = new()
@@ -95,8 +100,8 @@ namespace AssetSnap.Front.Nodes
 				ThemeTypeVariation = "HeaderSmall",
 				SizeFlagsHorizontal = Control.SizeFlags.ShrinkCenter,
 				SizeFlagsVertical = Control.SizeFlags.ShrinkBegin,
-			}; 
-			
+			};
+
 			MenuMarginContainer.AddThemeConstantOverride("margin_left", 5);
 			MenuMarginContainer.AddThemeConstantOverride("margin_right", 5);
 			MenuMarginContainer.AddThemeConstantOverride("margin_top", 5);
@@ -110,13 +115,18 @@ namespace AssetSnap.Front.Nodes
 			MenuPanelContainer.AddChild(MenuMarginContainer);
 
 			MenuPanelContainer.Position = new Vector2(-400, -400);
- 
+
 			ExplorerUtils.Get()._Plugin
 				.GetInternalContainer()
 				.AddChild(MenuPanelContainer);
 		}
-		
-		private void _SetupAddToCurrentGroupButton( VBoxContainer MenuBoxContainer )
+
+		public bool IsHidden()
+		{
+			return MenuPanelContainer.Visible == false;
+		}
+
+		private void _SetupAddToCurrentGroupButton(VBoxContainer MenuBoxContainer)
 		{
 			AddToCurrentGroup = new()
 			{
@@ -126,11 +136,11 @@ namespace AssetSnap.Front.Nodes
 				MouseDefaultCursorShape = Control.CursorShape.PointingHand
 			};
 
-			AddToCurrentGroup.Connect( Button.SignalName.Pressed, Callable.From( () => { _OnAddToCurrentGroup(); }));
+			AddToCurrentGroup.Connect(Button.SignalName.Pressed, Callable.From(() => { _OnAddToCurrentGroup(); }));
 
 			MenuBoxContainer.AddChild(AddToCurrentGroup);
 		}
-			
+
 		private void _OnAddToCurrentGroup()
 		{
 			ExplorerUtils.Get().GroupBuilder._Editor.AddMeshToGroup(FocusedMesh);

@@ -24,24 +24,23 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 {
 	using AssetSnap.Component;
 	using Godot;
-	using Godot.Collections;
 
 	[Tool]
 	public partial class Advanced : GroupObjectComponent
 	{
 		public EditorGroupObject Parent;
-		
+
 		public Advanced()
 		{
 			Name = "GroupsBuilderGroupObjectAdvanced";
 			UsingTraits = new()
 			{
-				{ typeof(Containerable).ToString() },
 				{ typeof(Buttonable).ToString() },
 				{ typeof(Labelable).ToString() },
+				{ typeof(Containerable).ToString() },
 			};
 		}
-		
+
 		protected override void _InitializeFields()
 		{
 			Trait<Containerable>()
@@ -74,7 +73,7 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 				.SetAction(() => { _OnToggleAdvanced(); })
 				.Instantiate();
 		}
-		
+
 		protected override void _FinalizeFields()
 		{
 			Trait<Buttonable>()
@@ -84,7 +83,7 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 						.Select(0)
 						.GetInnerContainer()
 				);
-				
+
 			Trait<Labelable>()
 				.Select(0)
 				.AddToContainer(
@@ -93,25 +92,25 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 						.GetOuterContainer(),
 					0
 				);
-			
+
 			Trait<Containerable>()
 				.Select(0)
 				.AddToContainer(
 					this
 				);
 		}
-		
+
 		private void _OnToggleAdvanced()
 		{
 			Parent._GroupBuilderEditorGroupObjectAdvancedContainer.ToggleVisibility();
-			
-			if( Parent._GroupBuilderEditorGroupObjectAdvancedContainer.IsVisible() ) 
+
+			if (Parent._GroupBuilderEditorGroupObjectAdvancedContainer.IsVisible())
 			{
 				Trait<Buttonable>()
 					.Select(0)
 					.SetIcon(GD.Load<Texture2D>("res://addons/assetsnap/assets/icons/chevron-up.svg"));
 			}
-			else 
+			else
 			{
 				Trait<Buttonable>()
 					.Select(0)

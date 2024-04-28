@@ -69,7 +69,6 @@ public partial class AsArrayModifier3D : AsGroup3D
 		set
 		{
 			_Duplicates = value;
-			GD.Print(_Duplicates is AsMeshInstance3D);
 		}
 	}
 

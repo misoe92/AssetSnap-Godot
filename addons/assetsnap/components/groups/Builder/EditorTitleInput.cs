@@ -31,31 +31,33 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		public EditorTitleInput()
 		{
 			Name = "GroupBuilderEditorTitleInput";
+
+			SizeFlagsVertical = SizeFlags.ShrinkCenter;
 			//_include = false;
 		}
-		
+
 		public LineEdit _InputField;
 
 		public override void Initialize()
 		{
 			base.Initialize();
-			
+
 			Initiated = true;
-			
+
 			_InputField = new()
 			{
 				Text = "None, select one in the sidebar or create one to start"
 			};
-			
+
 			_InputField.AddThemeConstantOverride("minimum_character_width", 36);
-			_InputField.Connect(LineEdit.SignalName.TextChanged, Callable.From( (string value ) => { _OnMaybeUpdateGroupName( value ); }));
+			_InputField.Connect(LineEdit.SignalName.TextChanged, Callable.From((string value) => { _OnMaybeUpdateGroupName(value); }));
 
 			AddChild(_InputField);
 		}
-		
+
 		public void Update()
 		{
-			if( null == _GlobalExplorer.GroupBuilder._Editor.Group || false == IsInstanceValid(_GlobalExplorer.GroupBuilder._Editor.Group) ) 
+			if (null == _GlobalExplorer.GroupBuilder._Editor.Group || false == IsInstanceValid(_GlobalExplorer.GroupBuilder._Editor.Group))
 			{
 				_InputField.Text = "None, select one in the sidebar or create one to start";
 				return;
@@ -63,16 +65,16 @@ namespace AssetSnap.Front.Components.Groups.Builder
 
 			_InputField.Text = _GlobalExplorer.GroupBuilder._Editor.Group.Name;
 		}
-		
+
 		private void _OnMaybeUpdateGroupName(string text)
 		{
-			if( null == _GlobalExplorer.GroupBuilder._Editor.Group ) 
+			if (null == _GlobalExplorer.GroupBuilder._Editor.Group)
 			{
 				_InputField.Text = "None, select one in the sidebar or create one to start";
 				return;
 			}
-			
-			if( "" == text ) 
+
+			if ("" == text)
 			{
 				_InputField.Text = _GlobalExplorer.GroupBuilder._Editor.Group.Name;
 				return;

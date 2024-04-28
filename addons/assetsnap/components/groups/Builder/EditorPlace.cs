@@ -23,92 +23,96 @@
 namespace AssetSnap.Front.Components.Groups.Builder
 {
 	using AssetSnap.Component;
+	using AssetSnap.Explorer;
 	using AssetSnap.Instance.Input;
+	using AssetSnap.States;
 	using Godot;
 
 	[Tool]
 	public partial class EditorPlace : LibraryComponent
 	{
-		private static readonly string Text = "Place"; 
-		
+		private static readonly string Text = "Place";
+
 		public EditorPlace()
 		{
 			Name = "GroupBuilderEditorPlace";
-			TooltipText = "Will let you place the group of objects in the 3D world"; 
-			MouseDefaultCursorShape = Control.CursorShape.PointingHand; 
-			
+			TooltipText = "Will let you place the group of objects in the 3D world";
+			MouseDefaultCursorShape = Control.CursorShape.PointingHand;
+
 			UsingTraits = new()
 			{
 				{ typeof(Buttonable).ToString() },
 			};
-			
+
 			//_include = false;
 		}
-		
+
 		public override void Initialize()
 		{
-			if( Initiated ) 
+			if (Initiated)
 			{
 				return;
 			}
-			
+
 			base.Initialize();
-			
+
 			Initiated = true;
 
 			_InitializeFields();
 			_FinalizeFields();
 		}
-		
+
 		public void DoShow()
 		{
 			Trait<Buttonable>()
 				.Select(0)
-				.SetVisible( true );
+				.SetVisible(true);
 		}
-			
+
 		public void DoHide()
 		{
 			Trait<Buttonable>()
 				.Select(0)
-				.SetVisible( false );
+				.SetVisible(false);
 		}
-		
+
 		private void _OnPlaceGroup()
 		{
-			_GlobalExplorer.GroupBuilder._Editor.OpenGroupOptions();
-			_GlobalExplorer.States.PlacingMode = GlobalStates.PlacingModeEnum.Group;
-			_GlobalExplorer.States.Group = _GlobalExplorer.GroupBuilder._Editor.Group;
-			_GlobalExplorer.States.GroupedObject = _GlobalExplorer.GroupBuilder._Editor.Group.Build();
+			ExplorerUtils.Get().GroupBuilder._Editor.OpenGroupOptions();
+			StatesUtils.Get().PlacingMode = GlobalStates.PlacingModeEnum.Group;
+			StatesUtils.Get().Group = _GlobalExplorer.GroupBuilder._Editor.Group;
+			StatesUtils.Get().GroupedObject = _GlobalExplorer.GroupBuilder._Editor.Group.Build();
 
-			_GlobalExplorer.GroupBuilder._Editor.Group.EachProperty(
-				( string key, Variant value ) =>
+			ExplorerUtils.Get().GroupBuilder._Editor.Group.EachProperty(
+				(string key, Variant value) =>
 				{
-					_GlobalExplorer.States.Set(key, value);
+					if( false == StatesUtils.Get().Is( key, value) ) {
+						StatesUtils.Get().Set(key, value);
+					}
 				}
 			);
-			
-			EditorInterface.Singleton.EditNode(_GlobalExplorer.States.GroupedObject);
-			
-			if( _GlobalExplorer.InputDriver is DragAddInputDriver DraggableInputDriver ) 
+
+			EditorInterface.Singleton.EditNode(StatesUtils.Get().GroupedObject);
+
+			if (ExplorerUtils.Get().InputDriver is DragAddInputDriver DraggableInputDriver)
 			{
 				DraggableInputDriver.CalculateObjectSize();
 			}
 		}
-		
+
 		private void _InitializeFields()
 		{
 			Trait<Buttonable>()
 				.SetName("GroupBuilderEditorPlace")
-				.SetType( Buttonable.ButtonType.ActionButton )
+				.SetType(Buttonable.ButtonType.ActionButton)
 				.SetText(Text)
 				.SetTooltipText(TooltipText)
 				.SetCursorShape(MouseDefaultCursorShape)
 				.SetVisible(false)
-				.SetAction( () => { _OnPlaceGroup(); } )
+				.SetAction(() => { _OnPlaceGroup(); })
 				.Instantiate();
 		}
-		
+
 		private void _FinalizeFields()
 		{
 			Trait<Buttonable>()

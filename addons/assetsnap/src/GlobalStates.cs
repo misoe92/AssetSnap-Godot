@@ -30,6 +30,7 @@ namespace AssetSnap
 
 	using AssetSnap.Front.Nodes;
 	using Godot;
+	using Microsoft.VisualBasic;
 
 	[Tool]
 	public partial class GlobalStates : LoadStates
@@ -655,6 +656,96 @@ namespace AssetSnap
 
 			return false;
 		}
+		
+		public bool Is(string key, Variant value) 
+		{
+			Variant KeyValue = Key(key);
+			Variant.Type ValueType = value.VariantType;
+			
+			if( ValueType != KeyValue.VariantType ) 
+			{
+				// Not the same type, just return early.
+				return false;
+			}
+			
+			if( KeyValue.VariantType == Variant.Type.String) 
+			{
+				return KeyValue.As<string>() == value.As<string>();
+			}
+			else if( KeyValue.VariantType == Variant.Type.Bool )
+			{
+				return KeyValue.As<bool>() == value.As<bool>();
+			}
+			else if( KeyValue.VariantType == Variant.Type.Float )
+			{
+				return KeyValue.As<float>() == value.As<float>();
+			}
+			else if( KeyValue.VariantType == Variant.Type.Int )
+			{
+				return KeyValue.As<int>() == value.As<int>();
+			}
+
+			return false;
+		}
+
+		public Variant Key(string name)
+		{
+			// Get the type of the class
+			Type type = GetType();
+
+			// Get the field or property with the provided name
+			FieldInfo field = type.GetField(name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+			PropertyInfo property = type.GetProperty(name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+			object value = "";
+
+			if (null == property && null == field)
+			{
+				return Variant.CreateFrom( "" );
+			}
+
+			if( null != field ) {
+				value = field.GetValue( this );
+				
+				if( value is string stringVal) 
+				{
+					return stringVal;
+				}
+				else if( value is bool boolVal)
+				{
+					return boolVal;
+				}
+				else if( value is float floatVal)
+				{
+					return floatVal;
+				}
+				else if( value is int intVal)
+				{
+					return intVal;
+				}
+			}
+	
+			if( null != property ) {
+				value = property.GetValue( this );
+				if( value is string stringVal) 
+				{
+					return stringVal;
+				}
+				else if( value is bool boolVal)
+				{
+					return boolVal;
+				}
+				else if( value is float floatVal)
+				{
+					return floatVal;
+				}
+				else if( value is int intVal)
+				{
+					return intVal;
+				}
+			}
+	
+			return "";
+		}
 
 		public void Set(string name, Variant value)
 		{
@@ -664,6 +755,11 @@ namespace AssetSnap
 			// Get the field or property with the provided name
 			FieldInfo field = type.GetField(name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
 			PropertyInfo property = type.GetProperty(name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+
+			if (null == property && null == field)
+			{
+				return;
+			}
 
 			if (value.VariantType == Variant.Type.Bool)
 			{
@@ -702,7 +798,7 @@ namespace AssetSnap
 					property.SetValue(this, typedValue);
 			}
 
-			StateChanged(name, value);
+			// StateChanged(name, value);
 		}
 	}
 }

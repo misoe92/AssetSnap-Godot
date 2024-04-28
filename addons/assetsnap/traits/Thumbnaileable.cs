@@ -21,7 +21,8 @@
 // SOFTWARE.
 
 #if TOOLS
-using System;
+using System.Collections.Generic;
+using AssetSnap.Nodes;
 using AssetSnap.Trait;
 using Godot;
 
@@ -36,7 +37,7 @@ namespace AssetSnap.Component
 		private TextureRect.ExpandModeEnum ExpandMode = TextureRect.ExpandModeEnum.KeepSize;
 		private TextureRect.StretchModeEnum StretchMode = TextureRect.StretchModeEnum.Keep;
 		private string FilePath;
-		
+
 		/*
 		** Public methods
 		*/
@@ -45,41 +46,55 @@ namespace AssetSnap.Component
 			Name = "Thumbnaileable";
 			TypeString = GetType().ToString();
 		}
-		
+
 		/*
 		** Instantiate an instance of the trait
 		**
 		** @return Thumbnaileable
-		*/	
+		*/
 		public override Thumbnaileable Instantiate()
 		{
 			base._Instantiate();
 			base.Instantiate();
-			
+
 			AsModelViewerRect _TextureRect = new()
 			{
 				Name = TraitName + "-Preview",
 				ExpandMode = ExpandMode,
-				StretchMode = StretchMode
+				StretchMode = StretchMode,
+				CustomMinimumSize = new Vector2I(62, 62)
 			};
-			
-			var mesh_preview = EditorInterface.Singleton.GetResourcePreviewer();
-			mesh_preview.QueueResourcePreview(FilePath, _TextureRect, "_MeshPreviewReady", _TextureRect);
-			
+
+			List<string> folderList = new(FilePath.Split("/"));
+			string FileName = folderList.ToArray()[folderList.Count - 1];
+			string LibraryName = folderList.ToArray()[folderList.Count - 2];
+			folderList.RemoveAt(folderList.Count - 1);
+			string FolderPath = folderList.ToArray().Join("/");
+
+			if (true == FileAccess.FileExists("res://assetsnap/previews/" + LibraryName + "/" + FileName.Split(".")[0] + "/default.png"))
+			{
+				Texture2D image = GD.Load<Texture2D>("res://assetsnap/previews/" + LibraryName + "/" + FileName.Split(".")[0] + "/default.png");
+				_TextureRect._MeshPreviewReady(FolderPath + "/" + FileName, image, image, _TextureRect);
+			}
+			else
+			{
+				ModelPreviewer.Singleton.AddToQueue(FolderPath + "/" + FileName, _TextureRect, LibraryName);
+			}
+
 			GetInnerContainer(0).AddChild(_TextureRect);
 
 			Dependencies[TraitName + "_WorkingNode"] = _TextureRect;
-		
+
 			Plugin.Singleton.traitGlobal.AddInstance(Iteration, _TextureRect, OwnerName, TypeString, Dependencies);
 			Plugin.Singleton.traitGlobal.AddName(Iteration, TraitName, OwnerName, TypeString);
-			
+
 			Reset();
 			Iteration += 1;
 			Dependencies = new();
-			
+
 			return this;
 		}
-		
+
 		/*
 		** Selects an placed thumbnail in the
 		** nodes array by index
@@ -90,16 +105,16 @@ namespace AssetSnap.Component
 		public override Thumbnaileable Select(int index, bool debug = false)
 		{
 			base._Select(index);
-			
-			if( false != Dependencies.ContainsKey(TraitName + "_WorkingNode") ) 
+
+			if (false != Dependencies.ContainsKey(TraitName + "_WorkingNode"))
 			{
 				Godot.Collections.Dictionary<string, Variant> dependencies = Plugin.Singleton.traitGlobal.GetDependencies(index, TypeString, OwnerName);
 				Dependencies = dependencies;
 			}
-			
+
 			return this;
 		}
-		
+
 		/*
 		** Selects an placed thumbnail in the
 		** nodes array by name
@@ -107,11 +122,11 @@ namespace AssetSnap.Component
 		** @param string name
 		** @return Thumbnaileable
 		*/
-		public override Thumbnaileable SelectByName( string name ) 
+		public override Thumbnaileable SelectByName(string name)
 		{
-			foreach( Container container in Nodes ) 
+			foreach (Container container in Nodes)
 			{
-				if( container.Name == name ) 
+				if (container.Name == name)
 				{
 					Dependencies[TraitName + "_WorkingNode"] = container;
 					break;
@@ -120,7 +135,7 @@ namespace AssetSnap.Component
 
 			return this;
 		}
-		
+
 		/*
 		** Adds the currently chosen thumbnail
 		** to a specified container
@@ -128,9 +143,9 @@ namespace AssetSnap.Component
 		** @param Node Container
 		** @return void
 		*/
-		public void AddToContainer( Node Container ) 
+		public void AddToContainer(Node Container)
 		{
-			if( false == Dependencies.ContainsKey(TraitName + "_MarginContainer") ) 
+			if (false == Dependencies.ContainsKey(TraitName + "_MarginContainer"))
 			{
 				GD.PushError("Container was not found @ AddToContainer");
 				GD.PushError("AddToContainer::Keys-> ", Dependencies.Keys);
@@ -140,37 +155,37 @@ namespace AssetSnap.Component
 
 			base._AddToContainer(Container, Dependencies[TraitName + "_MarginContainer"].As<MarginContainer>());
 		}
-		
+
 		/*
 		** Setter Methods
 		*/
-		
+
 		/*
 		** Sets the name of the current button
 		**
 		** @param string text
 		** @return Buttonable
 		*/
-		public Thumbnaileable SetName( string text ) 
+		public Thumbnaileable SetName(string text)
 		{
 			base._SetName(text);
-			
+
 			return this;
 		}
-		
+
 		/*
 		** Sets the file path of the current thumbnail
 		**
 		** @param string path
 		** @return Thumbnaileable
 		*/
-		public Thumbnaileable SetFilePath( string path ) 
+		public Thumbnaileable SetFilePath(string path)
 		{
 			FilePath = path;
-			
+
 			return this;
 		}
-		
+
 		/*
 		** Sets the visibility state of the
 		** currently chosen thumbnail
@@ -178,13 +193,13 @@ namespace AssetSnap.Component
 		** @param bool state
 		** @return Thumbnaileable
 		*/
-		public override Thumbnaileable SetVisible( bool state ) 
+		public override Thumbnaileable SetVisible(bool state)
 		{
 			base.SetVisible(state);
 
 			return this;
 		}
-		
+
 		/*
 		** Sets the dimensions of the current thumbnail
 		**
@@ -192,39 +207,46 @@ namespace AssetSnap.Component
 		** @param int height
 		** @return Thumbnaileable
 		*/
-		public override Thumbnaileable SetDimensions( int width, int height )
+		public override Thumbnaileable SetDimensions(int width, int height)
 		{
 			base.SetDimensions(width, height);
-			
+
 			return this;
 		}
-		
+
+		public override Thumbnaileable SetContainerHorizontalSizeFlag(Control.SizeFlags flag)
+		{
+			base.SetContainerHorizontalSizeFlag(flag);
+
+			return this;
+		}
+
 		/*
 		** Sets the expand mode of the texture rect
 		**
 		** @param TextureRect.ExpandModeEnum mode
 		** @return Thumbnaileable
 		*/
-		public Thumbnaileable SetExpandMode(TextureRect.ExpandModeEnum mode )
+		public Thumbnaileable SetExpandMode(TextureRect.ExpandModeEnum mode)
 		{
 			ExpandMode = mode;
-			
+
 			return this;
 		}
-		
+
 		/*
 		** Sets the stretch mode of the texture rect
 		**
 		** @param TextureRect.StretchModeEnum mode
 		** @return Thumbnaileable
 		*/
-		public Thumbnaileable SetStretchMode( TextureRect.StretchModeEnum mode )
+		public Thumbnaileable SetStretchMode(TextureRect.StretchModeEnum mode)
 		{
 			StretchMode = mode;
 
 			return this;
 		}
-		
+
 		/*
 		** Sets the horizontal size flag, which controls the x
 		** axis, and how it should act.
@@ -238,7 +260,7 @@ namespace AssetSnap.Component
 
 			return this;
 		}
-		
+
 		/*
 		** Sets the horizontal size flag, which controls the y
 		** axis, and how it should act.
@@ -252,20 +274,20 @@ namespace AssetSnap.Component
 
 			return this;
 		}
-		
+
 		/*
 		** Sets the orientation of the container
 		**
 		** @param ContainerOrientation orientation
 		** @return Thumbnaileable
 		*/
-		public override Thumbnaileable SetOrientation(ContainerOrientation orientation) 
+		public override Thumbnaileable SetOrientation(ContainerOrientation orientation)
 		{
 			base.SetOrientation(orientation);
 
 			return this;
 		}
-		
+
 		/*
 		** Sets margin values for 
 		** the currently chosen thumbnail
@@ -274,10 +296,10 @@ namespace AssetSnap.Component
 		** @param string side
 		** @return Thumbnaileable
 		*/
-		public override Thumbnaileable SetMargin( int value, string side = "" ) 
+		public override Thumbnaileable SetMargin(int value, string side = "")
 		{
 			base.SetMargin(value, side);
-			
+
 			return this;
 		}
 	}

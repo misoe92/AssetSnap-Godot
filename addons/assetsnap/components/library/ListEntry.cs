@@ -363,9 +363,6 @@ namespace AssetSnap.Front.Components.Library
 				ModelPreviewer.Singleton.AddToQueue(FolderPath + "/" + FileName, _TextureRect, Library.GetName());
 			}
 
-			// var mesh_preview = EditorInterface.Singleton.GetResourcePreviewer();
-			// mesh_preview.QueueResourcePreview(FolderPath + "/" + FileName, _TextureRect, "_MeshPreviewReady", _TextureRect);	
-
 			_MarginContainer.AddChild(_TextureRect);
 			_InnerContainer.AddChild(_MarginContainer);
 			BoxContainer.AddChild(_InnerContainer);

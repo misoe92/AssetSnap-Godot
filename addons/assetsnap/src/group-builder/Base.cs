@@ -28,12 +28,12 @@ namespace AssetSnap.GroupBuilder
 	using AssetSnap.Front.Nodes;
 	using AssetSnap.States;
 	using Godot;
-	
+
 	[Tool]
 	public partial class Base
 	{
 		public bool Initialized = false;
-		
+
 		/*
 		** Public
 		*/
@@ -41,7 +41,7 @@ namespace AssetSnap.GroupBuilder
 		{
 			get
 			{
-				if( null == _Instance ) 
+				if (null == _Instance)
 				{
 					_Instance = new();
 				}
@@ -49,13 +49,13 @@ namespace AssetSnap.GroupBuilder
 				return _Instance;
 			}
 		}
-		
+
 		public PanelContainer Container;
 		public Front.Components.Groups.Container _GroupContainer;
 		public Sidebar _Sidebar;
 		public Editor _Editor;
-		
-		
+
+
 		/*
 		** Private
 		*/
@@ -69,7 +69,7 @@ namespace AssetSnap.GroupBuilder
 			"Groups.Builder.Editor",
 		};
 		private static Base _Instance;
-		
+
 		/*
 		** Initializes the group builder
 		*/
@@ -77,76 +77,95 @@ namespace AssetSnap.GroupBuilder
 		{
 			StatesUtils.SetLoad("GroupBuilder", true);
 		}
-		
-		public bool HasMenu()
+
+		public bool MenuVisible()
 		{
-			if(
+			if (
 				null == Plugin.Singleton ||
 				null == Plugin.Singleton.GetInternalContainer()
 			)
 			{
-				return false;				
+				return false;
+			}
+
+			return Plugin.Singleton
+						.GetInternalContainer()
+						.HasNode("GroupContextMenu") &&
+					GetMenu().IsVisible();
+		}
+
+		public bool HasMenu()
+		{
+			if (
+				null == Plugin.Singleton ||
+				null == Plugin.Singleton.GetInternalContainer()
+			)
+			{
+				return false;
 			}
 
 			return Plugin.Singleton
 				.GetInternalContainer()
 				.HasNode("GroupContextMenu");
 		}
-		
+
 		public AsGroupContextMenu GetMenu()
 		{
-			return ExplorerUtils.Get()._Plugin
+			return Plugin.Singleton
 				.GetInternalContainer()
 				.GetNode("GroupContextMenu") as AsGroupContextMenu;
 		}
-		
+
 		public void CreateMenu()
 		{
-			AsGroupContextMenu menu = new();
+			AsGroupContextMenu menu = new()
+			{
+				Name = "GroupContextMenu"
+			};
 			menu.Initialize();
-			
-			ExplorerUtils.Get()._Plugin 
+
+			Plugin.Singleton
 				.GetInternalContainer()
 				.AddChild(menu);
 		}
 
-		public void ShowMenu( Vector2 coordinates, string path )
+		public void ShowMenu(Vector2 coordinates, string path)
 		{
-			if( ! HasMenu() ) 
+			if (!HasMenu())
 			{
 				CreateMenu();
 			}
-			
-			GetMenu().ShowMenu( coordinates, path );
+
+			GetMenu().ShowMenu(coordinates, path);
 		}
-		
-		public void MaybeHideMenu( Vector2 coordinates )
+
+		public void MaybeHideMenu(Vector2 coordinates)
 		{
-			if (!HasMenu())
+			if (!HasMenu() || true == GetMenu().IsHidden())
 			{
 				return;
 			}
 
-			GetMenu().MaybeHideMenu( coordinates );
+			GetMenu().MaybeHideMenu(coordinates);
 		}
-		
+
 		/*
 		** Initializes the container in the assets tab
 		*/
 		public void InitializeContainer()
 		{
 			Component.Base Components = ExplorerUtils.Get().Components;
-			
-			if( Initialized ) 
+
+			if (Initialized)
 			{
 				// Clear the instances first
 				Components.Clear<Sidebar>();
 				Components.Clear<Editor>();
 				Components.Clear<AssetSnap.Front.Components.Groups.Container>();
 			}
-			
+
 			Initialized = true;
-			
+
 			Container = new()
 			{
 				Name = "GroupBuilder",
@@ -155,32 +174,32 @@ namespace AssetSnap.GroupBuilder
 			};
 
 			/** Add the tab item if settings is turned on **/
-			if ( Components.HasAll( OuterComponents.ToArray() )) 
+			if (Components.HasAll(OuterComponents.ToArray()))
 			{
 				_GroupContainer = Components.Single<AssetSnap.Front.Components.Groups.Container>();
-				
-				if( HasGroupContainer() ) 
+
+				if (HasGroupContainer())
 				{
 					_GroupContainer.Container = Container;
 					_GroupContainer.Initialize();
-			
-					if ( Components.HasAll( InnerComponents.ToArray() )) 
+
+					if (Components.HasAll(InnerComponents.ToArray()))
 					{
 						_Sidebar = Components.Single<Sidebar>();
 						_Editor = Components.Single<Editor>();
-						
-						if( HasSidebar() ) 
+
+						if (HasSidebar())
 						{
 							_Sidebar.Container = _GroupContainer.GetLeftInnerContainer();
 							_Sidebar.Initialize();
 						}
-						
-						if( HasListing() ) 
+
+						if (HasListing())
 						{
 							_Editor.Container = _GroupContainer.GetRightInnerContainer();
 							_Editor.Initialize();
 						}
-						
+
 						StatesUtils.SetLoad("GroupBuilderContainer", true);
 					}
 					else
@@ -188,7 +207,7 @@ namespace AssetSnap.GroupBuilder
 						GD.PushError("Components was not found @ GroupBuilder -> Inner");
 					}
 				}
-				else 
+				else
 				{
 					GD.PushError("Could not spawn group container");
 				}
@@ -197,34 +216,34 @@ namespace AssetSnap.GroupBuilder
 			{
 				GD.PushError("Components was not found @ GroupBuilder -> Outer");
 			}
-		} 
-		
+		}
+
 		public void ClearContainer()
 		{
 			_Sidebar.Clear();
 			_Editor.Clear();
 			_GroupContainer.Clear();
-			
-			if( null != Container ) 
+
+			if (null != Container)
 			{
-				if( null != Container.GetParent() ) 
+				if (null != Container.GetParent())
 				{
 					Container.GetParent().RemoveChild(Container);
 				}
 
 				Container.Free();
 			}
-			else 
+			else
 			{
 				GD.PushError("Invalid container found");
 			}
 		}
-		
+
 		public bool HasSidebar()
 		{
 			return null != _Sidebar;
 		}
-		
+
 		public bool HasListing()
 		{
 			return null != _Editor;

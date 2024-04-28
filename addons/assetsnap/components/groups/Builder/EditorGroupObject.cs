@@ -35,18 +35,18 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		public string Path = "";
 
 		public Vector3 Origin { get; set; }
-		
+
 		public Vector3 ObjectRotation { get; set; }
-		
+
 		public Vector3 ObjectScale { get; set; }
-		
+
 		public Godot.Collections.Dictionary<string, Variant> Options { get; set; }
 
 		/** Components **/
 		private Advanced _GroupBuilderEditorGroupObjectAdvanced;
 		private Actions _GroupBuilderEditorGroupObjectActions;
 		public AdvancedContainer _GroupBuilderEditorGroupObjectAdvancedContainer;
-		
+
 		public Origin _GroupBuilderEditorGroupObjectOrigin;
 		public Scale _GroupBuilderEditorGroupObjectScale;
 		public Rotation _GroupBuilderEditorGroupObjectRotation;
@@ -54,36 +54,36 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		public EditorGroupObject()
 		{
 			Name = "GroupBuilderEditorGroupObject";
-			
+
 			UsingTraits = new()
 			{
+				{ typeof(Labelable).ToString() },
+				{ typeof(Thumbnaileable).ToString() },
 				{ typeof(Containerable).ToString() },
 				{ typeof(Panelable).ToString() },
-				{ typeof(Labelable).ToString() },
-				{ typeof(Spinboxable).ToString() },
-				{ typeof(Buttonable).ToString() },
-				{ typeof(Thumbnaileable).ToString() },
 			};
-			
+
 			//_include = false;
 		}
-		
+
 		public override void Initialize()
 		{
 			base.Initialize();
-		
+
 			Initiated = true;
-			
+
 			_InitializeFields();
 
 			Container RowInnerContainer = Trait<Containerable>()
 				.Select(0)
 				.GetInnerContainer();
-				
+
 			Container RowOuterContainer = Trait<Containerable>()
 				.Select(0)
 				.GetOuterContainer();
-			
+
+			_FinalizeFields();
+
 			_InitializePreviewContainer(FormatPathToFilename(Path), Path.Split("\\")[0], RowInnerContainer);
 
 			_InitializeOriginContainer(RowInnerContainer);
@@ -91,36 +91,35 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			_InitializeScaleContainer(RowInnerContainer);
 			_InitializeActionsContainer(RowInnerContainer);
 			_InitializeAdvancedContainer(RowInnerContainer);
-			
+
 			/** Advanced section of object **/
 			_InitializeAdvancedContainerControl(RowOuterContainer);
-			
-			_FinalizeFields();
+
 		}
-		
-		public string FormatPathToFilename( string path ) 
+
+		public string FormatPathToFilename(string path)
 		{
 			string filename = StringHelper.FilePathToFileName(path).Split("\\")[1];
 
 			return filename;
 		}
-		
-		public string FormatPathToTitle( string path ) 
+
+		public string FormatPathToTitle(string path)
 		{
 			string filename = StringHelper.FilePathToFileName(path).Split("\\")[1];
 			string title = StringHelper.FileNameToTitle(filename);
 
 			return title;
 		}
-		
+
 		private void _InitializeOriginContainer(Container RowInnerContainer)
 		{
 			List<string> Components = new()
 			{
 				"Groups.Builder.GroupObject.Origin"
 			};
-			
-			if (_GlobalExplorer.Components.HasAll( Components.ToArray() )) 
+
+			if (_GlobalExplorer.Components.HasAll(Components.ToArray()))
 			{
 				_GroupBuilderEditorGroupObjectOrigin = GlobalExplorer.GetInstance().Components.Single<Origin>(true);
 				_GroupBuilderEditorGroupObjectOrigin.Container = RowInnerContainer;
@@ -130,15 +129,15 @@ namespace AssetSnap.Front.Components.Groups.Builder
 				_GroupBuilderEditorGroupObjectOrigin.Initialize();
 			}
 		}
-		
+
 		private void _InitializeRotationContainer(Container RowInnerContainer)
 		{
 			List<string> Components = new()
 			{
 				"Groups.Builder.GroupObject.Rotation"
 			};
-			
-			if (_GlobalExplorer.Components.HasAll( Components.ToArray() )) 
+
+			if (_GlobalExplorer.Components.HasAll(Components.ToArray()))
 			{
 				_GroupBuilderEditorGroupObjectRotation = GlobalExplorer.GetInstance().Components.Single<Rotation>(true);
 				_GroupBuilderEditorGroupObjectRotation.Container = RowInnerContainer;
@@ -148,15 +147,15 @@ namespace AssetSnap.Front.Components.Groups.Builder
 				_GroupBuilderEditorGroupObjectRotation.Initialize();
 			}
 		}
-		
+
 		private void _InitializeScaleContainer(Container RowInnerContainer)
 		{
 			List<string> Components = new()
 			{
 				"Groups.Builder.GroupObject.Scale"
 			};
-			
-			if (_GlobalExplorer.Components.HasAll( Components.ToArray() )) 
+
+			if (_GlobalExplorer.Components.HasAll(Components.ToArray()))
 			{
 				_GroupBuilderEditorGroupObjectScale = GlobalExplorer.GetInstance().Components.Single<Scale>(true);
 				_GroupBuilderEditorGroupObjectScale.Container = RowInnerContainer;
@@ -166,15 +165,15 @@ namespace AssetSnap.Front.Components.Groups.Builder
 				_GroupBuilderEditorGroupObjectScale.Initialize();
 			}
 		}
-		
+
 		private void _InitializeActionsContainer(Container RowInnerContainer)
 		{
 			List<string> Components = new()
 			{
 				"Groups.Builder.GroupObject.Actions"
 			};
-			
-			if (_GlobalExplorer.Components.HasAll( Components.ToArray() )) 
+
+			if (_GlobalExplorer.Components.HasAll(Components.ToArray()))
 			{
 				_GroupBuilderEditorGroupObjectActions = GlobalExplorer.GetInstance().Components.Single<Actions>(true);
 				_GroupBuilderEditorGroupObjectActions.Container = RowInnerContainer;
@@ -183,15 +182,15 @@ namespace AssetSnap.Front.Components.Groups.Builder
 				_GroupBuilderEditorGroupObjectActions.Initialize();
 			}
 		}
-		
+
 		private void _InitializeAdvancedContainer(Container RowInnerContainer)
 		{
 			List<string> Components = new()
 			{
 				"Groups.Builder.GroupObject.Advanced"
 			};
-			
-			if (_GlobalExplorer.Components.HasAll( Components.ToArray() )) 
+
+			if (_GlobalExplorer.Components.HasAll(Components.ToArray()))
 			{
 				_GroupBuilderEditorGroupObjectAdvanced = GlobalExplorer.GetInstance().Components.Single<Advanced>(true);
 				_GroupBuilderEditorGroupObjectAdvanced.Container = RowInnerContainer;
@@ -199,42 +198,42 @@ namespace AssetSnap.Front.Components.Groups.Builder
 				_GroupBuilderEditorGroupObjectAdvanced.Initialize();
 			}
 		}
-		
+
 		/*
 		** Initializes model preview image and
 		** it's container
 		**
 		** @return void
 		*/
-		private void _InitializePreviewContainer(string FileName, string FolderPath, Container BoxContainer) 
+		private void _InitializePreviewContainer(string FileName, string FolderPath, Container BoxContainer)
 		{
 			Trait<Thumbnaileable>()
 				.SetName("GroupObjectsPreviewRect")
 				.SetMargin(0, "left")
-				.SetMargin(20, "right")
-				.SetMargin(10, "top")
-				.SetMargin(10, "bottom")
-				.SetFilePath(FolderPath + "/" + FileName )
+				.SetMargin(0, "right")
+				.SetMargin(15, "top")
+				.SetMargin(15, "bottom")
+				.SetFilePath(FolderPath + "/" + FileName)
 				.SetHorizontalSizeFlags(Control.SizeFlags.ShrinkBegin)
 				.SetVerticalSizeFlags(Control.SizeFlags.ShrinkBegin)
 				.SetExpandMode(TextureRect.ExpandModeEnum.FitHeightProportional)
 				.SetStretchMode(TextureRect.StretchModeEnum.KeepAspectCentered)
-				.SetDimensions(75, 75)
+				.SetContainerHorizontalSizeFlag(SizeFlags.ShrinkBegin)
 				.Instantiate()
 				.Select(0)
 				.AddToContainer(
 					BoxContainer
 				);
 		}
-		
-		private void _InitializeAdvancedContainerControl( Container container )
+
+		private void _InitializeAdvancedContainerControl(Container container)
 		{
 			List<string> Components = new()
 			{
 				"Groups.Builder.GroupObject.AdvancedContainer"
 			};
-			
-			if (_GlobalExplorer.Components.HasAll( Components.ToArray() )) 
+
+			if (_GlobalExplorer.Components.HasAll(Components.ToArray()))
 			{
 				_GroupBuilderEditorGroupObjectAdvancedContainer = GlobalExplorer.GetInstance().Components.Single<AdvancedContainer>(true);
 				_GroupBuilderEditorGroupObjectAdvancedContainer.Container = container;
@@ -244,7 +243,7 @@ namespace AssetSnap.Front.Components.Groups.Builder
 				_GroupBuilderEditorGroupObjectAdvancedContainer.Initialize();
 			}
 		}
-		
+
 		private void _InitializeFields()
 		{
 			Trait<Panelable>()
@@ -264,14 +263,15 @@ namespace AssetSnap.Front.Components.Groups.Builder
 				.SetName("IndexLabel")
 				.SetMargin(20, "left")
 				.SetMargin(20, "right")
-				.SetMargin(20, "top")
+				.SetMargin(30, "top")
 				.SetMargin(10, "bottom")
 				.SetText(Index.ToString())
+				.SetContainerHorizontalSizeFlag(SizeFlags.ShrinkBegin)
 				.SetHorizontalSizeFlags(Control.SizeFlags.ShrinkBegin)
 				.SetVerticalSizeFlags(Control.SizeFlags.ShrinkBegin)
 				.Instantiate();
 		}
-		
+
 		private void _FinalizeFields()
 		{
 			Trait<Labelable>()
@@ -282,7 +282,7 @@ namespace AssetSnap.Front.Components.Groups.Builder
 						.GetInnerContainer(),
 					0
 				);
-			
+
 			Trait<Containerable>()
 				.Select(0)
 				.AddToContainer(
@@ -290,7 +290,7 @@ namespace AssetSnap.Front.Components.Groups.Builder
 						.Select(0)
 						.GetNode()
 				);
-				
+
 			Trait<Panelable>()
 				.Select(0)
 				.AddToContainer(this);

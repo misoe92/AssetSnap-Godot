@@ -44,7 +44,6 @@ namespace AssetSnap.Front.Nodes
 		public AsMultiMeshInstance3D()
 		{
 			SetMeta("AsModel", true);
-			GD.Print("SET1");
 			SetMeta("Collision", true);
 		}
 
@@ -61,7 +60,7 @@ namespace AssetSnap.Front.Nodes
 			Collision.RegisterCollisionType(this);
 			await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
 
-			if (null != GetChild(0))
+			if ( GetChildCount() > 0 )
 			{
 				foreach (Node child in GetChildren())
 				{
@@ -69,8 +68,6 @@ namespace AssetSnap.Front.Nodes
 					child.QueueFree();
 				}
 			}
-
-			GD.Print("her::", GetMeta("Collision").As<bool>());
 
 			if (HasMeta("Collision") && GetMeta("Collision").As<bool>() == true)
 			{

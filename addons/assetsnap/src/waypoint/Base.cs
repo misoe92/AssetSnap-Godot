@@ -178,49 +178,52 @@ namespace AssetSnap.Waypoint
 
 			if (model is AsGrouped3D grouped3D)
 			{
-				Godot.Collections.Array<Godot.Collections.Dictionary<string, Variant>> ChildOptions = grouped3D.ChildOptions;
-				Node InitialChild = grouped3D.GetChild(0);
+				_SpawnNode(grouped3D);
+				_ConfigureNode(grouped3D, Origin, Rotation, Scale);
 				grouped3D.OptimizedSpawn = true;
-				List<Vector3> positions = new List<Vector3>();
-				List<Vector3> rotations = new List<Vector3>();
-				List<Vector3> scales = new List<Vector3>();
-				Godot.Collections.Array<Mesh> meshes = new Godot.Collections.Array<Mesh>();
-
 				foreach (Node3D child in grouped3D.GetChildren())
 				{
-					if (InitialChild is AsStaticBody3D)
+					if (child is AsNode3D)
 					{
-						// With collisions
-						AsMeshInstance3D asMeshInstance3D = child.GetChild(0) as AsMeshInstance3D;
-						int InstanceId = _OptimizedSpawn(asMeshInstance3D, Origin + child.Transform.Origin, asMeshInstance3D.RotationDegrees, asMeshInstance3D.Scale);
-						positions.Add(child.Transform.Origin);
-						meshes.Add(asMeshInstance3D.Mesh);
-						rotations.Add(asMeshInstance3D.RotationDegrees);
-						scales.Add(asMeshInstance3D.Scale);
+						foreach( AsMeshInstance3D asMeshInstance3D in child.GetChildren())
+						{
+							int InstanceId = _OptimizedSpawn(asMeshInstance3D, Origin + child.Transform.Origin, asMeshInstance3D.RotationDegrees, asMeshInstance3D.Scale);
+							grouped3D.AddConnection(InstanceId, GlobalExplorer.GetInstance().States.OptimizedGroups[asMeshInstance3D.Mesh], asMeshInstance3D.Mesh);
+						}
 					}
-					else if (InitialChild is AsMeshInstance3D)
+					else if (child is AsMeshInstance3D)
 					{
 						AsMeshInstance3D asMeshInstance3D = child as AsMeshInstance3D;
-						// Without collisions
 						int InstanceId = _OptimizedSpawn(asMeshInstance3D, Origin + asMeshInstance3D.Transform.Origin, asMeshInstance3D.RotationDegrees, asMeshInstance3D.Scale);
-
-						positions.Add(asMeshInstance3D.Transform.Origin);
-						meshes.Add(asMeshInstance3D.Mesh);
-						rotations.Add(asMeshInstance3D.RotationDegrees);
-						scales.Add(asMeshInstance3D.Scale);
 
 						grouped3D.AddConnection(InstanceId, GlobalExplorer.GetInstance().States.OptimizedGroups[asMeshInstance3D.Mesh], asMeshInstance3D.Mesh);
 					}
 				}
 
 				grouped3D.Clear();
-				_SpawnNode(grouped3D);
-				_ConfigureNode(grouped3D, Origin, Rotation, Scale);
+				grouped3D.Update();
 			}
 		}
 
 		private int _OptimizedSpawn(AsMeshInstance3D meshInstance3D, Vector3 Origin, Vector3 Rotation, Vector3 Scale)
 		{
+			Node3D AsChunks = null;
+			
+			if( false == Plugin.Singleton.GetTree().EditedSceneRoot.HasNode("AsChunks") ) 
+			{
+				AsChunks = new()
+				{
+					Name = "AsChunks"
+				};
+				Plugin.Singleton.GetTree().EditedSceneRoot.AddChild(AsChunks);
+				AsChunks.Owner = Plugin.Singleton.GetTree().EditedSceneRoot;
+				Plugin.Singleton.GetTree().EditedSceneRoot.MoveChild(AsChunks, 0);
+}
+			else 
+			{
+				AsChunks = Plugin.Singleton.GetTree().EditedSceneRoot.GetNode("AsChunks") as Node3D;
+			}
+			
 			int InstanceId = 0;
 			Transform3D transform = meshInstance3D.GlobalTransform;
 			Mesh mesh = meshInstance3D.Mesh;
@@ -257,9 +260,11 @@ namespace AssetSnap.Waypoint
 					Object = mesh,
 				};
 
+				_ParentContainer = AsChunks;
 				_SpawnNode(group);
+				_ParentContainer = null;
 				InstanceId = group.AddToBuffer(transform);
-				GlobalExplorer.GetInstance().States.OptimizedGroups[mesh].Update();
+				StatesUtils.Get().OptimizedGroups[mesh].Update();
 			}
 
 			return InstanceId;
@@ -392,6 +397,15 @@ namespace AssetSnap.Waypoint
 					for (int i = 0; i < _model.GetChildCount(); i++)
 					{
 						_model.GetChild(i).Owner = Tree.EditedSceneRoot;
+						
+						if( 
+							_model.GetChild(i) is Node3D node3d &&
+							_model.GetChild(i).GetChildCount() > 0 && 
+							EditorPlugin.IsInstanceValid(_model.GetChild(i).GetChild(0))
+						) 
+						{
+							_model.GetChild(i).GetChild(0).Owner = Tree.EditedSceneRoot;
+						}
 					}
 				}
 			}
@@ -436,7 +450,7 @@ namespace AssetSnap.Waypoint
 		{
 			Transform3D _Trans = _model.Transform;
 			_Trans.Origin = Origin;
-
+			GD.Print(Origin, _model);
 			_model.Transform = _Trans;
 			_model.RotationDegrees = Rotation;
 			_model.Scale = Scale;

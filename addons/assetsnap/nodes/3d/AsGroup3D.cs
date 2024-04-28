@@ -726,7 +726,7 @@ public partial class AsGroup3D : Node3D
 			if (IsInstanceValid(child))
 			{
 				RemoveChild(child);
-				child.QueueFree();
+				child.Free();
 			}
 		}
 	}

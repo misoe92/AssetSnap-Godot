@@ -288,6 +288,13 @@ namespace AssetSnap.Component
 			return this;
 		}
 
+		public override Labelable SetContainerHorizontalSizeFlag(Control.SizeFlags flag)
+		{
+			base.SetContainerHorizontalSizeFlag(flag);
+
+			return this;
+		}
+
 
 		/*
 		** Sets the alignment for the text

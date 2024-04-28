@@ -77,7 +77,6 @@ public partial class AsScatterModifier3D : AsGroup3D
 		set
 		{
 			_Duplicates = value;
-			GD.Print(_Duplicates is AsMeshInstance3D);
 		}
 	}
 

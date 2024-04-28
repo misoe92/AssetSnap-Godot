@@ -23,51 +23,55 @@
 namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 {
 	using AssetSnap.Component;
+	using AssetSnap.Explorer;
 	using Godot;
 
 	[Tool]
 	public partial class Rotation : GroupObjectComponent
 	{
 		public EditorGroupObject Parent;
-		
+
 		public Rotation()
 		{
 			Name = "GroupsBuilderGroupObjectRotation";
-		
+
 			UsingTraits = new()
 			{
-				{ typeof(Containerable).ToString() },
 				{ typeof(Spinboxable).ToString() },
 				{ typeof(Labelable).ToString() },
+				{ typeof(Containerable).ToString() },
 			};
+
+			SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+			SizeFlagsVertical = Control.SizeFlags.ExpandFill;
 		}
-		
-		public double GetValue( int index ) 
+
+		public double GetValue(int index)
 		{
 			return Trait<Spinboxable>()
 				.Select(index)
 				.GetValue();
 		}
-		
+
 		protected override void _InitializeFields()
 		{
-			if( Parent == null ) 
+			if (Parent == null)
 			{
 				GD.PushError("No parent found @ Object Rotation");
 				return;
 			}
-			
+
 			Trait<Containerable>()
 				.SetName("GroupObjectRotation")
 				.SetMargin(15, "left")
 				.SetMargin(15, "right")
-				.SetHorizontalSizeFlags(Control.SizeFlags.ShrinkBegin)
+				.SetHorizontalSizeFlags(Control.SizeFlags.ExpandFill)
 				.SetVerticalSizeFlags(Control.SizeFlags.ExpandFill)
 				.SetOrientation(Containerable.ContainerOrientation.Horizontal)
 				.SetInnerOrientation(Containerable.ContainerOrientation.Vertical)
 				.SetDimensions(75, 0)
 				.Instantiate();
-				
+
 			Trait<Labelable>()
 				.SetMargin(0)
 				.SetMargin(10, "top")
@@ -76,7 +80,7 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 				.SetType(Labelable.TitleType.HeaderSmall)
 				.SetText("Rotation")
 				.Instantiate();
-		
+
 			// X
 			Trait<Labelable>()
 				.SetMargin(0)
@@ -84,22 +88,22 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 				.SetType(Labelable.TitleType.HeaderSmall)
 				.SetText("X")
 				.Instantiate();
-				
+
 			Trait<Spinboxable>()
 				.SetName("GroupObjectsRotationXValue")
 				.SetValue(Parent.ObjectRotation.X)
 				.SetStep(0.1f)
 				.SetMinValue(0.0f)
 				.SetMaxValue(360.0f)
-				.SetAction( Callable.From( (double value) => { _OnValueChange(); } ) )
+				.SetAction(Callable.From((double value) => { _OnValueChange(); }))
 				.Instantiate();
-			
+
 			Trait<Spinboxable>()
 				.Select(0)
 				.GetNode<SpinBox>()
 				.GetLineEdit()
 				.AddThemeConstantOverride("minimum_character_width", 3);
-			
+
 			// Y
 			Trait<Labelable>()
 				.SetMargin(0)
@@ -107,22 +111,22 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 				.SetType(Labelable.TitleType.HeaderSmall)
 				.SetText("Y")
 				.Instantiate();
-				
+
 			Trait<Spinboxable>()
 				.SetName("GroupObjectsRotationYValue")
 				.SetValue(Parent.ObjectRotation.Y)
 				.SetStep(0.1f)
 				.SetMinValue(0.0f)
 				.SetMaxValue(360.0f)
-				.SetAction( Callable.From( (double value) => { _OnValueChange(); } ) )
+				.SetAction(Callable.From((double value) => { _OnValueChange(); }))
 				.Instantiate();
-			
+
 			Trait<Spinboxable>()
 				.Select(1)
 				.GetNode<SpinBox>()
 				.GetLineEdit()
 				.AddThemeConstantOverride("minimum_character_width", 3);
-			
+
 			// Z
 			Trait<Labelable>()
 				.SetMargin(0)
@@ -130,23 +134,23 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 				.SetType(Labelable.TitleType.HeaderSmall)
 				.SetText("Z")
 				.Instantiate();
-				
+
 			Trait<Spinboxable>()
 				.SetName("GroupObjectsRotationZValue")
 				.SetValue(Parent.ObjectRotation.Z)
 				.SetStep(0.1f)
 				.SetMinValue(0.0f)
 				.SetMaxValue(360.0f)
-				.SetAction( Callable.From( (double value) => { _OnValueChange(); } ) )
+				.SetAction(Callable.From((double value) => { _OnValueChange(); }))
 				.Instantiate();
-			
+
 			Trait<Spinboxable>()
 				.Select(2)
 				.GetNode<SpinBox>()
 				.GetLineEdit()
 				.AddThemeConstantOverride("minimum_character_width", 3);
 		}
-		
+
 		protected override void _FinalizeFields()
 		{
 			Trait<Labelable>()
@@ -156,7 +160,7 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 						.Select(0)
 						.GetInnerContainer()
 				);
-				
+
 			Trait<Spinboxable>()
 				.Select(0)
 				.AddToContainer(
@@ -164,7 +168,7 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 						.Select(0)
 						.GetInnerContainer()
 				);
-				
+
 			Trait<Labelable>()
 				.Select(2)
 				.AddToContainer(
@@ -172,7 +176,7 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 						.Select(0)
 						.GetInnerContainer()
 				);
-				
+
 			Trait<Spinboxable>()
 				.Select(1)
 				.AddToContainer(
@@ -180,7 +184,7 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 						.Select(0)
 						.GetInnerContainer()
 				);
-				
+
 			Trait<Labelable>()
 				.Select(3)
 				.AddToContainer(
@@ -188,7 +192,7 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 						.Select(0)
 						.GetInnerContainer()
 				);
-				
+
 			Trait<Spinboxable>()
 				.Select(2)
 				.AddToContainer(
@@ -196,7 +200,7 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 						.Select(0)
 						.GetInnerContainer()
 				);
-				
+
 			Trait<Labelable>()
 				.Select(0)
 				.AddToContainer(
@@ -205,26 +209,26 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 						.GetOuterContainer(),
 					0
 				);
-			
+
 			Trait<Containerable>()
 				.Select(0)
 				.AddToContainer(
 					this
 				);
 		}
-		
+
 		private void _OnValueChange()
 		{
 			Scale Scale = Parent._GroupBuilderEditorGroupObjectScale;
 			Origin Origin = Parent._GroupBuilderEditorGroupObjectOrigin;
-			
-			GlobalExplorer.GetInstance().GroupBuilder._Editor.UpdateMeshInGroup(
+
+			ExplorerUtils.Get().GroupBuilder._Editor.UpdateMeshInGroup(
 				Index,
 				new Vector3((float)Origin.GetValue(0), (float)Origin.GetValue(1), (float)Origin.GetValue(2)),
 				new Vector3((float)GetValue(0), (float)GetValue(1), (float)GetValue(2)),
 				new Vector3((float)Scale.GetValue(0), (float)Scale.GetValue(1), (float)Scale.GetValue(2))
 			);
-			
+
 			_TriggerGroupedUpdate();
 		}
 	}

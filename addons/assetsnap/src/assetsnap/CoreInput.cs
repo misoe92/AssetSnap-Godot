@@ -20,28 +20,28 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace AssetSnap.Core 
+namespace AssetSnap.Core
 {
 	using AssetSnap.Front.Nodes;
 	using Godot;
-	public class CoreInput : Core 
+	public class CoreInput : Core
 	{
 		private EventMouse _MouseEvent = EventMouse.EventNone;
-		
+
 		/*
 		** Handle GUI input events
 		*/
 		public int Handle(Camera3D Camera, InputEvent @event)
 		{
-			if( null == _GlobalExplorer )
+			if (null == _GlobalExplorer)
 			{
 				return (int)EditorPlugin.AfterGuiInput.Pass;
 			}
 
 			// If no handle is currently set
-			if( false == HasHandle() ) 
+			if (false == HasHandle())
 			{
-				if( ScrollAllowed() == GlobalExplorer.ScrollState.SCROLL_DISABLED ) 
+				if (ScrollAllowed() == GlobalExplorer.ScrollState.SCROLL_DISABLED)
 				{
 					_GlobalExplorer.AllowScroll = GlobalExplorer.ScrollState.SCROLL_ENABLED;
 					return (int)EditorPlugin.AfterGuiInput.Stop;
@@ -51,11 +51,12 @@ namespace AssetSnap.Core
 					return (int)EditorPlugin.AfterGuiInput.Pass;
 				}
 			}
-			
-			if( 
+
+			if (
 				_GlobalExplorer.GetHandle() is AsMeshInstance3D meshInstance3D && meshInstance3D.IsPlaced() ||
-				_GlobalExplorer.GetHandle() is AsGrouped3D grouped3D && grouped3D.IsPlaced()
-			) 
+				_GlobalExplorer.GetHandle() is AsGrouped3D grouped3D && grouped3D.IsPlaced() ||
+				_GlobalExplorer.GetHandle() is AsNode3D node3D && node3D.IsPlaced()
+			)
 			{
 				return (int)EditorPlugin.AfterGuiInput.Pass;
 			}
@@ -65,8 +66,8 @@ namespace AssetSnap.Core
 
 			// Run the input driver, depending on wheather it's drag or normal
 			_GlobalExplorer.InputDriver._Input(Camera, @event);
-			
-			if( ScrollAllowed() == GlobalExplorer.ScrollState.SCROLL_DISABLED ) 
+
+			if (ScrollAllowed() == GlobalExplorer.ScrollState.SCROLL_DISABLED)
 			{
 				_GlobalExplorer.AllowScroll = GlobalExplorer.ScrollState.SCROLL_ENABLED;
 				return (int)EditorPlugin.AfterGuiInput.Stop;
@@ -76,7 +77,7 @@ namespace AssetSnap.Core
 				return (int)EditorPlugin.AfterGuiInput.Pass;
 			}
 		}
-		
+
 		/*
 		** Projects origin and normals from the camera, given the event
 		** position.
@@ -87,9 +88,9 @@ namespace AssetSnap.Core
 		*/
 		private void MaybeProjectFromCamera(Camera3D Camera, InputEvent @event)
 		{
-			if( @event is InputEventMouseMotion _MotionEvent ) 
+			if (@event is InputEventMouseMotion _MotionEvent)
 			{
-				if( _GlobalExplorer._CurrentMouseInput != EventMouse.EventClick) 
+				if (_GlobalExplorer._CurrentMouseInput != EventMouse.EventClick)
 				{
 					_GlobalExplorer.ProjectRayOrigin = Camera.ProjectRayOrigin(_MotionEvent.Position);
 					_GlobalExplorer.ProjectRayNormal = Camera.ProjectRayNormal(_MotionEvent.Position);
@@ -97,7 +98,7 @@ namespace AssetSnap.Core
 				}
 			}
 		}
-		
+
 		/*
 		** Checks if dragging is currently enabled
 		**
@@ -106,15 +107,15 @@ namespace AssetSnap.Core
 		public bool ShouldDrag()
 		{
 			bool value = _GlobalExplorer.Settings.GetKey("allow_drag_add").As<bool>();
-			
-			if( value is bool valueBool ) 
+
+			if (value is bool valueBool)
 			{
 				return valueBool;
 			}
 
 			return false;
 		}
-		
+
 		/*
 		** Checks if scroll is disallowed
 		**
@@ -124,7 +125,7 @@ namespace AssetSnap.Core
 		{
 			return _GlobalExplorer.AllowScroll;
 		}
-		
+
 		/*
 		** Checks if we have a handle, and if its valid
 		**
@@ -133,9 +134,9 @@ namespace AssetSnap.Core
 		public bool HasHandle()
 		{
 			Node NodeHandle = _GlobalExplorer.GetHandle();
-			return null != NodeHandle; 
+			return null != NodeHandle;
 		}
-		
+
 		/*
 		** Sets the mouse event that are currently 
 		** being used
@@ -143,11 +144,11 @@ namespace AssetSnap.Core
 		** @param EventMouse value
 		** @return void
 		*/
-		public void SetMouseEvent( EventMouse value )
+		public void SetMouseEvent(EventMouse value)
 		{
 			_MouseEvent = value;
 		}
-		
+
 		/*
 		** Fetches the current mouse event
 		**

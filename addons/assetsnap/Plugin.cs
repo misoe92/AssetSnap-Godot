@@ -221,6 +221,19 @@ namespace AssetSnap
 		public override void _ExitTree()
 		{
 			disposed = true;
+			
+			/** Initialize custom node types **/  
+			new ASNode.Types.AsNodeType().Dispose( this );
+			new ASNode.Types.AsGroupType().Dispose( this );
+			new ASNode.Types.AsGroupedType().Dispose( this );
+			new ASNode.Types.AsArrayModifierType().Dispose( this );
+			new ASNode.Types.AsScatterModifierType().Dispose( this );
+			new ASNode.Types.AsStaticBodyType().Dispose( this );
+			new ASNode.Types.AsListSelectType().Dispose( this );
+			new ASNode.Types.AsMeshInstanceType().Dispose( this );
+			new ASNode.Types.AsMultiMeshInstanceType().Dispose( this );
+			new ASNode.Types.AsOptimizedMultiMeshGroupType().Dispose( this );
+			new ASNode.Types.AsMultiMeshType().Dispose( this );
 
 			foreach (GodotObject _object in traitGlobal.DisposeQueue)
 			{

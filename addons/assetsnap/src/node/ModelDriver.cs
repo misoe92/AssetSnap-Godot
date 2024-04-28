@@ -3,6 +3,7 @@ namespace AssetSnap.Nodes
 	using AssetSnap.Front.Nodes;
 	using Godot;
 
+	[Tool]
 	public class ModelDriver
 	{
 		public enum ModelTypes 

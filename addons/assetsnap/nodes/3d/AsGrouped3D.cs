@@ -20,9 +20,13 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using System;
 using System.Collections.Generic;
-using AssetSnap;
+using AssetSnap.Explorer;
 using AssetSnap.Front.Nodes;
+using AssetSnap.Nodes;
+using AssetSnap.States;
+using AssetSnap.Static;
 using Godot;
 
 [Tool]
@@ -31,161 +35,173 @@ public partial class AsGrouped3D : AsGroup3D
 
 	private List<GroupedConnection> Connections = new();
 
+	private string _GroupPath = "";
+	private int _SnapLayer = 0;
+	private float _ObjectOffsetX = 0.0f;
+	private float _ObjectOffsetZ = 0.0f;	
+	private float _SnapHeightValue = 0.0f;	
+	private float _SnapXValue = 0.0f;
+	private float _SnapZValue = 0.0f;
+	private float _DistanceToTop = 0.0f;
+	private float _DistanceToBottom = 0.0f;
+	private float _DistanceToLeft = 0.0f;
+	private float _DistanceToRight = 0.0f;
+	private bool _OptimizedSpawn = false;
+	private bool _SphereCollision = false;
+	private bool _ConvexCollision = false;
+	private bool _ConvexClean = false;
+	private bool _ConvexSimplify = false;
+	private bool _ConcaveCollision = false;
+	private bool _SnapToObject = false;
+	private bool _SnapToHeight = false;
+	private bool _SnapToX = false;
+	private bool _SnapToZ = false;
+	private Godot.Collections.Array<Godot.Collections.Dictionary<string, Variant>> _ChildOptions = new();
 
 	[Export]
-	public string GroupPath { get; set; } = "";
+	public string GroupPath { get => _GroupPath; set { _GroupPath = value; } }
 
 	[Export]
-	public int SnapLayer { get; set; } = 0;
-	
-	[Export]
-	public float ObjectOffsetX { get; set; } = 0.0f;
-	
-	[Export]
-	public float ObjectOffsetZ { get; set; } = 0.0f;
-	
-	[Export]
-	public float SnapHeightValue { get; set; } = 0.0f;
-	
-	[Export]
-	public float SnapXValue { get; set; } = 0.0f;
-	
-	[Export]
-	public float SnapZValue { get; set; } = 0.0f;
+	public int SnapLayer { get => _SnapLayer; set { _SnapLayer = value; Update(); } }
 
 	[Export]
-	public bool OptimizedSpawn { get; set; } = false;
-	
-	[Export]
-	public bool SphereCollision { get; set; } = false;
-	
-	[Export]
-	public bool ConvexCollision { get; set; } = false;
-	
-	[Export]
-	public bool ConvexClean { get; set; } = false;
-	
-	[Export]
-	public bool ConvexSimplify { get; set; } = false;
-	
-	[Export]
-	public bool ConcaveCollision { get; set; } = false;
-	
-	[Export]
-	public bool SnapToObject { get; set; } = false;
-	
-	[Export]
-	public bool SnapToHeight { get; set; } = false;
-	
-	[Export]
-	public bool SnapToX { get; set; } = false;
-	
-	[Export]
-	public bool SnapToZ { get; set; } = false;
+	public float ObjectOffsetX { get => _ObjectOffsetX; set { _ObjectOffsetX = value; } }
 
 	[Export]
-	public float DistanceToTop { get; set; } = 0;
+	public float ObjectOffsetZ { get => _ObjectOffsetZ; set { _ObjectOffsetZ = value; } }
+
+	[Export]
+	public float SnapHeightValue { get => _SnapHeightValue; set { _SnapHeightValue = value; } }
+
+	[Export]
+	public float SnapXValue { get => _SnapXValue; set { _SnapXValue = value; } }
+
+	[Export]
+	public float SnapZValue { get => _SnapZValue; set { _SnapZValue = value; } }
 	
 	[Export]
-	public float DistanceToBottom { get; set; } = 0;
-	
+	public float DistanceToTop { get => _DistanceToTop; set { _DistanceToTop = value; } }
+
 	[Export]
-	public float DistanceToLeft { get; set; } = 0;
-	
+	public float DistanceToBottom { get => _DistanceToBottom; set { _DistanceToBottom = value; } }
+
 	[Export]
-	public float DistanceToRight { get; set; } = 0;
-	
+	public float DistanceToLeft { get => _DistanceToLeft; set { _DistanceToLeft = value; } }
+
 	[Export]
-	public Godot.Collections.Array<Godot.Collections.Dictionary<string, Variant>> ChildOptions = new();
+	public float DistanceToRight { get => _DistanceToRight; set { _DistanceToRight = value; } }
+
+	[Export]
+	public bool OptimizedSpawn { get => _OptimizedSpawn; set { _OptimizedSpawn = value; } }
+
+	[Export]
+	public bool SphereCollision { get => _SphereCollision; set { _SphereCollision = value; Update(); } }
+
+	[Export]
+	public bool ConvexCollision { get => _ConvexCollision; set { _ConvexCollision = value; Update(); } }
+
+	[Export]
+	public bool ConvexClean { get => _ConvexClean; set { _ConvexClean = value; Update(); } }
+
+	[Export]
+	public bool ConvexSimplify { get => _ConvexSimplify; set { _ConvexSimplify = value; Update(); } }
+
+	[Export]
+	public bool ConcaveCollision { get => _ConcaveCollision; set { _ConcaveCollision = value; Update(); } }
+
+	[Export]
+	public bool SnapToObject { get => _SnapToObject; set { _SnapToObject = value; } }
+
+	[Export]
+	public bool SnapToHeight { get => _SnapToHeight; set { _SnapToHeight = value; } }
+
+	[Export]
+	public bool SnapToX { get => _SnapToX; set { _SnapToX = value; } }
+
+	[Export]
+	public bool SnapToZ { get => _SnapToZ; set { _SnapToZ = value; } }
+
+	[Export]
+	public Godot.Collections.Array<Godot.Collections.Dictionary<string, Variant>> ChildOptions { get => _ChildOptions; set { _ChildOptions = value; } }
 
 	public override void _EnterTree()
 	{
 		GroupResource resource = GD.Load<Resource>(GroupPath) as GroupResource;
-		GlobalExplorer explorer = GlobalExplorer.GetInstance();
-		
-		if( explorer.States.GroupedObjects.ContainsKey(GroupPath) ) 
+		if (StatesUtils.Get().GroupedObjects.ContainsKey(GroupPath))
 		{
-			GlobalExplorer.GetInstance().States.GroupedObjects[GroupPath].Add(this);
+			StatesUtils.Get().GroupedObjects[GroupPath].Add(this);
 		}
-		else 
+		else
 		{
-			GlobalExplorer.GetInstance().States.GroupedObjects.Add(GroupPath, new() { this });	
+			StatesUtils.Get().GroupedObjects.Add(GroupPath, new() { this });
 		}
-		
-		if( OptimizedSpawn ) 
+
+		if (OptimizedSpawn)
 		{
 			// Since we dont have AsMeshInstances to provide the usual snapping. We will have to use
 			// position data from our paths.
-			for( int i = 0; i < resource._Origins.Count; i++ ) 
+			for (int i = 0; i < resource._Origins.Count; i++)
 			{
-				GlobalExplorer.GetInstance().Waypoints.Register(this, resource._Origins[i], resource._Rotations[i], resource._Scales[i]);
+				ExplorerUtils.Get().Waypoints.Register(this, resource._Origins[i], resource._Rotations[i], resource._Scales[i]);
 			}
 		}
-		
+
 		base._EnterTree();
 	}
-	
+
 	public Aabb GetAabb()
 	{
-		GroupResource resource = GD.Load<Resource>(GroupPath) as GroupResource;
-
-		Godot.Collections.Array<string> meshPaths = resource._Paths;
-		Godot.Collections.Dictionary<int, Vector3> OgOrigins = resource._Origins;
-		Godot.Collections.Array<Mesh> meshes = new();
-		Godot.Collections.Array<Vector3> origins = new();
-		
-		for( int i = 0; i < meshPaths.Count; i++ ) 
-		{
-			meshes.Add(GD.Load<Mesh>(meshPaths[i]));
-			origins.Add(OgOrigins[i]);
-		}
-
-		Aabb aabb = AabbUtils.CalculateCombinedAABB(origins, meshes);
-		
-		return aabb;
+		return NodeUtils.CalculateNodeAabb(this);
 	}
-	
+
 	/*
 	** Will reload the group data and re draw the local space of the node 
 	**
 	** @returns void
-	*/ 
+	*/
 	public void Update()
 	{
+		if( null == GetParent() || GetParent().Name == "Decal") 
+		{
+			return;
+		}
+
 		GroupResource resource = GD.Load<Resource>(GroupPath) as GroupResource;
 
-		if( false == OptimizedSpawn ) 
+		if (false == OptimizedSpawn)
 		{
 			ClearCurrentChildren();
-			
-			if( ShouldAddCollision() ) 
-			{
-				resource.AddCollidingChildren(this, ChildOptions);
-			}
-			else
-			{
-				resource.AddChildren(this, ChildOptions);
-			}
+			resource.AddChildren(this, ChildOptions);
 		}
-		else 
+		else
 		{
 			ClearCurrentChildren();
-
-			List<Vector3> origins = new();
-			List<Vector3> rotations = new();
-			List<Vector3> scales = new();
-			Godot.Collections.Array<Mesh> meshes = new();
-
+			int Instanced = 0;
 			for (int i = 0; i < Connections.Count; i++)
 			{
 				GroupedConnection connection = Connections[i];
+				int index = 0;
+				
+				foreach( string path in resource._Paths )
+				{
+					if( path == connection.InstanceMesh.ResourcePath ) 
+					{
+						break;
+					}
+					index += 1;
+				}
+				
+				if( connection.InstanceId != 0 ) 
+				{
+					Instanced += 1;
+				}
 
-				Transform3D transform = Transform3D.Identity;
-				transform.Scaled(resource._Scales[i]);
+				Transform3D transform = new Transform3D(Basis.Identity, Vector3.Zero);
+				transform.Scaled(resource._Scales[index]);
 				// Convert the rotation from degrees to radians
-				float rotationRadiansX = Mathf.DegToRad(resource._Rotations[i].X);
-				float rotationRadiansY = Mathf.DegToRad(resource._Rotations[i].Y);
-				float rotationRadiansZ = Mathf.DegToRad(resource._Rotations[i].Z);
+				float rotationRadiansX = Mathf.DegToRad(resource._Rotations[index].X);
+				float rotationRadiansY = Mathf.DegToRad(resource._Rotations[index].Y);
+				float rotationRadiansZ = Mathf.DegToRad(resource._Rotations[index].Z);
 
 				// Create a rotation basis around each axis
 				Basis rotationBasisX = Basis.Identity.Rotated(Vector3.Right, rotationRadiansX);
@@ -197,21 +213,15 @@ public partial class AsGrouped3D : AsGroup3D
 
 				// Assuming you have a transform called transform
 				transform.Basis = finalRotation;
-				transform.Origin = Transform.Origin + new Vector3(resource._Origins[i].X, resource._Origins[i].Y, resource._Origins[i].Z);
-				
-				connection.Update( transform );
-				connection.UpdateUsing( transform, ChildOptions[i] );
-				meshes.Add(connection.InstanceMesh);
-				origins.Add(resource._Origins[i]);
-				rotations.Add(resource._Rotations[i]);
-				scales.Add(resource._Scales[i]);
-			}
+				transform.Origin = Transform.Origin + new Vector3(resource._Origins[index].X, resource._Origins[index].Y, resource._Origins[index].Z);
 
-			AddMultiCollisions(origins, scales, rotations, meshes, this, ChildOptions);
+				connection.Update(transform);
+				connection.UpdateUsing(transform, ChildOptions[index]);
+			}
 		}
 	}
-	
-	public void AddConnection( int id, AsOptimizedMultiMeshGroup3D optimizedMeshGroup, Mesh mesh )
+
+	public void AddConnection(int id, AsOptimizedMultiMeshGroup3D optimizedMeshGroup, Mesh mesh)
 	{
 		Connections.Add(
 			new OptimizedMultiMeshConnection()
@@ -224,137 +234,34 @@ public partial class AsGrouped3D : AsGroup3D
 		);
 	}
 
-	public void AddMultiCollisions(List<Vector3> _Positions, List<Vector3> _Scales, List<Vector3> _Rotations, Godot.Collections.Array<Mesh> _Meshes, AsGrouped3D grouped3D, Godot.Collections.Array<Godot.Collections.Dictionary<string, Variant>> ChildOptions )
-	{
-		Node _SceneRoot = GlobalExplorer.GetInstance()._Plugin.GetTree().EditedSceneRoot;
-
-		for (int i = 0; i < _Positions.Count; i++)
-		{
-			Vector3 _Pos = _Positions[i];
-			Transform3D _Trans = Transform3D.Identity;
-			_Trans.Origin = new Vector3(_Pos.X, _Pos.Y, _Pos.Z);
-			AsStaticBody3D _Body = new()
-			{
-				Transform = _Trans,
-				UsingMultiMesh = true,
-				// Mesh = _Meshes[i],
-				// MeshName = _Meshes[i].ResourceName,
-				// InstanceTransform = _Trans,
-				// InstanceScale = _Scales[i],
-				// InstanceRotation = _Rotations[i],
-			};
-
-			grouped3D.AddChild(_Body);
-			_Body.Owner = _SceneRoot;
-
-			int typeState = 0;
-			int argState = 0;
-
-			bool IsChildConvex = ChildOptions[i].ContainsKey("ConvexCollision") ? ChildOptions[i]["ConvexCollision"].As<bool>() : false;
-			bool IsChildConvexClean = ChildOptions[i].ContainsKey("ConvexClean") ? ChildOptions[i]["ConvexClean"].As<bool>() : false;
-			bool IsChildConvexSimplify = ChildOptions[i].ContainsKey("ConvexSimplify") ? ChildOptions[i]["ConvexSimplify"].As<bool>() : false;
-			bool IsChildConcave = ChildOptions[i].ContainsKey("ConcaveCollision") ? ChildOptions[i]["ConcaveCollision"].As<bool>() : false;
-			bool IsChildSphere = ChildOptions[i].ContainsKey("SphereCollision") ? ChildOptions[i]["SphereCollision"].As<bool>() : false;
-
-			if (
-				true == grouped3D.ConvexCollision &&
-				false == IsChildConvex &&
-				false == IsChildConcave &&
-				false == IsChildSphere ||
-				true == IsChildConvex	
-			) 
-			{
-				typeState = 1;
-				
-				if(
-					true == grouped3D.ConvexClean &&
-					false == grouped3D.ConvexSimplify &&
-					false == IsChildConvex ||
-					true == IsChildConvexClean &&
-					true == IsChildConvexSimplify
-				) 
-				{
-					argState = 1;	
-				}
-				else if( 
-					false == grouped3D.ConvexClean &&
-					true == grouped3D.ConvexSimplify &&
-					false == IsChildConvex ||
-					false == IsChildConvexClean &&
-					true == IsChildConvexSimplify
-				) 
-				{
-					argState = 2;	
-				}
-				else if( 
-					true == grouped3D.ConvexClean &&
-					true == grouped3D.ConvexSimplify &&
-					false == IsChildConvex ||
-					true == IsChildConvexClean &&
-					true == IsChildConvexSimplify
-				) 
-				{
-					argState = 3;	
-				}
-			}
-			else if( 
-				true == grouped3D.ConcaveCollision &&
-				false == IsChildConvex &&
-				false == IsChildConcave &&
-				false == IsChildSphere ||
-				true == IsChildConcave	
-			) 
-			{
-				typeState = 2;
-			}
-			else if(
-				true == grouped3D.SphereCollision &&
-				false == IsChildConvex &&
-				false == IsChildConcave &&
-				false == IsChildSphere ||
-				true == IsChildSphere	
-			) 
-			{
-				typeState = 3;
-			}
-
-			_Body.Initialize();
-		}
-	}
-	
 	public void Clear()
 	{
 		ClearCurrentChildren();
 	}
-	
+
 	public bool IsPlaced()
 	{
 		return GetParent() != null && GetParent().Name != "AsDecal";
 	}
-	
+
 	private bool ShouldAddCollision()
 	{
-		GlobalExplorer _GlobalExplorer = GlobalExplorer.GetInstance();
-		bool AddCollisions = _GlobalExplorer.Settings.GetKey("add_collisions").As<bool>();
-
-		return AddCollisions;
+		return SettingsStatic.ShouldAddCollision();
 	}
-	
+
 	public override void _ExitTree()
 	{
-		GlobalExplorer explorer = GlobalExplorer.GetInstance();
-		
-		if( explorer.States.GroupedObjects.ContainsKey(GroupPath) ) 
+		if (StatesUtils.Get().GroupedObjects.ContainsKey(GroupPath))
 		{
-			GlobalExplorer.GetInstance().States.GroupedObjects[GroupPath].Remove(this);
-			
-			if( GlobalExplorer.GetInstance().States.GroupedObjects[GroupPath].Count == 0 ) 
+			StatesUtils.Get().GroupedObjects[GroupPath].Remove(this);
+
+			if (StatesUtils.Get().GroupedObjects[GroupPath].Count == 0)
 			{
-				GlobalExplorer.GetInstance().States.GroupedObjects.Remove(GroupPath);
+				StatesUtils.Get().GroupedObjects.Remove(GroupPath);
 			}
 		}
 
 		base._EnterTree();
 	}
-	
+
 }

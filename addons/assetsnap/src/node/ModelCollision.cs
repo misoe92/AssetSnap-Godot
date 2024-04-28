@@ -4,6 +4,7 @@ namespace AssetSnap.Nodes
 	using AssetSnap.States;
 	using Godot;
 
+	[Tool]
 	public class ModelCollision
 	{
 		public enum State
@@ -130,7 +131,6 @@ namespace AssetSnap.Nodes
 		*/
 		private Type _CalculateCollisionType()
 		{
-			GD.Print(StatesUtils.Get().ConcaveCollision);
 			if (StatesUtils.Get().ConvexCollision == GlobalStates.LibraryStateEnum.Enabled)
 			{
 				return Type.Convex;

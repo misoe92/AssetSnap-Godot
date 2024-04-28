@@ -145,7 +145,6 @@ namespace AssetSnap.Front.Components.Library
 		public void Update()
 		{
 			// _Library.RemoveAllPanelState();
-			GD.Print(Trait<Containerable>().Select(1).GetInnerContainer().Name);
 			foreach (HBoxContainer child in Trait<Containerable>().Select(1).GetInnerContainer().GetChildren())
 			{
 				if (IsInstanceValid(child))

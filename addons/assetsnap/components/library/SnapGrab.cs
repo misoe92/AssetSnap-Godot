@@ -25,103 +25,119 @@ namespace AssetSnap.Front.Components.Library
 	using Godot;
 	using AssetSnap.Component;
 	using AssetSnap.Front.Nodes;
-    using AssetSnap.Explorer;
+	using AssetSnap.Explorer;
+	using AssetSnap.States;
 
-    [Tool]
+	[Tool]
 	public partial class SnapGrab : LibraryComponent
 	{
 		public SnapGrab()
 		{
 			Name = "LibrarySnapGrab";
-			
-			UsingTraits = new(){};
-		
+
+			UsingTraits = new() { };
+
 			//_include = false;  
 		}
-	
+
 		/*
 		** Checks if rotation is currently active
 		** and whether or not to apply it
 		**
 		** @return void
 		*/
-		public override void _Input(InputEvent @event)
+		public async override void _Input(InputEvent @event)
 		{
-			if( false == _ShouldGrab() ) 
+			if (false == _ShouldGrab())
 			{
 				return;
 			}
-			
-			if(
+
+			if (
 				null == ExplorerUtils.Get() ||
-				false == EditorPlugin.IsInstanceValid( ExplorerUtils.Get().GetHandle() )
-			) 
-			{ 
+				false == EditorPlugin.IsInstanceValid(ExplorerUtils.Get().GetHandle())
+			)
+			{
 				return;
 			}
-			
-			if( @event is InputEventKey keyEvent && keyEvent.Keycode == Key.A && Input.IsKeyPressed(Key.Shift) && Input.IsKeyPressed(Key.Alt) && keyEvent.IsPressed() == false) 
+
+			if (@event is InputEventKey keyEvent && keyEvent.Keycode == Key.A && Input.IsKeyPressed(Key.Shift) && Input.IsKeyPressed(Key.Alt) && keyEvent.IsPressed() == false)
 			{
 				// Grab the currently chosen node.
 				Node _Node = _GlobalExplorer.GetHandle();
 				Node Parent = null;
 				AssetSnap.Library.Instance CurrentLibrary = null;
-				
-				if( _Node is not AsMeshInstance3D && _Node is not AsGrouped3D ) 
+
+				if (_Node is not AsMeshInstance3D && _Node is not AsGrouped3D)
 				{
 					return;
 				}
 
-				if( _Node is AsMeshInstance3D _MeshInstance3D ) 
+				if (_Node is AsMeshInstance3D _MeshInstance3D)
 				{
-					CurrentLibrary = ExplorerUtils.Get().GetLibraryByName( _MeshInstance3D.GetLibraryName() );
-					if( null == CurrentLibrary ) 
+					CurrentLibrary = ExplorerUtils.Get().GetLibraryByName(_MeshInstance3D.GetLibraryName());
+					if (null == CurrentLibrary)
 					{
 						GD.PushWarning("No library");
 						return;
 					}
-					
+
 					Parent = _MeshInstance3D.GetParent();
-					if( null != Parent ) 
+					if (null != Parent)
 					{
 						Parent.RemoveChild(_MeshInstance3D);
 					}
-					else 
+					else
 					{
 						GD.PushWarning("No Parent");
 						return;
 					}
 
+					await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+					StatesUtils.Get().EditingObjectIsPlaced = false;
 					ExplorerUtils.Get().SetFocusToNode(_MeshInstance3D);
-
-					if ( null != Parent && Parent is AsStaticBody3D ) 
-					{
-						if( null != Parent.GetParent() ) 
-						{
-							Parent.GetParent().RemoveChild(Parent);
-						}
-					}
 				}
-				
-				if( _Node is AsGrouped3D _Grouped3D )
+
+				if (_Node is AsNode3D _Node3D)
+				{
+					AsNode3D newAsNode = _Node3D.Duplicate() as AsNode3D;
+					Parent = newAsNode.GetParent();
+					if (null != Parent)
+					{
+						Parent.RemoveChild(_Node3D);
+					}
+					else
+					{
+						GD.PushWarning("No Parent");
+						return;
+					}
+
+					await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+					StatesUtils.Get().EditingObjectIsPlaced = false;
+					ExplorerUtils.Get().SetFocusToNode(newAsNode);
+				}
+
+				if (_Node is AsGrouped3D _Grouped3D)
 				{
 					AsGrouped3D newGroup3D = _Grouped3D.Duplicate() as AsGrouped3D;
 					Parent = _Grouped3D.GetParent();
-					if( null != Parent ) 
+					if (null != Parent)
 					{
 						Parent.RemoveChild(_Grouped3D);
 					}
-					else 
+					else
 					{
 						GD.PushWarning("No Parent");
 						return;
 					}
-					
+
+					await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+					StatesUtils.Get().EditingObjectIsPlaced = false;
 					ExplorerUtils.Get().SetFocusToNode(newGroup3D);
-				} 
+				}
 			}
 		}
-		
+
 		/*
 		** Returns the current state of
 		** object grabbing
@@ -130,11 +146,11 @@ namespace AssetSnap.Front.Components.Library
 		*/
 		private bool _ShouldGrab()
 		{
-			if( null == ExplorerUtils.Get() || null == ExplorerUtils.Get().Settings ) 
+			if (null == ExplorerUtils.Get() || null == ExplorerUtils.Get().Settings)
 			{
-				return false; 
+				return false;
 			}
-			
+
 			bool ModelGrab = ExplorerUtils.Get().Settings.GetKey("allow_model_grab").As<bool>();
 			return ModelGrab;
 		}

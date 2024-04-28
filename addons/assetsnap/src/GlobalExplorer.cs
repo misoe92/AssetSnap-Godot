@@ -148,6 +148,7 @@ namespace AssetSnap
 
 			EditorInterface.Singleton.EditNode(Node);
 			States.EditingObject = Node;
+			States.EditingTitle = Node.Name;
 
 			if (Node is AsMeshInstance3D _instance)
 			{

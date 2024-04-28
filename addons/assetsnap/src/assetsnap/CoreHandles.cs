@@ -23,7 +23,6 @@
 namespace AssetSnap.Core
 {
 	using AssetSnap.Explorer;
-	using AssetSnap.Front.Components;
 	using AssetSnap.Front.Nodes;
 	using AssetSnap.Instance.Input;
 	using AssetSnap.Library;
@@ -45,13 +44,6 @@ namespace AssetSnap.Core
 			{
 				return true;
 			}
-
-			// Check if context menu is shown
-			// if( false == _GlobalExplorer.ContextMenu.IsHidden() ) 
-			// {
-			// 	// If so, hide
-			// 	_GlobalExplorer.ContextMenu.Hide();
-			// }
 
 			if (_ShouldHandleModel(_object))
 			{
@@ -231,21 +223,23 @@ namespace AssetSnap.Core
 		*/
 		private void _HandleGroup(AsGrouped3D _Node)
 		{
-			_GlobalExplorer.States.PlacingMode = GlobalStates.PlacingModeEnum.Group;
+			StatesUtils.Get().PlacingMode = GlobalStates.PlacingModeEnum.Group;
 
-			if (_GlobalExplorer.ContextMenu.IsHidden())
+			if (ExplorerUtils.Get().ContextMenu.IsHidden())
 			{
-				_GlobalExplorer.ContextMenu.Show();
+				ExplorerUtils.Get().ContextMenu.Show();
 			}
 
 			if (_Node.IsPlaced())
 			{
-				_GlobalExplorer.States.EditingObject = _Node;
-				_GlobalExplorer.States.GroupedObject = _Node;
-				_GlobalExplorer.States.Group = GD.Load<Resource>(_Node.GroupPath) as GroupResource;
-				_GlobalExplorer.BottomDock.SetTabByIndex(1);
+				StatesUtils.Get().EditingObject = _Node;
+				StatesUtils.Get().GroupedObject = _Node;
+				StatesUtils.Get().Group = GD.Load<Resource>(_Node.GroupPath) as GroupResource;
+				ExplorerUtils.Get().BottomDock.SetTabByIndex(1);
 
-				_GlobalExplorer.GroupBuilder._Editor.GroupPath = _Node.GroupPath;
+				ExplorerUtils.Get().GroupBuilder._Editor.GroupPath = _Node.GroupPath;
+				ExplorerUtils.Get().GroupBuilder._Editor.GroupOptions._UpdateGroupOptions();
+				ExplorerUtils.Get().GroupBuilder._Sidebar.DoHide();
 				// _GlobalExplorer.GroupBuilder._Editor	
 				// Check if drag add is currently active
 				if (_GlobalExplorer.InputDriver is DragAddInputDriver DraggableInputDriver)

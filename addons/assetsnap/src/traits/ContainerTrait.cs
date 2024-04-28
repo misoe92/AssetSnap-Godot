@@ -52,6 +52,8 @@ namespace AssetSnap.Trait
 		protected ContainerOrientation Orientation = ContainerOrientation.Vertical;
 		protected ContainerOrientation InnerOrientation = ContainerOrientation.Horizontal;
 
+		protected Control.SizeFlags ContainerHorizontalSizeFlag = Control.SizeFlags.ExpandFill;
+
 		protected int Seperation = 1;
 
 		protected bool UsePaddingContainer = true;
@@ -137,6 +139,13 @@ namespace AssetSnap.Trait
 		public virtual ContainerTrait SetLayout(ContainerLayout layout)
 		{
 			Layout = layout;
+
+			return this;
+		}
+
+		public virtual ContainerTrait SetContainerHorizontalSizeFlag(Control.SizeFlags flag)
+		{
+			ContainerHorizontalSizeFlag = flag;
 
 			return this;
 		}
@@ -372,7 +381,7 @@ namespace AssetSnap.Trait
 			MarginContainer _MarginContainer = new()
 			{
 				Name = prefix + "-ContainerMargin",
-				SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
+				SizeFlagsHorizontal = ContainerHorizontalSizeFlag,
 				SizeFlagsVertical = SizeFlagsVertical,
 				Visible = Visible,
 			};
@@ -390,7 +399,7 @@ namespace AssetSnap.Trait
 			MarginContainer _PaddingContainer = new()
 			{
 				Name = prefix + "-ContainerPadding",
-				SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
+				SizeFlagsHorizontal = ContainerHorizontalSizeFlag,
 				SizeFlagsVertical = SizeFlagsVertical,
 			};
 

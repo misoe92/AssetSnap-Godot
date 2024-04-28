@@ -36,7 +36,7 @@ namespace AssetSnap.Component
 			RoundedPanelContainer,
 			LightPanelContainer
 		}
-		
+
 		/*
 		** Private
 		*/
@@ -66,29 +66,29 @@ namespace AssetSnap.Component
 			Name = "Panelable";
 			TypeString = GetType().ToString();
 		}
-		
+
 		/*
 		** Instantiate an instance of the trait
 		**
 		** @return Panelable
-		*/	
+		*/
 		public Panelable Instantiate()
 		{
 			base._Instantiate();
 
 			_MarginContainer = new()
 			{
-				Name="PanelMarginContainer",
+				Name = "PanelMarginContainer",
 				SizeFlagsHorizontal = SizeFlagsHorizontal,
 				SizeFlagsVertical = SizeFlagsVertical,
 				Visible = Visible,
 			};
-			
-			foreach( (string side, int value ) in Margin ) 
+
+			foreach ((string side, int value) in Margin)
 			{
 				_MarginContainer.AddThemeConstantOverride("margin_" + side, value);
 			}
-			
+
 			PanelContainer WorkingPanel = new()
 			{
 				Name = TraitName,
@@ -96,15 +96,15 @@ namespace AssetSnap.Component
 				SizeFlagsHorizontal = SizeFlagsHorizontal,
 				SizeFlagsVertical = SizeFlagsVertical,
 			};
-		
+
 			_PaddingContainer = new()
 			{
-				Name="PanelPaddingContainer",
+				Name = "PanelPaddingContainer",
 				SizeFlagsHorizontal = SizeFlagsHorizontal,
 				SizeFlagsVertical = SizeFlagsVertical,
 			};
-			 
-			foreach( (string side, int value ) in Padding ) 
+
+			foreach ((string side, int value) in Padding)
 			{
 				_PaddingContainer.AddThemeConstantOverride("margin_" + side, value);
 			}
@@ -120,14 +120,14 @@ namespace AssetSnap.Component
 			Plugin.Singleton.traitGlobal.AddName(Iteration, TraitName, OwnerName, TypeString);
 
 			// GD.Print(Iteration);
-		
+
 			Reset();
 			Iteration += 1;
 			Dependencies = new();
-			
+
 			return this;
 		}
-		
+
 		/*
 		** Selects an placed panel container
 		** in the nodes array by index
@@ -138,8 +138,8 @@ namespace AssetSnap.Component
 		public Panelable Select(int index)
 		{
 			base._Select(index);
-			
-			if( false != Dependencies.ContainsKey(TraitName + "_WorkingNode") ) 
+
+			if (false != Dependencies.ContainsKey(TraitName + "_WorkingNode"))
 			{
 				Godot.Collections.Dictionary<string, Variant> dependencies = Plugin.Singleton.traitGlobal.GetDependencies(index, TypeString, OwnerName);
 				Dependencies = dependencies;
@@ -147,7 +147,7 @@ namespace AssetSnap.Component
 
 			return this;
 		}
-		
+
 		/*
 		** Selects an placed panel container
 		** in the nodes array by name
@@ -155,11 +155,11 @@ namespace AssetSnap.Component
 		** @param string name
 		** @return Panelable
 		*/
-		public Panelable SelectByName( string name ) 
+		public Panelable SelectByName(string name)
 		{
-			foreach( Button button in Nodes ) 
+			foreach (Button button in Nodes)
 			{
-				if( button.Name == name ) 
+				if (button.Name == name)
 				{
 					Dependencies["WorkingNode"] = button;
 					break;
@@ -168,7 +168,7 @@ namespace AssetSnap.Component
 
 			return this;
 		}
-		
+
 		/*
 		** Adds the currently chosen panel
 		** container to a specified container
@@ -176,36 +176,36 @@ namespace AssetSnap.Component
 		** @param Node Container
 		** @return void
 		*/
-		public void AddToContainer( Node Container )
+		public void AddToContainer(Node Container)
 		{
-			if( false == Dependencies.ContainsKey(TraitName + "_MarginContainer") ) 
+			if (false == Dependencies.ContainsKey(TraitName + "_MarginContainer"))
 			{
 				GD.PushError("Container was not found @ AddToContainer");
 				GD.PushError("AddToContainer::Keys-> ", Dependencies.Keys);
 				GD.PushError("AddToContainer::ADDTO-> ", TraitName + "_MarginContainer");
 				return;
 			}
-			
+
 			base._AddToContainer(Container, Dependencies[TraitName + "_MarginContainer"].As<MarginContainer>());
 		}
-		
+
 		/*
 		** Setter Methods
 		*/
-		
+
 		/*
 		** Sets the name of the current panel container
 		**
 		** @param string text
 		** @return Panelable
 		*/
-		public Panelable SetName( string text ) 
+		public Panelable SetName(string text)
 		{
 			base._SetName(text);
-			
+
 			return this;
 		}
-		
+
 		/*
 		** Sets the theme type of the panel continer,
 		** which lays out a set of specified rules
@@ -214,12 +214,12 @@ namespace AssetSnap.Component
 		** @param PanelType type
 		** @return Panelable
 		*/
-		public Panelable SetType( PanelType type ) 
+		public Panelable SetType(PanelType type)
 		{
 			Type = type;
 			return this;
 		}
-		
+
 		/*
 		** Sets the visible state
 		** of the current panel container
@@ -227,22 +227,21 @@ namespace AssetSnap.Component
 		** @param bool state
 		** @return Panelable
 		*/
-		public Panelable SetVisible( bool state ) 
+		public Panelable SetVisible(bool state)
 		{
 			base._SetVisible(state);
-			
-			if(
+
+			if (
 				null != Dependencies &&
-				false != Dependencies.ContainsKey(TraitName + "WorkingNode") &&
-				Dependencies["WorkingNode"].As<GodotObject>() is PanelContainer panel
-			) 
+				false != Dependencies.ContainsKey(TraitName + "_WorkingNode")
+			)
 			{
 				Dependencies[TraitName + "_MarginContainer"].As<MarginContainer>().Visible = state;
 			}
-			
+
 			return this;
 		}
-		
+
 		/*
 		** Sets the horizontal size flag, which controls the x
 		** axis, and how it should act.
@@ -256,7 +255,7 @@ namespace AssetSnap.Component
 
 			return this;
 		}
-		
+
 		/*
 		** Sets the horizontal size flag, which controls the y
 		** axis, and how it should act.
@@ -270,7 +269,7 @@ namespace AssetSnap.Component
 
 			return this;
 		}
-		
+
 		/*
 		** Sets margin values for the 
 		** currently chosen panel container
@@ -279,23 +278,23 @@ namespace AssetSnap.Component
 		** @param string side
 		** @return Panelable
 		*/
-		public Panelable SetMargin( int value, string side = "" ) 
+		public Panelable SetMargin(int value, string side = "")
 		{
-			if( side == "" ) 
+			if (side == "")
 			{
 				Margin["top"] = value;
 				Margin["bottom"] = value;
 				Margin["left"] = value;
 				Margin["right"] = value;
 			}
-			else 
+			else
 			{
 				Margin[side] = value;
 			}
-			
+
 			return this;
 		}
-		
+
 		/*
 		** Sets padding values for the 
 		** currently chosen panel container
@@ -304,31 +303,31 @@ namespace AssetSnap.Component
 		** @param string side
 		** @return Panelable
 		*/
-		public Panelable SetPadding( int value, string side ) 
+		public Panelable SetPadding(int value, string side)
 		{
 			base._SetPadding(value, side);
-			
+
 			return this;
 		}
-		
+
 		/*
 		** Getter Methods
 		*/
-		
+
 		public MarginContainer GetContainer()
 		{
-			if( false == Dependencies.ContainsKey(TraitName + "_PanelPaddingContainer") ) 
+			if (false == Dependencies.ContainsKey(TraitName + "_PanelPaddingContainer"))
 			{
 				return null;
 			}
-			
+
 			return Dependencies[TraitName + "_PanelPaddingContainer"].As<MarginContainer>();
 		}
-		
+
 		/*
 		** Private
 		*/
-		
+
 		/*
 		** Resets the trait to
 		** a cleared state

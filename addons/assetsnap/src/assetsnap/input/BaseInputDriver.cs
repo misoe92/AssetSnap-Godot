@@ -112,12 +112,12 @@ namespace AssetSnap.Instance.Input
 		*/
 		private int _ListenForMouseButtons(InputEvent Event)
 		{
+			StatesUtils.Get().MultiDrop = false;
 			if (Event is InputEventMouseButton _MouseButtonEvent)
 			{
 				if (InputsStatic.HasMouseLeftPressed(_MouseButtonEvent))
 				{
 					Node3D Node = ExplorerUtils.Get().GetHandle();
-					StatesUtils.Get().MultiDrop = false;
 
 					if (
 						SettingsStatic.CanMultiDrop() &&

@@ -79,10 +79,8 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 
 		public void MaybeUpdateValue(Godot.Collections.Array data)
 		{
-			GD.Print("Going", data[0].As<string>());
 			if (data[0].As<string>() == "PlacingType")
 			{
-				GD.Print("Going");
 				if (
 					false == IsValid()
 				)

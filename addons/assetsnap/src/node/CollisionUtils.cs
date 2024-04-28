@@ -20,36 +20,12 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#if TOOLS
 using Godot;
 
-namespace AssetSnap.Component
+namespace AssetSnap.Nodes
 {
-	[Tool]
-	public partial class GroupOptionComponent : TraitableComponent
+	public static class CollisionUtils
 	{
-		[Signal]
-		public delegate void GroupOptionChangedEventHandler(string name, Variant value);
-
-		protected void _MaybeUpdateGrouped(string key, Variant value)
-		{
-			Node3D Handle = _GlobalExplorer.GetHandle();
-
-			if (Handle is AsGrouped3D grouped3D)
-			{
-				grouped3D.Set(key, value);
-			}
-		}
-
-		protected void _HasGroupDataHasChanged()
-		{
-			EmitSignal(SignalName.GroupOptionChanged, Name, GetValueVariant());
-		}
-
-		public virtual Variant GetValueVariant()
-		{
-			return false;
-		}
+		
 	}
 }
-#endif

@@ -30,45 +30,48 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 	{
 
 		public EditorGroupObject Parent;
-		
+
 		public Origin()
 		{
 			Name = "GroupsBuilderGroupObjectOrigin";
-		
+
 			UsingTraits = new()
 			{
-				{ typeof(Containerable).ToString() },
 				{ typeof(Spinboxable).ToString() },
 				{ typeof(Labelable).ToString() },
+				{ typeof(Containerable).ToString() },
 			};
+
+			SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+			SizeFlagsVertical = Control.SizeFlags.ExpandFill;
 		}
-		
-		public double GetValue( int index ) 
+
+		public double GetValue(int index)
 		{
 			return Trait<Spinboxable>()
 				.Select(index)
 				.GetValue();
 		}
-		
+
 		protected override void _InitializeFields()
 		{
-			if( Parent == null ) 
+			if (Parent == null)
 			{
 				GD.PushError("No parent found @ Object Origin");
 				return;
 			}
-			
+
 			Trait<Containerable>()
 				.SetName("GroupObjectOrigin")
 				.SetMargin(10, "left")
 				.SetMargin(15, "right")
-				.SetHorizontalSizeFlags(Control.SizeFlags.ShrinkBegin)
+				.SetHorizontalSizeFlags(Control.SizeFlags.ExpandFill)
 				.SetVerticalSizeFlags(Control.SizeFlags.ExpandFill)
 				.SetOrientation(Containerable.ContainerOrientation.Horizontal)
 				.SetInnerOrientation(Containerable.ContainerOrientation.Vertical)
 				.SetDimensions(75, 0)
 				.Instantiate();
-				
+
 			Trait<Labelable>()
 				.SetMargin(0)
 				.SetMargin(10, "top")
@@ -77,7 +80,7 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 				.SetType(Labelable.TitleType.HeaderSmall)
 				.SetText("Origin")
 				.Instantiate();
-		
+
 			// X
 			Trait<Labelable>()
 				.SetName("GroupObjectsOriginXLabel")
@@ -85,22 +88,22 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 				.SetType(Labelable.TitleType.HeaderSmall)
 				.SetText("X")
 				.Instantiate();
-				
+
 			Trait<Spinboxable>()
 				.SetName("GroupObjectsOriginXValue")
 				.SetValue(Parent.Origin.X)
 				.SetStep(0.1f)
 				.SetMinValue(-200.0f)
 				.SetMaxValue(200.0f)
-				.SetAction( Callable.From( (double value) => { _OnValueChange(); } ) )
+				.SetAction(Callable.From((double value) => { _OnValueChange(); }))
 				.Instantiate();
-			
+
 			Trait<Spinboxable>()
 				.Select(0)
 				.GetNode<SpinBox>()
 				.GetLineEdit()
 				.AddThemeConstantOverride("minimum_character_width", 2);
-			
+
 			// Y
 			Trait<Labelable>()
 				.SetName("GroupObjectsOriginYLabel")
@@ -108,22 +111,22 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 				.SetType(Labelable.TitleType.HeaderSmall)
 				.SetText("Y")
 				.Instantiate();
-				
+
 			Trait<Spinboxable>()
 				.SetName("GroupObjectsOriginYValue")
 				.SetValue(Parent.Origin.Y)
 				.SetStep(0.1f)
 				.SetMinValue(-200.0f)
 				.SetMaxValue(200.0f)
-				.SetAction( Callable.From( (double value) => { _OnValueChange(); } ) )
+				.SetAction(Callable.From((double value) => { _OnValueChange(); }))
 				.Instantiate();
-			
+
 			Trait<Spinboxable>()
 				.Select(1)
 				.GetNode<SpinBox>()
 				.GetLineEdit()
 				.AddThemeConstantOverride("minimum_character_width", 2);
-			
+
 			// Z
 			Trait<Labelable>()
 				.SetMargin(0)
@@ -131,23 +134,23 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 				.SetType(Labelable.TitleType.HeaderSmall)
 				.SetText("Z")
 				.Instantiate();
-				
+
 			Trait<Spinboxable>()
 				.SetName("GroupObjectsOriginZValue")
 				.SetValue(Parent.Origin.Z)
 				.SetStep(0.1f)
 				.SetMinValue(-200.0f)
 				.SetMaxValue(200.0f)
-				.SetAction( Callable.From( (double value) => { _OnValueChange(); } ) )
+				.SetAction(Callable.From((double value) => { _OnValueChange(); }))
 				.Instantiate();
-			
+
 			Trait<Spinboxable>()
 				.Select(2)
 				.GetNode<SpinBox>()
 				.GetLineEdit()
 				.AddThemeConstantOverride("minimum_character_width", 2);
 		}
-		
+
 		protected override void _FinalizeFields()
 		{
 			Trait<Labelable>()
@@ -157,7 +160,7 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 						.Select(0)
 						.GetInnerContainer()
 				);
-				
+
 			Trait<Spinboxable>()
 				.Select(0)
 				.AddToContainer(
@@ -165,7 +168,7 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 						.Select(0)
 						.GetInnerContainer()
 				);
-				
+
 			Trait<Labelable>()
 				.Select(2)
 				.AddToContainer(
@@ -173,7 +176,7 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 						.Select(0)
 						.GetInnerContainer()
 				);
-				
+
 			Trait<Spinboxable>()
 				.Select(1)
 				.AddToContainer(
@@ -181,7 +184,7 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 						.Select(0)
 						.GetInnerContainer()
 				);
-				
+
 			Trait<Labelable>()
 				.Select(3)
 				.AddToContainer(
@@ -189,7 +192,7 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 						.Select(0)
 						.GetInnerContainer()
 				);
-				
+
 			Trait<Spinboxable>()
 				.Select(2)
 				.AddToContainer(
@@ -197,7 +200,7 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 						.Select(0)
 						.GetInnerContainer()
 				);
-				
+
 			Trait<Labelable>()
 				.Select(0)
 				.AddToContainer(
@@ -206,19 +209,19 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 						.GetOuterContainer(),
 					0
 				);
-			
+
 			Trait<Containerable>()
 				.Select(0)
 				.AddToContainer(
 					this
 				);
 		}
-		
+
 		private void _OnValueChange()
 		{
 			Rotation Rotation = Parent._GroupBuilderEditorGroupObjectRotation;
 			Scale Scale = Parent._GroupBuilderEditorGroupObjectScale;
-			
+
 			GlobalExplorer.GetInstance().GroupBuilder._Editor.UpdateMeshInGroup(
 				Index,
 				new Vector3((float)GetValue(0), (float)GetValue(1), (float)GetValue(2)),
