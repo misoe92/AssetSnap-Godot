@@ -120,6 +120,18 @@ namespace AssetSnap.Static
 
 			return false;
 		}
+		
+		public static bool ShouldUseASOverlay()
+		{
+			bool value = GlobalExplorer.GetInstance().Settings.GetKey("use_as_overlay").As<bool>();
+
+			if (value is bool valueBool)
+			{
+				return valueBool;
+			}
+
+			return false;
+		}
 	}
 }
 #endif
