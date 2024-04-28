@@ -68,7 +68,7 @@ namespace AssetSnap.Front.Components.Library
 				Node Parent = null;
 				AssetSnap.Library.Instance CurrentLibrary = null;
 
-				if (_Node is not AsMeshInstance3D && _Node is not AsGrouped3D)
+				if (_Node is not AsMeshInstance3D && _Node is not AsGrouped3D && _Node is not AsNode3D )
 				{
 					return;
 				}
@@ -101,7 +101,7 @@ namespace AssetSnap.Front.Components.Library
 				if (_Node is AsNode3D _Node3D)
 				{
 					AsNode3D newAsNode = _Node3D.Duplicate() as AsNode3D;
-					Parent = newAsNode.GetParent();
+					Parent = _Node3D.GetParent();
 					if (null != Parent)
 					{
 						Parent.RemoveChild(_Node3D);
