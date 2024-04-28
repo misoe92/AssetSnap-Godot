@@ -22,6 +22,7 @@
 
 namespace AssetSnap.Component
 {
+	using AssetSnap.States;
 	using Godot;
 
 	public partial class LSCollisionComponent : LibraryComponent
@@ -48,15 +49,8 @@ namespace AssetSnap.Component
 			base.Initialize();
 		}
 
-		public virtual void MaybeUpdateValue()
+		public virtual void MaybeUpdateValue(Godot.Collections.Array data)
 		{
-			if(
-				false == IsValid()
-			) 
-			{
-				return;
-			}
-
 			if( ShouldUpdateState() ) 
 			{
 				UpdateState();
@@ -130,8 +124,7 @@ namespace AssetSnap.Component
 		public bool IsValid()
 		{
 			return
-				null != _GlobalExplorer &&
-				null != _GlobalExplorer.States &&
+				null != StatesUtils.Get() &&
 				false != Initiated &&
 				null != Trait<Checkable>() &&
 				false != HasTrait<Checkable>();

@@ -25,9 +25,10 @@ namespace AssetSnap.Front.Components
 	using Godot;
 	using AssetSnap.Component;
 	using AssetSnap.Explorer;
+	using AssetSnap.Nodes;
 
 	[Tool]
-	public partial class AddFolderToLibrary : TraitableComponent
+	public partial class Actions : TraitableComponent
 	{
 		private readonly string TitleText = "General actions";
 
@@ -35,23 +36,23 @@ namespace AssetSnap.Front.Components
 		** Class Constructor
 		** 
 		** @return void  
-		*/ 
-		public AddFolderToLibrary()
-		{ 
-			Name = "AddFolderToLibrary";
-			
+		*/
+		public Actions()
+		{
+			Name = "Actions";
+
 			UsingTraits = new()
 			{
 				{ typeof(Containerable).ToString() },
 				{ typeof(Labelable).ToString() },
 				{ typeof(Buttonable).ToString() },
 			};
-			
-			/* Debugging Purpose */ 
+
+			/* Debugging Purpose */
 			// _include = false;  
-			/* -- */ 
+			/* -- */
 		}
-		
+
 		/* 
 		** Initializes component
 		** 
@@ -60,36 +61,52 @@ namespace AssetSnap.Front.Components
 		public override void Initialize()
 		{
 			base.Initialize();
-			
+
 			Initiated = true;
-			
+
 			Trait<Containerable>()
 				.SetName("AddFolderContainer")
+				.SetVerticalSizeFlags(SizeFlags.ShrinkCenter)
 				.SetInnerOrientation(Containerable.ContainerOrientation.Horizontal)
-				.SetOrientation(Containerable.ContainerOrientation.Vertical)
+				.SetOrientation(Containerable.ContainerOrientation.Horizontal)
+				.SetSeparation(15)
 				.SetMargin(20, "left")
 				.SetMargin(20, "bottom")
 				.Instantiate();
-			 
+
 			Trait<Labelable>()
 				.SetName("AddFolderButtonTitle")
-				.SetType( Labelable.TitleType.HeaderMedium)
-				.SetText( TitleText )
+				.SetType(Labelable.TitleType.HeaderMedium)
+				.SetText(TitleText)
 				.SetMargin(0, "bottom")
-				.Instantiate() 
+				.Instantiate()
 				.Select(0)
-				.AddToContainer( 
+				.AddToContainer(
 					this
-				); 
-				
+				);
+
 			Trait<Buttonable>()
 				.SetName("AddFolderButton")
 				.SetText("Add Library")
-				.SetType( Buttonable.ButtonType.ActionButton )
-				.SetAction( () => { _OnButtonPressed(); } )
+				.SetType(Buttonable.ButtonType.ActionButton)
+				.SetAction(() => { _OnButtonPressed(); })
 				.Instantiate()
 				.Select(0)
-				.AddToContainer( 
+				.AddToContainer(
+					Trait<Containerable>()
+						.Select(0)
+						.GetInnerContainer()
+				 );
+
+			Trait<Buttonable>()
+				.SetName("ClearPreviewImages")
+				.SetText("Clear preview images")
+				.SetTooltipText("Warning: This will remove all current preview images, and as such the images will need to be generated again")
+				.SetType(Buttonable.ButtonType.SmallDangerButton)
+				.SetAction(() => { _OnClearImages(); })
+				.Instantiate()
+				.Select(1)
+				.AddToContainer(
 					Trait<Containerable>()
 						.Select(0)
 						.GetInnerContainer()
@@ -101,7 +118,7 @@ namespace AssetSnap.Front.Components
 					this
 				);
 		}
-		
+
 		/*
 		** Handles folder selection when Add Library
 		** button is clicked.
@@ -109,7 +126,7 @@ namespace AssetSnap.Front.Components
 		** @param string FolderPath
 		** @return async<void>
 		*/
-		private void _OnFolderSelected( string FolderPath, FileDialog fileDialog )
+		private void _OnFolderSelected(string FolderPath, FileDialog fileDialog)
 		{
 			_GlobalExplorer.Settings.AddFolder(FolderPath);
 
@@ -131,10 +148,15 @@ namespace AssetSnap.Front.Components
 			// Set the dialog mode to "OpenDir" for folder selection
 			fileDialog.FileMode = FileDialog.FileModeEnum.OpenDir;
 			// Connect the "dir_selected" signal to another Callable function
-			fileDialog.DirSelected += (string FolderPath) => { _OnFolderSelected(FolderPath,fileDialog); };
+			fileDialog.DirSelected += (string FolderPath) => { _OnFolderSelected(FolderPath, fileDialog); };
 			fileDialog.MinSize = new Vector2I(768, 768);
 			// Show the file dialog
 			fileDialog.PopupCentered();
+		}
+
+		private void _OnClearImages()
+		{
+			ModelPreviewer.ClearPreviewImages("res://assetsnap/previews");
 		}
 	}
 }

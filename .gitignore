@@ -2,6 +2,7 @@
 .vscode/
 .godot/
 groups/*.tres
+assetsnap/previews/*
 *.godot
 icon.svg
 icon.svg.import
@@ -12,3 +13,7 @@ assets/*.*
 assets/*/*.*
 assets/*/*/*.*
 addons\assetsnap\config.cfg
+*.sln
+*.csproj
+*.csproj.old
+*.tscn

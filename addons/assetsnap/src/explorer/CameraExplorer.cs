@@ -23,7 +23,8 @@
 #if TOOLS
 namespace AssetSnap
 {
-	using Godot;
+    using System;
+    using Godot;
 
 	[Tool]
 	public partial class CameraExplorer : BaseExplorer
@@ -83,7 +84,7 @@ namespace AssetSnap
 		
 		public Vector3 GetPositionDrawn()
 		{
-			return (Vector3)PositionDraw;
+			return null != PositionDraw ? (Vector3)PositionDraw : Vector3.Zero;
 		}
 		
 		public Vector3 GetNomalDrawn()

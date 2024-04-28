@@ -28,58 +28,65 @@ namespace AssetSnap.Front.Components.Groups.Builder
 	[Tool]
 	public partial class EditorSave : LibraryComponent
 	{
-		private static readonly string Text = "Save"; 
+		private static readonly string Text = "Save";
 
 		public EditorSave()
 		{
 			Name = "GroupBuilderEditorSave";
-			TooltipText = "Will save the title and the object values"; 
+			TooltipText = "Will save the title and the object values";
 			MouseDefaultCursorShape = Control.CursorShape.PointingHand;
-			
+
 			UsingTraits = new()
 			{
 				{ typeof(Buttonable).ToString() },
+				{ typeof(Containerable).ToString() },
 			};
-			
+
 			//_include = false;
 		}
 
 		public override void Initialize()
 		{
-			if( Initiated ) 
+			if (Initiated)
 			{
 				return;
 			}
-			
+
 			base.Initialize();
-			
+
 			Initiated = true;
 
 			_InitializeFields();
 			_FinalizeFields();
 		}
-		
+
 		public void DoShow()
 		{
 			Trait<Buttonable>()
 				.Select(0)
-				.SetVisible( true );
+				.SetVisible(true);
 		}
-			
+
 		public void DoHide()
 		{
 			Trait<Buttonable>()
 				.Select(0)
-				.SetVisible( false );
+				.SetVisible(false);
 		}
-		
+
 		private void _OnSave()
 		{
 			_GlobalExplorer.GroupBuilder._Editor.UpdateGroup();
 		}
-		
+
 		private void _InitializeFields()
 		{
+			Trait<Containerable>()
+				.SetName("GroupBuilderEditorSaveContainer")
+				.SetVerticalSizeFlags(SizeFlags.ShrinkCenter)
+				.SetMargin(6, "top")
+				.Instantiate();
+
 			Trait<Buttonable>()
 				.SetName("GroupBuilderEditorSave")
 				.SetText(Text)
@@ -90,13 +97,21 @@ namespace AssetSnap.Front.Components.Groups.Builder
 				.SetAction(() => { _OnSave(); })
 				.Instantiate();
 		}
-		
+
 		private void _FinalizeFields()
 		{
-			Trait<Buttonable>()
+			Trait<Containerable>()
 				.Select(0)
 				.AddToContainer(
 					this
+				);
+
+			Trait<Buttonable>()
+				.Select(0)
+				.AddToContainer(
+					Trait<Containerable>()
+						.Select(0)
+						.GetInnerContainer()
 				);
 		}
 	}

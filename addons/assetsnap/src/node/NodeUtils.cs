@@ -26,23 +26,30 @@ namespace AssetSnap.Nodes
 {
 	public static class NodeUtils
 	{
-		public static Aabb CalculateNodeAabb( Node node ) 
+		public static Aabb CalculateNodeAabb(Node node)
 		{
 			Aabb aabb = new Aabb();
 
-			if( node is Node3D node3d && false == node3d.Visible) 
+
+			if (node is Node3D node3d && false == node3d.Visible)
 			{
 				return aabb;
 			}
-			
-			else if( node is MeshInstance3D meshInstance3D ) 
+			else if (node is MeshInstance3D meshInstance3D)
 			{
+				if (false == node.IsInsideTree())
+				{
+					return meshInstance3D.GetAabb();
+				}
+
 				aabb = meshInstance3D.GlobalTransform * meshInstance3D.GetAabb();
 			}
-			
-			for( int i = 0; i < node.GetChildCount(); i++ ) 
+			else if (node is AsNode3D)
 			{
-				aabb = aabb.Merge(CalculateNodeAabb(node.GetChild(i)));
+				for (int i = 0; i < node.GetChildCount(); i++)
+				{
+					aabb = aabb.Merge(CalculateNodeAabb(node.GetChild(i)));
+				}
 			}
 
 			return aabb;

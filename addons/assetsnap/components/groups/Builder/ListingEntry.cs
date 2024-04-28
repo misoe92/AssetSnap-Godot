@@ -36,12 +36,12 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			Name = "GroupBuilderListingEntry";
 			//_include = false;
 		}
-		
+
 		public string title { get; set; }
-		
+
 		public HBoxContainer RemoveRow;
 		public HBoxContainer RemoveInnerRow;
-	
+
 		public MarginContainer OuterMarginContainer;
 		public MarginContainer InnerMarginContainer;
 		public PanelContainer _PanelContainer;
@@ -52,25 +52,25 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		public Button Remove;
 		public Button Confirm;
 		public Button Cancel;
-		
+
 		private readonly Theme ActiveTheme = GD.Load<Theme>("res://addons/assetsnap/assets/themes/SnapThemeActiveGroup.tres");
-		
+
 		private readonly List<string> RootSidebar = new()
 		{
 			"Groups.Builder.Sidebar",
 		};
-		
+
 		private readonly List<string> GroupEditor = new()
 		{
 			"Groups.Builder.Editor",
 		};
-		
+
 		public override void Initialize()
 		{
 			base.Initialize();
-		
+
 			Initiated = true;
-			
+
 			OuterMarginContainer = new()
 			{
 				Name = "GroupBuilderListingEntryMargin"
@@ -79,33 +79,33 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			{
 				Name = "GroupBuilderListingEntryPadding"
 			};
-			_PanelContainer = new() 
+			_PanelContainer = new()
 			{
 				Name = "GroupBuilderListingEntryPanel"
 			};
 			Row = new()
 			{
 				Name = "GroupBuilderListingEntryRow"
-				
+
 			};
 			RemoveRow = new()
 			{
 				Visible = false
 			};
-					
+
 			OuterMarginContainer.AddThemeConstantOverride("margin_left", 10);
 			OuterMarginContainer.AddThemeConstantOverride("margin_right", 10);
 			OuterMarginContainer.AddThemeConstantOverride("margin_top", 1);
 			OuterMarginContainer.AddThemeConstantOverride("margin_bottom", 1);
-								
+
 			InnerMarginContainer.AddThemeConstantOverride("margin_left", 5);
 			InnerMarginContainer.AddThemeConstantOverride("margin_right", 5);
 			InnerMarginContainer.AddThemeConstantOverride("margin_top", 1);
 			InnerMarginContainer.AddThemeConstantOverride("margin_bottom", 1);
-			
+
 			_SetupTitle();
 			_SetupButtons();
-			
+
 			_SetupRemoveTitle();
 			_SetupRemoveButtons();
 
@@ -115,51 +115,51 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			OuterMarginContainer.AddChild(_PanelContainer);
 			AddChild(OuterMarginContainer);
 		}
-		
+
 		public void DeselectGroup()
 		{
 			Component.Base Components = _GlobalExplorer.Components;
-			
+
 			if (Components.HasAll(GroupEditor.ToArray()))
 			{
 				Editor Editor = Components.Single<Editor>();
 				Editor.GroupPath = null;
 			}
-			
-			if ( Components.HasAll( RootSidebar.ToArray() )) 
+
+			if (Components.HasAll(RootSidebar.ToArray()))
 			{
 				Sidebar _Sidebar = Components.Single<Sidebar>();
 				_Sidebar.UnFocusGroup(title);
 			}
 		}
-		
-		public void SelectGroup() 
+
+		public void SelectGroup()
 		{
 			Component.Base Components = _GlobalExplorer.Components;
-			
+
 			if (Components.HasAll(GroupEditor.ToArray()))
 			{
 				Editor Editor = Components.Single<Editor>();
 				Editor.GroupPath = title;
 			}
-			
-			if ( Components.HasAll( RootSidebar.ToArray() )) 
+
+			if (Components.HasAll(RootSidebar.ToArray()))
 			{
 				Sidebar _Sidebar = Components.Single<Sidebar>();
 				_Sidebar.FocusGroup(title);
 			}
 		}
-		
+
 		public void Focus()
 		{
 			_PanelContainer.Theme = ActiveTheme;
 		}
-		
+
 		public void Unfocus()
 		{
 			_PanelContainer.Theme = null;
 		}
-		
+
 		private void _SetupTitle()
 		{
 			Title = new()
@@ -170,7 +170,7 @@ namespace AssetSnap.Front.Components.Groups.Builder
 
 			Row.AddChild(Title);
 		}
-			
+
 		private void _SetupRemoveTitle()
 		{
 			MarginContainer _RemoveTitleContainer = new()
@@ -181,7 +181,7 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			_RemoveTitleContainer.AddThemeConstantOverride("margin_right", 0);
 			_RemoveTitleContainer.AddThemeConstantOverride("margin_top", 2);
 			_RemoveTitleContainer.AddThemeConstantOverride("margin_bottom", 2);
-			
+
 			Title = new()
 			{
 				Text = "Are you sure you wish to continue?",
@@ -192,35 +192,35 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			_RemoveTitleContainer.AddChild(Title);
 			RemoveRow.AddChild(_RemoveTitleContainer);
 		}
-		
+
 		private void _SetupButtons()
 		{
 			InnerRow = new();
 
 			_SetupRemoveButton();
 			_SetupEditButton();
-			
+
 			Row.AddChild(InnerRow);
 		}
-		
+
 		private void _SetupRemoveButtons()
 		{
 			RemoveInnerRow = new();
 
 			_SetupCancelButton();
 			_SetupConfirmButton();
-			
+
 			RemoveRow.AddChild(RemoveInnerRow);
 		}
-		
-		private string _FormatTitle(string title )
+
+		private string _FormatTitle(string title)
 		{
 			string filename = StringHelper.FilePathToFileName(title);
 			string _newTitle = StringHelper.FileNameToTitle(filename);
 
 			return _newTitle;
 		}
-		
+
 		private void _SetupEditButton()
 		{
 			Edit = new()
@@ -236,7 +236,7 @@ namespace AssetSnap.Front.Components.Groups.Builder
 
 			InnerRow.AddChild(Edit);
 		}
-		
+
 		private void _SetupRemoveButton()
 		{
 			Remove = new()
@@ -252,7 +252,7 @@ namespace AssetSnap.Front.Components.Groups.Builder
 
 			InnerRow.AddChild(Remove);
 		}
-			
+
 		private void _SetupConfirmButton()
 		{
 			Confirm = new()
@@ -265,10 +265,10 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			};
 
 			Confirm.Connect(Button.SignalName.Pressed, Callable.From(() => { _OnConfirmRemoveGroup(); }));
-		
+
 			RemoveInnerRow.AddChild(Confirm);
 		}
-		
+
 		private void _SetupCancelButton()
 		{
 			Cancel = new()
@@ -281,33 +281,33 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			};
 
 			Cancel.Connect(Button.SignalName.Pressed, Callable.From(() => { _OnCancelRemoveGroup(); }));
-		
+
 			RemoveInnerRow.AddChild(Cancel);
 		}
-		
+
 		private void _OnRemoveGroup()
 		{
 			Row.Visible = false;
 			RemoveRow.Visible = true;
 		}
-		
+
 		private void _OnCancelRemoveGroup()
 		{
 			Row.Visible = true;
 			RemoveRow.Visible = false;
 		}
-			
+
 		private void _OnConfirmRemoveGroup()
 		{
 			Component.Base Components = ExplorerUtils.Get().Components;
-			if ( Components.HasAll( RootSidebar.ToArray() )) 
+			if (Components.HasAll(RootSidebar.ToArray()))
 			{
 				Sidebar _Sidebar = Components.Single<Sidebar>();
 				_Sidebar.RemoveGroup(title);
 				_Sidebar.RefreshExistingGroups();
 			}
 		}
-		
+
 		private void _OnSelectGroup()
 		{
 			Component.Base Components = ExplorerUtils.Get().Components;
@@ -317,8 +317,8 @@ namespace AssetSnap.Front.Components.Groups.Builder
 				Editor Editor = Components.Single<Editor>();
 				Editor.GroupPath = title;
 			}
-			
-			if ( Components.HasAll( RootSidebar.ToArray() )) 
+
+			if (Components.HasAll(RootSidebar.ToArray()))
 			{
 				Sidebar _Sidebar = Components.Single<Sidebar>();
 				_Sidebar.Update();

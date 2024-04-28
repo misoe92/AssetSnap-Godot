@@ -23,23 +23,24 @@
 namespace AssetSnap.Front.Components.Library.Sidebar
 {
 	using AssetSnap.Component;
+	using AssetSnap.States;
 	using Godot;
 
 	[Tool]
 	public partial class SnapOffsetX : LSObjectComponent
 	{
-		public float value 
+		public float value
 		{
 			get => IsValid() ? (float)Trait<Spinboxable>().GetValue() : 0;
-			set 
+			set
 			{
-				if( false == IsValid() && null != Trait<Spinboxable>() ) 
+				if (false == IsValid() && null != Trait<Spinboxable>())
 				{
 					Trait<Spinboxable>().SetValue(value);
 				}
 			}
 		}
-		
+
 		private readonly string _Title = "Offset X: ";
 		private readonly string _Tooltip = "Offsets the X axis when snapping to object, enabling for precise operations.";
 
@@ -47,32 +48,32 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		** Constructor of the component
 		** 
 		** @return void
-		*/	
+		*/
 		public SnapOffsetX()
 		{
 			Name = "LSSnapOffsetX";
-			
+
 			UsingTraits = new()
 			{
 				{ typeof(Spinboxable).ToString() },
 			};
-			
+
 			//_include = false;
 		}
-			
+
 		/*
 		** Initializes the component
 		** 
 		** @return void
-		*/	
+		*/
 		public override void Initialize()
 		{
 			base.Initialize();
 
 			Callable _callable = Callable.From((double value) => { _OnSpinBoxValueChange((float)value); });
-			
+
 			Initiated = true;
-			
+
 			Trait<Spinboxable>()
 				.SetName("SnapObjectOffsetX")
 				.SetAction(_callable)
@@ -80,6 +81,7 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 				.SetPrefix(_Title + ": ")
 				.SetMinValue(-200)
 				.SetDimensions(140, 20)
+				.SetVisible(StatesUtils.Get().SnapToObject == GlobalStates.LibraryStateEnum.Enabled)
 				.SetMargin(10, "left")
 				.SetMargin(10, "right")
 				.SetMargin(0, "top")
@@ -87,87 +89,96 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 				.SetTooltipText(_Tooltip)
 				.Instantiate()
 				.Select(0)
-				.AddToContainer( this );
-				
-			Plugin.GetInstance().StatesChanged += () => { MaybeUpdateValue(); };
+				.AddToContainer(this);
+
+			Plugin.GetInstance().StatesChanged += (Godot.Collections.Array data) => { MaybeUpdateValue(data); };
 		}
-		
-		private void MaybeUpdateValue()
+
+		private void MaybeUpdateValue(Godot.Collections.Array data)
 		{
-			if( false == IsValid() ) 
+			if (data[0].As<string>() == "SnapToObject" || data[0].As<string>() == "SnapToObjectOffsetXValue")
+			{
+				if (false == IsValid())
+				{
+					return;
+				}
+
+				if (data[0].As<string>() == "SnapToObject")
+				{
+					if (IsSnapToObject() && false == IsVisible() && data[1].As<bool>())
+					{
+						SetVisible(true);
+					}
+					else if ((false == IsSnapToObject() || false == data[1].As<bool>()) && true == IsVisible())
+					{
+						SetVisible(false);
+					}
+				}
+
+				if (data[0].As<string>() == "SnapToObjectOffsetXValue")
+				{
+					Trait<Spinboxable>()
+						.Select(0)
+						.SetValue(data[1].As<double>());
+				}
+			}
+		}
+
+		public override void SetVisible(bool state)
+		{
+			if (false == IsValid())
 			{
 				return;
 			}
-			
-			if( IsSnapToObject() && false == IsVisible()) 
-			{
-				SetVisible(true);
-			}
-			else if( false == IsSnapToObject() && true == IsVisible())
-			{
-				SetVisible(false);
-			}
-			
+
 			Trait<Spinboxable>()
 				.Select(0)
-				.SetValue(_GlobalExplorer.States.SnapToObjectOffsetXValue);
+				.SetVisible(state);
 		}
-		
-		public override void SetVisible(bool state) 
+		public override bool IsVisible()
 		{
-			if( false == IsValid() ) 
-			{
-				return;
-			}
-			
-			Trait<Spinboxable>()
-				.Select(0)
-				.SetVisible( state );
-		}
-		public override bool IsVisible() 
-		{
-			if( false == IsValid() ) 
+			if (false == IsValid())
 			{
 				return false;
 			}
-			
+
 			return Trait<Spinboxable>()
 				.Select(0)
 				.IsVisible();
 		}
-		
+
 		/*
 		** Updates spawn settings when
 		** input is changed
 		** 
 		** @return void
-		*/	
+		*/
 		private void _OnSpinBoxValueChange(float value)
 		{
-			_GlobalExplorer.States.SnapToObjectOffsetXValue = value;	
+			_GlobalExplorer.States.SnapToObjectOffsetXValue = value;
 			UpdateSpawnSettings("SnapToObjectOffsetXValue", value);
 		}
-		
+
 		/*
 		** Fetches the current component value
 		** 
 		** @return float
-		*/	
+		*/
 		public float GetValue()
 		{
 			return _GlobalExplorer.States.SnapToObjectOffsetXValue;
 		}
-		
+
 		/*
 		** Resets the component
 		** 
 		** @return void
-		*/	
+		*/
 		public void Reset()
 		{
 			_GlobalExplorer.States.SnapToObjectOffsetXValue = 0.0f;
 		}
-		
+
 		public bool IsValid()
 		{
 			return
@@ -177,20 +188,20 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 				null != Trait<Spinboxable>() &&
 				false != HasTrait<Spinboxable>();
 		}
-		
+
 		/*
 		** Syncronizes it's value to a global
 		** central state controller
 		**
 		** @return void
 		*/
-		public override void Sync() 
+		public override void Sync()
 		{
-			if( false == IsValid() ) 
+			if (false == IsValid())
 			{
 				return;
 			}
-			
+
 			_GlobalExplorer.States.SnapToObjectOffsetXValue = (float)Trait<Spinboxable>().Select(0).GetValue();
 		}
 	}

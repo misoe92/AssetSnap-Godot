@@ -31,13 +31,13 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 		public SnapToObjectOffsetX()
 		{
 			Name = "GroupsBuilderGroupOptionsSnapToObjectOffsetX";
-		
+
 			UsingTraits = new()
 			{
 				{ typeof(Spinboxable).ToString() },
 			};
 		}
-		
+
 		protected override void _InitializeFields()
 		{
 			Trait<Spinboxable>()
@@ -48,24 +48,24 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 				.SetValue(0)
 				.SetStep(0.1f)
 				.SetMinValue(0.0f)
-				.SetAction( Callable.From( ( double value ) => { _OnValueChanged( (int)value ); } ) )
+				.SetAction(Callable.From((double value) => { _OnValueChanged((int)value); }))
 				.Instantiate();
-				
+
 			Trait<Spinboxable>()
 				.Select(0)
 				.GetNode<SpinBox>()
 				.GetLineEdit().AddThemeConstantOverride("minimum_character_width", 24);
 		}
 
-		private void _OnValueChanged( float value )
+		private void _OnValueChanged(float value)
 		{
-			_GlobalExplorer.GroupBuilder._Editor.Group.ObjectOffsetX = value;
-			
-			if( _GlobalExplorer.States.PlacingMode == GlobalStates.PlacingModeEnum.Group )
+			_GlobalExplorer.GroupBuilder._Editor.Group.SnapToObjectOffsetXValue = value;
+
+			if (_GlobalExplorer.States.PlacingMode == GlobalStates.PlacingModeEnum.Group)
 			{
 				_GlobalExplorer.States.SnapToObjectOffsetXValue = value;
 			}
-															
+
 			Parent._UpdateGroupOptions();
 
 			_MaybeUpdateGrouped("SnapToObjectOffsetXValue", value);

@@ -39,15 +39,15 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		public SimplePlacement()
 		{
 			Name = "LSSimplePlacement";
-			
+
 			UsingTraits = new()
 			{
 				{ typeof(Checkable).ToString() },
 			};
-			
+
 			//_include = false;
 		}
-		
+
 		/*
 		** Initializes the component
 		**
@@ -57,43 +57,41 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		{
 			base.Initialize();
 			Callable _callable = Callable.From(() => { _OnCheckboxPressed(); });
-			
+
 			Initiated = true;
 
 			Trait<Checkable>()
 				.SetName("SimplePlacementCheckbox")
-				.SetAction( _callable )
+				.SetAction(_callable)
 				.SetDimensions(140, 20)
 				.SetMargin(10, "left")
 				.SetMargin(10, "right")
-				.SetMargin(2, "top")
+				.SetMargin(5, "top")
 				.SetMargin(7, "bottom")
 				.SetText(_Title)
 				.SetTooltipText(_CheckboxTooltip)
-				.SetValue( IsActive() )
+				.SetValue(IsActive())
 				.Instantiate()
 				.Select(0)
-				.AddToContainer( this );
+				.AddToContainer(this);
 
-			Plugin.GetInstance().StatesChanged += () => { MaybeUpdateValue(); };
+			Plugin.GetInstance().StatesChanged += (Godot.Collections.Array data) => { MaybeUpdateValue(data); };
 		}
 
-		public void MaybeUpdateValue()
+		public void MaybeUpdateValue(Godot.Collections.Array data)
 		{
-			if(
-				false == IsValid()
-			) 
+			if (data[0].As<string>() == "PlacingType")
 			{
-				return;
-			}
+				if (
+					false == IsValid()
+				)
+				{
+					return;
+				}
 
-			if( IsActive() && false == Trait<Checkable>().Select(0).GetValue() ) 
-			{
-				Trait<Checkable>().Select(0).SetValue(true);
-			}
-			else if( IsOptimized() && true == Trait<Checkable>().Select(0).GetValue() )
-			{
-				Trait<Checkable>().Select(0).SetValue(false);	
+				GD.Print(data[1].As<string>());
+
+				Trait<Checkable>().Select(0).SetValue(data[1].As<string>() == "Simple");
 			}
 		}
 
@@ -111,16 +109,9 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			{
 				return;
 			}
-			
-			if( Trait<Checkable>().Select(0).GetValue() ) 
-			{
-				_GlobalExplorer.States.PlacingType = GlobalStates.PlacingTypeEnum.Simple;
-				UpdateSpawnSettings("SimplePlacement", true);
-			}
-			else
-			{
-				UpdateSpawnSettings("SimplePlacement", false);
-			}
+
+			_GlobalExplorer.States.PlacingType = GlobalStates.PlacingTypeEnum.Simple;
+			UpdateSpawnSettings("PlacingType", "Simple");
 		}
 
 		/*
@@ -129,34 +120,34 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		** 
 		** @return bool
 		*/
-		public bool IsActive() 
+		public bool IsActive()
 		{
 			return GlobalExplorer.GetInstance().States.PlacingType == GlobalStates.PlacingTypeEnum.Simple;
 		}
-		
+
 		/*
 		** Checks if the component state
 		** is active
 		** 
 		** @return bool
 		*/
-		public bool IsOptimized() 
+		public bool IsOptimized()
 		{
 			return _GlobalExplorer.States.PlacingType == GlobalStates.PlacingTypeEnum.Optimized;
 		}
-		
+
 		/*
 		** Syncronizes it's value to a global
 		** central state controller
 		**
 		** @return void
 		*/
-		public override void Sync() 
+		public override void Sync()
 		{
-			if(
+			if (
 				IsValid() &&
 				Trait<Checkable>().Select(0).GetValue()
-			) 
+			)
 			{
 				_GlobalExplorer.States.PlacingType = GlobalStates.PlacingTypeEnum.Simple;
 			}

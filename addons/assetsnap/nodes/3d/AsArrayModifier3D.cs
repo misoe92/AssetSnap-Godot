@@ -22,6 +22,9 @@
 
 using AssetSnap;
 using AssetSnap.Front.Nodes;
+using AssetSnap.Nodes;
+using AssetSnap.States;
+using AssetSnap.Static;
 using Godot;
 using System;
 using System.Collections.Generic;
@@ -29,15 +32,17 @@ using System.Collections.Generic;
 [Tool]
 public partial class AsArrayModifier3D : AsGroup3D
 {
-	private bool Initialized = false;
+	private Node _Duplicates;
 	public AsStaticBody3D _Parent;
 	private string _Name;
-	
+	private string _DuplicateType;
+	private bool Initialized = false;
+
 	[ExportGroup("Settings")]
 	[ExportSubgroup("Modifier")]
-	
+
 	[Export]
-	public new string Name
+	public string ArrayName
 	{
 		get => _Name;
 		set
@@ -46,21 +51,54 @@ public partial class AsArrayModifier3D : AsGroup3D
 			_Name = value;
 		}
 	}
-	
+
+	[Export]
+	public string DuplicateType
+	{
+		get => _DuplicateType;
+		set
+		{
+			_DuplicateType = value;
+		}
+	}
+
+	[Export]
+	public Node Duplicates
+	{
+		get => _Duplicates;
+		set
+		{
+			_Duplicates = value;
+		}
+	}
+
 	[ExportSubgroup("Mesh")]
 	private Mesh _Mesh;
-	
+
 	[Export]
-	public Mesh Mesh {
+	public Mesh Mesh
+	{
 		get => _Mesh;
-		set 
+		set
 		{
 			_Mesh = value;
 		}
 	}
-	
+
+	private Godot.Collections.Array<Mesh> _Meshes;
+
+	[Export]
+	public Godot.Collections.Array<Mesh> Meshes
+	{
+		get => _Meshes;
+		set
+		{
+			_Meshes = value;
+		}
+	}
+
 	private string _InstanceName;
-	
+
 	[Export]
 	public string InstanceName
 	{
@@ -70,96 +108,64 @@ public partial class AsArrayModifier3D : AsGroup3D
 			_InstanceName = value;
 		}
 	}
-	
+
 	private string _InstanceLibrary;
-	
+
 	[Export]
-	public string InstanceLibrary 
+	public string InstanceLibrary
 	{
 		get => _InstanceLibrary;
-		set 
+		set
 		{
 			_InstanceLibrary = value;
 		}
 	}
-	
-	private Transform3D _InstanceTransform;
-	
-	[Export]
-	public Transform3D InstanceTransform 
-	{
-		get => _InstanceTransform;
-		set 
-		{
-			_InstanceTransform = value;
-		}
-	}
-	
-	private Vector3 _InstanceRotation;
-	
-	[Export]
-	public Vector3 InstanceRotation 
-	{
-		get => _InstanceRotation;
-		set 
-		{
-			_InstanceRotation = value;
-		}
-	}
-	
-	private Vector3 _InstanceScale;
-	
-	[Export]
-	public Vector3 InstanceScale 
-	{
-		get => _InstanceScale;
-		set 
-		{
-			_InstanceScale = value;
-		}
-	}
-	
+
 	[ExportSubgroup("Optimization")]
 	private bool _UseMultiMesh = false;
-	
+
 	[Export]
-	public bool UseMultiMesh {
+	public bool UseMultiMesh
+	{
 		get => _UseMultiMesh;
-		set 
+		set
 		{
 			_UseMultiMesh = value;
 			UpdateArray();
 		}
 	}
-	
+
 	[ExportSubgroup("Collisions")]
 	private bool _ForceCollisions = false;
-	
+
 	[Export]
-	public bool ForceCollisions {
+	public bool ForceCollisions
+	{
 		get => _ForceCollisions;
-		set 
+		set
 		{
 			_ForceCollisions = value;
 			UpdateArray();
 		}
 	}
 	private bool _NoCollisions = false;
-	
+
 	[Export]
-	public bool NoCollisions {
+	public bool NoCollisions
+	{
 		get => _NoCollisions;
-		set 
+		set
 		{
 			_NoCollisions = value;
 			UpdateArray();
 		}
 	}
-	
+
 	[Export]
-	public bool UseSphere {
+	public bool UseSphere
+	{
 		get => _UseSphere;
-		set 
+		set
 		{
 			_UseSphere = value;
 			UpdateArray();
@@ -167,11 +173,12 @@ public partial class AsArrayModifier3D : AsGroup3D
 		}
 	}
 	private bool _UseSphere = false;
-	
+
 	[Export]
-	public bool UseConvexPolygon {
+	public bool UseConvexPolygon
+	{
 		get => _UseConvexPolygon;
-		set 
+		set
 		{
 			_UseConvexPolygon = value;
 			UpdateArray();
@@ -179,11 +186,12 @@ public partial class AsArrayModifier3D : AsGroup3D
 		}
 	}
 	private bool _UseConvexPolygon = false;
-	
+
 	[Export]
-	public bool UseConvexClean {
+	public bool UseConvexClean
+	{
 		get => _UseConvexClean;
-		set 
+		set
 		{
 			_UseConvexClean = value;
 			UpdateArray();
@@ -191,11 +199,12 @@ public partial class AsArrayModifier3D : AsGroup3D
 		}
 	}
 	private bool _UseConvexClean = false;
-	
+
 	[Export]
-	public bool UseConvexSimplify {
+	public bool UseConvexSimplify
+	{
 		get => _UseConvexSimplify;
-		set 
+		set
 		{
 			_UseConvexSimplify = value;
 			UpdateArray();
@@ -203,11 +212,12 @@ public partial class AsArrayModifier3D : AsGroup3D
 		}
 	}
 	private bool _UseConvexSimplify = false;
-	
+
 	[Export]
-	public bool UseConcavePolygon {
+	public bool UseConcavePolygon
+	{
 		get => _UseConcavePolygon;
-		set 
+		set
 		{
 			_UseConcavePolygon = value;
 			UpdateArray();
@@ -215,102 +225,106 @@ public partial class AsArrayModifier3D : AsGroup3D
 		}
 	}
 	private bool _UseConcavePolygon = false;
-	
+
 	[ExportCategory("General")]
 	private bool _OffsetBySize = true;
-	
+
 	[Export]
-	public bool OffsetBySize {
+	public bool OffsetBySize
+	{
 		get => _OffsetBySize;
-		set 
+		set
 		{
 			_OffsetBySize = value;
 			UpdateArray();
 			NotifyPropertyListChanged();
 		}
 	}
-	
+
 	private bool _OffsetByXAngle = true;
-	
+
 	[Export]
-	public bool OffsetByXAngle {
+	public bool OffsetByXAngle
+	{
 		get => _OffsetByXAngle;
-		set 
+		set
 		{
 			_OffsetByXAngle = value;
 			UpdateArray();
 		}
 	}
-	
+
 	private bool _OffsetByZAngle = false;
-	
+
 	[Export]
-	public bool OffsetByZAngle {
+	public bool OffsetByZAngle
+	{
 		get => _OffsetByZAngle;
-		set 
+		set
 		{
 			_OffsetByZAngle = value;
 			UpdateArray();
 		}
 	}
-	
+
 	private bool _ReverseOffsetAngle = false;
-	
+
 	[Export]
-	public bool ReverseOffsetAngle {
+	public bool ReverseOffsetAngle
+	{
 		get => _ReverseOffsetAngle;
-		set 
+		set
 		{
 			_ReverseOffsetAngle = value;
 			UpdateArray();
 		}
 	}
-	
+
 	private int _Amount = 1;
-	
+
 	[Export]
-	public int Amount {
+	public int Amount
+	{
 		get => _Amount;
-		set 
+		set
 		{
 			_Amount = value;
-
 			UpdateArray();
 		}
 	}
-	
+
 	private float _OffsetX = 0.0f;
 	[Export]
-	public float OffsetX {
+	public float OffsetX
+	{
 		get => _OffsetX;
-		set 
+		set
 		{
 			_OffsetX = value;
-			
 			UpdateArray();
 		}
 	}
-	
+
 	private float _OffsetY = 0.0f;
 	[Export]
-	public float OffsetY {
+	public float OffsetY
+	{
 		get => _OffsetY;
-		set 
+		set
 		{
 			_OffsetY = value;
-			
 			UpdateArray();
 		}
 	}
-	
+
 	private float _OffsetZ = 0.0f;
 	[Export]
-	public float OffsetZ {
+	public float OffsetZ
+	{
 		get => _OffsetZ;
-		set 
+		set
 		{
 			_OffsetZ = value;
-			
 			UpdateArray();
 		}
 	}
@@ -318,393 +332,404 @@ public partial class AsArrayModifier3D : AsGroup3D
 	public override void _Ready()
 	{
 		Initialized = true;
-		_SceneRoot = GlobalExplorer.GetInstance()._Plugin.GetTree().EditedSceneRoot;
-		
+		_SceneRoot = Plugin.Singleton.GetTree().EditedSceneRoot;
+
 		base._Ready();
+
+		if (GetChildCount() == 0)
+		{
+			UpdateArray();
+		}
 	}
 
 	public override void _ValidateProperty(Godot.Collections.Dictionary property)
 	{
-		if( _OffsetBySize == false && property.ContainsKey("name") && ( property["name"].As<string>() == "OffsetByXAngle" || property["name"].As<string>() == "OffsetByZAngle"  ) ) 
+		if (_OffsetBySize == false && property.ContainsKey("name") && (property["name"].As<string>() == "OffsetByXAngle" || property["name"].As<string>() == "OffsetByZAngle"))
 		{
 			var usage = PropertyUsageFlags.ReadOnly;
 			property["usage"] = (int)usage;
 		}
-		else if( _OffsetBySize == true && property.ContainsKey("name") && ( property["name"].As<string>() == "OffsetByXAngle" || property["name"].As<string>() == "OffsetByZAngle"  ) ) 
+		else if (_OffsetBySize == true && property.ContainsKey("name") && (property["name"].As<string>() == "OffsetByXAngle" || property["name"].As<string>() == "OffsetByZAngle"))
 		{
 			var usage = property["usage"].As<PropertyUsageFlags>() | PropertyUsageFlags.ScriptVariable;
 			property["usage"] = (int)usage;
 		}
-		
-		if( ( UseConvexPolygon == true || UseConcavePolygon == true ) && property.ContainsKey("name") && ( property["name"].As<string>() == "UseSphere" || property["name"].As<string>() == "UseSphere" ) ) 
+
+		if ((UseConvexPolygon == true || UseConcavePolygon == true) && property.ContainsKey("name") && (property["name"].As<string>() == "UseSphere" || property["name"].As<string>() == "UseSphere"))
 		{
 			var usage = PropertyUsageFlags.ReadOnly;
 			property["usage"] = (int)usage;
 		}
-		else if( UseConvexPolygon == false && UseConcavePolygon == false && property.ContainsKey("name") && ( property["name"].As<string>() == "UseSphere" || property["name"].As<string>() == "UseSphere" ) ) 
+		else if (UseConvexPolygon == false && UseConcavePolygon == false && property.ContainsKey("name") && (property["name"].As<string>() == "UseSphere" || property["name"].As<string>() == "UseSphere"))
 		{
 			var usage = property["usage"].As<PropertyUsageFlags>() | PropertyUsageFlags.ScriptVariable;
 			property["usage"] = (int)usage;
 		}
-		
-		if( UseConvexPolygon == false && property.ContainsKey("name") && ( property["name"].As<string>() == "UseConvexClean" || property["name"].As<string>() == "UseConvexClean" ) ) 
+
+		if (UseConvexPolygon == false && property.ContainsKey("name") && (property["name"].As<string>() == "UseConvexClean" || property["name"].As<string>() == "UseConvexClean"))
 		{
 			var usage = PropertyUsageFlags.ReadOnly;
 			property["usage"] = (int)usage;
 		}
-		else if( UseConvexPolygon == true && property.ContainsKey("name") && ( property["name"].As<string>() == "UseConvexClean" || property["name"].As<string>() == "UseConvexClean" ) ) 
+		else if (UseConvexPolygon == true && property.ContainsKey("name") && (property["name"].As<string>() == "UseConvexClean" || property["name"].As<string>() == "UseConvexClean"))
 		{
 			var usage = property["usage"].As<PropertyUsageFlags>() | PropertyUsageFlags.ScriptVariable;
 			property["usage"] = (int)usage;
 		}
-		
-		if( UseConvexPolygon == false && property.ContainsKey("name") && ( property["name"].As<string>() == "UseConvexSimplify" || property["name"].As<string>() == "UseConvexSimplify" ) ) 
+
+		if (UseConvexPolygon == false && property.ContainsKey("name") && (property["name"].As<string>() == "UseConvexSimplify" || property["name"].As<string>() == "UseConvexSimplify"))
 		{
 			var usage = PropertyUsageFlags.ReadOnly;
 			property["usage"] = (int)usage;
 		}
-		else if( UseConvexPolygon == true && property.ContainsKey("name") && ( property["name"].As<string>() == "UseConvexSimplify" || property["name"].As<string>() == "UseConvexSimplify" ) ) 
+		else if (UseConvexPolygon == true && property.ContainsKey("name") && (property["name"].As<string>() == "UseConvexSimplify" || property["name"].As<string>() == "UseConvexSimplify"))
 		{
 			var usage = property["usage"].As<PropertyUsageFlags>() | PropertyUsageFlags.ScriptVariable;
 			property["usage"] = (int)usage;
 		}
-		
-		if( ( UseSphere == true || UseConcavePolygon == true ) && property.ContainsKey("name") && ( property["name"].As<string>() == "UseConvexPolygon" || property["name"].As<string>() == "UseConvexPolygon" ) ) 
+
+		if ((UseSphere == true || UseConcavePolygon == true) && property.ContainsKey("name") && (property["name"].As<string>() == "UseConvexPolygon" || property["name"].As<string>() == "UseConvexPolygon"))
 		{
 			var usage = PropertyUsageFlags.ReadOnly;
 			property["usage"] = (int)usage;
 		}
-		else if( UseSphere == false && UseConcavePolygon == false && property.ContainsKey("name") && ( property["name"].As<string>() == "UseConvexPolygon" || property["name"].As<string>() == "UseConvexPolygon" ) ) 
+		else if (UseSphere == false && UseConcavePolygon == false && property.ContainsKey("name") && (property["name"].As<string>() == "UseConvexPolygon" || property["name"].As<string>() == "UseConvexPolygon"))
 		{
 			var usage = property["usage"].As<PropertyUsageFlags>() | PropertyUsageFlags.ScriptVariable;
 			property["usage"] = (int)usage;
 		}
-		
-		if( ( UseSphere == true || UseConvexPolygon == true ) && property.ContainsKey("name") && ( property["name"].As<string>() == "UseConcavePolygon" || property["name"].As<string>() == "UseConcavePolygon" ) ) 
+
+		if ((UseSphere == true || UseConvexPolygon == true) && property.ContainsKey("name") && (property["name"].As<string>() == "UseConcavePolygon" || property["name"].As<string>() == "UseConcavePolygon"))
 		{
 			var usage = PropertyUsageFlags.ReadOnly;
 			property["usage"] = (int)usage;
 		}
-		else if( UseSphere == false && UseConvexPolygon == false && property.ContainsKey("name") && ( property["name"].As<string>() == "UseConcavePolygon" || property["name"].As<string>() == "UseConcavePolygon" ) ) 
+		else if (UseSphere == false && UseConvexPolygon == false && property.ContainsKey("name") && (property["name"].As<string>() == "UseConcavePolygon" || property["name"].As<string>() == "UseConcavePolygon"))
 		{
 			var usage = property["usage"].As<PropertyUsageFlags>() | PropertyUsageFlags.ScriptVariable;
 			property["usage"] = (int)usage;
 		}
-		
+
 		base._ValidateProperty(property);
 	}
-	
+
 	public void Update()
 	{
 		UpdateArray();
 	}
-	
+
 	private void UpdateArray()
 	{
-		if( false == Initialized || _Mesh == null ) 
+		if (false == Initialized || null == Duplicates)
 		{
 			return;
 		}
-			
-		ClearCurrentChildren();
-		
-		if( UseMultiMesh == false ) 
-		{
-			CreateSimpleArray();
-		}
-		else 
-		{
-			CreateMultiArray();
-		}
-	}
-	
-	private void CreateSimpleArray()
-	{
-		if( GetParent() == null ) 
+
+		if (GetParent() == null)
 		{
 			GD.PushError("Parent aint set yet");
 			return;
 		}
-		
-		if( _Mesh == null ) 
-		{
-			throw new Exception("Mesh is invalid");
-		}
 
-		if( null == GetTree() ) 
+		if (null == GetTree())
 		{
 			GD.PushError("No tree was found");
 			return;
 		}
-		
-		for( int i = 0; i < _Amount; i++) 
+
+		if (GetChildCount() != 0)
 		{
-			AssetSnap.Front.Nodes.AsMeshInstance3D _Model = new()
+			ClearCurrentChildren();
+		}
+
+		StatesUtils.Get().ConcaveCollision = GlobalStates.LibraryStateEnum.Disabled;
+		StatesUtils.Get().ConvexCollision = GlobalStates.LibraryStateEnum.Disabled;
+		StatesUtils.Get().ConvexClean = GlobalStates.LibraryStateEnum.Disabled;
+		StatesUtils.Get().ConvexSimplify = GlobalStates.LibraryStateEnum.Disabled;
+		StatesUtils.Get().SphereCollision = GlobalStates.LibraryStateEnum.Disabled;
+
+		// Apply options
+		if (UseSphere)
+		{
+			StatesUtils.Get().SphereCollision = GlobalStates.LibraryStateEnum.Enabled;
+		}
+
+		if (UseConcavePolygon)
+		{
+			StatesUtils.Get().ConcaveCollision = GlobalStates.LibraryStateEnum.Enabled;
+		}
+
+		if (UseConvexPolygon)
+		{
+			StatesUtils.Get().ConvexCollision = GlobalStates.LibraryStateEnum.Enabled;
+
+			if (UseConvexClean)
 			{
-				Name = Name + "/" + i,
-				Mesh = _Mesh,
-				Transform = InstanceTransform,
-				Scale = InstanceScale,
-				RotationDegrees = InstanceRotation,
-				Floating = true,
-			}; 
-						
-			if( _Model == null ) 
-			{
-				throw new Exception("Model is invalid");
+				StatesUtils.Get().ConvexClean = GlobalStates.LibraryStateEnum.Enabled;
 			}
 
-			_Model.SetLibraryName(InstanceLibrary);
-			
-			Transform3D Trans = InstanceTransform;
+			if (UseConvexSimplify)
+			{
+				StatesUtils.Get().ConvexSimplify = GlobalStates.LibraryStateEnum.Enabled;
+			}
+		}
 
-			float ExtraOffsetX = 0;
-			float ExtraOffsetY = 0;
-			float ExtraOffsetZ = 0;
-			
-			if( OffsetBySize ) 
-			{
-				Aabb ModelAabb = _Mesh.GetAabb();
-				
-				if( OffsetByXAngle && ReverseOffsetAngle == false ) 
-				{
-					ExtraOffsetX += ModelAabb.Size.X;					
-				}
-				
-				if( OffsetByZAngle && ReverseOffsetAngle == false ) 
-				{
-					ExtraOffsetZ += ModelAabb.Size.Z;					
-				}
-				
-				if( OffsetByXAngle && ReverseOffsetAngle == true ) 
-				{
-					ExtraOffsetX -= ModelAabb.Size.X;					
-				}
-				
-				if( OffsetByZAngle && ReverseOffsetAngle == true ) 
-				{
-					ExtraOffsetZ -= ModelAabb.Size.Z;					
-				}
-			}
-
-			Trans.Origin.X = ( OffsetX * i) + ( ExtraOffsetX * i ) + Trans.Origin.X;
-			Trans.Origin.Y = ( OffsetY * i) + ( ExtraOffsetY * i ) + Trans.Origin.Y;
-			Trans.Origin.Z = ( OffsetZ * i) + ( ExtraOffsetZ * i ) + Trans.Origin.Z;
-			
-			AddChild(_Model, true);
-			_Model.Owner = _SceneRoot;
-			_Model.Transform = Trans;
-			
-			if( ShouldAddCollision() && _NoCollisions == false || _ForceCollisions ) 
-			{
-				_AddCollisions(_Model, i);
-			}
-			else 
-			{
-				_Model.SetIsFloating(false);
-			}
-			
-			Randomnize();
+		if (UseMultiMesh == false)
+		{
+			CreateSimpleArray();
+		}
+		else
+		{
+			CreateMultiArray();
 		}
 	}
-	
+
+	private void CreateSimpleArray()
+	{
+		try
+		{
+			for (int i = 0; i < _Amount; i++)
+			{
+				Node3D _Model = Duplicates.Duplicate() as Node3D;
+
+				if (_Model == null)
+				{
+					throw new Exception("Model is invalid");
+				}
+
+				float ExtraOffsetX = 0;
+				float ExtraOffsetY = 0;
+				float ExtraOffsetZ = 0;
+
+				Transform3D transform = new Transform3D(Basis.Identity, Vector3.Zero);
+
+				if (OffsetBySize)
+				{
+					Aabb ModelAabb = NodeUtils.CalculateNodeAabb(Duplicates);
+					if (OffsetByXAngle)
+					{
+						ExtraOffsetX += ModelAabb.Size.X;
+					}
+
+					if (OffsetByZAngle)
+					{
+						ExtraOffsetZ += ModelAabb.Size.Z;
+					}
+				}
+
+				transform = ApplyModelTransforms(transform, new Vector3(ExtraOffsetX, ExtraOffsetY, ExtraOffsetZ), i);
+				if (_Model is AsMeshInstance3D)
+				{
+					ApplyModelMeta(_Model);
+				}
+
+				if (_Model is AsNode3D)
+				{
+					foreach (Node child in _Model.GetChildren())
+					{
+						ApplyModelMeta(child);
+					}
+				}
+
+				AddChild(_Model, true);
+				_Model.Owner = GetTree().EditedSceneRoot;
+				_Model.Transform = transform;
+
+				if (_Model is AsMeshInstance3D meshInstance3D)
+				{
+					meshInstance3D.SetLibraryName(InstanceLibrary);
+					meshInstance3D.SetIsFloating(false);
+					meshInstance3D.GetCollisionBody().Initialize();
+					meshInstance3D.UpdateViewability();
+				}
+
+				if (_Model is AsNode3D node3d)
+				{
+					node3d.SetLibraryName(InstanceLibrary);
+					node3d.SetIsFloating(false);
+
+					foreach (Node child in node3d.GetChildren())
+					{
+						child.Owner = GetTree().EditedSceneRoot;
+
+						if (child is AsMeshInstance3D childMeshInstance3D)
+						{
+							childMeshInstance3D.SetLibraryName(InstanceLibrary);
+							childMeshInstance3D.SetIsFloating(false);
+							childMeshInstance3D.GetCollisionBody().Initialize();
+							childMeshInstance3D.UpdateViewability();
+						}
+					}
+				}
+
+				// Randomnize();
+			}
+		}
+		catch (Exception e)
+		{
+			GD.PushWarning(e.Message);
+		}
+	}
+
 	private void CreateMultiArray()
+	{
+		// Check if duplicated item is AsMeshInstance
+		// If yes SimpleMultiMeshArray
+		// If no AdvancedMultiMeshArray 
+
+		if (Duplicates is AsMeshInstance3D asMeshInstance3D)
+		{
+			// Simple MultiMeshInstance3D
+			_SimpleMultiMeshArray(asMeshInstance3D);
+		}
+		else
+		{
+			_AdvancedMultiMeshArray();
+		}
+
+		// Randomnize();
+	}
+
+	private void _SimpleMultiMeshArray(AsMeshInstance3D asMeshInstance3D)
 	{
 		MultiMesh _MultiMesh = new()
 		{
 			TransformFormat = MultiMesh.TransformFormatEnum.Transform3D,
-			Mesh = _Mesh,
+			Mesh = asMeshInstance3D.Mesh,
 			InstanceCount = _Amount,
 		};
 
-		MultiMeshInstance3D _MultiMeshInstance = new()
+		AsMultiMeshInstance3D _MultiMeshInstance = new()
 		{
 			Multimesh = _MultiMesh
 		};
-		
+		ApplyModelMeta(_MultiMeshInstance);
+
 		List<Vector3> positions = new List<Vector3>();
-	
-		for( int i = 0; i < _Amount; i++) 
+
+		for (int i = 0; i < _Amount; i++)
 		{
-			Transform3D Trans = InstanceTransform;
+			Transform3D transform = new Transform3D(Basis.Identity, Vector3.Zero);
 
 			float ExtraOffsetX = 0;
 			float ExtraOffsetY = 0;
 			float ExtraOffsetZ = 0;
-			
-			if( OffsetBySize ) 
+
+			if (OffsetBySize)
 			{
-				Aabb ModelAabb = _Mesh.GetAabb();
-				
-				if( OffsetByXAngle ) 
+				Aabb ModelAabb = NodeUtils.CalculateNodeAabb(asMeshInstance3D);
+
+				if (OffsetByXAngle)
 				{
-					ExtraOffsetX += ModelAabb.Size.X;					
+					ExtraOffsetX += ModelAabb.Size.X;
 				}
-				
-				if( OffsetByZAngle ) 
+
+				if (OffsetByZAngle)
 				{
-					ExtraOffsetZ += ModelAabb.Size.Z;					
+					ExtraOffsetZ += ModelAabb.Size.Z;
 				}
 			}
 
-			Trans.Origin.X = ( OffsetX * i) + ( ExtraOffsetX * i ) + Trans.Origin.X;
-			Trans.Origin.Y = ( OffsetY * i) + ( ExtraOffsetY * i ) + Trans.Origin.Y;
-			Trans.Origin.Z = ( OffsetZ * i) + ( ExtraOffsetZ * i ) + Trans.Origin.Z;
-
-			_MultiMesh.SetInstanceTransform(i, Trans);
-			positions.Add(Trans.Origin);
+			transform = ApplyModelTransforms(transform, new Vector3(ExtraOffsetX, ExtraOffsetY, ExtraOffsetZ), i);
+			_MultiMesh.SetInstanceTransform(i, transform);
+			positions.Add(transform.Origin);
 		}
 
 		AddChild(_MultiMeshInstance);
 		_MultiMeshInstance.Owner = _SceneRoot;
-		_MultiMeshInstance.Name = _InstanceName + "/multiMesh";
-		
-		if( ShouldAddCollision() && _NoCollisions == false || _ForceCollisions ) 
-		{
-			Aabb _aabb = Mesh.GetAabb();
-			_AddMultiCollisions(_MultiMeshInstance, positions, _aabb);
-		}
-		
-		Randomnize();
+		_MultiMeshInstance.Name = _Name + "/multiMesh";
 	}
-	
-	private void _AddCollisions(Node3D _model, int index)
+
+	private void _AdvancedMultiMeshArray()
 	{
-		// Only add collisions to models
-		if( _model.HasMeta("AsModel") == false ) 
+		if (Duplicates is AsNode3D asNode3D)
 		{
-			return;
-		}
-		
-		if( _model is AssetSnap.Front.Nodes.AsMeshInstance3D model ) 
-		{
-			AsStaticBody3D _Body = new()
+			// Childable
+			foreach (MeshInstance3D child in asNode3D.GetChildren())
 			{
-				Name = "AsBody@idx-" + GetChildCount(),
-				Transform = model.Transform,
-				
-				Mesh = model.Mesh,
-				MeshName = model.Name,
-				InstanceTransform = model.Transform,
-				InstanceScale = InstanceScale,
-				InstanceRotation = model.RotationDegrees,
-				InstanceLibrary = InstanceLibrary,
-				InstanceSpawnSettings = model.SpawnSettings,
-			};
-	
-			AddChild(_Body, true);
-			_Body.Owner = _SceneRoot;
+				MultiMesh _MultiMesh = new()
+				{
+					TransformFormat = MultiMesh.TransformFormatEnum.Transform3D,
+					Mesh = child.Mesh,
+					InstanceCount = _Amount,
+				};
 
-			int typeState = 0;
-			int argState = 0;
-			
-			if( UseConvexPolygon ) 
-			{
-				typeState = 1;
-				
-				if(UseConvexClean && false == UseConvexSimplify ) 
+				AsMultiMeshInstance3D _MultiMeshInstance = new()
 				{
-					argState = 1;	
-				}
-				else if( false == UseConvexClean && UseConvexSimplify ) 
+					Multimesh = _MultiMesh
+				};
+				ApplyModelMeta(_MultiMeshInstance);
+
+				List<Vector3> positions = new List<Vector3>();
+
+				for (int i = 0; i < _Amount; i++)
 				{
-					argState = 2;	
+					Transform3D transform = new Transform3D(Basis.Identity, Vector3.Zero);
+
+					float ExtraOffsetX = 0;
+					float ExtraOffsetY = 0;
+					float ExtraOffsetZ = 0;
+
+					if (OffsetBySize)
+					{
+						Aabb ModelAabb = NodeUtils.CalculateNodeAabb(asNode3D);
+
+						if (OffsetByXAngle)
+						{
+							ExtraOffsetX += ModelAabb.Size.X;
+						}
+
+						if (OffsetByZAngle)
+						{
+							ExtraOffsetZ += ModelAabb.Size.Z;
+						}
+					}
+
+					transform = ApplyModelTransforms(transform, new Vector3(ExtraOffsetX, ExtraOffsetY, ExtraOffsetZ), i);
+					_MultiMesh.SetInstanceTransform(i, transform);
+					positions.Add(transform.Origin);
 				}
-				else if( UseConvexClean && UseConvexSimplify ) 
-				{
-					argState = 3;	
-				}
+
+				AddChild(_MultiMeshInstance);
+				_MultiMeshInstance.Owner = _SceneRoot;
+				_MultiMeshInstance.Name = _InstanceName + "/multiMesh";
 			}
-			
-			if( UseConcavePolygon ) 
-			{
-				typeState = 2;
-			}
-			
-			if( UseSphere ) 
-			{
-				typeState = 3;
-			} 
-			
-			_Body.Initialize(typeState, argState);
-			
-			model.GetParent().RemoveChild(model);
-			model.QueueFree();
 		}
 	}
-	
-	private void _AddMultiCollisions(MultiMeshInstance3D _MultiMeshInstance, List<Vector3> _Positions, Aabb ModelAabb )
+
+	private Transform3D ApplyModelTransforms(Transform3D transform, Vector3 ExtraOffset, int i)
 	{
-		GlobalExplorer _GlobalExplorer = GlobalExplorer.GetInstance();
-			
-		for( int i = 0; i < _Positions.Count; i++ ) 
+		if (ReverseOffsetAngle)
 		{
-			Vector3 _Pos = _Positions[i];
-			Transform3D _Trans = Transform3D.Identity;
+			transform.Origin.X -= transform.Origin.X + (OffsetX * i) + (ExtraOffset.X * i);
+			transform.Origin.Y -= transform.Origin.Y + (OffsetY * i) + (ExtraOffset.Y * i);
+			transform.Origin.Z -= transform.Origin.Z + (OffsetZ * i) + (ExtraOffset.Z * i);
+		}
+		else
+		{
+			transform.Origin.X += transform.Origin.X + (OffsetX * i) + (ExtraOffset.X * i);
+			transform.Origin.Y += transform.Origin.Y + (OffsetY * i) + (ExtraOffset.Y * i);
+			transform.Origin.Z += transform.Origin.Z + (OffsetZ * i) + (ExtraOffset.Z * i);
+		}
 
-			_Trans.Origin = new Vector3(_Pos.X, _Pos.Y, _Pos.Z);
-			AsStaticBody3D _Body = new()
-			{
-				Transform = _Trans,
-				UsingMultiMesh = true,
-										
-				Mesh = _Mesh,
-				MeshName = _Mesh.ResourceName,
-				InstanceLibrary = InstanceLibrary,
-				InstanceScale = _MultiMeshInstance.Multimesh.GetInstanceTransform(i).Basis.Scale,
-			};
+		return transform;
+	}
 
-			AddChild(_Body);
-			_Body.Owner = _SceneRoot;
-			
-			int typeState = 0;
-			int argState = 0;
-			
-			if( UseConvexPolygon ) 
-			{
-				typeState = 1;
-				
-				if(UseConvexClean && false == UseConvexSimplify ) 
-				{
-					argState = 1;	
-				}
-				else if( false == UseConvexClean && UseConvexSimplify ) 
-				{
-					argState = 2;	
-				}
-				else if( UseConvexClean && UseConvexSimplify ) 
-				{
-					argState = 3;	
-				}
-			}
-			
-			if( UseConcavePolygon ) 
-			{
-				typeState = 2;
-			}
-			
-			if( UseSphere ) 
-			{
-				typeState = 3;
-			}
+	private void ApplyModelMeta(Node _Model)
+	{
+		if (ForceCollisions)
+		{
+			_Model.SetMeta("Collision", true);
+		}
 
-			_Body.Initialize(typeState, argState);
+		if (NoCollisions)
+		{
+			_Model.SetMeta("Collision", false);
 		}
 	}
-	
+
 	private bool ShouldAddCollision()
 	{
-		GlobalExplorer _GlobalExplorer = GlobalExplorer.GetInstance();
-		bool AddCollisions = _GlobalExplorer.Settings.GetKey("add_collisions").As<bool>();
-
-		return AddCollisions;
-	}
- 
-	public override void _ExitTree()
-	{
-		_Parent = null;
-		Mesh = null;
-		
-		base._ExitTree();
+		return SettingsStatic.ShouldAddCollision();
 	}
 }

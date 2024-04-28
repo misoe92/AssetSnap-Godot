@@ -34,33 +34,33 @@ namespace AssetSnap.Front.Components
 		private float _value = 0.0f;
 		private string _key;
 
-		public string key 
+		public string key
 		{
 			get => _key;
-			set 
+			set
 			{
 				_key = value;
 			}
 		}
-		
-		public float value 
+
+		public float value
 		{
 			get => _value;
-			set 
+			set
 			{
 				_value = value;
 			}
 		}
-		
+
 		/*
 		** Constructor of the component
 		** 
 		** @return void
-		*/			 
+		*/
 		public SettingsSpinBox()
 		{
 			Name = "SettingsSpinBox";
-			
+
 			UsingTraits = new()
 			{
 				{ typeof(Panelable).ToString() },
@@ -68,21 +68,21 @@ namespace AssetSnap.Front.Components
 				{ typeof(Labelable).ToString() },
 				{ typeof(Spinboxable).ToString() },
 			};
-			
+
 			//_include = false;   
 		}
-		
+
 		/*
 		** Initializing the component
 		**   
 		** @return void 
 		*/
-		public override void Initialize() 
+		public override void Initialize()
 		{
 			base.Initialize();
-			
-			string title = GetTitle( key );
-			string description = GetDescription( key );
+
+			string title = GetTitle(key);
+			string description = GetDescription(key);
 
 			Initiated = true;
 
@@ -90,12 +90,12 @@ namespace AssetSnap.Front.Components
 				.SetName("SettingsPanel")
 				.SetType(Panelable.PanelType.RoundedPanelContainer)
 				.SetHorizontalSizeFlags(Control.SizeFlags.ExpandFill)
-				.SetMargin(1, "top")
+				.SetMargin(5, "top")
 				.SetMargin(5, "bottom")
 				.SetMargin(5, "left")
 				.SetMargin(5, "right")
 				.Instantiate();
-			
+
 			Trait<Containerable>()
 				.SetName("SettingsSpinboxContainer")
 				.SetHorizontalSizeFlags(Control.SizeFlags.ExpandFill)
@@ -111,17 +111,18 @@ namespace AssetSnap.Front.Components
 				.SetDimensions(0, 20)
 				.SetVerticalSizeFlags(Control.SizeFlags.ShrinkEnd)
 				.SetStep(0.0f)
+				.SetMaxValue(1000)
 				.SetValue(value)
-				.SetAction( new Callable(this, "UpdateKey") )
+				.SetAction(new Callable(this, "UpdateKey"))
 				.Instantiate();
-			
-			ConfigureTitle( title, description );
+
+			ConfigureTitle(title, description);
 
 			Container innerContainer = Trait<Containerable>()
 					.Select(0)
 					.GetInnerContainer();
-			
-			if( null != title ) 
+
+			if (null != title)
 			{
 				Trait<Labelable>()
 					.Select(0)
@@ -129,8 +130,8 @@ namespace AssetSnap.Front.Components
 						innerContainer
 					);
 			}
-			
-			if( null != description ) 
+
+			if (null != description)
 			{
 				Trait<Labelable>()
 					.Select(1)
@@ -138,7 +139,7 @@ namespace AssetSnap.Front.Components
 						innerContainer
 					);
 			}
-			
+
 			Trait<Spinboxable>()
 				.Select(0)
 				.AddToContainer(
@@ -152,20 +153,20 @@ namespace AssetSnap.Front.Components
 						.Select(0)
 						.GetNode()
 				);
-				
+
 			Trait<Panelable>()
 				.Select(0)
 				.AddToContainer(
 					this
 				);
 		}
-		
+
 		/*
 		** Configures the title
 		** 
 		** @return void
 		*/
-		private void ConfigureTitle( string title, string description)
+		private void ConfigureTitle(string title, string description)
 		{
 			if (title != null || description != null)
 			{
@@ -180,7 +181,7 @@ namespace AssetSnap.Front.Components
 						.SetVerticalSizeFlags(Control.SizeFlags.ShrinkBegin)
 						.Instantiate();
 				}
-				
+
 				if (description != null)
 				{
 					Trait<Labelable>()
@@ -196,36 +197,36 @@ namespace AssetSnap.Front.Components
 				}
 			}
 		}
-		
+
 		/*
 		** Fetches the title
 		** 
 		** @return string
 		*/
-		public string GetTitle( string key )
+		public string GetTitle(string key)
 		{
 			string FinalKey = key + "_title";
 			return SettingsText.KeyToString(FinalKey);
 		}
-		
+
 		/*
 		** Fetches the description
 		** 
 		** @return string
 		*/
-		public string GetDescription( string key )
+		public string GetDescription(string key)
 		{
 			string FinalKey = key + "_description";
 			return SettingsText.KeyToString(FinalKey);
 		}
-		
+
 		/*
 		** Updates the settings key and
 		** interval value
 		** 
 		** @return void
 		*/
-		public void UpdateKey( float NewValue )
+		public void UpdateKey(float NewValue)
 		{
 			value = NewValue;
 			ExplorerUtils.Get().Settings.SetKey(key, NewValue);

@@ -32,19 +32,19 @@ namespace AssetSnap.Front.Components.Library
 	public partial class Listing : LibraryComponent
 	{
 		private string _Folder;
-	
+
 		private Godot.Collections.Array<HBoxContainer> Containers = new();
 		private Godot.Collections.Array<ListEntry> Items = new();
-		
-		public string Folder 
+
+		public string Folder
 		{
 			get => _Folder;
-			set 
+			set
 			{
 				_Folder = value;
 			}
 		}
-		
+
 		/*
 		** Constructor
 		**
@@ -53,16 +53,16 @@ namespace AssetSnap.Front.Components.Library
 		public Listing()
 		{
 			Name = "LibraryListing";
-			
+
 			UsingTraits = new()
 			{
 				{ typeof(Containerable).ToString() },
 				{ typeof(ScrollContainerable).ToString() },
 			};
-			
+
 			//_include = false; 
 		}
-		
+
 		/*
 		** Initializes the component 
 		**
@@ -71,19 +71,19 @@ namespace AssetSnap.Front.Components.Library
 		public override void Initialize()
 		{
 			base.Initialize();
-			
+
 			Containers = new();
 			Items = new();
 			Initiated = true;
-			
+
 			SizeFlagsHorizontal = SizeFlags.ExpandFill;
 			SizeFlagsVertical = SizeFlags.ExpandFill;
-		
-			if( Folder == null ) 
+
+			if (Folder == null)
 			{
 				return;
 			}
-						
+
 			Trait<Containerable>()
 				.SetName("LibraryListingInner")
 				.SetVerticalSizeFlags(Control.SizeFlags.ExpandFill)
@@ -91,21 +91,21 @@ namespace AssetSnap.Front.Components.Library
 				.SetMargin(5, "left")
 				.SetMargin(5, "right")
 				.Instantiate();
-				
+
 			Trait<ScrollContainerable>()
 				.SetName("LibraryListingMain")
 				.SetVerticalSizeFlags(Control.SizeFlags.ExpandFill)
 				.SetMargin(5, "right")
 				.SetMargin(5, "left")
 				.Instantiate();
-				
+
 			Trait<Containerable>()
 				.SetName("LibraryListingInner")
 				.SetVerticalSizeFlags(Control.SizeFlags.ExpandFill)
 				.SetMargin(5, "left")
 				.SetMargin(5, "right")
 				.Instantiate();
-			
+
 			// Get the bottom dock
 			IterateFiles(
 				_Folder,
@@ -129,14 +129,14 @@ namespace AssetSnap.Front.Components.Library
 						.Select(0)
 						.GetInnerContainer()
 				);
-				
+
 			Trait<Containerable>()
 				.Select(0)
 				.AddToContainer(
 					this
 				);
 		}
-		
+
 		/*
 		** Updates the list 
 		**
@@ -145,19 +145,19 @@ namespace AssetSnap.Front.Components.Library
 		public void Update()
 		{
 			// _Library.RemoveAllPanelState();
-			foreach(HBoxContainer child in Trait<Containerable>().Select(0).GetInnerContainer().GetChildren()) 
+			foreach (HBoxContainer child in Trait<Containerable>().Select(1).GetInnerContainer().GetChildren())
 			{
-				if( IsInstanceValid( child ) ) 
+				if (IsInstanceValid(child))
 				{
 					_Library.RemoveAllPanelState();
-					Trait<Containerable>().Select(0).GetInnerContainer().RemoveChild(child);	
+					Trait<Containerable>().Select(1).GetInnerContainer().RemoveChild(child);
 					child.QueueFree();
 				}
 			}
 
-			IterateFiles(Folder, Trait<Containerable>().Select(0).GetInnerContainer());
+			IterateFiles(Folder, Trait<Containerable>().Select(1).GetInnerContainer());
 		}
-	
+
 		/*
 		** Iterates through the files inside the current folder
 		** and adds them as entries to the list
@@ -165,65 +165,73 @@ namespace AssetSnap.Front.Components.Library
 		** @return void
 		*/
 		private void IterateFiles(string folderPath, Container BoxContainer)
-		{		
+		{
 			List<string> Components = new()
 			{
 				"LibraryListEntry",
 			};
-			
-			if (GlobalExplorer.GetInstance().Components.HasAll( Components.ToArray() )) 
+
+			if (GlobalExplorer.GetInstance().Components.HasAll(Components.ToArray()))
 			{
 				int iteration = 0;
 				int rows = 0;
 				int max_iteration = 4;
 
 				HBoxContainer CurrentBoxContainer = _SetupListContainer(BoxContainer);
-				string[] fileNames = System.IO.Directory.GetFiles(folderPath.Split("res://").Join(""));
-				
+
+				// Build array of compatible models
+				string[] fileNames = System.IO.Directory.GetFiles(
+					folderPath.Split("res://").Join("")).Where(
+						t => t.Contains(".glb") || t.Contains(".gltf") || t.Contains(".fbx") || t.Contains(".obj")
+					).ToArray();
+
+				// Remove .import files from the array
+				fileNames = fileNames.Except(fileNames.Where(t => t.Contains(".import"))).ToArray();
+
 				Library.ItemCount = fileNames.Length;
 				foreach (string fileName in fileNames)
 				{
-					if(fileName.Contains(".import")) 
+					if (fileName.Contains(".import"))
 					{
-						continue; 
+						continue;
 					}
-					
+
 					string extension = System.IO.Path.GetExtension(fileName).ToLower();
 					string file_name = System.IO.Path.GetFileName(fileName);
-					
-					if( IsInstanceValid(Library._LibraryTopbar) && IsInstanceValid(Library._LibraryTopbar._LibrarySearch)) 
+
+					if (IsInstanceValid(Library._LibraryTopbar) && IsInstanceValid(Library._LibraryTopbar._LibrarySearch))
 					{
 						bool IsSearching = Library._LibraryTopbar._LibrarySearch.IsSearching();
 						bool SearchValid = Library._LibraryTopbar._LibrarySearch.SearchValid(file_name);
-						
-						if( IsSearching && false == SearchValid)
+
+						if (IsSearching && false == SearchValid)
 						{
 							continue;
 						}
 					}
 
 					// Check if the file has a supported extension 
-					if ( IsValidExtension( extension ) )
+					if (IsValidExtension(extension))
 					{
 						ListEntry SingleEntry = GlobalExplorer.GetInstance().Components.Single<ListEntry>(true);
 						SingleEntry.Name = "LibraryEntry-" + ((rows + 1) * iteration);
-						
+
 						SingleEntry.Container = CurrentBoxContainer;
 						SingleEntry.Folder = folderPath;
 						SingleEntry.Filename = file_name;
 						SingleEntry.Library = Library;
 						SingleEntry.Initialize();
-						
-						Items.Add(SingleEntry); 
-						  
-						if( iteration == max_iteration ) 
+
+						Items.Add(SingleEntry);
+
+						if (iteration == max_iteration)
 						{
 							iteration = 0;
-							rows += 1; 
-							
+							rows += 1;
+
 							CurrentBoxContainer = _SetupListContainer(BoxContainer);
 						}
-						else 
+						else
 						{
 							iteration += 1;
 						}
@@ -231,7 +239,7 @@ namespace AssetSnap.Front.Components.Library
 				}
 			}
 		}
-		
+
 		/*
 		** Check's if a extension is valid
 		** to be used as a model
@@ -239,11 +247,11 @@ namespace AssetSnap.Front.Components.Library
 		** @TODO Move check to a better section/class
 		** @return HBoxContainer
 		*/
-		private bool IsValidExtension( string Extension ) 
+		private bool IsValidExtension(string Extension)
 		{
 			return Extension == ".obj" || Extension == ".fbx" || Extension == ".glb" || Extension == ".gltf";
 		}
-			
+
 		/*
 		** Set's up the list container
 		**
@@ -256,9 +264,9 @@ namespace AssetSnap.Front.Components.Library
 				SizeFlagsVertical = Control.SizeFlags.ShrinkBegin,  // Uncheck VSize Flags for fixed height
 				SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,  // Uncheck HSize Flags for fixed width
 			};
-			
+
 			BoxContainer.AddChild(_Con);
-			Containers.Add( _Con );
+			Containers.Add(_Con);
 
 			return _Con;
 		}

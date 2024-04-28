@@ -149,7 +149,7 @@ namespace AssetSnap.Front.Nodes
 			for (int i = 0; i < numChunks; i++)
 			{
 				// Create a MultiMeshInstance for each chunk
-				MultiMeshInstance3D multiMeshInstance = new MultiMeshInstance3D()
+				AsMultiMeshInstance3D multiMeshInstance = new AsMultiMeshInstance3D()
 				{
 					Name = "Chunk-" + ( i + 1)
 				};

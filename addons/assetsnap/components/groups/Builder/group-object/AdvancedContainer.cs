@@ -34,34 +34,34 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 		private ConvexCollision _GroupBuilderEditorGroupObjectAdvancedContainerConvexCollision;
 		private ConcaveCollision _GroupBuilderEditorGroupObjectAdvancedContainerConcaveCollision;
 		private SnapLayer _GroupBuilderEditorGroupObjectAdvancedContainerSnapLayer;
-		
+
 		public AdvancedContainer()
 		{
 			Name = "GroupsBuilderGroupObjectAdvancedContainer";
-			
+
 			UsingTraits = new()
 			{
-				{ typeof(Containerable).ToString() },
 				{ typeof(Buttonable).ToString() },
 				{ typeof(Spinboxable).ToString() },
 				{ typeof(Labelable).ToString() },
+				{ typeof(Containerable).ToString() },
 			};
 		}
-		
+
 		public bool IsVisible()
 		{
 			return Trait<Containerable>()
 				.Select(0)
 				.IsVisible();
 		}
-		
+
 		public void ToggleVisibility()
 		{
 			Trait<Containerable>()
 				.Select(0)
 				.ToggleVisible();
 		}
-		
+
 		protected override void _InitializeFields()
 		{
 			Trait<Containerable>()
@@ -70,19 +70,19 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 				.SetMargin(20, "bottom")
 				.SetHorizontalSizeFlags(Control.SizeFlags.ShrinkBegin)
 				.SetVerticalSizeFlags(Control.SizeFlags.ShrinkBegin)
-				.SetOrientation( Containerable.ContainerOrientation.Horizontal )
-				.SetInnerOrientation( Containerable.ContainerOrientation.Vertical )
-				.SetVisible( false )
+				.SetOrientation(Containerable.ContainerOrientation.Horizontal)
+				.SetInnerOrientation(Containerable.ContainerOrientation.Vertical)
+				.SetVisible(false)
 				.Instantiate();
 
 			Container BoxContainer = Trait<Containerable>().Select(0).GetInnerContainer();
-		
+
 			_InitializeSnapLayerControl(BoxContainer);
 			_InitializeSphereCollisionControl(BoxContainer);
 			_InitializeConvexCollisionControl(BoxContainer);
 			_InitializeConcaveCollisionControl(BoxContainer);
 		}
-		
+
 		protected override void _FinalizeFields()
 		{
 			Trait<Containerable>()
@@ -91,15 +91,15 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 					this
 				);
 		}
-		
+
 		private void _InitializeSnapLayerControl(Container innerContainer)
 		{
 			List<string> Components = new()
 			{
 				"Groups.Builder.GroupObjects.AdvancedContainers.SnapLayer"
 			};
-			
-			if (_GlobalExplorer.Components.HasAll( Components.ToArray() )) 
+
+			if (_GlobalExplorer.Components.HasAll(Components.ToArray()))
 			{
 				_GroupBuilderEditorGroupObjectAdvancedContainerSnapLayer = GlobalExplorer.GetInstance().Components.Single<SnapLayer>(true);
 				_GroupBuilderEditorGroupObjectAdvancedContainerSnapLayer.Container = innerContainer;
@@ -109,15 +109,15 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 				_GroupBuilderEditorGroupObjectAdvancedContainerSnapLayer.Initialize();
 			}
 		}
-		
+
 		private void _InitializeSphereCollisionControl(Container innerContainer)
 		{
 			List<string> Components = new()
 			{
 				"Groups.Builder.GroupObjects.AdvancedContainers.SphereCollision"
 			};
-			
-			if (_GlobalExplorer.Components.HasAll( Components.ToArray() )) 
+
+			if (_GlobalExplorer.Components.HasAll(Components.ToArray()))
 			{
 				_GroupBuilderEditorGroupObjectAdvancedContainerSphereCollision = GlobalExplorer.GetInstance().Components.Single<SphereCollision>(true);
 				_GroupBuilderEditorGroupObjectAdvancedContainerSphereCollision.Container = innerContainer;
@@ -127,15 +127,15 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 				_GroupBuilderEditorGroupObjectAdvancedContainerSphereCollision.Initialize();
 			}
 		}
-		
+
 		private void _InitializeConvexCollisionControl(Container innerContainer)
 		{
 			List<string> Components = new()
 			{
 				"Groups.Builder.GroupObjects.AdvancedContainers.ConvexCollision"
 			};
-			
-			if (_GlobalExplorer.Components.HasAll( Components.ToArray() )) 
+
+			if (_GlobalExplorer.Components.HasAll(Components.ToArray()))
 			{
 				_GroupBuilderEditorGroupObjectAdvancedContainerConvexCollision = GlobalExplorer.GetInstance().Components.Single<ConvexCollision>(true);
 				_GroupBuilderEditorGroupObjectAdvancedContainerConvexCollision.Container = innerContainer;
@@ -145,15 +145,15 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 				_GroupBuilderEditorGroupObjectAdvancedContainerConvexCollision.Initialize();
 			}
 		}
-		
+
 		private void _InitializeConcaveCollisionControl(Container innerContainer)
 		{
 			List<string> Components = new()
 			{
 				"Groups.Builder.GroupObjects.AdvancedContainers.ConcaveCollision"
 			};
-			
-			if (_GlobalExplorer.Components.HasAll( Components.ToArray() )) 
+
+			if (_GlobalExplorer.Components.HasAll(Components.ToArray()))
 			{
 				_GroupBuilderEditorGroupObjectAdvancedContainerConcaveCollision = GlobalExplorer.GetInstance().Components.Single<ConcaveCollision>(true);
 				_GroupBuilderEditorGroupObjectAdvancedContainerConcaveCollision.Container = innerContainer;

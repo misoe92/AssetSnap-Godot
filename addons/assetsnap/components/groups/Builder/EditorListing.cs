@@ -24,6 +24,7 @@ namespace AssetSnap.Front.Components.Groups.Builder
 {
 	using System.Collections.Generic;
 	using AssetSnap.Component;
+	using AssetSnap.Explorer;
 	using Godot;
 
 	[Tool]
@@ -32,7 +33,7 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		public EditorListing()
 		{
 			Name = "GroupBuilderEditorListing";
-			
+
 			UsingTraits = new()
 			{
 				{ typeof(Containerable).ToString() },
@@ -41,29 +42,29 @@ namespace AssetSnap.Front.Components.Groups.Builder
 				{ typeof(Panelable).ToString() },
 				{ typeof(ScrollContainerable).ToString() },
 			};
-			
+
 			//_include = false;
 		}
-		
+
 		public override void Initialize()
 		{
 			SizeFlagsVertical = Control.SizeFlags.ExpandFill;
 			SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
-			
-			if( Initiated == true ) 
+
+			if (Initiated == true)
 			{
 				return;
 			}
-			
+
 			base.Initialize();
-			
+
 			Initiated = true;
-			
+
 			_InitializeFields();
-		
-			if( null != _GlobalExplorer.GroupBuilder._Editor.Group )
+
+			if (null != _GlobalExplorer.GroupBuilder._Editor.Group)
 			{
-				if( _GlobalExplorer.GroupBuilder._Editor.Group._Paths.Count == 0 ) 
+				if (_GlobalExplorer.GroupBuilder._Editor.Group._Paths.Count == 0)
 				{
 					_SetupNoFound();
 					HideTopbar();
@@ -71,51 +72,47 @@ namespace AssetSnap.Front.Components.Groups.Builder
 				else
 				{
 					ShowTopbar();
-					_SetupGroupObjects();	
+					_SetupGroupObjects();
 				}
 			}
-			else 
+			else
 			{
 				HideTopbar();
-				_SetupNoGroup();	
+				_SetupNoGroup();
 			}
 
 			_FinalizeFields();
 		}
-		
+
 		public void DoHide()
 		{
-			Trait<Panelable>()
-				.Select(0)
-				.SetVisible(false);
+			Visible = false;
 		}
-		
+
 		public void DoShow()
 		{
-			Trait<Panelable>()
-				.Select(0)
-				.SetVisible(true);
+			Visible = true;
 		}
-		
+
 		public void HideTopbar()
 		{
 			Trait<Containerable>()
 				.Select(1)
 				.SetVisible(false);
 		}
-		
+
 		public void ShowTopbar()
 		{
 			Trait<Containerable>()
 				.Select(1)
 				.SetVisible(true);
 		}
-		
+
 		public void Update()
 		{
-			if( null != _GlobalExplorer.GroupBuilder._Editor.Group )
+			if (null != ExplorerUtils.Get().GroupBuilder._Editor.Group)
 			{
-				if( _GlobalExplorer.GroupBuilder._Editor.Group._Paths.Count == 0 ) 
+				if (ExplorerUtils.Get().GroupBuilder._Editor.Group._Paths.Count == 0)
 				{
 					HideTopbar();
 					_SetupNoFound();
@@ -123,29 +120,29 @@ namespace AssetSnap.Front.Components.Groups.Builder
 				else
 				{
 					ShowTopbar();
-					_SetupGroupObjects();	
+					_SetupGroupObjects();
 				}
 			}
-			else 
+			else
 			{
 				HideTopbar();
-				_SetupNoGroup();	
+				_SetupNoGroup();
 			}
 		}
-		
+
 		public void Reset()
 		{
 			Container container = Trait<Containerable>()
 				.Select(2)
 				.GetInnerContainer();
 
-			foreach( Node child in container.GetChildren() )
+			foreach (Node child in container.GetChildren())
 			{
 				container.RemoveChild(child);
-				child.QueueFree();
+				child.Free();
 			}
 		}
-		
+
 		private void _InitializeFields()
 		{
 			Trait<Panelable>()
@@ -168,14 +165,14 @@ namespace AssetSnap.Front.Components.Groups.Builder
 				.SetHorizontalSizeFlags(Control.SizeFlags.ExpandFill)
 				.SetVerticalSizeFlags(Control.SizeFlags.ExpandFill)
 				.Instantiate();
-				
+
 			Trait<Containerable>()
 				.SetName("GroupBuilderEditorListingContainer")
 				.SetHorizontalSizeFlags(Control.SizeFlags.ExpandFill)
 				.SetVerticalSizeFlags(Control.SizeFlags.ExpandFill)
 				.SetLayout(Containerable.ContainerLayout.OneColumn)
 				.Instantiate();
-				
+
 			Trait<Containerable>()
 				.SetName("GroupBuilderEditorListingInnerContainer")
 				.SetHorizontalSizeFlags(Control.SizeFlags.ExpandFill)
@@ -184,7 +181,7 @@ namespace AssetSnap.Front.Components.Groups.Builder
 				.SetInnerOrientation(Containerable.ContainerOrientation.Horizontal)
 				.SetLayout(Containerable.ContainerLayout.TwoColumns)
 				.Instantiate();
-				
+
 			Trait<Containerable>()
 				.SetName("GroupBuilderEditorListingFinalContainer")
 				.SetHorizontalSizeFlags(Control.SizeFlags.ExpandFill)
@@ -194,7 +191,7 @@ namespace AssetSnap.Front.Components.Groups.Builder
 				.SetMargin(10, "bottom")
 				.SetLayout(Containerable.ContainerLayout.OneColumn)
 				.Instantiate();
-	
+
 			Trait<Containerable>()
 				.SetName("GroupBuilderEditorListingFinalButtonContainer")
 				.SetMargin(10, "top")
@@ -203,45 +200,45 @@ namespace AssetSnap.Front.Components.Groups.Builder
 				.SetVerticalSizeFlags(Control.SizeFlags.ShrinkBegin)
 				.SetLayout(Containerable.ContainerLayout.OneColumn)
 				.Instantiate();
-				
+
 			Trait<Labelable>()
 				.SetName("GroupBuilderEditorListingDescription")
-				.SetType(Labelable.TitleType.HeaderMedium)
+				.SetType(Labelable.TitleType.TextMedium)
 				.SetHorizontalSizeFlags(Control.SizeFlags.ExpandFill)
-				.SetMargin(0, "bottom")
+				.SetMargin(10, "bottom")
 				.SetText("Below objects are currently bound to the group. You can add more from the library at anytime")
 				.Instantiate();
-				
+
 			Trait<Buttonable>()
 				.SetName("GroupBuilderEditorListingAdvancedOptions")
 				.SetMargin(10, "top")
-				.SetMargin(0, "bottom")
+				.SetMargin(10, "bottom")
 				.SetType(Buttonable.ButtonType.SmallFlatButton)
-				.SetText( "Advanced Group Options" )
-				.SetTooltipText( "Advanced options all group objects will default to" )
+				.SetText("Advanced Group Options")
+				.SetTooltipText("Advanced options all group objects will default to")
 				.SetCursorShape(Control.CursorShape.PointingHand)
 				.SetIcon(GD.Load<Texture2D>("res://addons/assetsnap/assets/icons/settings.svg"))
 				.SetIconAlignment(HorizontalAlignment.Right)
-				.SetAction( () => { _OnOpenGroupOptions(); } )
+				.SetAction(() => { _OnOpenGroupOptions(); })
 				.Instantiate();
 		}
-		
+
 		private void _FinalizeFields()
 		{
 			Container containerOne = Trait<Containerable>()
 				.Select(0)
 				.GetInnerContainer();
-			
+
 			Container containerTwoOne = Trait<Containerable>()
 				.Select(1)
 				.GetInnerContainer(0);
-				
+
 			Container containerTwoTwo = Trait<Containerable>()
 				.Select(1)
 				.GetInnerContainer(1);
 
 			containerTwoTwo.SizeFlagsHorizontal = Control.SizeFlags.ShrinkEnd;
-			
+
 			Trait<Labelable>()
 				.Select(0)
 				.AddToContainer(
@@ -255,13 +252,13 @@ namespace AssetSnap.Front.Components.Groups.Builder
 						.Select(3)
 						.GetInnerContainer()
 				);
-				
+
 			Trait<Containerable>()
 				.Select(3)
 				.AddToContainer(
 					containerTwoTwo
 				);
-			
+
 			Trait<Containerable>()
 				.Select(2)
 				.AddToContainer(
@@ -269,19 +266,19 @@ namespace AssetSnap.Front.Components.Groups.Builder
 						.Select(0)
 						.GetScrollContainer()
 				);
-					
+
 			Trait<Containerable>()
 				.Select(1)
 				.AddToContainer(
 					containerOne
 				);
-				
+
 			Trait<ScrollContainerable>()
 				.Select(0)
 				.AddToContainer(
 					containerOne
 				);
-			
+
 			Trait<Containerable>()
 				.Select(0)
 				.AddToContainer(
@@ -289,64 +286,64 @@ namespace AssetSnap.Front.Components.Groups.Builder
 						.Select(0)
 						.GetNode()
 				);
-				
+
 			Trait<Panelable>()
 				.Select(0)
 				.AddToContainer(
 					this
 				);
 		}
-		
+
 		private void _SetupGroupObjects()
 		{
 			List<string> Components = new()
 			{
 				"Groups.Builder.EditorGroupObject",
 			};
-			
-			if (_GlobalExplorer.Components.HasAll( Components.ToArray() )) 
+
+			if (_GlobalExplorer.Components.HasAll(Components.ToArray()))
 			{
-				for( int i = 0; i < _GlobalExplorer.GroupBuilder._Editor.Group._Paths.Count; i++ ) 
+				for (int i = 0; i < _GlobalExplorer.GroupBuilder._Editor.Group._Paths.Count; i++)
 				{
 					string path = _GlobalExplorer.GroupBuilder._Editor.Group._Paths[i];
 					Vector3 origin = _GlobalExplorer.GroupBuilder._Editor.Group._Origins[i];
 					Vector3 scale = _GlobalExplorer.GroupBuilder._Editor.Group._Scales[i];
 					Vector3 rotation = _GlobalExplorer.GroupBuilder._Editor.Group._Rotations[i];
-					
-					if( false == _GlobalExplorer.GroupBuilder._Editor.Group._Options.Count > i ) 
+
+					if (false == _GlobalExplorer.GroupBuilder._Editor.Group._Options.Count > i)
 					{
 						_GlobalExplorer.GroupBuilder._Editor.Group._Options.Add(new());
 					}
-					
+
 					Godot.Collections.Dictionary<string, Variant> options = _GlobalExplorer.GroupBuilder._Editor.Group._Options[i];
-					
+
 					EditorGroupObject SingleEntry = GlobalExplorer.GetInstance().Components.Single<EditorGroupObject>(true);
-					
+
 					SingleEntry.Path = path;
 					SingleEntry.Origin = origin;
 					SingleEntry.ObjectScale = scale;
 					SingleEntry.ObjectRotation = rotation;
 					SingleEntry.Options = options;
 					SingleEntry.Index = i;
-					
+
 					SingleEntry.Container = Trait<Containerable>()
 						.Select(2)
 						.GetInnerContainer();
-						
-					SingleEntry.Initialize(); 
+
+					SingleEntry.Initialize();
 				}
 			}
 		}
-		
+
 		private void _SetupNoFound()
 		{
 			MarginContainer NoFoundMargin = new();
-			
+
 			NoFoundMargin.AddThemeConstantOverride("margin_left", 5);
 			NoFoundMargin.AddThemeConstantOverride("margin_right", 5);
 			NoFoundMargin.AddThemeConstantOverride("margin_top", 10);
 			NoFoundMargin.AddThemeConstantOverride("margin_bottom", 10);
-			
+
 			Label NoFoundTitle = new()
 			{
 				Text = "No objects was found, please go to a library to add objects to the group",
@@ -357,16 +354,16 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			NoFoundMargin.AddChild(NoFoundTitle);
 			Trait<Containerable>().Select(2).GetInnerContainer().AddChild(NoFoundMargin);
 		}
-		
+
 		private void _SetupNoGroup()
 		{
 			MarginContainer NoFoundMargin = new();
-			
+
 			NoFoundMargin.AddThemeConstantOverride("margin_left", 5);
 			NoFoundMargin.AddThemeConstantOverride("margin_right", 5);
 			NoFoundMargin.AddThemeConstantOverride("margin_top", 10);
 			NoFoundMargin.AddThemeConstantOverride("margin_bottom", 10);
-			
+
 			Label NoFoundTitle = new()
 			{
 				Text = "No group is chosen, please select a group to edit or place it",
@@ -381,7 +378,7 @@ namespace AssetSnap.Front.Components.Groups.Builder
 				.GetInnerContainer()
 				.AddChild(NoFoundMargin);
 		}
-			
+
 		private void _OnOpenGroupOptions()
 		{
 			_GlobalExplorer.GroupBuilder._Editor.GroupOptions.DoShow();

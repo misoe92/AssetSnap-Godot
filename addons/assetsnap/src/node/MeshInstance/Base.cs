@@ -23,16 +23,16 @@
 namespace AssetSnap.ASNode.MeshInstance
 {
 	using Godot;
-	
+
 	[Tool]
 	public partial class Base : MeshInstance3D
 	{
 		[Export]
 		public string LibraryName { get; set; }
-		
+
 		[Export]
 		public Godot.Collections.Dictionary<string, Variant> SpawnSettings { get; set; } = new();
-		
+
 		[Export]
 		public bool Floating { get; set; } = false;
 
@@ -41,51 +41,51 @@ namespace AssetSnap.ASNode.MeshInstance
 
 		public override void _EnterTree()
 		{
-			if( false == Floating && IsInstanceValid(this)) 
+			if (false == Floating && IsInstanceValid(this))
 			{
 				GlobalExplorer.GetInstance().Waypoints.Register(this, Transform.Origin, RotationDegrees, Scale);
 				WaypointAdded = true;
 			}
-			
-			base._Ready();
-		} 
 
-		public void SetIsFloating( bool state )
+			base._Ready();
+		}
+
+		public void SetIsFloating(bool state)
 		{
 			Floating = state;
-			 
-			if( false == state && IsInstanceValid(this)) 
+
+			if (false == state && IsInstanceValid(this))
 			{
 				GlobalExplorer.GetInstance().Waypoints.Register(this, Transform.Origin, RotationDegrees, Scale);
 				WaypointAdded = true;
 			}
 		}
-		
+
 		public void UpdateWaypointScale()
 		{
 			GlobalExplorer.GetInstance().Waypoints.UpdateScaleOnPoint(Transform.Origin, Scale);
 		}
-		
+
 		public void UpdateWaypointRotation()
 		{
-			
+
 		}
-		
-		public void AddSetting( string key, Variant value )
+
+		public void AddSetting(string key, Variant value)
 		{
 			SpawnSettings.Add(key, value);
 		}
-		
-		public void RemoveSetting( string key )
+
+		public void RemoveSetting(string key)
 		{
 			SpawnSettings.Remove(key);
 		}
-		
+
 		public Godot.Collections.Dictionary<string, Variant> GetSettings()
 		{
 			return SpawnSettings;
 		}
-		
+
 		public Variant GetSetting(string key)
 		{
 			Variant value = false;
@@ -93,10 +93,10 @@ namespace AssetSnap.ASNode.MeshInstance
 
 			return value;
 		}
-		
-		public T GetSetting<[MustBeVariant] T>( string key ) 
+
+		public T GetSetting<[MustBeVariant] T>(string key)
 		{
-			if( HasSetting( key ) ) 
+			if (HasSetting(key))
 			{
 				Variant value = GetSetting(key);
 
@@ -105,92 +105,97 @@ namespace AssetSnap.ASNode.MeshInstance
 
 			return default(T);
 		}
-		
+
 		public string GetLibraryName()
 		{
 			return LibraryName;
 		}
-		
-		public bool HasSetting( string key )
+
+		public bool HasSetting(string key)
 		{
 			return SpawnSettings.ContainsKey(key);
 		}
-		
+
 		public bool HasLibraryName()
 		{
 			return LibraryName != null && LibraryName != "";
 		}
 
-		public void SetLibraryName( string name ) 
+		public void SetLibraryName(string name)
 		{
 			LibraryName = name;
-		}  
-		
+		}
+
 		public Library.Instance GetLibrary()
 		{
-			if( null == LibraryName || "" == LibraryName ) 
+			if (null == LibraryName || "" == LibraryName)
 			{
 				return null;
 			}
-			
-			return GlobalExplorer.GetInstance().GetLibraryByName( LibraryName );
+
+			return GlobalExplorer.GetInstance().GetLibraryByName(LibraryName);
 		}
-		
+
 		public Godot.Collections.Dictionary<string, Variant> GetLibrarySettings()
 		{
 			return SpawnSettings;
 		}
-		
+
 		public EventMouse CurrentMouseInput()
 		{
 			return GlobalExplorer.GetInstance().CurrentMouseInput;
 		}
-			
+
 		public Node3D GetModel()
 		{
 			return GlobalExplorer.GetInstance().Model;
 		}
-		
+
 		public Node3D GetHandle()
 		{
 			return GlobalExplorer.GetInstance().GetHandle();
 		}
-		
+
 		public float GetDeltaTime()
 		{
 			return GlobalExplorer.GetInstance().DeltaTime;
 		}
-		
+
 		public bool IsPlaced()
 		{
-			return GetParent() != null && GetParent().Name != "AsDecal";
+			return
+				GetParent() != null &&
+				GetParent().Name != "AsDecal" &&
+				null != GetParent() &&
+				null != GetParent().GetParent() &&
+				GetParent().GetParent().Name != "AsDecal";
 		}
-		
+
 		public bool HasLibrarySettings()
 		{
 			return SpawnSettings != null && SpawnSettings.Count != 0;
 		}
-		
+
 		public bool HandleIsModel()
 		{
 			return GlobalExplorer.GetInstance().HandleIsModel();
 		}
-		
+
 		public bool HasModel()
 		{
 			return GlobalExplorer.GetInstance().HasModel;
 		}
-		 
+
 		public bool IsModelPlaced()
 		{
 			return GlobalExplorer.GetInstance().IsModelPlaced;
 		}
 
 		public override void _ExitTree()
-		{ 
-			if( null != GlobalExplorer.GetInstance() && null != GlobalExplorer.GetInstance().Waypoints ) 
+		{
+			if (null != GlobalExplorer.GetInstance() && null != GlobalExplorer.GetInstance().Waypoints)
 			{
-				if( IsInstanceValid(this) ) 
+				if (IsInstanceValid(this))
 				{
 					GlobalExplorer.GetInstance().Waypoints.Remove(this, Transform.Origin);
 				}
@@ -198,8 +203,8 @@ namespace AssetSnap.ASNode.MeshInstance
 
 			Floating = true;
 			WaypointAdded = false;
-			
-			base._ExitTree(); 
+
+			base._ExitTree();
 		}
 	}
 }

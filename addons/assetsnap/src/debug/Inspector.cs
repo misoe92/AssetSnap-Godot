@@ -37,7 +37,8 @@ namespace AssetSnap.Debug
 		private GlobalExplorer _GlobalExplorer;
 
 		private List<string> Categories = new List<string>();
-				
+		private Godot.Collections.Dictionary<string, Node> InspectorOptionInstances = new();
+		
 		private static Inspector _Instance;
 		public static Inspector Singleton 
 		{
@@ -88,7 +89,7 @@ namespace AssetSnap.Debug
 			_InitializeInspectorTitle();
 			_BuildChildList();
 
-			_GlobalExplorer._Plugin.StatesChanged += () => { _OnUpdate(); };
+			_GlobalExplorer._Plugin.StatesChanged += (Godot.Collections.Array data) => { _OnUpdate(data); };
 		}	
 		
 		public void AddToDock()
@@ -214,6 +215,8 @@ namespace AssetSnap.Debug
 				SizeFlagsVertical = Control.SizeFlags.ShrinkBegin,
 			};
 
+			InspectorOptionInstances.Add(name, checkbox);
+
 			InputContainer.AddChild(checkbox);
 			OuterContainer.AddChild(InputContainer);
 			marginContainer.AddChild(OuterContainer);
@@ -270,6 +273,7 @@ namespace AssetSnap.Debug
 				SizeFlagsVertical = Control.SizeFlags.ShrinkBegin,
 				AutowrapMode = TextServer.AutowrapMode.WordSmart,
 			};
+			InspectorOptionInstances.Add(name, valueLabel);
 
 			LabelContainer.AddChild(label);
 			OuterContainer.AddChild(LabelContainer);
@@ -331,6 +335,7 @@ namespace AssetSnap.Debug
 				SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
 				SizeFlagsVertical = Control.SizeFlags.ShrinkBegin,
 			};
+			InspectorOptionInstances.Add(name, spinbox);
 
 			LabelContainer.AddChild(label);
 			OuterContainer.AddChild(LabelContainer);
@@ -470,10 +475,48 @@ namespace AssetSnap.Debug
 			Categories = new();
 		}
 		
-		private void _OnUpdate()
+		private void _OnUpdate( Godot.Collections.Array data )
 		{
-			ClearCurrentChildren();
-			_BuildChildList();
+			string key = data[0].As<string>();
+			if( InspectorOptionInstances.ContainsKey(key) ) 
+			{
+				GodotObject _object = InspectorOptionInstances[key];
+				
+				if( _object is SpinBox spinbox ) 
+				{
+					spinbox.Value = data[1].As<double>();
+				}
+				
+				if( _object is CheckBox checkbox ) 
+				{
+					checkbox.ButtonPressed = data[1].As<bool>();
+				}
+				
+				if( _object is Label label ) 
+				{
+					if( data[1].As<GodotObject>() is Library.Instance libraryValue )
+					{
+						label.Text = libraryValue.GetName();
+					}
+					else if( data[1].As<GodotObject>() is Node NodeValue )
+					{
+						if( EditorPlugin.IsInstanceValid( NodeValue ) ) 
+						{
+							label.Text = NodeValue.Name;
+						}
+					}
+					else if( "" != data[1].As<string>() )
+					{
+						label.Text = data[1].As<string>();
+					}
+					else 
+					{
+						label.Text = "N/A";
+					}
+				}
+			}
+			// ClearCurrentChildren();
+			// _BuildChildList();
 		}
 	}
 }

@@ -68,23 +68,33 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			_InitializeCheckBox(this);
 			_InitializeGlue(this);
 			_InitializeSpinBox(this);
-			Plugin.GetInstance().StatesChanged += () => { MaybeUpdateValue(); };
+			Plugin.GetInstance().StatesChanged += (Godot.Collections.Array data) => { MaybeUpdateValue(data); };
 		}
 
-		public override void MaybeUpdateValue()
+		public override void MaybeUpdateValue(Godot.Collections.Array data)
 		{
-			if(
-				false == IsValid()
-			) 
+			if( data[0].As<string>() == "SnapToZ" || data[0].As<string>() == "SnapToZValue" ) 
 			{
-				return;
-			}
-			
-			Trait<Spinboxable>()
-				.Select(0)
-				.SetValue(_GlobalExplorer.States.SnapToZValue);
+				if(
+					false == IsValid()
+				) 
+				{
+					return;
+				}
 
-			base.MaybeUpdateValue();
+				if( data[0].As<string>() == "SnapToZValue" ) 
+				{
+					Trait<Spinboxable>()
+						.Select(0)
+						.SetValue(data[1].As<double>());
+
+				}
+				
+				if( data[0].As<string>() == "SnapToZ" ) 
+				{
+					base.MaybeUpdateValue(data);
+				}
+			}
 		}
 	
 		/*

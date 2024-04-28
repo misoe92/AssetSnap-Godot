@@ -23,6 +23,9 @@
 #if TOOLS
 namespace AssetSnap.Component
 {
+	using AssetSnap.Explorer;
+
+	using AssetSnap.States;
 	using Godot;
 
 	[Tool]
@@ -30,30 +33,25 @@ namespace AssetSnap.Component
 	{
 		public bool IsValid()
 		{
-			if(
-				null == GlobalExplorer.GetInstance() ||
-				null == GlobalExplorer.GetInstance().States
+			if (
+				null == ExplorerUtils.Get() ||
+				null == StatesUtils.Get()
 			)
 			{
 				return false;
 			}
-			
-			if( false == Initiated ) 
+
+			if (false == Initiated)
 			{
 				return false;
 			}
-			
-			if( false == Trait<Checkable>().HasNodes() ) 
-			{
-				return false;
-			}
-			
-			if(
+
+			if (
 				null == Trait<Checkable>() ||
 				false == IsInstanceValid(Trait<Checkable>()) ||
 				false == HasTrait<Checkable>() ||
 				Trait<Checkable>().IsDisposed()
-			) 
+			)
 			{
 				return false;
 			}

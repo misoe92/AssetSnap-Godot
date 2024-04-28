@@ -72,8 +72,8 @@ namespace AssetSnap.Front.Components.Library
 
 			Trait<Containerable>()
 				.SetName("SearchContainer")
-				.SetMargin(5, "top")
-				.SetMargin(3, "bottom")
+				.SetMargin(4, "top")
+				.SetMargin(0, "bottom")
 				.SetOrientation(Containerable.ContainerOrientation.Horizontal)
 				.SetInnerOrientation(Containerable.ContainerOrientation.Horizontal)
 				.Instantiate();

@@ -36,6 +36,7 @@ namespace AssetSnap.Core
 		public void InitializeCore()
 		{	 
 			/** Initialize custom node types **/  
+			new ASNode.Types.AsNodeType().Initialize();
 			new ASNode.Types.AsGroupType().Initialize();
 			new ASNode.Types.AsGroupedType().Initialize();
 			new ASNode.Types.AsArrayModifierType().Initialize();

@@ -31,33 +31,37 @@ namespace AssetSnap.Trait
 		/*
 		** Enums
 		*/
-		public enum ContainerLayout 
+		public enum ContainerLayout
 		{
 			OneColumn,
 			TwoColumns,
 			ThreeColumns,
 			FourColumns,
 		};
-		
-		public enum ContainerOrientation 
+
+		public enum ContainerOrientation
 		{
 			Horizontal,
 			Vertical,
 		};
-		
+
 		/*
 		** Protected
 		*/
 		protected ContainerLayout Layout = ContainerLayout.OneColumn;
 		protected ContainerOrientation Orientation = ContainerOrientation.Vertical;
 		protected ContainerOrientation InnerOrientation = ContainerOrientation.Horizontal;
-		
+
+		protected Control.SizeFlags ContainerHorizontalSizeFlag = Control.SizeFlags.ExpandFill;
+
+		protected int Seperation = 1;
+
 		protected bool UsePaddingContainer = true;
 
 		/*
 		** Public Methods
 		*/
-		
+
 		/*
 		** Shows the current container
 		**
@@ -67,7 +71,7 @@ namespace AssetSnap.Trait
 		{
 			Dependencies[TraitName + "_MarginContainer"].As<MarginContainer>().Visible = true;
 		}
-		
+
 		/*
 		** Hides the current container
 		**
@@ -77,7 +81,7 @@ namespace AssetSnap.Trait
 		{
 			Dependencies[TraitName + "_MarginContainer"].As<MarginContainer>().Visible = false;
 		}
-		
+
 		/*
 		** Selects an placed container in the
 		** nodes array by index
@@ -88,10 +92,10 @@ namespace AssetSnap.Trait
 		public override ContainerTrait Select(int index, bool debug = false)
 		{
 			base._Select(index, debug);
-			
-			if( false == Dependencies.ContainsKey(TraitName + "_WorkingNode")) 
+
+			if (false == Dependencies.ContainsKey(TraitName + "_WorkingNode"))
 			{
-				if( debug ) 
+				if (debug)
 				{
 					GD.PushError("Node was false @ ContainerTrait -> @", OwnerName, "::", TraitName, "::", TypeString);
 					GD.PushError("KEYS::", Dependencies.Keys);
@@ -99,13 +103,13 @@ namespace AssetSnap.Trait
 
 				return this;
 			}
-			
+
 			Godot.Collections.Dictionary<string, Variant> dependencies = Plugin.Singleton.traitGlobal.GetDependencies(index, TypeString, OwnerName);
 			Dependencies = dependencies;
-			
+
 			return this;
 		}
-		
+
 		/*
 		** Selects an placed container in the
 		** nodes array by name
@@ -113,11 +117,11 @@ namespace AssetSnap.Trait
 		** @param string name
 		** @return Containerable
 		*/
-		public virtual ContainerTrait SelectByName( string name ) 
+		public virtual ContainerTrait SelectByName(string name)
 		{
-			foreach( Container container in Nodes ) 
+			foreach (Container container in Nodes)
 			{
-				if( container.Name == name ) 
+				if (container.Name == name)
 				{
 					break;
 				}
@@ -125,20 +129,27 @@ namespace AssetSnap.Trait
 
 			return this;
 		}
-		
+
 		/*
 		** Sets the layout of the container
 		**
 		** @param ContainerLayout layout
 		** @return Containerable
 		*/
-		public virtual ContainerTrait SetLayout( ContainerLayout layout ) 
+		public virtual ContainerTrait SetLayout(ContainerLayout layout)
 		{
 			Layout = layout;
-			
+
 			return this;
 		}
-		
+
+		public virtual ContainerTrait SetContainerHorizontalSizeFlag(Control.SizeFlags flag)
+		{
+			ContainerHorizontalSizeFlag = flag;
+
+			return this;
+		}
+
 		/*
 		** Sets the visibility state of the
 		** currently chosen container
@@ -146,65 +157,71 @@ namespace AssetSnap.Trait
 		** @param bool state
 		** @return Containerable
 		*/
-		public virtual ContainerTrait SetVisible( bool state ) 
+		public virtual ContainerTrait SetVisible(bool state)
 		{
 			Visible = state;
-			
-			if(
+
+			if (
 				null != Dependencies &&
-				false != Dependencies.ContainsKey( TraitName + "_MarginContainer" )
-			)  
+				false != Dependencies.ContainsKey(TraitName + "_MarginContainer")
+			)
 			{
 				Dependencies[TraitName + "_MarginContainer"].As<MarginContainer>().Visible = state;
 			}
 
 			return this;
 		}
-		
+
 		/*
 		** Toggles the visibility state of the
 		** currently chosen container
 		**
 		** @return Containerable
 		*/
-		public virtual ContainerTrait ToggleVisible() 
+		public virtual ContainerTrait ToggleVisible()
 		{
-			if(
+			if (
 				null != Dependencies &&
-				false != Dependencies.ContainsKey( TraitName + "_MarginContainer" )
-			)  
+				false != Dependencies.ContainsKey(TraitName + "_MarginContainer")
+			)
 			{
 				Dependencies[TraitName + "_MarginContainer"].As<MarginContainer>().Visible = !Dependencies[TraitName + "_MarginContainer"].As<MarginContainer>().Visible;
 			}
 
 			return this;
 		}
-		
+
 		/*
 		** Sets the orientation of the container
 		**
 		** @param ContainerOrientation orientation
 		** @return Containerable
 		*/
-		public virtual ContainerTrait SetOrientation(ContainerOrientation orientation) 
+		public virtual ContainerTrait SetOrientation(ContainerOrientation orientation)
 		{
 			Orientation = orientation;
 			return this;
 		}
-		
+
+		public virtual ContainerTrait SetSeparation(int seperation)
+		{
+			Seperation = seperation;
+			return this;
+		}
+
 		/*
 		** Sets the inner orientation of the container
 		**
 		** @param ContainerOrientation orientation
 		** @return Containerable
 		*/
-		public virtual ContainerTrait SetInnerOrientation(ContainerOrientation orientation) 
+		public virtual ContainerTrait SetInnerOrientation(ContainerOrientation orientation)
 		{
 			InnerOrientation = orientation;
 			return this;
 		}
-		
-		
+
+
 		/*
 		** Sets margin values for 
 		** the currently chosen container
@@ -213,31 +230,31 @@ namespace AssetSnap.Trait
 		** @param string side
 		** @return Containerable
 		*/
-		public virtual ContainerTrait SetMargin( int value, string side = "" ) 
+		public virtual ContainerTrait SetMargin(int value, string side = "")
 		{
 			_SetMargin(value, side);
-			
-			if( side == "" ) 
+
+			if (side == "")
 			{
-				if( false != Dependencies.ContainsKey(TraitName + "_MarginContainer") ) 
+				if (false != Dependencies.ContainsKey(TraitName + "_MarginContainer"))
 				{
-					foreach( (string marginSide, int marginValue ) in Margin ) 
+					foreach ((string marginSide, int marginValue) in Margin)
 					{
 						Dependencies[TraitName + "_MarginContainer"].As<MarginContainer>().AddThemeConstantOverride("margin_" + marginSide, marginValue);
 					}
 				}
 			}
-			else 
+			else
 			{
-				if( false != Dependencies.ContainsKey(TraitName + "_MarginContainer") ) 
+				if (false != Dependencies.ContainsKey(TraitName + "_MarginContainer"))
 				{
 					Dependencies[TraitName + "_MarginContainer"].As<MarginContainer>().AddThemeConstantOverride("margin_" + side, value);
 				}
 			}
-			
+
 			return this;
 		}
-		
+
 		/*
 		** Sets padding values for 
 		** the currently chosen container
@@ -246,38 +263,38 @@ namespace AssetSnap.Trait
 		** @param string side
 		** @return Containerable
 		*/
-		public virtual ContainerTrait SetPadding( int value, string side = "" ) 
+		public virtual ContainerTrait SetPadding(int value, string side = "")
 		{
 			_SetPadding(value, side);
-			
-			if( side == "" ) 
+
+			if (side == "")
 			{
-				if( false != Dependencies.ContainsKey(TraitName + "_PaddingContainer") ) 
+				if (false != Dependencies.ContainsKey(TraitName + "_PaddingContainer"))
 				{
-					foreach( (string marginSide, int marginValue ) in Margin ) 
+					foreach ((string marginSide, int marginValue) in Margin)
 					{
 						Dependencies[TraitName + "_PaddingContainer"].As<MarginContainer>().AddThemeConstantOverride("margin_" + marginSide, marginValue);
 					}
 				}
 			}
-			else 
+			else
 			{
-				if( false != Dependencies.ContainsKey(TraitName + "_PaddingContainer") ) 
+				if (false != Dependencies.ContainsKey(TraitName + "_PaddingContainer"))
 				{
 					Dependencies[TraitName + "_PaddingContainer"].As<MarginContainer>().AddThemeConstantOverride("margin_" + side, value);
 				}
 			}
-			
+
 			return this;
 		}
-		
+
 		/*
 		** Getter Methods
 		*/
-		
+
 		public virtual Node GetParentContainer()
 		{
-			if( false != Dependencies.ContainsKey(TraitName + "_MarginContainer") ) 
+			if (false != Dependencies.ContainsKey(TraitName + "_MarginContainer"))
 			{
 				// Single placement
 				return Dependencies[TraitName + "_MarginContainer"].As<MarginContainer>().GetParent();
@@ -285,7 +302,7 @@ namespace AssetSnap.Trait
 
 			return null;
 		}
-		
+
 		/*
 		** Returns the outer container
 		** of the container layout
@@ -294,7 +311,7 @@ namespace AssetSnap.Trait
 		*/
 		public virtual Container GetOuterContainer()
 		{
-			if( false != Dependencies.ContainsKey(TraitName + "_InnerContainer") ) 
+			if (false != Dependencies.ContainsKey(TraitName + "_InnerContainer"))
 			{
 				// Single placement
 				return Dependencies[TraitName + "_InnerContainer"].As<Container>();
@@ -302,7 +319,7 @@ namespace AssetSnap.Trait
 
 			return null;
 		}
-		
+
 		/*
 		** Returns a inner container
 		** depending on a specified index
@@ -310,85 +327,85 @@ namespace AssetSnap.Trait
 		** @param int(0) index
 		** @return Container
 		*/
-		public virtual Container GetInnerContainer( int index )
+		public virtual Container GetInnerContainer(int index)
 		{
-			if( null == Dependencies || Dependencies.Count == 0) 
+			if (null == Dependencies || Dependencies.Count == 0)
 			{
 				GD.PushError("No dependencies");
 				return null;
 			}
-			
-			if(
-				false != Dependencies.ContainsKey(TraitName + "_InnerContainer")  &&
-				null != Dependencies[TraitName + "_InnerContainer"].As<Container>().GetChild( index )
-			) 
+
+			if (
+				false != Dependencies.ContainsKey(TraitName + "_InnerContainer") &&
+				null != Dependencies[TraitName + "_InnerContainer"].As<Container>().GetChild(index)
+			)
 			{
 				// Single placement
-				return Dependencies[TraitName + "_InnerContainer"].As<Container>().GetChild( index ) as Container;
+				return Dependencies[TraitName + "_InnerContainer"].As<Container>().GetChild(index) as Container;
 			}
-			else 
+			else
 			{
 				GD.Print("Not found @ Inner Container ", TraitName + "_InnerContainer", " ", Dependencies.Keys);
 			}
 
 			return null;
 		}
-		
+
 		/*
 		** Booleans
 		*/
-		
+
 		/*
 		** Checks if the container is visible
 		**
 		** @return bool
 		*/
-		public virtual bool IsVisible() 
+		public virtual bool IsVisible()
 		{
-			if( false != Dependencies.ContainsKey(TraitName + "_MarginContainer") )  
+			if (false != Dependencies.ContainsKey(TraitName + "_MarginContainer"))
 			{
 				return Dependencies[TraitName + "_MarginContainer"].As<MarginContainer>().Visible == true;
 			}
 
 			return false;
 		}
-		
+
 		/*
 		** Protected
 		*/
 		public virtual ContainerTrait Instantiate()
 		{
 			int ColumnCount = (int)Layout + 1;
-			string prefix = TraitName ;
-			
+			string prefix = TraitName;
+
 			MarginContainer _MarginContainer = new()
 			{
 				Name = prefix + "-ContainerMargin",
-				SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
+				SizeFlagsHorizontal = ContainerHorizontalSizeFlag,
 				SizeFlagsVertical = SizeFlagsVertical,
 				Visible = Visible,
 			};
 
-			if( Size != Vector2.Zero ) 
+			if (Size != Vector2.Zero)
 			{
-				_MarginContainer.Size = Size;	
+				_MarginContainer.Size = Size;
 			}
-			
-			if( CustomMinimumSize != Vector2.Zero ) 
+
+			if (CustomMinimumSize != Vector2.Zero)
 			{
-				_MarginContainer.CustomMinimumSize = CustomMinimumSize;	
+				_MarginContainer.CustomMinimumSize = CustomMinimumSize;
 			}
-			
+
 			MarginContainer _PaddingContainer = new()
 			{
 				Name = prefix + "-ContainerPadding",
-				SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
+				SizeFlagsHorizontal = ContainerHorizontalSizeFlag,
 				SizeFlagsVertical = SizeFlagsVertical,
 			};
 
 			Container _InnerContainer;
-			
-			if( InnerOrientation == ContainerOrientation.Vertical ) 
+
+			if (InnerOrientation == ContainerOrientation.Vertical)
 			{
 				_InnerContainer = new VBoxContainer()
 				{
@@ -397,7 +414,7 @@ namespace AssetSnap.Trait
 					SizeFlagsVertical = SizeFlagsVertical,
 				};
 			}
-			else 
+			else
 			{
 				_InnerContainer = new HBoxContainer()
 				{
@@ -407,58 +424,60 @@ namespace AssetSnap.Trait
 				};
 			}
 
-			foreach( (string side, int value ) in Margin ) 
+			foreach ((string side, int value) in Margin)
 			{
 				_MarginContainer.AddThemeConstantOverride("margin_" + side, value);
 			}
-			
+
 			VBoxContainer _ContainerNode = new()
 			{
 				SizeFlagsHorizontal = SizeFlagsHorizontal,
 				SizeFlagsVertical = SizeFlagsVertical,
 				Name = prefix + "_Container",
 			};
-			
+
 			// if( TypeString == "AssetSnap.Component.Containerable") 
 			// {
 			// 	GD.Print(SizeFlagsVertical, Name );
 			// }
 
-			if( UsePaddingContainer ) 
+			if (UsePaddingContainer)
 			{
-				foreach( (string side, int value ) in Padding ) 
+				foreach ((string side, int value) in Padding)
 				{
 					_PaddingContainer.AddThemeConstantOverride("margin_" + side, value);
 				}
 			}
-			
-			for( int i = 0; i < ColumnCount; i++ ) 
+
+			for (int i = 0; i < ColumnCount; i++)
 			{
 				Container innerContainer = Orientation == ContainerOrientation.Horizontal ? new HBoxContainer() : new VBoxContainer();
 				innerContainer.SizeFlagsHorizontal = SizeFlagsHorizontal;
 				innerContainer.SizeFlagsVertical = SizeFlagsVertical;
 				innerContainer.Name = prefix + "-inner-" + i;
-				
+
+				innerContainer.AddThemeConstantOverride("separation", Seperation);
+
 				_InnerContainer.AddChild(innerContainer);
 			}
 
-			if( Dependencies.ContainsKey(prefix + "_InnerContainer") ) 
+			if (Dependencies.ContainsKey(prefix + "_InnerContainer"))
 			{
-				GD.Print(prefix + "_InnerContainer already exists" );
+				GD.Print(prefix + "_InnerContainer already exists");
 			}
-			
+
 			Dependencies.Add(prefix + "_InnerContainer", _InnerContainer);
 			Dependencies.Add(prefix + "_PaddingContainer", _PaddingContainer);
 			Dependencies.Add(prefix + "_Container", _ContainerNode);
 			Dependencies.Add(prefix + "_MarginContainer", _MarginContainer);
-			
+
 			_PaddingContainer.AddChild(_InnerContainer);
 			_ContainerNode.AddChild(_PaddingContainer);
 			_MarginContainer.AddChild(_ContainerNode);
 
 			return this;
 		}
-		
+
 		/*
 		** Resets the trait to
 		** a cleared state

@@ -77,14 +77,17 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 				.Select(0)
 				.AddToContainer( this );
 				
-			Plugin.GetInstance().StatesChanged += () => { MaybeUpdateValue(); };
+			Plugin.GetInstance().StatesChanged += (Godot.Collections.Array data) => { MaybeUpdateValue(data); };
 		}
 		
-		private void MaybeUpdateValue()
+		private void MaybeUpdateValue(Godot.Collections.Array data)
 		{
-			Trait<Spinboxable>()
-				.Select(0)
-				.SetValue(_GlobalExplorer.States.SnapLayer);
+			if( data[0].As<string>() == "SnapLayer" ) 
+			{
+				Trait<Spinboxable>()
+					.Select(0)
+					.SetValue(data[1].As<double>());
+			} 
 		}
 		
 		/*

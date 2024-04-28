@@ -80,7 +80,7 @@ namespace AssetSnap.Front.Components.Library
 			Initiated = true;
 			
 			SizeFlagsHorizontal = SizeFlags.ExpandFill;
-			SizeFlagsVertical = SizeFlags.ShrinkBegin;
+			SizeFlagsVertical = SizeFlags.ExpandFill;
 
 			Trait<Containerable>()
 				.SetName("LibrarySettingsMain")

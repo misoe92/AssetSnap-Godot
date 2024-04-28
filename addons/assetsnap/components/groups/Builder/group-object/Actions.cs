@@ -31,22 +31,25 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 		public Actions()
 		{
 			Name = "GroupsBuilderGroupObjectActions";
-			
+
 			UsingTraits = new()
 			{
-				{ typeof(Containerable).ToString() },
 				{ typeof(Buttonable).ToString() },
 				{ typeof(Labelable).ToString() },
+				{ typeof(Containerable).ToString() },
 			};
+
+			SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+			SizeFlagsVertical = Control.SizeFlags.ExpandFill;
 		}
-		
+
 		protected override void _InitializeFields()
 		{
 			Trait<Containerable>()
 				.SetName("GroupObjectsActions")
 				.SetMargin(15, "left")
 				.SetMargin(15, "right")
-				.SetHorizontalSizeFlags(Control.SizeFlags.ShrinkBegin)
+				.SetHorizontalSizeFlags(Control.SizeFlags.ExpandFill)
 				.SetVerticalSizeFlags(Control.SizeFlags.ShrinkBegin)
 				.SetOrientation(Containerable.ContainerOrientation.Horizontal)
 				.SetInnerOrientation(Containerable.ContainerOrientation.Vertical)
@@ -69,7 +72,7 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 				.SetCursorShape(Control.CursorShape.PointingHand)
 				.SetAction(() => { _OnRemoveObjectEntry(); })
 				.Instantiate();
-				
+
 			Trait<Buttonable>()
 				.SetName("GroupObjectsActionsInnerDuplicateButton")
 				.SetType(Buttonable.ButtonType.SmallFlatButton)
@@ -79,7 +82,7 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 				.SetAction(() => { _OnDuplicateObjectEntry(); })
 				.Instantiate();
 		}
-		
+
 		protected override void _FinalizeFields()
 		{
 			Trait<Buttonable>()
@@ -89,7 +92,7 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 						.Select(0)
 						.GetInnerContainer()
 				);
-				
+
 			Trait<Buttonable>()
 				.Select(1)
 				.AddToContainer(
@@ -97,7 +100,7 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 						.Select(0)
 						.GetInnerContainer()
 				);
-				
+
 			Trait<Labelable>()
 				.Select(0)
 				.AddToContainer(
@@ -106,19 +109,19 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 						.GetOuterContainer(),
 					0
 				);
-			
+
 			Trait<Containerable>()
 				.Select(0)
 				.AddToContainer(
 					this
 				);
 		}
-		
+
 		private void _OnRemoveObjectEntry()
 		{
 			GlobalExplorer.GetInstance().GroupBuilder._Editor.RemoveMeshInGroup(Index, Path);
 		}
-		
+
 		private void _OnDuplicateObjectEntry()
 		{
 			GlobalExplorer.GetInstance().GroupBuilder._Editor.DuplicateMeshInGroup(Index);

@@ -9,6 +9,7 @@ uniform float line_scale_1 : hint_range(0.001, 1, 0.001);
 uniform vec4 color_0 : source_color;
 uniform vec4 color_1 : source_color;
 uniform float opacity : hint_range(0.1, 1, 0.1) = 0.5;
+uniform bool flatten = false;
 
 float pristineGrid( vec2 uv, vec2 lineWidth)
 {
@@ -46,12 +47,25 @@ void vertex()
 
 void fragment() 
 {
+	//offset.xy; // Subtract the offset from UV
 	vec3 grid_0 = vec3(pristineGrid(UV * float(scale_0), vec2(line_scale_0)));
-	vec3 grid_1 = vec3(pristineGrid(UV * float(scale_1), vec2(line_scale_1)));
-	
-	vec3 grid_3 = mix(grid_1 * color_1.rgb, grid_0 * color_0.rgb, grid_0);
-	
-	ALBEDO = grid_3;
-	
-	ALPHA = opacity;
+    vec3 grid_1 = vec3(pristineGrid(UV * float(scale_1), vec2(line_scale_1)));
+    vec3 interpolatedColor = mix(grid_1 * color_1.rgb, grid_0 * color_0.rgb, grid_0);
+    vec4 finalColor = vec4(interpolatedColor, opacity);
+    
+	if(! flatten ) {
+		// Calculate distance from the center
+	    vec2 centerDist = abs(UV - 0.5);
+	    float distFromCenter = length(centerDist);
+
+	    // Calculate the final alpha based on distance from the center
+	    float finalAlpha = opacity - distFromCenter * 3.0;
+	    finalAlpha = clamp(finalAlpha, 0.0, opacity);  // Ensure alpha is between 0 and 1
+	    
+	    // Apply final alpha to the color
+	    finalColor = vec4(interpolatedColor, finalAlpha * opacity);
+	}
+    
+    ALBEDO = finalColor.rgb;
+    ALPHA = finalColor.a;
 }

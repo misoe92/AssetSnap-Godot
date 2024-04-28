@@ -74,7 +74,21 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 				.Select(0)
 				.AddToContainer( this );
 				
-			Plugin.GetInstance().StatesChanged += () => { MaybeUpdateValue(); };
+			Plugin.GetInstance().StatesChanged += (Godot.Collections.Array data) => { MaybeUpdateValue(data); };
+		}
+		
+		/*
+		** Synchronizes the state of various checkboxes with
+		** their internal state.
+		**
+		** @return void
+		*/
+		public override void MaybeUpdateValue(Godot.Collections.Array data)
+		{
+			if (data[0].As<string>() == "SphereCollision")
+			{
+				base.MaybeUpdateValue(data);
+			}
 		}
 
 		/*
