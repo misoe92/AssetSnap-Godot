@@ -27,6 +27,7 @@ namespace AssetSnap.ContextMenu
 	using AssetSnap.Explorer;
 	using AssetSnap.Front.Components.Library;
 	using AssetSnap.Front.Nodes;
+	using AssetSnap.Static;
 	using Godot;
 	
 	public partial class Base
@@ -79,31 +80,7 @@ namespace AssetSnap.ContextMenu
 		{
 			_Initialize();
 		}
-		
-		/*
-		** Handles viewability of the contextmenu based
-		** on certain parameters.
-		**
-		** @param double delta
-		** @return void
-		*/
-		public void _Process(double delta)
-		{
-			// if( false == Shown && _ShouldUseOverlay()) 
-			// {
-			// 	Shown = true; 
- 
-			// 	if( GlobalExplorer.GetInstance().HandleIsModel() ) 
-			// 	{
-			// 		SetVisible(true);
-			// 	}
-			// }
-			// else if( true == Shown && false == _ShouldUseOverlay() ) 
-			// { 
-			// 	ClearOverlay();
-			// }
-		} 
-		
+	
 		/*
 		** Shows the context menu
 		**
@@ -170,16 +147,9 @@ namespace AssetSnap.ContextMenu
 				ContextMenu.SetRotationY(Rotation.Y);
 				ContextMenu.SetRotationZ(Rotation.Z);
 			}
-
-			if( false == IsParentBody() ) 
-			{
-				Node3D Handle = GlobalExplorer.GetInstance().GetHandle();
-				Handle.RotationDegrees = Rotation;
-			}
-			else if( GlobalExplorer.GetInstance().HandleIsModel() && IsParentBody() )
-			{
-				UpdateModelBody("Rotation", Rotation);
-			}
+			
+			Node3D Handle = GlobalExplorer.GetInstance().GetHandle();
+			Handle.RotationDegrees = Rotation;
 		}
 		
 		/*
@@ -203,28 +173,8 @@ namespace AssetSnap.ContextMenu
 				ContextMenu.SetScaleZ(Scale.Z);
 			}
 			
-			if( false == IsParentBody() ) 
-			{
-				Node3D Handle = GlobalExplorer.GetInstance().GetHandle();
-				Handle.Scale = Scale;
-			}
-			else if( GlobalExplorer.GetInstance().HandleIsModel() && IsParentBody() )
-			{
-				UpdateModelBody("Scale", Scale);
-			}
-		}
-		
-		/*
-		** If certain conditions are met it
-		** will query a collision update
-		** on the body
-		**
-		** @return void
-		*/
-		public void UpdateModelBody( string Type, Vector3 Value ) 
-		{
-			AsStaticBody3D _body = GetParentBody();
-			_body.Update( Type, Value );
+			Node3D Handle = GlobalExplorer.GetInstance().GetHandle();
+			Handle.Scale = Scale;
 		}
 		
 		public AsContextMenu GetInstance()
@@ -334,30 +284,6 @@ namespace AssetSnap.ContextMenu
 		}
 		
 		/*
-		** Checks if the instance of ContextMenu is valid or not
-		**
-		** @return bool
-		*/
-		public bool IsParentBody()
-		{
-			AsMeshInstance3D MeshInstance = GlobalExplorer.GetInstance().GetHandle() as AssetSnap.Front.Nodes.AsMeshInstance3D;
-			Node3D parent = MeshInstance.GetParent() as Node3D;
-			
-			return parent is AsStaticBody3D;
-		}
-		/*
-		** Checks if the instance of ContextMenu is valid or not
-		**
-		** @return bool
-		*/
-		public AsStaticBody3D GetParentBody()
-		{
-			AsMeshInstance3D MeshInstance = GlobalExplorer.GetInstance().GetHandle() as AssetSnap.Front.Nodes.AsMeshInstance3D;
-			AsStaticBody3D parent = MeshInstance.GetParent() as AsStaticBody3D;
-			
-			return parent;
-		}
-		/*
 		** Initialies the scene and adds
 		** it to the tree
 		**
@@ -401,30 +327,7 @@ namespace AssetSnap.ContextMenu
 				_LibrarySnapGrab.Initialize();
 			}
 		}
-		
-		/*
-		** Clears the instance and set's it's shown state to false
-		**
-		** @return void
-		*/
-		private void ClearOverlay() 
-		{
-			if( null != GetInstance() )  
-			{
-				GetInstance().QueueFree();
-			}
-		}
-		
-		/*
-		** Checks if the message bus is connected
-		**
-		** @return bool
-		*/
-		private bool IsGlobalExplorerConnected()
-		{
-			return null != ExplorerUtils.Get() && null != ExplorerUtils.Get().Settings;
-		}
-		
+	
 		/*
 		** Checks if the components needed are available
 		** 
@@ -442,13 +345,7 @@ namespace AssetSnap.ContextMenu
 		*/
 		private bool _ShouldUseOverlay()
 		{
-			if( null == ExplorerUtils.Get() || null ==  ExplorerUtils.Get().Settings ) 
-			{ 
-				return false;
-			}
-
-			bool UseAsOverlay = ExplorerUtils.Get().Settings.GetKey("use_as_overlay").As<bool>();
-			return UseAsOverlay;
+			return SettingsStatic.ShouldUseASOverlay();
 		}
 	}
 }

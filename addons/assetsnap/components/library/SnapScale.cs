@@ -25,9 +25,9 @@ namespace AssetSnap.Front.Components.Library
 	using Godot;
 	using AssetSnap.Component;
 	using AssetSnap.Front.Nodes;
-    using AssetSnap.Explorer;
+	using AssetSnap.Explorer;
 
-    [Tool]
+	[Tool]
 	public partial class SnapScale : LibraryComponent
 	{ 
 		private float SnapHeight;
@@ -126,9 +126,7 @@ namespace AssetSnap.Front.Components.Library
 		public override void _Input(InputEvent @event)
 		{
 			if(
-				null == ExplorerUtils.Get() ||
-				false == EditorPlugin.IsInstanceValid( ExplorerUtils.Get().Model )  &&
-				false == EditorPlugin.IsInstanceValid( ExplorerUtils.Get().HandleNode )
+				null == ExplorerUtils.Get()
 			) 
 			{ 
 				return;
@@ -137,14 +135,9 @@ namespace AssetSnap.Front.Components.Library
 			InputEvent Event = @event; 
 			CurrentEvent = Event; 
 			int angle = ExplorerUtils.Get().ContextMenu.GetCurrentAngle();
-			Node3D Handle = ExplorerUtils.Get().HandleNode as Node3D;
+			Node3D Handle = ExplorerUtils.Get().GetHandle();
 			
-			if( null == Handle && null != ExplorerUtils.Get().Model )
-			{ 
-				Handle = ExplorerUtils.Get().Model;
-			}
-			
-			if ( null == Handle ) 
+			if( Handle == null ) 
 			{
 				return;
 			}
