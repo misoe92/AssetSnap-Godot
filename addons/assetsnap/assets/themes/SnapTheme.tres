@@ -253,52 +253,44 @@ corner_radius_bottom_right = 5
 corner_radius_bottom_left = 5
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5g2si"]
-content_margin_left = 15.0
-content_margin_top = 5.0
-content_margin_right = 15.0
-content_margin_bottom = 5.0
+content_margin_left = 20.0
+content_margin_top = 7.0
+content_margin_right = 20.0
+content_margin_bottom = 7.0
 corner_radius_top_left = 3
 corner_radius_top_right = 3
 corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
-expand_margin_top = 2.0
-expand_margin_bottom = 2.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fcrmu"]
-content_margin_left = 15.0
-content_margin_top = 5.0
-content_margin_right = 15.0
-content_margin_bottom = 5.0
+content_margin_left = 20.0
+content_margin_top = 7.0
+content_margin_right = 20.0
+content_margin_bottom = 7.0
 corner_radius_top_left = 3
 corner_radius_top_right = 3
 corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
-expand_margin_top = 2.0
-expand_margin_bottom = 2.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pghl1"]
-content_margin_left = 15.0
-content_margin_top = 5.0
-content_margin_right = 15.0
-content_margin_bottom = 5.0
+content_margin_left = 20.0
+content_margin_top = 7.0
+content_margin_right = 20.0
+content_margin_bottom = 7.0
 corner_radius_top_left = 3
 corner_radius_top_right = 3
 corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
-expand_margin_top = 2.0
-expand_margin_bottom = 2.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1tbwp"]
-content_margin_left = 15.0
-content_margin_top = 5.0
-content_margin_right = 15.0
-content_margin_bottom = 5.0
+content_margin_left = 20.0
+content_margin_top = 7.0
+content_margin_right = 20.0
+content_margin_bottom = 7.0
 corner_radius_top_left = 3
 corner_radius_top_right = 3
 corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
-expand_margin_top = 2.0
-expand_margin_bottom = 2.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3b6iu"]
 content_margin_left = 15.0
@@ -991,10 +983,10 @@ SmallFlatButton/colors/font_color = Color(1, 1, 1, 1)
 SmallFlatButton/colors/font_focus_color = Color(1, 1, 1, 0.54902)
 SmallFlatButton/colors/font_hover_color = Color(1, 1, 1, 0.54902)
 SmallFlatButton/colors/font_hover_pressed_color = Color(1, 1, 1, 0.54902)
-SmallFlatButton/colors/icon_focus_color = Color(1, 1, 1, 1)
-SmallFlatButton/colors/icon_hover_color = Color(1, 1, 1, 1)
-SmallFlatButton/colors/icon_hover_pressed_color = Color(1, 1, 1, 1)
-SmallFlatButton/colors/icon_normal_color = Color(1, 1, 1, 0.34902)
+SmallFlatButton/colors/icon_focus_color = Color(1, 1, 1, 0.34902)
+SmallFlatButton/colors/icon_hover_color = Color(1, 1, 1, 0.34902)
+SmallFlatButton/colors/icon_hover_pressed_color = Color(1, 1, 1, 0.34902)
+SmallFlatButton/colors/icon_normal_color = Color(1, 1, 1, 1)
 SmallFlatButton/font_sizes/font_size = 10
 SmallFlatButton/styles/focus = SubResource("StyleBoxFlat_dcdk0")
 SmallFlatButton/styles/hover = SubResource("StyleBoxFlat_4fsg1")
