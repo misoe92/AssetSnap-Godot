@@ -267,16 +267,16 @@ namespace AssetSnap.Front.Components.Library
 			{
 				if( false == reverse) 
 				{
-					if(CurrentAngleRotation > 355)
+					if(CurrentAngleRotation > 354)
 					{
-						CurrentAngleRotation = 0 - CurrentAngleRotation;
+						CurrentAngleRotation = -5;
 					}
 				}
 				else 
 				{
 					if(CurrentAngleRotation - 5 <= 0) 
 					{
-						CurrentAngleRotation = 360 + CurrentAngleRotation;
+						CurrentAngleRotation = 365 + CurrentAngleRotation;
 					}
 				}
 				
