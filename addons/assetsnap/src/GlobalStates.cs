@@ -30,7 +30,6 @@ namespace AssetSnap
 
 	using AssetSnap.Front.Nodes;
 	using Godot;
-	using Microsoft.VisualBasic;
 
 	[Tool]
 	public partial class GlobalStates : LoadStates
@@ -439,6 +438,7 @@ namespace AssetSnap
 
 
 		/** Library Values **/
+		private LibraryStateEnum _LevelOfDetailsState = LibraryStateEnum.Disabled;
 		private int _SnapLayer = 0;
 		private float _SnapToObjectOffsetXValue = 0;
 		private float _SnapToObjectOffsetZValue = 0;
@@ -446,7 +446,7 @@ namespace AssetSnap
 		private float _SnapToXValue = 0;
 		private float _SnapToZValue = 0;
 		private float _DragSizeOffset = 0;
-
+		private float _LevelOfDetails = 0;
 
 
 		[Export]
@@ -546,6 +546,35 @@ namespace AssetSnap
 				}
 			}
 		}
+		
+		[Export]
+		public float LevelOfDetails
+		{
+			get => _LevelOfDetails;
+			set
+			{
+				if (value != _LevelOfDetails)
+				{
+					_LevelOfDetails = value;
+					StateChanged("LevelOfDetails", value);
+				}
+			}
+		}
+		
+		[Export]
+		public LibraryStateEnum LevelOfDetailsState
+		{
+			get => _LevelOfDetailsState;
+			set
+			{
+				if (value != _LevelOfDetailsState)
+				{
+					_LevelOfDetailsState = value;
+					StateChanged("LevelOfDetailsState", value.ToString());
+				}
+			}
+		}
+		
 		/** Snap States **/
 		private SpawnStateEnum _BoundarySpawned = SpawnStateEnum.Null;
 

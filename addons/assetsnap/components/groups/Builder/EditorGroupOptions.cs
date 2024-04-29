@@ -24,10 +24,11 @@ namespace AssetSnap.Front.Components.Groups.Builder
 {
 	using System.Collections.Generic;
 	using AssetSnap.Component;
+	using AssetSnap.Explorer;
 	using AssetSnap.Front.Components.Groups.Builder.GroupOptions;
 	using AssetSnap.Instance.Input;
-    using AssetSnap.States;
-    using Godot;
+	using AssetSnap.States;
+	using Godot;
 
 	[Tool]
 	public partial class EditorGroupOptions : LibraryComponent
@@ -49,6 +50,8 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		private ConvexClean _GroupBuilderEditorGroupOptionConvexClean;
 		private ConvexSimplify _GroupBuilderEditorGroupOptionConvexSimplify;
 		private DragOffset _GroupBuilderEditorGroupOptionDragOffset;
+		private LevelOfDetailsState _GroupBuilderEditorGroupOptionLevelOfDetailsState;
+		private LevelOfDetails _GroupBuilderEditorGroupOptionLevelOfDetails;
 		private PlacementSimple _GroupBuilderEditorGroupOptionPlacementSimple;
 		private PlacementOptimized _GroupBuilderEditorGroupOptionPlacementOptimized;
 
@@ -241,6 +244,12 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			List<string> DragComponents = new()
 			{
 				"Groups.Builder.GroupOptions.DragOffset",
+			};
+			
+			List<string> LODComponents = new()
+			{
+				"Groups.Builder.GroupOptions.LevelOfDetailsState",
+				"Groups.Builder.GroupOptions.LevelOfDetails",
 			};
 
 			/** Initializing Snap Object fields **/
@@ -460,6 +469,32 @@ namespace AssetSnap.Front.Components.Groups.Builder
 					_GroupBuilderEditorGroupOptionDragOffset.GroupOptionChanged += (string Name, Variant value) => { _UpdateGroupOption(Name, value); };
 				}
 			}
+			
+			_InitializeGroupOptionLODTitle(Trait<Containerable>().Select(2).GetInnerContainer(2));
+			if (ExplorerUtils.Get().Components.HasAll(LODComponents.ToArray()))
+			{
+				_GroupBuilderEditorGroupOptionLevelOfDetailsState = GlobalExplorer.GetInstance().Components.Single<LevelOfDetailsState>(true);
+				_GroupBuilderEditorGroupOptionLevelOfDetails = GlobalExplorer.GetInstance().Components.Single<LevelOfDetails>(true);
+
+				if (null != _GroupBuilderEditorGroupOptionLevelOfDetailsState)
+				{
+					_GroupBuilderEditorGroupOptionLevelOfDetailsState.Container = Trait<Containerable>().Select(2).GetInnerContainer(2);
+					_GroupBuilderEditorGroupOptionLevelOfDetailsState.Parent = this;
+					_GroupBuilderEditorGroupOptionLevelOfDetailsState.Initialize();
+
+					_GroupBuilderEditorGroupOptionLevelOfDetailsState.GroupOptionChanged += (string Name, Variant value) => { _UpdateGroupOption(Name, value); };
+				}
+				
+				if (null != _GroupBuilderEditorGroupOptionLevelOfDetails)
+				{
+					_GroupBuilderEditorGroupOptionLevelOfDetails.Container = Trait<Containerable>().Select(2).GetInnerContainer(2);
+					_GroupBuilderEditorGroupOptionLevelOfDetails.Parent = this;
+					_GroupBuilderEditorGroupOptionLevelOfDetails.Initialize();
+
+					_GroupBuilderEditorGroupOptionLevelOfDetails.GroupOptionChanged += (string Name, Variant value) => { _UpdateGroupOption(Name, value); };
+				}
+			}
+			
 		}
 
 		private void _FinalizeFields()
@@ -713,6 +748,11 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		private void _InitializeGroupOptionPlacementModeTitle(Container Container)
 		{
 			Container.AddChild(_GenerateTitle("_InitializeGroupOptionPlacementModeTitle", "Placement Modes"));
+		}
+		
+		private void _InitializeGroupOptionLODTitle(Container Container)
+		{
+			Container.AddChild(_GenerateTitle("_InitializeGroupOptionLODTitle", "Level of details"));
 		}
 
 		private MarginContainer _GenerateTitle(string name, string text)
