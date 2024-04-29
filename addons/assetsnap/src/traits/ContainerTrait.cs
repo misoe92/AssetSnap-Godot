@@ -178,14 +178,27 @@ namespace AssetSnap.Trait
 		**
 		** @return Containerable
 		*/
-		public virtual ContainerTrait ToggleVisible()
+		public virtual ContainerTrait ToggleVisible( bool debug = false)
 		{
+			Visible = !Visible;
+			
 			if (
 				null != Dependencies &&
 				false != Dependencies.ContainsKey(TraitName + "_MarginContainer")
 			)
 			{
 				Dependencies[TraitName + "_MarginContainer"].As<MarginContainer>().Visible = !Dependencies[TraitName + "_MarginContainer"].As<MarginContainer>().Visible;
+				if( debug )
+				{
+					GD.PushWarning("Visibility set");
+				}
+			}
+			else 
+			{
+				if( debug )
+				{
+					GD.PushWarning("No dependencies found when trying to toggle visibility");
+				}
 			}
 
 			return this;
@@ -360,11 +373,20 @@ namespace AssetSnap.Trait
 		**
 		** @return bool
 		*/
-		public virtual bool IsVisible()
+		public virtual bool IsVisible( bool debug = false )
 		{
 			if (false != Dependencies.ContainsKey(TraitName + "_MarginContainer"))
 			{
+				if( debug ) 
+				{
+					GD.Print("Visibility state found", Dependencies[TraitName + "_MarginContainer"].As<MarginContainer>().Visible);
+				}
 				return Dependencies[TraitName + "_MarginContainer"].As<MarginContainer>().Visible == true;
+			}
+			
+			if( debug ) 
+			{
+				GD.Print("Visibility state not found");
 			}
 
 			return false;

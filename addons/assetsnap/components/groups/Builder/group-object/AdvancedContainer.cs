@@ -34,6 +34,7 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 		private ConvexCollision _GroupBuilderEditorGroupObjectAdvancedContainerConvexCollision;
 		private ConcaveCollision _GroupBuilderEditorGroupObjectAdvancedContainerConcaveCollision;
 		private SnapLayer _GroupBuilderEditorGroupObjectAdvancedContainerSnapLayer;
+		private LevelOfDetails _GroupBuilderEditorGroupObjectAdvancedContainerLevelOfDetails;
 
 		public AdvancedContainer()
 		{
@@ -78,6 +79,7 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 			Container BoxContainer = Trait<Containerable>().Select(0).GetInnerContainer();
 
 			_InitializeSnapLayerControl(BoxContainer);
+			_InitializeLevelOfDetailsControl(BoxContainer);
 			_InitializeSphereCollisionControl(BoxContainer);
 			_InitializeConvexCollisionControl(BoxContainer);
 			_InitializeConcaveCollisionControl(BoxContainer);
@@ -92,11 +94,29 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 				);
 		}
 
+		private void _InitializeLevelOfDetailsControl(Container innerContainer)
+		{
+			List<string> Components = new()
+			{
+				"Groups.Builder.GroupObject.AdvancedContainers.LevelOfDetails"
+			};
+
+			if (_GlobalExplorer.Components.HasAll(Components.ToArray()))
+			{
+				_GroupBuilderEditorGroupObjectAdvancedContainerLevelOfDetails = GlobalExplorer.GetInstance().Components.Single<LevelOfDetails>(true);
+				_GroupBuilderEditorGroupObjectAdvancedContainerLevelOfDetails.Container = innerContainer;
+				_GroupBuilderEditorGroupObjectAdvancedContainerLevelOfDetails.Index = Index;
+				_GroupBuilderEditorGroupObjectAdvancedContainerLevelOfDetails.Options = Options;
+				_GroupBuilderEditorGroupObjectAdvancedContainerLevelOfDetails.Path = Path;
+				_GroupBuilderEditorGroupObjectAdvancedContainerLevelOfDetails.Initialize();
+			}
+		}
+		
 		private void _InitializeSnapLayerControl(Container innerContainer)
 		{
 			List<string> Components = new()
 			{
-				"Groups.Builder.GroupObjects.AdvancedContainers.SnapLayer"
+				"Groups.Builder.GroupObject.AdvancedContainers.SnapLayer"
 			};
 
 			if (_GlobalExplorer.Components.HasAll(Components.ToArray()))
@@ -114,7 +134,7 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 		{
 			List<string> Components = new()
 			{
-				"Groups.Builder.GroupObjects.AdvancedContainers.SphereCollision"
+				"Groups.Builder.GroupObject.AdvancedContainers.SphereCollision"
 			};
 
 			if (_GlobalExplorer.Components.HasAll(Components.ToArray()))
@@ -132,7 +152,7 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 		{
 			List<string> Components = new()
 			{
-				"Groups.Builder.GroupObjects.AdvancedContainers.ConvexCollision"
+				"Groups.Builder.GroupObject.AdvancedContainers.ConvexCollision"
 			};
 
 			if (_GlobalExplorer.Components.HasAll(Components.ToArray()))
@@ -150,7 +170,7 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 		{
 			List<string> Components = new()
 			{
-				"Groups.Builder.GroupObjects.AdvancedContainers.ConcaveCollision"
+				"Groups.Builder.GroupObject.AdvancedContainers.ConcaveCollision"
 			};
 
 			if (_GlobalExplorer.Components.HasAll(Components.ToArray()))

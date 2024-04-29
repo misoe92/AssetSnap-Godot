@@ -27,11 +27,11 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject.AdvancedContaine
 	using Godot;
 
 	[Tool]
-	public partial class SnapLayer : AdvancedGroupComponent
+	public partial class LevelOfDetails : AdvancedGroupComponent
 	{
-		public SnapLayer()
+		public LevelOfDetails()
 		{
-			Text = "Snap Layer";
+			Text = "Level of details";
 			
 			UsingTraits = new()
 			{
@@ -51,16 +51,14 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject.AdvancedContaine
 			base._InitializeFields();
 			
 			Trait<Spinboxable>()
-				.SetName("GroupBuilderEditorGroupObjectAdvancedContainerSnapLayer")
-				.SetValue(Options.ContainsKey("SnapLayer") ? (int)Options["SnapLayer"] : 0)
+				.SetName("GroupBuilderEditorGroupObjectAdvancedContainerLevelOfDetails")
+				.SetValue(Options.ContainsKey("LevelOfDetails") ? (int)Options["LevelOfDetails"] : 0)
 				.SetStep(0.1f)
 				.SetMinValue(0.0f)
-				.SetAction( Callable.From( ( double value ) => { _OnSnapLayerChanged((int)value); } ) )
+				.SetMaxValue(5.0f)
+				.SetTooltipText("To use default group Level of details or project level, leave this as 0")
+				.SetAction( Callable.From( ( double value ) => { _OnChanged((int)value); } ) )
 				.Instantiate();
-
-			Trait<Containerable>()
-				.Select(0)
-				.SetMargin(130, "left");
 		}
 
 		protected override void _FinalizeFields()
@@ -78,10 +76,10 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject.AdvancedContaine
 			base._FinalizeFields();
 		}
 
-		private void _OnSnapLayerChanged( int value )
+		private void _OnChanged( int value )
 		{
-			GlobalExplorer.GetInstance().GroupBuilder._Editor.SetOption(Index, "SnapLayer", value);
-			HandleStatic.MaybeUpdateGrouped(Index, "SnapLayer", value);
+			GlobalExplorer.GetInstance().GroupBuilder._Editor.SetOption(Index, "LevelOfDetails", value);
+			HandleStatic.MaybeUpdateGrouped(Index, "LevelOfDetails", value);
 		}
 	}
 }

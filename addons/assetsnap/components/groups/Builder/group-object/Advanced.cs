@@ -103,7 +103,6 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 		private void _OnToggleAdvanced()
 		{
 			Parent._GroupBuilderEditorGroupObjectAdvancedContainer.ToggleVisibility();
-
 			if (Parent._GroupBuilderEditorGroupObjectAdvancedContainer.IsVisible())
 			{
 				Trait<Buttonable>()

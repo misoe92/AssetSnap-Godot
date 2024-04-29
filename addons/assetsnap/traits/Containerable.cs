@@ -178,9 +178,9 @@ namespace AssetSnap.Component
 		**
 		** @return Containerable
 		*/
-		public override Containerable ToggleVisible()
+		public override Containerable ToggleVisible( bool debug = false)
 		{
-			base.ToggleVisible();
+			base.ToggleVisible(debug);
 
 			return this;
 		}
