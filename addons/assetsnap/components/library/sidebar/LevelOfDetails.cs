@@ -57,6 +57,7 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			
 			UsingTraits = new()
 			{
+				{ typeof(Labelable).ToString() },
 				{ typeof(Checkable).ToString() },
 				{ typeof(Spinboxable).ToString() },
 			};
@@ -88,7 +89,21 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			Callable _callable = Callable.From(() => { _OnCheckboxPressed(); });
 			
 			Initiated = true;
-		
+			
+			Trait<Labelable>()
+				.SetName("LevelOfDetailsText")
+				.SetType(Labelable.TitleType.TextSmall)
+				.SetText( "If no Level of detail value is specified, models will follow the project settings for LOD" )
+				.SetDimensions(140, 20)
+				.SetMargin(10, "left")
+				.SetMargin(10, "right")
+				.SetMargin(2, "top")
+				.SetMargin(2, "bottom")
+				.SetAutoWrap(TextServer.AutowrapMode.Word)
+				.Instantiate()
+				.Select(0)
+				.AddToContainer( this );
+				
 			Trait<Checkable>()
 				.SetName("LevelOfDetailsCheckbox")
 				.SetAction( _callable )
