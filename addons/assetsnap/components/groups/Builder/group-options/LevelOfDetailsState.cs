@@ -54,17 +54,20 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 
 		private void _OnValueChanged()
 		{
-			if( StatesUtils.Get().LevelOfDetailsState == GlobalStates.LibraryStateEnum.Disabled ) 
+			if( StatesUtils.Get().PlacingMode == GlobalStates.PlacingModeEnum.Group ) 
 			{
-				StatesUtils.Get().LevelOfDetailsState = GlobalStates.LibraryStateEnum.Enabled; 
-			}
-			else 
-			{
-				StatesUtils.Get().LevelOfDetailsState = GlobalStates.LibraryStateEnum.Disabled; 
-			}
-			
-			Parent._UpdateGroupOptions();
-			_HasGroupDataHasChanged();
+				if( StatesUtils.Get().LevelOfDetailsState == GlobalStates.LibraryStateEnum.Disabled ) 
+				{
+					StatesUtils.Get().LevelOfDetailsState = GlobalStates.LibraryStateEnum.Enabled; 
+				}
+				else 
+				{
+					StatesUtils.Get().LevelOfDetailsState = GlobalStates.LibraryStateEnum.Disabled; 
+				}
+				
+				Parent._UpdateGroupOptions();
+				_HasGroupDataHasChanged();
+			} 
 		}
 	}
 }

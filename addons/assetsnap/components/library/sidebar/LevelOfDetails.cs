@@ -23,6 +23,8 @@
 namespace AssetSnap.Front.Components.Library.Sidebar
 {
 	using AssetSnap.Component;
+	using AssetSnap.Explorer;
+	using AssetSnap.States;
 	using Godot;
 
 	[Tool]
@@ -117,9 +119,9 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 				.Instantiate()
 				.Select(0)
 				.AddToContainer( this );
-				
+
 			Trait<Spinboxable>()
-				.SetName("LevelOfDetailsScale")
+				.SetName("LevelOfDetailsValue")
 				.SetDimensions(140, 20)
 				.SetMargin(10, "left")
 				.SetMargin(10, "right")
@@ -130,6 +132,7 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 				.SetMaxValue(5)
 				.SetMinValue(0)
 				.SetTooltipText(_CheckboxTooltip)
+				.SetAction(Callable.From((double value) => { _OnLevelOfDetailsChanged(value); }))
 				.Instantiate()
 				.Select(0)
 				.AddToContainer( this );
@@ -161,7 +164,19 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		*/	
 		private void _OnCheckboxPressed()
 		{
-			bool state = false;
+			if( StatesUtils.Get().LevelOfDetailsState == GlobalStates.LibraryStateEnum.Disabled ) 
+			{
+				StatesUtils.Get().LevelOfDetailsState = GlobalStates.LibraryStateEnum.Enabled;
+			}
+			else
+			{
+				StatesUtils.Get().LevelOfDetailsState = GlobalStates.LibraryStateEnum.Disabled;	
+			}
+		}
+		
+		private void _OnLevelOfDetailsChanged( double value ) 
+		{
+			StatesUtils.Get().LevelOfDetails = (float)value;
 		}
 		
 		private bool IsCheckboxChecked()
@@ -176,7 +191,8 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		*/	
 		public void Reset()
 		{
-			_GlobalExplorer.States.SnapToObject = GlobalStates.LibraryStateEnum.Disabled;
+			StatesUtils.Get().LevelOfDetailsState = GlobalStates.LibraryStateEnum.Disabled;
+			StatesUtils.Get().LevelOfDetails = 0.0f;
 			state = false;
 		}
 		
@@ -198,7 +214,10 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		*/
 		public override void Sync() 
 		{
-			// _GlobalExplorer.States.LevelOfDetails = state ? GlobalStates.LibraryStateEnum.Enabled : GlobalStates.LibraryStateEnum.Disabled;
+			if( StatesUtils.Get().LevelOfDetailsState == GlobalStates.LibraryStateEnum.Enabled ) 
+			{
+				StatesUtils.Get().LevelOfDetails = (float)Trait<Spinboxable>().Select(0).GetValue();
+			}
 		}
 	}
 }

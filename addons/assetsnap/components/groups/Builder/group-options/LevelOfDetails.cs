@@ -41,7 +41,6 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 		
 		protected override void _InitializeFields()
 		{
-				
 			Trait<Spinboxable>()
 				.SetName("GroupBuilderEditorGroupOptionLevelOfDetails")
 				.SetMargin(35, "right")
@@ -49,8 +48,8 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 				.SetStep(0.1f)
 				.SetMaxValue(5)
 				.SetMinValue(0)
-				.Instantiate()
-				.SetAction( Callable.From( ( double value ) => { _OnValueChanged( (float)value ); } ) );
+				.SetAction(Callable.From((double value) => { _OnValueChanged((float)value); }))
+				.Instantiate();
 				
 			Trait<Spinboxable>()
 				.Select(0)
@@ -60,14 +59,16 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 
 		private void _OnValueChanged( float value )
 		{
-			if( StatesUtils.Get().LevelOfDetails != value )
+			if( StatesUtils.Get().PlacingMode == GlobalStates.PlacingModeEnum.Group ) 
 			{
-				StatesUtils.Get().LevelOfDetails = value;
+				if( StatesUtils.Get().LevelOfDetailsState == GlobalStates.LibraryStateEnum.Enabled )
+				{
+					StatesUtils.Get().LevelOfDetails = value;
+				}
+				
+				Parent._UpdateGroupOptions();
+				_HasGroupDataHasChanged();
 			}
-			
-			Parent._UpdateGroupOptions();
-			
-			_HasGroupDataHasChanged();
 		}
 	}
 }

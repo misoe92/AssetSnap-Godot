@@ -23,7 +23,10 @@
 namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 {
 	using AssetSnap.Component;
-	using Godot;
+    using AssetSnap.Explorer;
+
+    using AssetSnap.States;
+    using Godot;
 
 	[Tool]
 	public partial class SnapToZValue : GroupOptionSpinboxableComponent
@@ -48,7 +51,7 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 				.SetValue(0)
 				.SetStep(0.1f)
 				.SetMinValue(0.0f)
-				.SetAction(Callable.From((double value) => { _OnValueChanged((int)value); }))
+				.SetAction(Callable.From((double value) => { _OnValueChanged((float)value); }))
 				.Instantiate();
 
 			Trait<Spinboxable>()
@@ -59,17 +62,18 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 
 		private void _OnValueChanged(float value)
 		{
-			_GlobalExplorer.GroupBuilder._Editor.Group.SnapToZValue = value;
-
-			if (_GlobalExplorer.States.PlacingMode == GlobalStates.PlacingModeEnum.Group)
+			if (
+				StatesUtils.Get().SnapToZ == GlobalStates.LibraryStateEnum.Enabled &&
+				StatesUtils.Get().PlacingMode == GlobalStates.PlacingModeEnum.Group
+			)
 			{
-				_GlobalExplorer.States.SnapToZValue = value;
+				ExplorerUtils.Get().GroupBuilder._Editor.Group.SnapToZValue = value;
+				StatesUtils.Get().SnapToZValue = value;
+				
+				Parent._UpdateGroupOptions();
+				_MaybeUpdateGrouped("SnapToZValue", value);
+				_HasGroupDataHasChanged();
 			}
-
-			Parent._UpdateGroupOptions();
-
-			_MaybeUpdateGrouped("SnapToZValue", value);
-			_HasGroupDataHasChanged();
 		}
 	}
 }

@@ -26,6 +26,7 @@ namespace AssetSnap.Front.Components.Groups.Builder
 	using AssetSnap.Component;
 	using AssetSnap.Explorer;
 	using AssetSnap.Helpers;
+	using AssetSnap.States;
 	using Godot;
 
 	[Tool]
@@ -316,6 +317,13 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			{
 				Editor Editor = Components.Single<Editor>();
 				Editor.GroupPath = title;
+
+
+				StatesUtils.Get().Group = Editor.Group;
+				StatesUtils.Get().PlacingMode = GlobalStates.PlacingModeEnum.Group;
+				StatesUtils.Get().EditingTitle = null;
+				StatesUtils.Get().EditingObject = null;
+				StatesUtils.Get().CurrentLibrary = null;
 			}
 
 			if (Components.HasAll(RootSidebar.ToArray()))
@@ -323,6 +331,7 @@ namespace AssetSnap.Front.Components.Groups.Builder
 				Sidebar _Sidebar = Components.Single<Sidebar>();
 				_Sidebar.Update();
 			}
+			
 		}
 	}
 }
