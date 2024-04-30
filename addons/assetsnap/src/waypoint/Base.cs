@@ -450,10 +450,28 @@ namespace AssetSnap.Waypoint
 		{
 			Transform3D _Trans = _model.Transform;
 			_Trans.Origin = Origin;
-			GD.Print(Origin, _model);
 			_model.Transform = _Trans;
 			_model.RotationDegrees = Rotation;
 			_model.Scale = Scale;
+			
+			if( _model is AsMeshInstance3D asMeshInstance3D ) 
+			{
+				if( StatesUtils.Get().LevelOfDetailsState == GlobalStates.LibraryStateEnum.Enabled ) 
+				{
+					asMeshInstance3D.LodBias = StatesUtils.Get().LevelOfDetails; 
+				}
+			}
+			
+			if( _model is AsNode3D asNode3D)
+			{
+				if( StatesUtils.Get().LevelOfDetailsState == GlobalStates.LibraryStateEnum.Enabled ) 
+				{
+					foreach( MeshInstance3D meshInstance3D in asNode3D.GetChildren() )
+					{
+						meshInstance3D.LodBias = StatesUtils.Get().LevelOfDetails; 
+					}
+				}
+			}
 		}
 
 		/*
