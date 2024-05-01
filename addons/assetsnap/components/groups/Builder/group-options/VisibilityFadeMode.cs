@@ -23,55 +23,46 @@
 namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 {
 	using AssetSnap.Component;
-	using AssetSnap.Explorer;
 	using AssetSnap.States;
-
 	using Godot;
 
 	[Tool]
-	public partial class SnapToXValue : GroupOptionSpinboxableComponent
+	public partial class VisibilityFadeMode : GroupOptionSelectableComponent
 	{
-		public SnapToXValue()
+		public VisibilityFadeMode()
 		{
-			Name = "GroupsBuilderGroupOptionsSnapToXValue";
-
+			Name = "GroupsBuilderGroupOptionsVisibilityFadeMode";
+			
 			UsingTraits = new()
 			{
-				{ typeof(Spinboxable).ToString() },
+				{ typeof(Selectable).ToString() },
 			};
 		}
-
+		
 		protected override void _InitializeFields()
 		{
-			Trait<Spinboxable>()
-				.SetName("InitializeGroupOptionSnapXValueContainer")
+			Trait<Selectable>()
+				.SetName("GroupBuilderEditorGroupOptionVisibilityFadeMode")
+				.SetType(Selectable.Type.SelectableSmall)
+				.SetText("Fade Mode")
+				.SetMargin(0)
 				.SetMargin(35, "right")
-				.SetMargin(10, "left")
-				.SetPrefix("Snap x: ")
-				.SetValue(0)
-				.SetStep(0.1f)
-				.SetMinValue(0.0f)
-				.SetAction(Callable.From((double value) => { _OnValueChanged((float)value); }))
+				.AddItem("Use project default")
+				.AddItem("Disabled")
+				.AddItem("Self")
+				.AddItem("Dependencies")
+				.SetAction(( int index ) => { _OnValueChanged( index ); })
 				.Instantiate();
-
-			Trait<Spinboxable>()
-				.Select(0)
-				.GetNode<SpinBox>()
-				.GetLineEdit().AddThemeConstantOverride("minimum_character_width", 24);
 		}
 
-		private void _OnValueChanged(float value)
+		private void _OnValueChanged( int index )
 		{
-			if (
-				StatesUtils.Get().SnapToX == GlobalStates.LibraryStateEnum.Enabled &&
-				StatesUtils.Get().PlacingMode == GlobalStates.PlacingModeEnum.Group
-			)
+			if( StatesUtils.Get().PlacingMode == GlobalStates.PlacingModeEnum.Group ) 
 			{
-				ExplorerUtils.Get().GroupBuilder._Editor.Group.SnapToXValue = value;
-				StatesUtils.Get().SnapToXValue = value;
-				
+				OptionButton selectable = Trait<Selectable>().Select(0).GetNode() as OptionButton;
+				StatesUtils.Get().VisibilityFadeMode = selectable.GetItemText(index);
+			
 				Parent._UpdateGroupOptions();
-				_MaybeUpdateGrouped("SnapToXValue", value);
 				_HasGroupDataHasChanged();
 			}
 		}

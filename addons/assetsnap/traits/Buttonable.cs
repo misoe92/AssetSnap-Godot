@@ -333,6 +333,11 @@ namespace AssetSnap.Component
 		public Buttonable SetIcon( Texture2D icon )
 		{
 			Icon = icon;
+			
+			if( false != Dependencies.ContainsKey(TraitName + "_WorkingNode") && Dependencies[TraitName + "_WorkingNode"].As<GodotObject>() is Button button) 
+			{
+				button.Icon = icon;
+			}
 
 			return this;
 		}

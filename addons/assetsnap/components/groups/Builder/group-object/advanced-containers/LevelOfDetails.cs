@@ -20,60 +20,66 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
+namespace AssetSnap.Front.Components.Groups.Builder.GroupObject.AdvancedContainers
 {
 	using AssetSnap.Component;
-	using AssetSnap.Explorer;
-	using AssetSnap.States;
-
+	using AssetSnap.Static;
 	using Godot;
 
 	[Tool]
-	public partial class SnapToXValue : GroupOptionSpinboxableComponent
+	public partial class LevelOfDetails : AdvancedGroupComponent
 	{
-		public SnapToXValue()
+		public LevelOfDetails()
 		{
-			Name = "GroupsBuilderGroupOptionsSnapToXValue";
-
+			Text = "Level of details";
+			
 			UsingTraits = new()
 			{
+				{ typeof(Containerable).ToString() },
+				{ typeof(Labelable).ToString() },
 				{ typeof(Spinboxable).ToString() },
 			};
 		}
-
+		
+		protected override void _RegisterTraits()
+		{
+			base._RegisterTraits();
+		}
+		
 		protected override void _InitializeFields()
 		{
+			base._InitializeFields();
+			
 			Trait<Spinboxable>()
-				.SetName("InitializeGroupOptionSnapXValueContainer")
-				.SetMargin(35, "right")
-				.SetMargin(10, "left")
-				.SetPrefix("Snap x: ")
-				.SetValue(0)
+				.SetName("GroupBuilderEditorGroupObjectAdvancedContainerLevelOfDetails")
+				.SetValue(Options.ContainsKey("LevelOfDetails") ? (int)Options["LevelOfDetails"] : 0)
 				.SetStep(0.1f)
 				.SetMinValue(0.0f)
-				.SetAction(Callable.From((double value) => { _OnValueChanged((float)value); }))
+				.SetMaxValue(5.0f)
+				.SetTooltipText("To use default group Level of details or project level, leave this as 0")
+				.SetAction( Callable.From( ( double value ) => { _OnChanged((int)value); } ) )
 				.Instantiate();
+		}
+
+		protected override void _FinalizeFields()
+		{
+			Container InnerContainer = Trait<Containerable>()
+				.Select(0)
+				.GetInnerContainer();
 
 			Trait<Spinboxable>()
 				.Select(0)
-				.GetNode<SpinBox>()
-				.GetLineEdit().AddThemeConstantOverride("minimum_character_width", 24);
+				.AddToContainer(
+					InnerContainer
+				);
+				
+			base._FinalizeFields();
 		}
 
-		private void _OnValueChanged(float value)
+		private void _OnChanged( int value )
 		{
-			if (
-				StatesUtils.Get().SnapToX == GlobalStates.LibraryStateEnum.Enabled &&
-				StatesUtils.Get().PlacingMode == GlobalStates.PlacingModeEnum.Group
-			)
-			{
-				ExplorerUtils.Get().GroupBuilder._Editor.Group.SnapToXValue = value;
-				StatesUtils.Get().SnapToXValue = value;
-				
-				Parent._UpdateGroupOptions();
-				_MaybeUpdateGrouped("SnapToXValue", value);
-				_HasGroupDataHasChanged();
-			}
+			GlobalExplorer.GetInstance().GroupBuilder._Editor.SetOption(Index, "LevelOfDetails", value);
+			HandleStatic.MaybeUpdateGrouped(Index, "LevelOfDetails", value);
 		}
 	}
 }

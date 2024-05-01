@@ -30,7 +30,6 @@ namespace AssetSnap
 
 	using AssetSnap.Front.Nodes;
 	using Godot;
-	using Microsoft.VisualBasic;
 
 	[Tool]
 	public partial class GlobalStates : LoadStates
@@ -264,6 +263,7 @@ namespace AssetSnap
 		private LibraryStateEnum _ConvexCollision = LibraryStateEnum.Disabled;
 		private LibraryStateEnum _ConvexClean = LibraryStateEnum.Disabled;
 		private LibraryStateEnum _ConvexSimplify = LibraryStateEnum.Disabled;
+		private LibraryStateEnum _LevelOfDetailsState = LibraryStateEnum.Disabled;
 
 		[ExportCategory("Placement States & Values")]
 		[Export]
@@ -434,11 +434,25 @@ namespace AssetSnap
 			}
 		}
 
+		[Export]
+		public LibraryStateEnum LevelOfDetailsState
+		{
+			get => _LevelOfDetailsState;
+			set
+			{
+				if (value != _LevelOfDetailsState)
+				{
+					_LevelOfDetailsState = value;
+					StateChanged("LevelOfDetailsState", value.ToString());
+				}
+			}
+		}
 
 		/** Group States **/
 
 
 		/** Library Values **/
+		private string _VisibilityFadeMode = "Use project default";
 		private int _SnapLayer = 0;
 		private float _SnapToObjectOffsetXValue = 0;
 		private float _SnapToObjectOffsetZValue = 0;
@@ -446,7 +460,11 @@ namespace AssetSnap
 		private float _SnapToXValue = 0;
 		private float _SnapToZValue = 0;
 		private float _DragSizeOffset = 0;
-
+		private float _LevelOfDetails = 0;
+		private float _VisibilityRangeBegin = 0;
+		private float _VisibilityRangeBeginMargin = 0;
+		private float _VisibilityRangeEnd = 0;
+		private float _VisibilityRangeEndMargin = 0;
 
 
 		[Export]
@@ -546,6 +564,91 @@ namespace AssetSnap
 				}
 			}
 		}
+		
+		[Export]
+		public float LevelOfDetails
+		{
+			get => _LevelOfDetails;
+			set
+			{
+				if (value != _LevelOfDetails)
+				{
+					_LevelOfDetails = value;
+					StateChanged("LevelOfDetails", value);
+				}
+			}
+		}
+		
+		[Export]
+		public float VisibilityRangeBegin
+		{
+			get => _VisibilityRangeBegin;
+			set
+			{
+				if (value != _VisibilityRangeBegin)
+				{
+					_VisibilityRangeBegin = value;
+					StateChanged("VisibilityRangeBegin", value);
+				}
+			}
+		}
+		
+		[Export]
+		public float VisibilityRangeBeginMargin
+		{
+			get => _VisibilityRangeBeginMargin;
+			set
+			{
+				if (value != _VisibilityRangeBeginMargin)
+				{
+					_VisibilityRangeBeginMargin = value;
+					StateChanged("VisibilityRangeBeginMargin", value);
+				}
+			}
+		}
+		
+		[Export]
+		public float VisibilityRangeEnd
+		{
+			get => _VisibilityRangeEnd;
+			set
+			{
+				if (value != _VisibilityRangeEnd)
+				{
+					_VisibilityRangeEnd = value;
+					StateChanged("VisibilityRangeEnd", value);
+				}
+			}
+		}
+		
+		[Export]
+		public float VisibilityRangeEndMargin
+		{
+			get => _VisibilityRangeEndMargin;
+			set
+			{
+				if (value != _VisibilityRangeEndMargin)
+				{
+					_VisibilityRangeEndMargin = value;
+					StateChanged("VisibilityRangeEndMargin", value);
+				}
+			}
+		}
+		
+		[Export]
+		public string VisibilityFadeMode
+		{
+			get => _VisibilityFadeMode;
+			set
+			{
+				if (value != _VisibilityFadeMode)
+				{
+					_VisibilityFadeMode = value;
+					StateChanged("VisibilityFadeMode", value);
+				}
+			}
+		}
+		
 		/** Snap States **/
 		private SpawnStateEnum _BoundarySpawned = SpawnStateEnum.Null;
 
@@ -617,7 +720,7 @@ namespace AssetSnap
 			}
 		}
 
-		public Godot.Collections.Dictionary<Mesh, AsOptimizedMultiMeshGroup3D> OptimizedGroups = new();
+		public Godot.Collections.Dictionary<Mesh, Godot.Collections.Array<AsOptimizedMultiMeshGroup3D>> OptimizedGroups = new();
 
 		public string Name = "GlobalStates";
 

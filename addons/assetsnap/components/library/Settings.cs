@@ -48,6 +48,8 @@ namespace AssetSnap.Front.Components.Library
 		public SnapToZ _LSSnapToZ;
 		public OptimizedPlacement _LSOptimizedPlacement;
 		public SimplePlacement _LSSimplePlacement;
+		public LevelOfDetails _LSLevelOfDetails;
+		public VisibilityRange _LSVisibilityRange;
 		
 		/*
 		** Component constructor
@@ -110,7 +112,17 @@ namespace AssetSnap.Front.Components.Library
 				.SetName("Collisions")
 				.SetDefaultValue("Collisions")
 				.Instantiate(3);
-		
+				
+			Trait<Dropdownable>()
+				.SetName("Level of detail")
+				.SetDefaultValue("Level of detail")
+				.Instantiate(4);
+							
+			Trait<Dropdownable>()
+				.SetName("Visibility Range")
+				.SetDefaultValue("Visibility Range")
+				.Instantiate(5);
+				
 			Trait<Labelable>()
 				.SetName("LibrarySettingsTitle")
 				.SetText("Library Controls")
@@ -186,6 +198,9 @@ namespace AssetSnap.Front.Components.Library
 				_LSSimpleSphereCollision = GlobalExplorer.GetInstance().Components.Single<SimpleSphereCollision>(true);
 				_LSConvexPolygonCollision = GlobalExplorer.GetInstance().Components.Single<ConvexPolygonCollision>(true);
 				_LSConcaveCollision = GlobalExplorer.GetInstance().Components.Single<ConcaveCollision>(true);
+				
+				_LSLevelOfDetails = GlobalExplorer.GetInstance().Components.Single<LevelOfDetails>(true);
+				_LSVisibilityRange = GlobalExplorer.GetInstance().Components.Single<VisibilityRange>(true);
 				
 				if( _LSEditing != null ) 
 				{
@@ -315,21 +330,52 @@ namespace AssetSnap.Front.Components.Library
 					_LSConcaveCollision.Library = Library;
 					_LSConcaveCollision.Initialize();
 				}
+				
+				if( _LSLevelOfDetails != null ) 
+				{
+					_LSLevelOfDetails.Container = Trait<Dropdownable>()
+						.Select(4)
+						.GetDropdownContainer();
+						
+					_LSLevelOfDetails.Library = Library;
+					_LSLevelOfDetails.Initialize();
+				}
+				
+				if( _LSVisibilityRange != null ) 
+				{
+					_LSVisibilityRange.Container = Trait<Dropdownable>()
+						.Select(5)
+						.GetDropdownContainer();
+						
+					_LSVisibilityRange.Library = Library;
+					_LSVisibilityRange.Initialize();
+				}
 			}
 			
 			Trait<Dropdownable>()
+				.Select(5)
+				.AddToContainer(componentContainer);
+				
+			Trait<Dropdownable>()
+				.Select(4)
+				.AddToContainer(componentContainer);
+				
+			Trait<Dropdownable>()
 				.Select(3)
 				.AddToContainer(componentContainer);
+				
 			Trait<Dropdownable>()
 				.Select(2)
-				.AddToContainer(componentContainer);		
+				.AddToContainer(componentContainer);
+						
 			Trait<Dropdownable>()
 				.Select(1)
 				.AddToContainer(componentContainer);
+				
 			Trait<Dropdownable>()
 				.Select(0)
 				.AddToContainer(componentContainer);
-			
+
 			Trait<Containerable>()
 				.Select(1)
 				.AddToContainer(scrollContainerInner);

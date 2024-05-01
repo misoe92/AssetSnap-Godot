@@ -23,57 +23,51 @@
 namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 {
 	using AssetSnap.Component;
-	using AssetSnap.Explorer;
 	using AssetSnap.States;
-
 	using Godot;
 
 	[Tool]
-	public partial class SnapToXValue : GroupOptionSpinboxableComponent
+	public partial class LevelOfDetailsState : GroupOptionCheckableComponent
 	{
-		public SnapToXValue()
+		private readonly string _Tooltip = "When enabled you will be able to choose a Level of details level that all models in the group will default to, if none is set models will default to Project settings";
+		public LevelOfDetailsState()
 		{
-			Name = "GroupsBuilderGroupOptionsSnapToXValue";
-
+			Name = "GroupsBuilderGroupOptionsLevelOfDetailsState";
+			
 			UsingTraits = new()
 			{
-				{ typeof(Spinboxable).ToString() },
+				{ typeof(Checkable).ToString() },
 			};
 		}
-
+		
 		protected override void _InitializeFields()
 		{
-			Trait<Spinboxable>()
-				.SetName("InitializeGroupOptionSnapXValueContainer")
+				
+			Trait<Checkable>()
+				.SetName("GroupBuilderEditorGroupOptionLevelOfDetailsState")
+				.SetAction( Callable.From( () => { _OnValueChanged(); } ) )
 				.SetMargin(35, "right")
-				.SetMargin(10, "left")
-				.SetPrefix("Snap x: ")
-				.SetValue(0)
-				.SetStep(0.1f)
-				.SetMinValue(0.0f)
-				.SetAction(Callable.From((double value) => { _OnValueChanged((float)value); }))
+				.SetTooltipText(_Tooltip)
+				.SetText("Specify Level of details")
 				.Instantiate();
-
-			Trait<Spinboxable>()
-				.Select(0)
-				.GetNode<SpinBox>()
-				.GetLineEdit().AddThemeConstantOverride("minimum_character_width", 24);
 		}
 
-		private void _OnValueChanged(float value)
+		private void _OnValueChanged()
 		{
-			if (
-				StatesUtils.Get().SnapToX == GlobalStates.LibraryStateEnum.Enabled &&
-				StatesUtils.Get().PlacingMode == GlobalStates.PlacingModeEnum.Group
-			)
+			if( StatesUtils.Get().PlacingMode == GlobalStates.PlacingModeEnum.Group ) 
 			{
-				ExplorerUtils.Get().GroupBuilder._Editor.Group.SnapToXValue = value;
-				StatesUtils.Get().SnapToXValue = value;
+				if( StatesUtils.Get().LevelOfDetailsState == GlobalStates.LibraryStateEnum.Disabled ) 
+				{
+					StatesUtils.Get().LevelOfDetailsState = GlobalStates.LibraryStateEnum.Enabled; 
+				}
+				else 
+				{
+					StatesUtils.Get().LevelOfDetailsState = GlobalStates.LibraryStateEnum.Disabled; 
+				}
 				
 				Parent._UpdateGroupOptions();
-				_MaybeUpdateGrouped("SnapToXValue", value);
 				_HasGroupDataHasChanged();
-			}
+			} 
 		}
 	}
 }

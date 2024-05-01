@@ -60,7 +60,7 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject.AdvancedContaine
 
 			Trait<Containerable>()
 				.Select(0)
-				.SetMargin(170, "left");
+				.SetMargin(130, "left");
 		}
 
 		protected override void _FinalizeFields()

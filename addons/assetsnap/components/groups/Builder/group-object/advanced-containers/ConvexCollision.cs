@@ -55,6 +55,7 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject.AdvancedContaine
 				.SetName("GroupBuilderEditorGroupObjectAdvancedContainerConvexCollision")
 				.SetText("Use convex collision")
 				.SetValue(Options.ContainsKey("ConvexCollision") ? (bool)Options["ConvexCollision"] : false)
+				.SetMargin(5, "right")
 				.SetAction( Callable.From( () => { _OnUseConvexCollision(Trait<Checkable>().Select(0).GetValue()); } ))
 				.Instantiate();
 				
@@ -62,6 +63,7 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject.AdvancedContaine
 				.SetName("GroupBuilderEditorGroupObjectAdvancedContainerConvexClean")
 				.SetText("Clean")
 				.SetValue(Options.ContainsKey("ConvexClean") ? (bool)Options["ConvexClean"] : false)
+				.SetMargin(5, "right")
 				.SetAction( Callable.From( () => { _OnUseConvexClean(Trait<Checkable>().Select(1).GetValue()); } ))
 				.Instantiate();
 				

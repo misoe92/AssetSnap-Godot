@@ -23,55 +23,46 @@
 namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 {
 	using AssetSnap.Component;
-	using AssetSnap.Explorer;
 	using AssetSnap.States;
-
 	using Godot;
 
 	[Tool]
-	public partial class SnapToXValue : GroupOptionSpinboxableComponent
+	public partial class VisibilityBegin : GroupOptionSpinboxableComponent
 	{
-		public SnapToXValue()
+		public VisibilityBegin()
 		{
-			Name = "GroupsBuilderGroupOptionsSnapToXValue";
-
+			Name = "GroupsBuilderGroupOptionsVisibilityBegin";
+			
 			UsingTraits = new()
 			{
 				{ typeof(Spinboxable).ToString() },
 			};
 		}
-
+		
 		protected override void _InitializeFields()
 		{
 			Trait<Spinboxable>()
-				.SetName("InitializeGroupOptionSnapXValueContainer")
+				.SetName("GroupBuilderEditorGroupOptionVisibilityBegin")
 				.SetMargin(35, "right")
-				.SetMargin(10, "left")
-				.SetPrefix("Snap x: ")
+				.SetPrefix("Begin: ")
 				.SetValue(0)
 				.SetStep(0.1f)
 				.SetMinValue(0.0f)
-				.SetAction(Callable.From((double value) => { _OnValueChanged((float)value); }))
+				.SetAction( Callable.From( ( double value ) => { _OnValueChanged( (float)value ); } ) )
 				.Instantiate();
-
+				
 			Trait<Spinboxable>()
 				.Select(0)
 				.GetNode<SpinBox>()
 				.GetLineEdit().AddThemeConstantOverride("minimum_character_width", 24);
 		}
 
-		private void _OnValueChanged(float value)
+		private void _OnValueChanged( float value )
 		{
-			if (
-				StatesUtils.Get().SnapToX == GlobalStates.LibraryStateEnum.Enabled &&
-				StatesUtils.Get().PlacingMode == GlobalStates.PlacingModeEnum.Group
-			)
+			if( StatesUtils.Get().PlacingMode == GlobalStates.PlacingModeEnum.Group ) 
 			{
-				ExplorerUtils.Get().GroupBuilder._Editor.Group.SnapToXValue = value;
-				StatesUtils.Get().SnapToXValue = value;
-				
+				StatesUtils.Get().VisibilityRangeBegin = value;
 				Parent._UpdateGroupOptions();
-				_MaybeUpdateGrouped("SnapToXValue", value);
 				_HasGroupDataHasChanged();
 			}
 		}
