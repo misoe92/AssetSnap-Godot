@@ -263,6 +263,7 @@ namespace AssetSnap
 		private LibraryStateEnum _ConvexCollision = LibraryStateEnum.Disabled;
 		private LibraryStateEnum _ConvexClean = LibraryStateEnum.Disabled;
 		private LibraryStateEnum _ConvexSimplify = LibraryStateEnum.Disabled;
+		private LibraryStateEnum _LevelOfDetailsState = LibraryStateEnum.Disabled;
 
 		[ExportCategory("Placement States & Values")]
 		[Export]
@@ -433,12 +434,25 @@ namespace AssetSnap
 			}
 		}
 
+		[Export]
+		public LibraryStateEnum LevelOfDetailsState
+		{
+			get => _LevelOfDetailsState;
+			set
+			{
+				if (value != _LevelOfDetailsState)
+				{
+					_LevelOfDetailsState = value;
+					StateChanged("LevelOfDetailsState", value.ToString());
+				}
+			}
+		}
 
 		/** Group States **/
 
 
 		/** Library Values **/
-		private LibraryStateEnum _LevelOfDetailsState = LibraryStateEnum.Disabled;
+		private string _VisibilityFadeMode = "Use project default";
 		private int _SnapLayer = 0;
 		private float _SnapToObjectOffsetXValue = 0;
 		private float _SnapToObjectOffsetZValue = 0;
@@ -447,6 +461,10 @@ namespace AssetSnap
 		private float _SnapToZValue = 0;
 		private float _DragSizeOffset = 0;
 		private float _LevelOfDetails = 0;
+		private float _VisibilityRangeBegin = 0;
+		private float _VisibilityRangeBeginMargin = 0;
+		private float _VisibilityRangeEnd = 0;
+		private float _VisibilityRangeEndMargin = 0;
 
 
 		[Export]
@@ -562,15 +580,71 @@ namespace AssetSnap
 		}
 		
 		[Export]
-		public LibraryStateEnum LevelOfDetailsState
+		public float VisibilityRangeBegin
 		{
-			get => _LevelOfDetailsState;
+			get => _VisibilityRangeBegin;
 			set
 			{
-				if (value != _LevelOfDetailsState)
+				if (value != _VisibilityRangeBegin)
 				{
-					_LevelOfDetailsState = value;
-					StateChanged("LevelOfDetailsState", value.ToString());
+					_VisibilityRangeBegin = value;
+					StateChanged("VisibilityRangeBegin", value);
+				}
+			}
+		}
+		
+		[Export]
+		public float VisibilityRangeBeginMargin
+		{
+			get => _VisibilityRangeBeginMargin;
+			set
+			{
+				if (value != _VisibilityRangeBeginMargin)
+				{
+					_VisibilityRangeBeginMargin = value;
+					StateChanged("VisibilityRangeBeginMargin", value);
+				}
+			}
+		}
+		
+		[Export]
+		public float VisibilityRangeEnd
+		{
+			get => _VisibilityRangeEnd;
+			set
+			{
+				if (value != _VisibilityRangeEnd)
+				{
+					_VisibilityRangeEnd = value;
+					StateChanged("VisibilityRangeEnd", value);
+				}
+			}
+		}
+		
+		[Export]
+		public float VisibilityRangeEndMargin
+		{
+			get => _VisibilityRangeEndMargin;
+			set
+			{
+				if (value != _VisibilityRangeEndMargin)
+				{
+					_VisibilityRangeEndMargin = value;
+					StateChanged("VisibilityRangeEndMargin", value);
+				}
+			}
+		}
+		
+		[Export]
+		public string VisibilityFadeMode
+		{
+			get => _VisibilityFadeMode;
+			set
+			{
+				if (value != _VisibilityFadeMode)
+				{
+					_VisibilityFadeMode = value;
+					StateChanged("VisibilityFadeMode", value);
 				}
 			}
 		}
