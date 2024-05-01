@@ -217,7 +217,7 @@ namespace AssetSnap.Waypoint
 				Plugin.Singleton.GetTree().EditedSceneRoot.AddChild(AsChunks);
 				AsChunks.Owner = Plugin.Singleton.GetTree().EditedSceneRoot;
 				Plugin.Singleton.GetTree().EditedSceneRoot.MoveChild(AsChunks, 0);
-}
+			}
 			else 
 			{
 				AsChunks = Plugin.Singleton.GetTree().EditedSceneRoot.GetNode("AsChunks") as Node3D;

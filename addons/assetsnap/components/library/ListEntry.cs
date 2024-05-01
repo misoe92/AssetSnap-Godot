@@ -143,7 +143,7 @@ namespace AssetSnap.Front.Components.Library
 
 			// Now you can use the previewImage as needed
 			// For example, you could display it in your UI or store it for later use
-			_PanelContainer.SetFilePath(Folder + "\\" + Filename);
+			_PanelContainer.SetFilePath(Folder + "/" + Filename);
 
 			absoluteContainer = new();
 			// Set the Rect Min and Max sizes for the Control

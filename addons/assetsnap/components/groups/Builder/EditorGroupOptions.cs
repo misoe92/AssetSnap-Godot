@@ -476,12 +476,10 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			_InitializeGroupOptionFadeModeTitle(Trait<Containerable>().Select(2).GetInnerContainer(0));
 			if (_GlobalExplorer.Components.HasAll(FadeModeComponents.ToArray()))
 			{
-				GD.Print("Spawning fade mode");
 				_GroupBuilderEditorGroupOptionFadeMode = GlobalExplorer.GetInstance().Components.Single<VisibilityFadeMode>(true);
 
 				if (null != _GroupBuilderEditorGroupOptionFadeMode)
 				{
-				GD.Print("Spawn fade mode");
 					_GroupBuilderEditorGroupOptionFadeMode.Container = Trait<Containerable>().Select(2).GetInnerContainer(0);
 					_GroupBuilderEditorGroupOptionFadeMode.Parent = this;
 					_GroupBuilderEditorGroupOptionFadeMode.Initialize();

@@ -188,9 +188,12 @@ public partial class AsGrouped3D : AsGroup3D
 					{
 						break;
 					}
-					index += 1;
+					else 
+					{
+						index += 1;
+					}
 				}
-				
+
 				if( connection.InstanceId != 0 ) 
 				{
 					Instanced += 1;

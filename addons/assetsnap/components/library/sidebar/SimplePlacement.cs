@@ -89,8 +89,6 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 					return;
 				}
 
-				GD.Print(data[1].As<string>());
-
 				Trait<Checkable>().Select(0).SetValue(data[1].As<string>() == "Simple");
 			}
 		}

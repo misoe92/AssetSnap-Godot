@@ -211,7 +211,7 @@ public partial class AsLibraryPanelContainer : PanelContainer
 	{
 		if (_Ressource is Mesh _Mesh)
 		{
-			var FileNameSplit = _FileName.Split("\\");
+			var FileNameSplit = _FileName.Split("/");
 			AssetSnap.Front.Nodes.AsMeshInstance3D instance = new()
 			{
 				Floating = true,
@@ -225,7 +225,7 @@ public partial class AsLibraryPanelContainer : PanelContainer
 		}
 		else if (_Ressource is PackedScene _Scene)
 		{
-			var FileNameSplit = _FileName.Split("\\");
+			var FileNameSplit = _FileName.Split("/");
 
 			Variant sceneInstance = _Scene.Instantiate();
 			Node3D node = sceneInstance.As<Node3D>();
