@@ -22,6 +22,9 @@
 
 namespace AssetSnap.Front.Nodes
 {
+	using AssetSnap.Explorer;
+	using AssetSnap.States;
+
 	using Godot;
 
 	[Tool]
@@ -86,16 +89,38 @@ namespace AssetSnap.Front.Nodes
 				}
 			}
 		}
+		
+		[Export]
+		public Godot.Collections.Dictionary<string, Variant> RulesBuffer
+		{
+			get => _RulesBuffer;
+			set 
+			{
+				_RulesBuffer = value;
+				if( Initiated ) 
+				{
+					_Update();
+				}
+			}
+		}
 
 		private Mesh _Object;
 		private int _ChunkSize = 20;
 		private Godot.Collections.Array<Transform3D> _TransformBuffer = new();
+		private Godot.Collections.Dictionary<string, Variant> _RulesBuffer = new();
 
 		public override void _EnterTree()
 		{
 			if( null != GetParent() && IsInstanceValid( GetParent() ) ) 
 			{
-				GlobalExplorer.GetInstance().States.OptimizedGroups.Add(_Object, this);
+				if( StatesUtils.Get().OptimizedGroups.ContainsKey(_Object) ) 
+				{
+					StatesUtils.Get().OptimizedGroups[_Object].Add(this);
+				}
+				else 
+				{
+					GlobalExplorer.GetInstance().States.OptimizedGroups.Add(_Object, new(){ this });
+				}
 			}
 			
 			ClearChildren();
@@ -104,12 +129,56 @@ namespace AssetSnap.Front.Nodes
 			Initiated = true;
 		}
 		
+		public bool RulesEqual( Godot.Collections.Dictionary<string, Variant> rules )
+		{
+			if( _RulesBuffer.Count != rules.Count ) 
+			{
+				// Cannot be equal if the length is different
+				return false;
+			}
+			
+			foreach( (string name, Variant value ) in rules ) 
+			{
+				if( _RulesBuffer.ContainsKey( name ) == false ) 
+				{
+					return false;
+				}
+				
+				switch( value.VariantType ) 
+				{
+					case Variant.Type.Float:
+						if( _RulesBuffer[name].As<float>() != value.As<float>()) 
+						{
+							return false;
+						}
+						break;
+						
+					case Variant.Type.Bool:
+						if( _RulesBuffer[name].As<bool>() != value.As<bool>()) 
+						{
+							return false;
+						}
+						break;
+				}				
+			}
+			
+			return true;
+		}
+		
 		public int AddToBuffer(Transform3D transform ) 
 		{
 			_TransformBuffer.Add(transform);
 			Update();
 
 			return _TransformBuffer.Count - 1;
+		}
+		
+		public int SetRules(Godot.Collections.Dictionary<string, Variant> rules ) 
+		{
+			_RulesBuffer = rules;
+			Update();
+
+			return _RulesBuffer.Count - 1;
 		}
 		
 		public void UpdateBuffer( int InstanceId, Transform3D transform, Godot.Collections.Dictionary<string, Variant> Options)
@@ -153,6 +222,8 @@ namespace AssetSnap.Front.Nodes
 				{
 					Name = "Chunk-" + ( i + 1)
 				};
+				ApplyRulesTo(multiMeshInstance);
+				
 				AddChild(multiMeshInstance); // Add the MultiMeshInstance as a child of this node
 				multiMeshInstance.Owner = Owner;
 				
@@ -163,7 +234,7 @@ namespace AssetSnap.Front.Nodes
 					Mesh = _Object,
 					InstanceCount = Mathf.Min(ChunkSize, _TransformBuffer.Count - i * ChunkSize)
 				};
-
+				
 				for (int j = 0; j < multiMesh.InstanceCount; j++)
 				{
 					// Set the transform data for each instance
@@ -172,6 +243,39 @@ namespace AssetSnap.Front.Nodes
 
 				// Assign the MultiMesh to the MultiMeshInstance
 				multiMeshInstance.Multimesh = multiMesh;
+			}
+		}
+		
+		private void ApplyRulesTo( AsMultiMeshInstance3D multiMeshInstance ) 
+		{
+			foreach( (string name, Variant value) in RulesBuffer ) 
+			{
+				switch( name )
+				{
+					case "LevelOfDetails":
+						multiMeshInstance.LodBias = value.As<float>();
+						break;
+						
+					case "VisibilityRangeBegin":
+						multiMeshInstance.VisibilityRangeBegin = value.As<float>();
+						break;
+						
+					case "VisibilityRangeBeginMargin":
+						multiMeshInstance.VisibilityRangeBeginMargin = value.As<float>();
+						break;
+						
+					case "VisibilityRangeEnd":
+						multiMeshInstance.VisibilityRangeEnd = value.As<float>();
+						break;
+						
+					case "VisibilityRangeEndMargin":
+						multiMeshInstance.VisibilityRangeEndMargin = value.As<float>();
+						break;
+						
+					case "VisibilityRangeFadeMode":
+						multiMeshInstance.VisibilityRangeFadeMode = value.As<GeometryInstance3D.VisibilityRangeFadeModeEnum>();
+						break;
+				}
 			}
 		}
 		
