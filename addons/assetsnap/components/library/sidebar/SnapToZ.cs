@@ -90,10 +90,8 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 
 				}
 				
-				if( data[0].As<string>() == "SnapToZ" ) 
-				{
-					base.MaybeUpdateValue(data);
-				}
+				
+				base.MaybeUpdateValue(data);
 			}
 		}
 	
@@ -141,6 +139,7 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 				.SetMargin(0, "top")
 				.SetMargin(2, "bottom")
 				.SetText(_GlueTitle)
+				.SetVisible(false)
 				.SetTooltipText(_GlueTooltip)
 				.Instantiate()
 				.Select(1)
@@ -168,6 +167,7 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 				.SetStep(0.01f)
 				.SetMinValue(-200)
 				.SetPrefix("Z Axis: ")
+				.SetVisible(false)
 				.SetTooltipText(_SpinBoxTooltip)
 				.Instantiate()
 				.Select(0)

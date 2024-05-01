@@ -25,7 +25,6 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 	using AssetSnap.Component;
 	using AssetSnap.States;
 	using Godot;
-	using Godot.Collections;
 
 	[Tool]
 	public partial class SnapToHeight : LSSnapComponent

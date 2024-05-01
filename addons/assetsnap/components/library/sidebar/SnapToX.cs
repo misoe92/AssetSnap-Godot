@@ -88,11 +88,8 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 						.Select(0)
 						.SetValue(data[1].As<double>());
 				}
-				
-				if( data[0].As<string>() == "SnapToX" ) 
-				{
-					base.MaybeUpdateValue(data);
-				}
+			
+				base.MaybeUpdateValue(data);
 			}
 		}
 		
@@ -142,6 +139,7 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 				.SetMargin(2, "bottom")
 				.SetText(_GlueTitle)
 				.SetTooltipText(_GlueTooltip)
+				.SetVisible(false)
 				.Instantiate()
 				.Select(1)
 				.AddToContainer( BoxContainer );
@@ -169,6 +167,7 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 				.SetMinValue(-200)
 				.SetPrefix("X Axis: ")
 				.SetTooltipText(_SpinBoxTooltip)
+				.SetVisible(false)
 				.Instantiate()
 				.Select(0)
 				.AddToContainer( BoxContainer );
