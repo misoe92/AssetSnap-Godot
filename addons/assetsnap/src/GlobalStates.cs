@@ -720,7 +720,7 @@ namespace AssetSnap
 			}
 		}
 
-		public Godot.Collections.Dictionary<Mesh, AsOptimizedMultiMeshGroup3D> OptimizedGroups = new();
+		public Godot.Collections.Dictionary<Mesh, Godot.Collections.Array<AsOptimizedMultiMeshGroup3D>> OptimizedGroups = new();
 
 		public string Name = "GlobalStates";
 
