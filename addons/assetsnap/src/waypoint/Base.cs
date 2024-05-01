@@ -460,15 +460,93 @@ namespace AssetSnap.Waypoint
 				{
 					asMeshInstance3D.LodBias = StatesUtils.Get().LevelOfDetails; 
 				}
+
+				if (StatesUtils.Get().VisibilityRangeBegin != 0)
+				{
+					asMeshInstance3D.VisibilityRangeBegin = StatesUtils.Get().VisibilityRangeBegin;
+				}
+				
+				if (StatesUtils.Get().VisibilityRangeBeginMargin != 0)
+				{
+					asMeshInstance3D.VisibilityRangeBeginMargin = StatesUtils.Get().VisibilityRangeBeginMargin;
+				}
+				
+				if (StatesUtils.Get().VisibilityRangeEnd != 0)
+				{
+					asMeshInstance3D.VisibilityRangeEnd = StatesUtils.Get().VisibilityRangeEnd;
+				}
+				
+				if (StatesUtils.Get().VisibilityRangeEndMargin != 0)
+				{
+					asMeshInstance3D.VisibilityRangeEndMargin = StatesUtils.Get().VisibilityRangeEndMargin;
+				}
+				
+				if (StatesUtils.Get().VisibilityFadeMode != "Use project default")
+				{
+					switch( StatesUtils.Get().VisibilityFadeMode ) 
+					{
+						case "Disabled":
+							asMeshInstance3D.VisibilityRangeFadeMode = GeometryInstance3D.VisibilityRangeFadeModeEnum.Disabled;
+							break;
+							
+						case "Self":
+							asMeshInstance3D.VisibilityRangeFadeMode = GeometryInstance3D.VisibilityRangeFadeModeEnum.Self;
+							break;
+							
+							
+						case "Dependencies":
+							asMeshInstance3D.VisibilityRangeFadeMode = GeometryInstance3D.VisibilityRangeFadeModeEnum.Dependencies;
+							break;
+					}
+				}
 			}
 			
 			if( _model is AsNode3D asNode3D)
 			{
-				if( StatesUtils.Get().LevelOfDetailsState == GlobalStates.LibraryStateEnum.Enabled ) 
+				foreach( MeshInstance3D meshInstance3D in asNode3D.GetChildren() )
 				{
-					foreach( MeshInstance3D meshInstance3D in asNode3D.GetChildren() )
+					if( StatesUtils.Get().LevelOfDetailsState == GlobalStates.LibraryStateEnum.Enabled ) 
 					{
-						meshInstance3D.LodBias = StatesUtils.Get().LevelOfDetails; 
+						meshInstance3D.LodBias = StatesUtils.Get().LevelOfDetails;
+					}
+
+					if (StatesUtils.Get().VisibilityRangeBegin != 0)
+					{
+						meshInstance3D.VisibilityRangeBegin = StatesUtils.Get().VisibilityRangeBegin;
+					}
+					
+					if (StatesUtils.Get().VisibilityRangeBeginMargin != 0)
+					{
+						meshInstance3D.VisibilityRangeBeginMargin = StatesUtils.Get().VisibilityRangeBeginMargin;
+					}
+					
+					if (StatesUtils.Get().VisibilityRangeEnd != 0)
+					{
+						meshInstance3D.VisibilityRangeEnd = StatesUtils.Get().VisibilityRangeEnd;
+					}
+					
+					if (StatesUtils.Get().VisibilityRangeEndMargin != 0)
+					{
+						meshInstance3D.VisibilityRangeEndMargin = StatesUtils.Get().VisibilityRangeEndMargin;
+					}
+					
+					if (StatesUtils.Get().VisibilityFadeMode != "Use project default")
+					{
+						switch( StatesUtils.Get().VisibilityFadeMode ) 
+						{
+							case "Disabled":
+								meshInstance3D.VisibilityRangeFadeMode = GeometryInstance3D.VisibilityRangeFadeModeEnum.Disabled;
+								break;
+								
+							case "Self":
+								meshInstance3D.VisibilityRangeFadeMode = GeometryInstance3D.VisibilityRangeFadeModeEnum.Self;
+								break;
+								
+								
+							case "Dependencies":
+								meshInstance3D.VisibilityRangeFadeMode = GeometryInstance3D.VisibilityRangeFadeModeEnum.Dependencies;
+								break;
+						}
 					}
 				}
 			}
