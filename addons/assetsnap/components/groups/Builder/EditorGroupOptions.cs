@@ -54,7 +54,12 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		private LevelOfDetails _GroupBuilderEditorGroupOptionLevelOfDetails;
 		private PlacementSimple _GroupBuilderEditorGroupOptionPlacementSimple;
 		private PlacementOptimized _GroupBuilderEditorGroupOptionPlacementOptimized;
-
+		private VisibilityBegin _GroupBuilderEditorGroupOptionVisibilityBegin;
+		private VisibilityBeginMargin _GroupBuilderEditorGroupOptionVisibilityBeginMargin;
+		private VisibilityEnd _GroupBuilderEditorGroupOptionVisibilityEnd;
+		private VisibilityEndMargin _GroupBuilderEditorGroupOptionVisibilityEndMargin;
+		private VisibilityFadeMode _GroupBuilderEditorGroupOptionFadeMode;
+		
 		public EditorGroupOptions()
 		{
 			Name = "GroupBuilderEditorGroupOptions";
@@ -240,10 +245,23 @@ namespace AssetSnap.Front.Components.Groups.Builder
 				"Groups.Builder.GroupOptions.ConvexClean",
 				"Groups.Builder.GroupOptions.ConvexSimplify",
 			};
-
+			
+			List<string> FadeModeComponents = new()
+			{
+				"Groups.Builder.GroupOptions.VisibilityFadeMode",
+			};
+			
 			List<string> DragComponents = new()
 			{
 				"Groups.Builder.GroupOptions.DragOffset",
+			};
+			
+			List<string> VisibilityComponents = new()
+			{
+				"Groups.Builder.GroupOptions.VisibilityBegin",
+				"Groups.Builder.GroupOptions.VisibilityBeginMargin",
+				"Groups.Builder.GroupOptions.VisibilityEnd",
+				"Groups.Builder.GroupOptions.VisibilityEndMargin",
 			};
 			
 			List<string> LODComponents = new()
@@ -455,6 +473,23 @@ namespace AssetSnap.Front.Components.Groups.Builder
 				}
 			}
 
+			_InitializeGroupOptionFadeModeTitle(Trait<Containerable>().Select(2).GetInnerContainer(0));
+			if (_GlobalExplorer.Components.HasAll(FadeModeComponents.ToArray()))
+			{
+				GD.Print("Spawning fade mode");
+				_GroupBuilderEditorGroupOptionFadeMode = GlobalExplorer.GetInstance().Components.Single<VisibilityFadeMode>(true);
+
+				if (null != _GroupBuilderEditorGroupOptionFadeMode)
+				{
+				GD.Print("Spawn fade mode");
+					_GroupBuilderEditorGroupOptionFadeMode.Container = Trait<Containerable>().Select(2).GetInnerContainer(0);
+					_GroupBuilderEditorGroupOptionFadeMode.Parent = this;
+					_GroupBuilderEditorGroupOptionFadeMode.Initialize();
+
+					_GroupBuilderEditorGroupOptionFadeMode.GroupOptionChanged += (string Name, Variant value) => { _UpdateGroupOption(Name, value); };
+				}
+			}
+			
 			_InitializeGroupOptionDragTitle(Trait<Containerable>().Select(2).GetInnerContainer(1));
 			if (_GlobalExplorer.Components.HasAll(DragComponents.ToArray()))
 			{
@@ -467,6 +502,51 @@ namespace AssetSnap.Front.Components.Groups.Builder
 					_GroupBuilderEditorGroupOptionDragOffset.Initialize();
 
 					_GroupBuilderEditorGroupOptionDragOffset.GroupOptionChanged += (string Name, Variant value) => { _UpdateGroupOption(Name, value); };
+				}
+			}
+			
+			_InitializeGroupOptionVisibilityRangeTitle(Trait<Containerable>().Select(2).GetInnerContainer(1));
+			if (_GlobalExplorer.Components.HasAll(VisibilityComponents.ToArray()))
+			{
+				_GroupBuilderEditorGroupOptionVisibilityBegin = GlobalExplorer.GetInstance().Components.Single<VisibilityBegin>(true);
+				_GroupBuilderEditorGroupOptionVisibilityBeginMargin = GlobalExplorer.GetInstance().Components.Single<VisibilityBeginMargin>(true);
+				_GroupBuilderEditorGroupOptionVisibilityEnd = GlobalExplorer.GetInstance().Components.Single<VisibilityEnd>(true);
+				_GroupBuilderEditorGroupOptionVisibilityEndMargin = GlobalExplorer.GetInstance().Components.Single<VisibilityEndMargin>(true);
+
+				if (null != _GroupBuilderEditorGroupOptionVisibilityBegin)
+				{
+					_GroupBuilderEditorGroupOptionVisibilityBegin.Container = Trait<Containerable>().Select(2).GetInnerContainer(1);
+					_GroupBuilderEditorGroupOptionVisibilityBegin.Parent = this;
+					_GroupBuilderEditorGroupOptionVisibilityBegin.Initialize();
+
+					_GroupBuilderEditorGroupOptionVisibilityBegin.GroupOptionChanged += (string Name, Variant value) => { _UpdateGroupOption(Name, value); };
+				}
+				
+				if (null != _GroupBuilderEditorGroupOptionVisibilityBeginMargin)
+				{
+					_GroupBuilderEditorGroupOptionVisibilityBeginMargin.Container = Trait<Containerable>().Select(2).GetInnerContainer(1);
+					_GroupBuilderEditorGroupOptionVisibilityBeginMargin.Parent = this;
+					_GroupBuilderEditorGroupOptionVisibilityBeginMargin.Initialize();
+
+					_GroupBuilderEditorGroupOptionVisibilityBeginMargin.GroupOptionChanged += (string Name, Variant value) => { _UpdateGroupOption(Name, value); };
+				}
+				
+				if (null != _GroupBuilderEditorGroupOptionVisibilityEnd)
+				{
+					_GroupBuilderEditorGroupOptionVisibilityEnd.Container = Trait<Containerable>().Select(2).GetInnerContainer(1);
+					_GroupBuilderEditorGroupOptionVisibilityEnd.Parent = this;
+					_GroupBuilderEditorGroupOptionVisibilityEnd.Initialize();
+
+					_GroupBuilderEditorGroupOptionVisibilityEnd.GroupOptionChanged += (string Name, Variant value) => { _UpdateGroupOption(Name, value); };
+				}
+				
+				if (null != _GroupBuilderEditorGroupOptionVisibilityEndMargin)
+				{
+					_GroupBuilderEditorGroupOptionVisibilityEndMargin.Container = Trait<Containerable>().Select(2).GetInnerContainer(1);
+					_GroupBuilderEditorGroupOptionVisibilityEndMargin.Parent = this;
+					_GroupBuilderEditorGroupOptionVisibilityEndMargin.Initialize();
+
+					_GroupBuilderEditorGroupOptionVisibilityEndMargin.GroupOptionChanged += (string Name, Variant value) => { _UpdateGroupOption(Name, value); };
 				}
 			}
 			
@@ -753,6 +833,16 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		private void _InitializeGroupOptionLODTitle(Container Container)
 		{
 			Container.AddChild(_GenerateTitle("_InitializeGroupOptionLODTitle", "Level of details"));
+		}
+		
+		private void _InitializeGroupOptionVisibilityRangeTitle(Container Container ) 
+		{
+			Container.AddChild(_GenerateTitle("_InitializeGroupOptionVisibilityTitle", "Visibility"));
+		}
+		
+		private void _InitializeGroupOptionFadeModeTitle(Container Container)
+		{
+			Container.AddChild(_GenerateTitle("_InitializeGroupOptionVisibilityFadeModeTitle", "Visibility Fade Mode"));
 		}
 
 		private MarginContainer _GenerateTitle(string name, string text)
