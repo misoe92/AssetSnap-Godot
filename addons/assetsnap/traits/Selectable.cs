@@ -21,6 +21,7 @@
 // SOFTWARE.
 
 #if TOOLS
+using System;
 using AssetSnap.Trait;
 using Godot;
 
@@ -38,7 +39,13 @@ namespace AssetSnap.Component
 			SelectableMedium,
 			SelectableLarge,
 		};
-
+		
+		/*
+		** Exports
+		*/
+		[Export]
+		public Godot.Collections.Array<Callable> _Actions = new Godot.Collections.Array<Callable>();
+		
 		/*
 		** Public
 		*/
@@ -112,6 +119,17 @@ namespace AssetSnap.Component
 				for( int i = 0; i < Items.Count; i++ ) 
 				{
 					Select.AddItem(Items[i]);
+				}
+			}
+			
+			// Connect the button to it's action
+			if( _Actions.Count >= Iteration ) 
+			{
+				Callable actionCallable = _Actions[Iteration];
+				Godot.Error error = Select.Connect( OptionButton.SignalName.ItemSelected, actionCallable);
+				if( error != Godot.Error.Ok)
+				{
+					GD.Print("Error connecting signal: " + error.ToString());
 				}
 			}
 
@@ -223,7 +241,21 @@ namespace AssetSnap.Component
 		/*
 		** Setter Methods
 		*/
-
+		
+		/*
+		** Sets the action for the
+		** currently chosen button
+		**
+		** @param Action action
+		** @return Buttonable
+		*/
+		public Selectable SetAction( Action<int> action ) 
+		{
+			_Actions.Add(Callable.From(action));
+			
+			return this;
+		}
+		
 		/*
 		** Sets the name of the current label
 		**
