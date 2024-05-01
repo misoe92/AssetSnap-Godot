@@ -84,7 +84,7 @@ namespace AssetSnap.Front.Components.Groups.Builder
 
 			_FinalizeFields();
 
-			_InitializePreviewContainer(FormatPathToFilename(Path), Path.Split("\\")[0], RowInnerContainer);
+			_InitializePreviewContainer(FormatPathToFilename(Path), Path.Replace("/" + FormatPathToFilename(Path), "") , RowInnerContainer);
 
 			_InitializeOriginContainer(RowInnerContainer);
 			_InitializeRotationContainer(RowInnerContainer);
@@ -99,14 +99,14 @@ namespace AssetSnap.Front.Components.Groups.Builder
 
 		public string FormatPathToFilename(string path)
 		{
-			string filename = StringHelper.FilePathToFileName(path).Split("\\")[1];
+			string filename = StringHelper.FilePathToFileName(path);
 
 			return filename;
 		}
 
 		public string FormatPathToTitle(string path)
 		{
-			string filename = StringHelper.FilePathToFileName(path).Split("\\")[1];
+			string filename = StringHelper.FilePathToFileName(path);
 			string title = StringHelper.FileNameToTitle(filename);
 
 			return title;

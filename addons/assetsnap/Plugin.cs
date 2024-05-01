@@ -184,21 +184,6 @@ namespace AssetSnap
 
 		private void _OnSceneChanged(Node Scene)
 		{
-			if (null == StatesUtils.Get().CurrentScene && null != Scene)
-			{
-				GD.Print("Scene is set");
-			}
-
-			if (null != StatesUtils.Get().CurrentScene && null != Scene)
-			{
-				GD.Print("Scene is set");
-			}
-
-			if (null != StatesUtils.Get().CurrentScene && null == Scene)
-			{
-				GD.Print("Scene is released");
-			}
-
 			StatesUtils.Get().CurrentScene = Scene;
 
 			if (StatesUtils.Get().CurrentScene == null)
