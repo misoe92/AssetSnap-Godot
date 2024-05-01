@@ -143,7 +143,7 @@ namespace AssetSnap.Front.Nodes
 				{
 					return false;
 				}
-				
+
 				switch( value.VariantType ) 
 				{
 					case Variant.Type.Float:

@@ -195,7 +195,6 @@ namespace AssetSnap.Waypoint
 					{
 						AsMeshInstance3D asMeshInstance3D = child as AsMeshInstance3D;
 						int InstanceId = _OptimizedSpawn(asMeshInstance3D, Origin + asMeshInstance3D.Transform.Origin, asMeshInstance3D.RotationDegrees, asMeshInstance3D.Scale);
-
 						grouped3D.AddConnection(InstanceId, StatesUtils.Get().OptimizedGroups[asMeshInstance3D.Mesh][InstanceId], asMeshInstance3D.Mesh);
 					}
 				}
@@ -292,6 +291,7 @@ namespace AssetSnap.Waypoint
 						InstanceId = multiMeshGroup.AddToBuffer(transform);
 						multiMeshGroup.Update();
 						found = true;
+						break;
 					}
 					
 					index += 1;
