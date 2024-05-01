@@ -188,7 +188,7 @@ namespace AssetSnap.Waypoint
 						foreach( AsMeshInstance3D asMeshInstance3D in child.GetChildren())
 						{
 							int InstanceId = _OptimizedSpawn(asMeshInstance3D, Origin + child.Transform.Origin, asMeshInstance3D.RotationDegrees, asMeshInstance3D.Scale);
-							grouped3D.AddConnection(InstanceId, GlobalExplorer.GetInstance().States.OptimizedGroups[asMeshInstance3D.Mesh], asMeshInstance3D.Mesh);
+							grouped3D.AddConnection(InstanceId, StatesUtils.Get().OptimizedGroups[asMeshInstance3D.Mesh][InstanceId], asMeshInstance3D.Mesh);
 						}
 					}
 					else if (child is AsMeshInstance3D)
@@ -196,7 +196,7 @@ namespace AssetSnap.Waypoint
 						AsMeshInstance3D asMeshInstance3D = child as AsMeshInstance3D;
 						int InstanceId = _OptimizedSpawn(asMeshInstance3D, Origin + asMeshInstance3D.Transform.Origin, asMeshInstance3D.RotationDegrees, asMeshInstance3D.Scale);
 
-						grouped3D.AddConnection(InstanceId, GlobalExplorer.GetInstance().States.OptimizedGroups[asMeshInstance3D.Mesh], asMeshInstance3D.Mesh);
+						grouped3D.AddConnection(InstanceId, StatesUtils.Get().OptimizedGroups[asMeshInstance3D.Mesh][InstanceId], asMeshInstance3D.Mesh);
 					}
 				}
 
@@ -244,30 +244,102 @@ namespace AssetSnap.Waypoint
 			// Assuming you have a transform called transform
 			transform.Basis = finalRotation;
 			transform.Origin = Origin;
-
+			
+			/*
+			** Add rules
+			*/
+			Godot.Collections.Dictionary<string, Variant> rules = new();
+			
+			if( StatesUtils.Get().LevelOfDetailsState == GlobalStates.LibraryStateEnum.Enabled ) 
+			{
+				rules.Add("LevelOfDetails", StatesUtils.Get().LevelOfDetails);
+			}
+			
+			if( StatesUtils.Get().VisibilityRangeBegin != 0 ) 
+			{
+				rules.Add("VisibilityRangeBegin", StatesUtils.Get().VisibilityRangeBegin);
+			}
+			
+			if( StatesUtils.Get().VisibilityRangeBeginMargin != 0 ) 
+			{
+				rules.Add("VisibilityRangeBeginMargin", StatesUtils.Get().VisibilityRangeBeginMargin);
+			}
+			
+			if( StatesUtils.Get().VisibilityRangeEnd != 0 ) 
+			{
+				rules.Add("VisibilityRangeEnd", StatesUtils.Get().VisibilityRangeEnd);
+			}
+			
+			if( StatesUtils.Get().VisibilityRangeEndMargin != 0 ) 
+			{
+				rules.Add("VisibilityRangeEndMargin", StatesUtils.Get().VisibilityRangeEndMargin);
+			}
+			
+			if( StatesUtils.Get().VisibilityFadeMode != "Use project default" ) 
+			{
+				rules.Add("VisibilityFadeMode", StatesUtils.Get().VisibilityFadeMode);
+			}
+			
 			if (StatesUtils.Get().OptimizedGroups.ContainsKey(mesh))
 			{
+				bool found = false;
+				int index = 0;
 				// Already has a group
-				InstanceId = StatesUtils.Get().OptimizedGroups[mesh].AddToBuffer(transform);
-				StatesUtils.Get().OptimizedGroups[mesh].Update();
-			}
-			else
-			{
-				// Create our optimized multi mesh group
-				AsOptimizedMultiMeshGroup3D group = new()
+				foreach( AsOptimizedMultiMeshGroup3D multiMeshGroup in StatesUtils.Get().OptimizedGroups[mesh] ) 
 				{
-					Name = "AsMultimesh-" + meshInstance3D.Name,
-					Object = mesh,
-				};
+					if( multiMeshGroup.RulesEqual( rules ) ) 
+					{
+						InstanceId = multiMeshGroup.AddToBuffer(transform);
+						multiMeshGroup.Update();
+						found = true;
+					}
+					
+					index += 1;
+				}
+				
+				if( found == false ) 
+				{
+					// None found that have the same rules as we are working with, as such we should
+					// create a new one.
+					
+					// Create our optimized multi mesh group
+					AsOptimizedMultiMeshGroup3D newGroup = new()
+					{
+						Name = "AsMultimesh-" + meshInstance3D.Name,
+						Object = mesh,
+					};
 
-				_ParentContainer = AsChunks;
-				_SpawnNode(group);
-				_ParentContainer = null;
-				InstanceId = group.AddToBuffer(transform);
-				StatesUtils.Get().OptimizedGroups[mesh].Update();
+					_ParentContainer = AsChunks;
+					_SpawnNode(newGroup);
+					_ParentContainer = null;
+					InstanceId = newGroup.AddToBuffer(transform);
+					newGroup.SetRules(rules);
+					
+					StatesUtils.Get().OptimizedGroups[mesh][ StatesUtils.Get().OptimizedGroups[mesh].Count - 1 ].Update();
+
+					return StatesUtils.Get().OptimizedGroups[mesh].Count - 1;
+				}
+
+				return index;
 			}
+		
+			// Create our optimized multi mesh group
+			AsOptimizedMultiMeshGroup3D group = new()
+			{
+				Name = "AsMultimesh-" + meshInstance3D.Name,
+				Object = mesh,
+			};
 
-			return InstanceId;
+			_ParentContainer = AsChunks;
+			_SpawnNode(group);
+			_ParentContainer = null;
+			InstanceId = group.AddToBuffer(transform);
+			
+			group.SetRules(rules);
+			
+			StatesUtils.Get().OptimizedGroups[mesh][0].Update();
+
+			return 0;
 		}
 
 		/*
