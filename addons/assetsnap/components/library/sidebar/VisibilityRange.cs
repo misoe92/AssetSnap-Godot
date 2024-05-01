@@ -88,8 +88,6 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		{
 			base.Initialize();
 
-			Callable _callable = Callable.From(() => { _OnCheckboxPressed(); });
-			
 			Initiated = true;
 			
 			Trait<Labelable>()
@@ -117,11 +115,10 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 				.SetStep(0.1f)
 				.SetMinValue(0)
 				.SetTooltipText(_Tooltip)
-				.SetAction(Callable.From((double value) => { _OnVisibilityRangeChanged(value); }))
+				.SetAction(Callable.From((double value) => { _OnVisibilityRangeBeginChanged(value); }))
 				.Instantiate()
 				.Select(0)
 				.AddToContainer( this );
-				
 				
 			Trait<Spinboxable>()
 				.SetName("VisibilityRangeBeginMargin")
@@ -134,11 +131,10 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 				.SetStep(0.1f)
 				.SetMinValue(0)
 				.SetTooltipText(_MarginTooltip)
-				.SetAction(Callable.From((double value) => { _OnVisibilityRangeChanged(value); }))
+				.SetAction(Callable.From((double value) => { _OnVisibilityRangeBeginMarginChanged(value); }))
 				.Instantiate()
 				.Select(1)
 				.AddToContainer( this );
-				
 				
 			Trait<Spinboxable>()
 				.SetName("VisibilityRangeEnd")
@@ -151,7 +147,7 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 				.SetStep(0.1f)
 				.SetMinValue(0)
 				.SetTooltipText(_Tooltip)
-				.SetAction(Callable.From((double value) => { _OnVisibilityRangeChanged(value); }))
+				.SetAction(Callable.From((double value) => { _OnVisibilityRangeEndChanged(value); }))
 				.Instantiate()
 				.Select(2)
 				.AddToContainer( this );
@@ -167,7 +163,7 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 				.SetStep(0.1f)
 				.SetMinValue(0)
 				.SetTooltipText(_MarginTooltip)
-				.SetAction(Callable.From((double value) => { _OnVisibilityRangeChanged(value); }))
+				.SetAction(Callable.From((double value) => { _OnVisibilityRangeEndMarginChanged(value); }))
 				.Instantiate()
 				.Select(3)
 				.AddToContainer( this );
@@ -180,7 +176,7 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 				.SetMargin(10, "left")
 				.SetMargin(10, "right")
 				.SetMargin(2, "top")
-				.SetMargin(2, "bottom")
+				.SetMargin(0, "bottom")
 				.SetAutoWrap(TextServer.AutowrapMode.Word)
 				.Instantiate()
 				.Select(1)
@@ -194,7 +190,8 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 				.SetMargin(10, "right")
 				.SetMargin(0, "top")
 				.SetMargin(10, "bottom")
-				.SetText("Fade mode")
+				.SetAction(( int index ) => { _OnVisibilityFadeModeChanged(index); })
+				.SetText( "Fade mode" )
 				.AddItem("Use project default")
 				.AddItem("Disabled")
 				.AddItem("Self")
@@ -228,21 +225,30 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		** 
 		** @return void
 		*/	
-		private void _OnCheckboxPressed()
+		private void _OnVisibilityFadeModeChanged( int index )
 		{
-			// if( StatesUtils.Get().VisibilityRangeState == GlobalStates.LibraryStateEnum.Disabled ) 
-			// {
-			// 	StatesUtils.Get().VisibilityRangeState = GlobalStates.LibraryStateEnum.Enabled;
-			// }
-			// else
-			// {
-			// 	StatesUtils.Get().VisibilityRangeState = GlobalStates.LibraryStateEnum.Disabled;	
-			// }
+			OptionButton selectable = Trait<Selectable>().Select(0).GetNode() as OptionButton;
+			StatesUtils.Get().VisibilityFadeMode = selectable.GetItemText(index);
 		}
 		
-		private void _OnVisibilityRangeChanged( double value ) 
+		private void _OnVisibilityRangeBeginChanged( double value ) 
 		{
-			// StatesUtils.Get().VisibilityRange = (float)value;
+			StatesUtils.Get().VisibilityRangeBegin = (float)value;
+		}
+		
+		private void _OnVisibilityRangeBeginMarginChanged( double value ) 
+		{
+			StatesUtils.Get().VisibilityRangeBeginMargin = (float)value;
+		}
+		
+		private void _OnVisibilityRangeEndChanged( double value ) 
+		{
+			StatesUtils.Get().VisibilityRangeEnd = (float)value;
+		}
+		
+		private void _OnVisibilityRangeEndMarginChanged( double value ) 
+		{
+			StatesUtils.Get().VisibilityRangeEndMargin = (float)value;
 		}
 		
 		private bool IsCheckboxChecked()
