@@ -275,6 +275,7 @@ namespace AssetSnap.Decal
 			if (EditorPlugin.IsInstanceValid(Model) && Model != model)
 			{
 				GetNode().RemoveChild(Model);
+				Model.QueueFree();
 			}
 		}
 

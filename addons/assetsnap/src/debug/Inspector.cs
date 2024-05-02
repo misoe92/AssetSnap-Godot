@@ -51,6 +51,7 @@ namespace AssetSnap.Debug
 		
 		public Inspector()
 		{
+			Name = "Inspector";
 			_Instance = this;
 		}
 

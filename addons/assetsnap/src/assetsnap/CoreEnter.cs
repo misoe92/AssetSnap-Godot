@@ -71,6 +71,7 @@ namespace AssetSnap.Core
 			Plugin.Singleton.AddChild(ExplorerUtils.Get().Library);
 			Plugin.Singleton.AddChild(ExplorerUtils.Get().Components);
 			Plugin.Singleton.AddChild(ExplorerUtils.Get().ContextMenu);
+			Plugin.Singleton.AddChild(ExplorerUtils.Get().Inspector);
 			
 			_GlobalExplorer.Settings.MaybeEmitFoldersLoaded();
 		} 

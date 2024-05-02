@@ -66,8 +66,8 @@ namespace AssetSnap.Waypoint
 		*/
 		public void Spawn(Node3D ModelInstance, Vector3 Origin, Vector3 Rotation, Vector3 Scale)
 		{
-			Node3D _model = new();
-			Node3D model = new();
+			Node3D _model = null;
+			Node3D model = null;
 			try
 			{
 				if (ModelInstance is AsMeshInstance3D _meshInstance)
@@ -78,17 +78,14 @@ namespace AssetSnap.Waypoint
 				}
 				else if (ModelInstance is AsGrouped3D)
 				{
-					_model.QueueFree();
 					_model = ModelInstance as AsGrouped3D;
 				}
 				else if (ModelInstance is AsGroup3D)
 				{
-					_model.QueueFree();
 					_model = ModelInstance as AsGroup3D;
 				}
 				else if (ModelInstance is AsNode3D)
 				{
-					_model.QueueFree();
 					_model = ModelInstance as AsNode3D;
 				}
 
@@ -106,7 +103,7 @@ namespace AssetSnap.Waypoint
 				{
 					node3d.SetLibraryName(StatesUtils.Get().CurrentLibrary.GetName());
 				}
-
+				
 				model = _model.Duplicate() as Node3D;
 
 				if (IsSimpleMode())

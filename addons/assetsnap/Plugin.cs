@@ -232,7 +232,7 @@ namespace AssetSnap
 			new ASNode.Types.AsMultiMeshInstanceType().Dispose( this );
 			new ASNode.Types.AsOptimizedMultiMeshGroupType().Dispose( this );
 			new ASNode.Types.AsMultiMeshType().Dispose( this );
-
+			
 			foreach (GodotObject _object in traitGlobal.DisposeQueue)
 			{
 				if (IsInstanceValid(_object) && _object is Node node)
@@ -274,10 +274,9 @@ namespace AssetSnap
 				_dock.Free();
 			}
 			
-			if ( HasInternalContainer() )
+			if ( HasInternalContainer() && null != GetInternalContainer())
 			{
-				RemoveChild( GetInternalContainer() );
-				GetInternalContainer().Free();
+				GetInternalContainer().QueueFree();
 			}
 
 			if (null != traitGlobal)

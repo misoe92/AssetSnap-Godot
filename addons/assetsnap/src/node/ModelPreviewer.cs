@@ -215,7 +215,10 @@ namespace AssetSnap.Nodes
 			}
 			else if (path.Contains(".obj"))
 			{
-				node = new();
+				node = new()
+				{
+					Name = "ObjectPreviewer"
+				};
 
 				Mesh mesh = GD.Load<Mesh>(path);
 				MeshInstance3D meshinstance3D = new()
