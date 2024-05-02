@@ -204,151 +204,157 @@ namespace AssetSnap.Front.Components.Library
 				
 				if( _LSEditing != null ) 
 				{
-					_LSEditing.Container = container;
-					_LSEditing.Library = Library;
+					_LSEditing.LibraryName = LibraryName;
 					_LSEditing.Initialize();
+					container.AddChild(_LSEditing);
 				}
 				
 				if( _LSSimplePlacement != null ) 
 				{
-					_LSSimplePlacement.Container = Trait<Dropdownable>()
-						.Select(0)
-						.GetDropdownContainer();
-						
-					_LSSimplePlacement.Library = Library;
+					_LSSimplePlacement.LibraryName = LibraryName;
 					_LSSimplePlacement.Initialize();
+					Trait<Dropdownable>()
+						.Select(0)
+						.GetDropdownContainer()
+						.AddChild(_LSSimplePlacement);
 				}
 				
 				if( _LSOptimizedPlacement != null ) 
 				{
-					_LSOptimizedPlacement.Container = Trait<Dropdownable>()
-						.Select(0)
-						.GetDropdownContainer();
-						
-					_LSOptimizedPlacement.Library = Library;
+					_LSOptimizedPlacement.LibraryName = LibraryName;
 					_LSOptimizedPlacement.Initialize();
+
+					Trait<Dropdownable>()
+						.Select(0)
+						.GetDropdownContainer()
+						.AddChild(_LSOptimizedPlacement);
 				}
 				
 				
 				if( _LSSnapLayer != null ) 
 				{
-					_LSSnapLayer.Container = Trait<Dropdownable>()
-						.Select(1)
-						.GetDropdownContainer();
-						
-					_LSSnapLayer.Library = Library;
+					_LSSnapLayer.LibraryName = LibraryName;
 					_LSSnapLayer.Initialize();
+					
+					Trait<Dropdownable>()
+						.Select(1)
+						.GetDropdownContainer()
+						.AddChild(_LSSnapLayer);
 				}
 				
 				if( _LSSnapObject != null ) 
 				{
-					_LSSnapObject.Container = Trait<Dropdownable>()
-						.Select(1)
-						.GetDropdownContainer();
-						
-					_LSSnapObject.Library = Library;
+					_LSSnapObject.LibraryName = LibraryName;
 					_LSSnapObject.Initialize();
+					
+					Trait<Dropdownable>()
+						.Select(1)
+						.GetDropdownContainer()
+						.AddChild(_LSSnapObject);
 				} 
 				
 				if( _LSSnapOffsetX != null ) 
 				{
-					_LSSnapOffsetX.Container = Trait<Dropdownable>()
-						.Select(1)
-						.GetDropdownContainer();
-						
-					_LSSnapOffsetX.Library = Library;
+					_LSSnapOffsetX.LibraryName = LibraryName;
 					_LSSnapOffsetX.Initialize();
+					
+					Trait<Dropdownable>()
+						.Select(1)
+						.GetDropdownContainer()
+						.AddChild(_LSSnapOffsetX);
 				}
 				
 				if( _LSSnapOffsetZ != null ) 
 				{
-					_LSSnapOffsetZ.Container = Trait<Dropdownable>()
-						.Select(1)
-						.GetDropdownContainer();
-						
-					_LSSnapOffsetZ.Library = Library;
+					_LSSnapOffsetZ.LibraryName = LibraryName;
 					_LSSnapOffsetZ.Initialize();
+					
+					Trait<Dropdownable>()
+						.Select(1)
+						.GetDropdownContainer()
+						.AddChild(_LSSnapOffsetZ);
 				}
 				
 					
 				if( _LSSnapToHeight != null ) 
 				{
-					_LSSnapToHeight.Container = Trait<Dropdownable>()
-						.Select(2)
-						.GetDropdownContainer();
-						
-					_LSSnapToHeight.Library = Library;
+					_LSSnapToHeight.LibraryName = LibraryName;
 					_LSSnapToHeight.Initialize();
+					
+					Trait<Dropdownable>()
+						.Select(2)
+						.GetDropdownContainer()
+						.AddChild(_LSSnapToHeight);
 				}
 				
 				if( _LSSnapToX != null ) 
 				{
-					_LSSnapToX.Container = Trait<Dropdownable>()
-						.Select(2)
-						.GetDropdownContainer();
-						
-					_LSSnapToX.Library = Library;
+					_LSSnapToX.LibraryName = LibraryName;
 					_LSSnapToX.Initialize();
+					Trait<Dropdownable>()
+						.Select(2)
+						.GetDropdownContainer()
+						.AddChild(_LSSnapToX);
 				}
 				
 				if( _LSSnapToZ != null ) 
 				{
-					_LSSnapToZ.Container = Trait<Dropdownable>()
-						.Select(2)
-						.GetDropdownContainer();
-						
-					_LSSnapToZ.Library = Library;
+					_LSSnapToZ.LibraryName = LibraryName;
 					_LSSnapToZ.Initialize();
+					Trait<Dropdownable>()
+						.Select(2)
+						.GetDropdownContainer()
+						.AddChild(_LSSnapToZ);
 				}
 				
 				if( _LSSimpleSphereCollision != null )
 				{
-					_LSSimpleSphereCollision.Container = Trait<Dropdownable>()
-						.Select(3)
-						.GetDropdownContainer();
-
-					_LSSimpleSphereCollision.Library = Library;
+					_LSSimpleSphereCollision.LibraryName = LibraryName;
 					_LSSimpleSphereCollision.Initialize();
+					Trait<Dropdownable>()
+						.Select(3)
+						.GetDropdownContainer()
+						.AddChild(_LSSimpleSphereCollision);
 				}
 				
 				if( _LSConvexPolygonCollision != null ) 
 				{
-					_LSConvexPolygonCollision.Container = Trait<Dropdownable>()
-						.Select(3)
-						.GetDropdownContainer();
-						
-					_LSConvexPolygonCollision.Library = Library;
+					_LSConvexPolygonCollision.LibraryName = LibraryName;
 					_LSConvexPolygonCollision.Initialize();
+					Trait<Dropdownable>()
+						.Select(3)
+						.GetDropdownContainer()
+						.AddChild(_LSConvexPolygonCollision);
 				}
 				
 				if( _LSConcaveCollision != null )
 				{
-					_LSConcaveCollision.Container = Trait<Dropdownable>()
-						.Select(3)
-						.GetDropdownContainer();
-						
-					_LSConcaveCollision.Library = Library;
+					_LSConcaveCollision.LibraryName = LibraryName;
 					_LSConcaveCollision.Initialize();
+					Trait<Dropdownable>()
+						.Select(3)
+						.GetDropdownContainer()
+						.AddChild(_LSConcaveCollision);
 				}
 				
 				if( _LSLevelOfDetails != null ) 
 				{
-					_LSLevelOfDetails.Container = Trait<Dropdownable>()
-						.Select(4)
-						.GetDropdownContainer();
-						
-					_LSLevelOfDetails.Library = Library;
+					_LSLevelOfDetails.LibraryName = LibraryName;
 					_LSLevelOfDetails.Initialize();
+					Trait<Dropdownable>()
+						.Select(4)
+						.GetDropdownContainer()
+						.AddChild(_LSLevelOfDetails);
 				}
 				
 				if( _LSVisibilityRange != null ) 
 				{
-					_LSVisibilityRange.Container = Trait<Dropdownable>()
-						.Select(5)
-						.GetDropdownContainer();
-						
-					_LSVisibilityRange.Library = Library;
+					_LSVisibilityRange.LibraryName = LibraryName;
 					_LSVisibilityRange.Initialize();
+					Trait<Dropdownable>()
+						.Select(5)
+						.GetDropdownContainer()
+						.AddChild(_LSVisibilityRange);
 				}
 			}
 			
