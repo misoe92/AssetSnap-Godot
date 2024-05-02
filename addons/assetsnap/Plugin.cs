@@ -69,6 +69,11 @@ namespace AssetSnap
 		{
 			get
 			{
+				if( false == IsInstanceValid( TraitGlobal.Singleton ) ) 
+				{
+					return null;
+				}
+				
 				return TraitGlobal.Singleton;
 			}
 			set
@@ -76,9 +81,6 @@ namespace AssetSnap
 				// GD.Print("Cant be set");
 			}
 		}
-
-		[Export]
-		public Node internalNode;
 
 		[Export]
 		public AsBottomDock _dock;
@@ -132,20 +134,21 @@ namespace AssetSnap
 		public override void _EnterTree()
 		{
 			_Instance = this;
-			Connect(EditorPlugin.SignalName.SceneChanged, Callable.From((Node scene) => { _OnSceneChanged(scene); }));
 
 			AddChild(traitGlobal);
-			if (null == internalNode)
+			if ( false == HasInternalContainer() )
 			{
-				internalNode = new()
+				Node internalNode = new()
 				{
 					Name = "InternalNode"
 				};
 
 				AddChild(internalNode);
 			}
+			
 			_dock = new AsBottomDock();
 			AddControlToBottomPanel(_dock, "Assets");
+			Connect(EditorPlugin.SignalName.SceneChanged, Callable.From((Node scene) => { _OnSceneChanged(scene); }));
 
 			if (null == GlobalExplorer.InitializeExplorer())
 			{
@@ -153,12 +156,12 @@ namespace AssetSnap
 				return;
 			}
 
-			// UpdateHandleCallable = new(this, "UpdateHandle");
-
-			// if(false == IsUpdateHandleConnected()) 
-			// {
-			// 	EditorInterface.Singleton.GetInspector().Connect(EditorInspector.SignalName.EditedObjectChanged, UpdateCallable());
-			// }
+			UpdateHandleCallable = new(this, "UpdateHandle");
+			if(false == IsUpdateHandleConnected()) 
+			{
+				EditorInterface.Singleton.GetInspector().Connect(EditorInspector.SignalName.EditedObjectChanged, UpdateCallable());
+			}
+			
 			_CoreEnter.InitializeCore();
 		}
 
@@ -177,9 +180,19 @@ namespace AssetSnap
 			ExplorerUtils.Get().Settings.RemoveFolder(title);
 		}
 
+		public bool HasInternalContainer()
+		{
+			return HasNode("InternalNode") && IsInstanceValid(GetNode("InternalNode"));
+		}
+		
 		public Node GetInternalContainer()
 		{
-			return internalNode;
+			if( false == HasInternalContainer() )
+			{
+				return null;
+			}
+			
+			return GetNode("InternalNode");
 		}
 
 		private void _OnSceneChanged(Node Scene)
@@ -255,11 +268,16 @@ namespace AssetSnap
 				}
 			}
 
-
 			if (null != _dock)
 			{
 				RemoveControlFromBottomPanel(_dock);
 				_dock.Free();
+			}
+			
+			if ( HasInternalContainer() )
+			{
+				RemoveChild( GetInternalContainer() );
+				GetInternalContainer().Free();
 			}
 
 			if (null != traitGlobal)
