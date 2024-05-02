@@ -21,7 +21,6 @@
 // SOFTWARE.
 
 #if TOOLS
-using System;
 using AssetSnap.Trait;
 using Godot;
 
