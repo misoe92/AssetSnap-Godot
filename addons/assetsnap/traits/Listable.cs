@@ -88,8 +88,6 @@ namespace AssetSnap.Component
 					
 					if( null != component && EditorPlugin.IsInstanceValid( component ) && component is BaseComponent baseComponent ) 
 					{
-						baseComponent.Container = _WorkingNode;
-						
 						if( null != OnIterationAction ) 
 						{
 							OnIterationAction(i, component);
@@ -100,7 +98,7 @@ namespace AssetSnap.Component
 						}
 						
 						_components.Add(component);
-						// AddChild(component);
+						_WorkingNode.AddChild(baseComponent);
 					}
 				}
 			}
