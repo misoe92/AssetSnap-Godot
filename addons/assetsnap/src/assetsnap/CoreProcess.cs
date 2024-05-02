@@ -43,12 +43,17 @@ namespace AssetSnap.Core
 		*/
 		public void Tick(double delta)
 		{
-			if (null == ExplorerUtils.Get() || null == SettingsUtils.Get())
+			if (null == ExplorerUtils.Get() || null == SettingsUtils.Get() || false == EditorPlugin.IsInstanceValid(Plugin.Singleton) )
 			{
 				return;
 			}
 			
-			if( false == EditorPlugin.IsInstanceValid(ExplorerUtils.Get().GetHandle()) ) 
+			if( false == Plugin.Singleton.HasInternalContainer() ) 
+			{
+				return;
+			}
+			
+			if( false == EditorPlugin.IsInstanceValid( ExplorerUtils.Get().GetHandle() ) ) 
 			{
 				StatesUtils.Get().EditingObject = null;
 				StatesUtils.Get().EditingTitle = null;
