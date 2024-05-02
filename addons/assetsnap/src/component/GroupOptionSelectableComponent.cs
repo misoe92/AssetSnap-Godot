@@ -77,7 +77,7 @@ namespace AssetSnap.Component
 		{
 			Trait<Selectable>()
 				.Select(0)
-				.AddToContainer(Container);
+				.AddToContainer(this);
 		}
 	}
 }

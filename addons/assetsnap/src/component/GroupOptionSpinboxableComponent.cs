@@ -92,7 +92,7 @@ namespace AssetSnap.Component
 		{
 			Trait<Spinboxable>()
 				.Select(0)
-				.AddToContainer(Container);
+				.AddToContainer(this);
 		}
 	}
 }
