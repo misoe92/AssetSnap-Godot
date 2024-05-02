@@ -40,11 +40,16 @@ namespace AssetSnap.Core
 		*/
 		public bool Handle(GodotObject _object)
 		{
-			if (null == ExplorerUtils.Get() || null == Plugin.Singleton || null == ExplorerUtils.Get().ContextMenu || null == _object)
+			if (
+				null == ExplorerUtils.Get() ||
+				null == Plugin.Singleton ||
+				null == ExplorerUtils.Get().ContextMenu ||
+				null == _object
+			)
 			{
 				return true;
 			}
-
+			
 			if (_ShouldHandleModel(_object))
 			{
 				if (_object is AsNode3D node3d)
@@ -66,15 +71,15 @@ namespace AssetSnap.Core
 			}
 			else
 			{
-				if (null != _GlobalExplorer.CurrentLibrary)
+				if (null != StatesUtils.Get().CurrentLibrary)
 				{
-					_GlobalExplorer.CurrentLibrary._LibrarySettings._LSEditing.SetText("None");
+					StatesUtils.Get().CurrentLibrary._LibrarySettings._LSEditing.SetText("None");
 				}
 
-				if (null != _GlobalExplorer.Library && null != _GlobalExplorer.Library.Libraries)
+				if (null != ExplorerUtils.Get().Library && null != ExplorerUtils.Get().Library.Libraries)
 				{
 					// Goes through all libraries and resets it's data
-					foreach (Instance _Library in _GlobalExplorer.Library.Libraries)
+					foreach (Instance _Library in ExplorerUtils.Get().Library.Libraries)
 					{
 						if (EditorPlugin.IsInstanceValid(_Library) && null != _Library._LibrarySettings)
 						{
@@ -262,9 +267,9 @@ namespace AssetSnap.Core
 			{
 				foreach ((string key, Variant value) in node3d.GetSettings())
 				{
-					if (_GlobalExplorer.States.Has(key))
+					if (StatesUtils.Get().Has(key))
 					{
-						_GlobalExplorer.States.Set(key, value);
+						StatesUtils.Get().Set(key, value);
 					}
 				}
 			}
@@ -273,13 +278,12 @@ namespace AssetSnap.Core
 			{
 				foreach ((string key, Variant value) in meshInstance3D.GetSettings())
 				{
-					if (_GlobalExplorer.States.Has(key))
+					if (StatesUtils.Get().Has(key))
 					{
-						_GlobalExplorer.States.Set(key, value);
+						StatesUtils.Get().Set(key, value);
 					}
 				}
 			}
-
 		}
 
 		/*
@@ -325,10 +329,10 @@ namespace AssetSnap.Core
 		*/
 		public void ResetHandle()
 		{
-			_GlobalExplorer.HandleNode = null;
-			_GlobalExplorer.States.EditingObject = null;
-			_GlobalExplorer.States.Group = null;
-			_GlobalExplorer.States.GroupedObject = null;
+			StatesUtils.Get().EditingTitle = null;
+			StatesUtils.Get().EditingObject = null;
+			StatesUtils.Get().Group = null;
+			StatesUtils.Get().GroupedObject = null;
 		}
 	}
 }

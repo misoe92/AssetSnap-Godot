@@ -326,11 +326,11 @@ namespace AssetSnap.Front.Components.Groups.Builder
 					SingleEntry.Options = options;
 					SingleEntry.Index = i;
 
-					SingleEntry.Container = Trait<Containerable>()
-						.Select(2)
-						.GetInnerContainer();
-
 					SingleEntry.Initialize();
+					Trait<Containerable>()
+						.Select(2)
+						.GetInnerContainer()
+						.AddChild(SingleEntry);
 				}
 			}
 		}

@@ -278,8 +278,8 @@ namespace AssetSnap.Settings
 
 						_SettingsSpinBox.key = key;
 						_SettingsSpinBox.value = value;
-						_SettingsSpinBox.Container = _Container;
 						_SettingsSpinBox.Initialize();
+						_Container.AddChild(_SettingsSpinBox);
 					}
 					break;
 			}
@@ -310,8 +310,8 @@ namespace AssetSnap.Settings
 
 						_SettingsCheckbox.key = key;
 						_SettingsCheckbox.value = value;
-						_SettingsCheckbox.Container = _Container;
 						_SettingsCheckbox.Initialize();
+						_Container.AddChild(_SettingsCheckbox);
 					}
 					break;
 			}

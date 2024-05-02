@@ -27,7 +27,7 @@ namespace AssetSnap.Library
 	using Godot;
 
 	[Tool]
-	public partial class Base : Node
+	public partial class Base : Node, ISerializationListener
 	{
 		[Export]
 		public Godot.Collections.Array<GodotObject> _Libraries = new();
@@ -38,10 +38,10 @@ namespace AssetSnap.Library
 		{
 			get
 			{
-				if (_Instance == null)
-				{
-					_Instance = new();
-				}
+				// if (_Instance == null)
+				// {
+				// 	_Instance = new();
+				// }
 
 				return _Instance;
 			}
@@ -55,6 +55,17 @@ namespace AssetSnap.Library
 		public Base()
 		{
 			Name = "LibraryBase";
+			_Instance = this;
+		}
+		
+		public void OnBeforeSerialize()
+		{
+			//
+		}
+
+		public void OnAfterDeserialize()
+		{
+			_Instance = this;
 		}
 
 		public void Initialize()
@@ -110,12 +121,13 @@ namespace AssetSnap.Library
 				Index = index,
 				Dock = Dock,
 			};
+			
+			_Libraries.Add(_Base);
 
 			_Base.Name = _Base.FileName.Capitalize();
 			_Base._Name = _Base.FileName.Capitalize();
 
 			_Base.Initialize();
-			_Libraries.Add(_Base);
 		}
 
 		private bool AlreadyHaveFolder(string Folder)

@@ -34,16 +34,11 @@ namespace AssetSnap.Front.Components.Library
 		public float RotationX = 0.0f;
 		public float RotationY = 0.0f;
 		public float RotationZ = 0.0f;
-
-		public Callable? StateChangeCallable;
 		public InputEvent CurrentEvent;
 
 		public SnapRotate()
 		{
 			Name = "LibrarySnapRotate";
-			
-			UsingTraits = new(){};
-			
 			//_include = false;  
 		}
 		
@@ -54,6 +49,8 @@ namespace AssetSnap.Front.Components.Library
 		*/
 		public override void Initialize() 
 		{
+			UsingTraits = new(){};
+			
 			base.Initialize();
 			
 			if( ExplorerUtils.Get() == null )
@@ -73,7 +70,7 @@ namespace AssetSnap.Front.Components.Library
 			RotationY = 0.0f;
 			RotationZ = 0.0f;
 			
-			StateChangeCallable = new(this, "_OnListStateChange");
+			Callable StateChangeCallable = new(this, "_OnListStateChange");
 			if( StateChangeCallable is Callable callable && null != ContextMenu.GetInstance()) 
 			{
 				ContextMenu.GetInstance().Connect(AsContextMenu.SignalName.QuickActionsChanged, callable);
@@ -118,12 +115,12 @@ namespace AssetSnap.Front.Components.Library
 		public override void _Input(InputEvent @event)
 		{
 			if(
-				null == ExplorerUtils.Get()
+				null == ExplorerUtils.Get() ||
+				false == Plugin.Singleton.HasInternalContainer()
 			) 
 			{ 
 				return;
 			}
-
 
 			InputEvent Event = @event;
 			CurrentEvent = Event;

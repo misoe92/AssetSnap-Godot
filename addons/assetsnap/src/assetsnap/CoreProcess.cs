@@ -43,12 +43,17 @@ namespace AssetSnap.Core
 		*/
 		public void Tick(double delta)
 		{
-			if (null == ExplorerUtils.Get() || null == SettingsUtils.Get())
+			if (null == ExplorerUtils.Get() || null == SettingsUtils.Get() || false == EditorPlugin.IsInstanceValid(Plugin.Singleton) )
 			{
 				return;
 			}
 			
-			if( false == EditorPlugin.IsInstanceValid(ExplorerUtils.Get().GetHandle()) ) 
+			if( false == Plugin.Singleton.HasInternalContainer() ) 
+			{
+				return;
+			}
+			
+			if( false == EditorPlugin.IsInstanceValid( ExplorerUtils.Get().GetHandle() ) ) 
 			{
 				StatesUtils.Get().EditingObject = null;
 				StatesUtils.Get().EditingTitle = null;
@@ -109,6 +114,19 @@ namespace AssetSnap.Core
 			{
 				ExplorerUtils.Get().ContextMenu.Show();
 			}
+			
+			if( 
+				StatesUtils.Get().EditingObject != null &&
+				null != StatesUtils.Get().EditingObject.GetParent() &&
+				StatesUtils.Get().EditingObject.GetParent().Name == "AsDecal"
+			) 
+			{
+				ExplorerUtils.Get().Decal.Show();
+			}
+			else 
+			{
+				ExplorerUtils.Get().Decal.Hide();
+			}
 
 			if (
 				false == HasRayProjections() ||
@@ -116,10 +134,7 @@ namespace AssetSnap.Core
 				(false == HasHandle() && false == HandleIsGroup())
 			)
 			{
-				if (HasDecal())
-				{
-					ExplorerUtils.Get().Decal.Hide();
-				}
+				
 			}
 			else
 			{
@@ -232,13 +247,6 @@ namespace AssetSnap.Core
 		*/
 		private void ProcessModelHandle()
 		{
-			// Checks if our decal is hidden
-			if (ExplorerUtils.Get().Decal.IsHidden())
-			{
-				// If it is we show it
-				ExplorerUtils.Get().Decal.Show();
-			}
-
 			// Checks if current mouse is event is motion
 			if (MouseEventIsMove() && ExplorerUtils.Get().HasProjectNormal() && ExplorerUtils.Get().HasProjectOrigin())
 			{
@@ -280,7 +288,6 @@ namespace AssetSnap.Core
 				{
 					// Use mouse position and hard set height to 0
 					ItemTransform.Origin = new Vector3(0, 0.25f, 0);
-					ExplorerUtils.Get().Decal.Hide();
 				}
 
 				// Sets transform and resets the current mouse input
@@ -291,13 +298,6 @@ namespace AssetSnap.Core
 
 		private void ProcessGroupHandle()
 		{
-			// Checks if our decal is hidden
-			if (ExplorerUtils.Get().Decal.IsHidden())
-			{
-				// If it is we show it
-				ExplorerUtils.Get().Decal.Show();
-			}
-
 			// Checks if current mouse is event is motion
 			if (MouseEventIsMove() && ExplorerUtils.Get().HasProjectNormal() && ExplorerUtils.Get().HasProjectOrigin())
 			{
@@ -338,7 +338,6 @@ namespace AssetSnap.Core
 				{
 					// Use mouse position and hard set height to 0
 					ItemTransform.Origin = new Vector3(0, 0.25f, 0);
-					ExplorerUtils.Get().Decal.Hide();
 				}
 
 				// Sets transform and resets the current mouse input
@@ -448,27 +447,6 @@ namespace AssetSnap.Core
 				ExplorerUtils.Get().Raycast.TargetPosition = new Vector3(0, 1000, 0);
 				ExplorerUtils.Get().Raycast.Update();
 			}
-		}
-
-		/*
-		** Fetches the instance of our current
-		** library settings
-		**
-		** @return LibrarySettings
-		*/
-		private Settings GetLibrarySettings()
-		{
-			if (false == HasLibrary())
-			{
-				return null;
-			}
-
-			if (false == HasLibrarySettings())
-			{
-				return null;
-			}
-
-			return ExplorerUtils.Get().CurrentLibrary._LibrarySettings;
 		}
 
 		/*

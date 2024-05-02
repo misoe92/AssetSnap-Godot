@@ -81,7 +81,7 @@ namespace AssetSnap.Front.Components
 			base.Initialize();
 			
 			Name = "SettingsCheckbox";
-			if( key == null || Container == null ) 
+			if( key == null ) 
 			{
 				return;
 			}

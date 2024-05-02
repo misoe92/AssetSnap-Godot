@@ -66,7 +66,7 @@ namespace AssetSnap.Component
 			Trait<Containerable>()
 				.Select(0)
 				.AddToContainer(
-					Container
+					this
 				);
 		}
 	}

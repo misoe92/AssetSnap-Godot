@@ -308,9 +308,9 @@ namespace AssetSnap.Library
 				
 				if( HasLibraryBody() ) 
 				{
-					_LibraryBody.Container = PanelContainer;
-					_LibraryBody.Library = this;
+					_LibraryBody.LibraryName = GetName();
 					_LibraryBody.Initialize();
+					PanelContainer.AddChild(_LibraryBody);
 				}
 			}
 		}
@@ -329,9 +329,9 @@ namespace AssetSnap.Library
 				
 				if( HasLibraryTopbar() ) 
 				{
-					_LibraryTopbar.Container = _LibraryBody.GetRightInnerContainer();
-					_LibraryTopbar.Library = this;
+					_LibraryTopbar.LibraryName = GetName();
 					_LibraryTopbar.Initialize();
+					_LibraryBody.GetRightInnerContainer().AddChild(_LibraryTopbar);
 				}
 			}
 		}
@@ -350,9 +350,9 @@ namespace AssetSnap.Library
 				
 				if( HasLibrarySettings() ) 
 				{
-					_LibrarySettings.Container = _LibraryBody.GetLeftInnerContainer();
-					_LibrarySettings.Library = this;
+					_LibrarySettings.LibraryName = GetName();
 					_LibrarySettings.Initialize();
+					_LibraryBody.GetLeftInnerContainer().AddChild(_LibrarySettings);
 				}
 			}
 		}
@@ -371,10 +371,10 @@ namespace AssetSnap.Library
 				
 				if( HasLibraryListing() ) 
 				{
-					_LibraryListing.Container = _LibraryBody.GetRightInnerContainer();
 					_LibraryListing.Folder = Folder;
-					_LibraryListing.Library = this;
+					_LibraryListing.LibraryName = GetName();
 					_LibraryListing.Initialize();
+					_LibraryBody.GetRightInnerContainer().AddChild(_LibraryListing);
 				}
 			}
 		}

@@ -79,6 +79,11 @@ namespace AssetSnap.Front.Nodes
 
 		public void Initialize()
 		{
+			if( false == Plugin.Singleton.HasInternalContainer() ) 
+			{
+				return;
+			}
+			
 			MenuPanelContainer = new()
 			{
 				Name = "MenuPanelContainer",
@@ -116,7 +121,7 @@ namespace AssetSnap.Front.Nodes
 
 			MenuPanelContainer.Position = new Vector2(-400, -400);
 
-			ExplorerUtils.Get()._Plugin
+			Plugin.Singleton
 				.GetInternalContainer()
 				.AddChild(MenuPanelContainer);
 		}

@@ -135,20 +135,19 @@ namespace AssetSnap
 		{
 			if (null == Node)
 			{
-				CurrentLibrary.ClearActivePanelState(null);
-				CurrentLibrary._LibrarySettings._LSEditing.SetText("None");
+				StatesUtils.Get().CurrentLibrary.ClearActivePanelState(null);
+				StatesUtils.Get().CurrentLibrary._LibrarySettings._LSEditing.SetText("None");
 
-				States.EditingObject = null;
-				HandleNode = null;
-				Model = null;
-				CurrentLibrary = null;
+				StatesUtils.Get().EditingObject = null;
+				StatesUtils.Get().Group = null;
+				StatesUtils.Get().GroupedObject = null;
 
 				return;
 			}
 
 			EditorInterface.Singleton.EditNode(Node);
-			States.EditingObject = Node;
-			States.EditingTitle = Node.Name;
+			StatesUtils.Get().EditingObject = Node;
+			StatesUtils.Get().EditingTitle = Node.Name;
 
 			if (Node is AsMeshInstance3D _instance)
 			{
@@ -157,7 +156,6 @@ namespace AssetSnap
 
 				Library.Instance Library = GetLibraryByName(_instance.GetLibraryName());
 				Library._LibrarySettings._LSEditing.SetText(Node.Name);
-				CurrentLibrary = Library;
 				StatesUtils.Get().CurrentLibrary = Library;
 
 				if (InputDriver is DragAddInputDriver DraggableInputDriver)
@@ -172,7 +170,6 @@ namespace AssetSnap
 
 				Library.Instance Library = GetLibraryByName(_nodeInstance.GetLibraryName());
 				Library._LibrarySettings._LSEditing.SetText(Node.Name);
-				CurrentLibrary = Library;
 				StatesUtils.Get().CurrentLibrary = Library;
 
 				if (InputDriver is DragAddInputDriver DraggableInputDriver)
@@ -183,13 +180,13 @@ namespace AssetSnap
 
 			if (Node is AsGrouped3D _Grouped3D)
 			{
-				States.PlacingMode = GlobalStates.PlacingModeEnum.Group;
+				StatesUtils.Get().PlacingMode = GlobalStates.PlacingModeEnum.Group;
 
 				Transform3D transform = _Grouped3D.Transform;
 				transform.Origin = new Vector3(0, 0, 0);
 				_Grouped3D.Transform = transform;
 
-				States.GroupedObject = _Grouped3D;
+				StatesUtils.Get().GroupedObject = _Grouped3D;
 
 				if (InputDriver is DragAddInputDriver DraggableInputDriver)
 				{

@@ -122,13 +122,12 @@ namespace AssetSnap.Instance.Input
 		*/
 		private int _ListenForMouseButtons(InputEvent Event)
 		{
-			StatesUtils.Get().MultiDrop = false;
 			if (Event is InputEventMouseButton _MouseButtonEvent)
 			{
 				if (InputsStatic.HasMouseLeftPressed(_MouseButtonEvent))
 				{
+					StatesUtils.Get().MultiDrop = false;
 					Node3D Node = ExplorerUtils.Get().GetHandle();
-
 					if (
 						SettingsStatic.CanMultiDrop() &&
 						InputsStatic.ShiftInputPressed(_MouseButtonEvent) &&
@@ -245,8 +244,8 @@ namespace AssetSnap.Instance.Input
 		private bool ShouldListen()
 		{
 			return
-				null != GlobalExplorer.GetInstance().CurrentLibrary ||
-				GlobalExplorer.GetInstance().States.PlacingMode == GlobalStates.PlacingModeEnum.Group;
+				null != StatesUtils.Get().CurrentLibrary ||
+				StatesUtils.Get().PlacingMode == GlobalStates.PlacingModeEnum.Group;
 		}
 
 		/*

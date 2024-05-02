@@ -191,24 +191,24 @@ namespace AssetSnap.Front.Nodes
 
 				if (_Introduction != null)
 				{
-					_Introduction.Container = SubContainerOne;
 					_Introduction.Initialize();
+					SubContainerOne.AddChild(_Introduction);
 				}
 
 				Actions _Actions = GlobalExplorer.GetInstance().Components.Single<Actions>();
 
 				if (_Actions != null)
 				{
-					_Actions.Container = SubContainerOne;
 					_Actions.Initialize();
+					SubContainerOne.AddChild(_Actions);
 				}
 
 				Contribute Contribute = GlobalExplorer.GetInstance().Components.Single<Contribute>();
 
 				if (Contribute != null)
 				{
-					Contribute.Container = SubContainerThree;
 					Contribute.Initialize();
+					SubContainerThree.AddChild(Contribute);
 				}
 
 				Plugin.Singleton.FoldersLoaded += () => { _OnLoadListing(); };
@@ -222,8 +222,8 @@ namespace AssetSnap.Front.Nodes
 
 			if (_LibrariesListing != null)
 			{
-				_LibrariesListing.Container = SubContainerTwo;
 				_LibrariesListing.Initialize();
+				SubContainerTwo.AddChild(_LibrariesListing);
 			}
 		}
 

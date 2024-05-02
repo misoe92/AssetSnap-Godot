@@ -207,12 +207,15 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			if (_GlobalExplorer.Components.HasAll(Components.ToArray()))
 			{
 				TitleInput = _GlobalExplorer.Components.Single<EditorTitleInput>();
-				TitleInput.Container = InnerContainer;
 				TitleInput.Initialize();
 
+				InnerContainer.AddChild(TitleInput);
+
 				SaveButton = _GlobalExplorer.Components.Single<EditorSave>();
-				SaveButton.Container = InnerContainer;
 				SaveButton.Initialize();
+				
+				InnerContainer.AddChild(SaveButton);
+				
 			}
 
 			MarginContainer.AddChild(InnerContainer);
@@ -231,8 +234,8 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			if (_GlobalExplorer.Components.HasAll(Components.ToArray()))
 			{
 				CloseButton = _GlobalExplorer.Components.Single<EditorClose>();
-				CloseButton.Container = container;
 				CloseButton.Initialize();
+				container.AddChild(CloseButton);
 			}
 		}
 
@@ -246,8 +249,8 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			if (_GlobalExplorer.Components.HasAll(Components.ToArray()))
 			{
 				PlaceButton = _GlobalExplorer.Components.Single<EditorPlace>();
-				PlaceButton.Container = container;
 				PlaceButton.Initialize();
+				container.AddChild(PlaceButton);
 			}
 		}
 	}

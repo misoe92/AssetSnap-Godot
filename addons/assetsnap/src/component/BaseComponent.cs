@@ -42,18 +42,6 @@ namespace AssetSnap.Component
 		
 		public Array<string> UsingTraits = new(){};
 		
-		protected Node _Container;
- 
-		[Export]
-		public Node Container 
-		{ 
-			get => _Container;
-			set
-			{
-				_Container = value;
-			}
-		}
-
 		/*
 		** Virtual method for entering
 		** Ensures that there is always a enter method
@@ -80,7 +68,7 @@ namespace AssetSnap.Component
 				return;
 			}
 
-			Container.AddChild(this);
+			// Container.AddChild(this);
 			
 			if( Name == "" ) 
 			{

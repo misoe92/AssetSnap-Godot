@@ -26,9 +26,10 @@ namespace AssetSnap.Debug
 	using System;
 	using System.Collections.Generic;
 	using System.Reflection;
+	using AssetSnap.Explorer;
 	using Godot;
 
-	public partial class Inspector
+	public partial class Inspector : Node, ISerializationListener
 	{
 		private static readonly string ThemePath = "res://addons/assetsnap/assets/themes/SnapTheme.tres";
 		private VBoxContainer _Control;
@@ -44,23 +45,29 @@ namespace AssetSnap.Debug
 		{
 			get
 			{
-				if( null == _Instance ) 
-				{
-					_Instance = new();
-				}
-				
 				return _Instance;
 			}
 		}
 		
 		public Inspector()
 		{
+			Name = "Inspector";
+			_Instance = this;
+		}
+
+		public void OnBeforeSerialize()
+		{
+			//
+		}
+
+		public void OnAfterDeserialize()
+		{
 			_Instance = this;
 		}
 
 		public void Initialize()
 		{
-			_GlobalExplorer = GlobalExplorer.GetInstance();
+			_GlobalExplorer = ExplorerUtils.Get();
 		
 			_Control = new()
 			{

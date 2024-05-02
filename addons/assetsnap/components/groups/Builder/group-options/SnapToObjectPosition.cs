@@ -72,13 +72,13 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 			Trait<Checkable>()
 				.Select(1)
 				.AddToContainer(
-					Container
+					this
 				);
 				
 			Trait<Checkable>()
 				.Select(2)
 				.AddToContainer(
-					Container
+					this
 				);
 		}
 		

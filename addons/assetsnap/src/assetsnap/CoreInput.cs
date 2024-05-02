@@ -22,7 +22,8 @@
 
 namespace AssetSnap.Core
 {
-	using AssetSnap.Front.Nodes;
+    using AssetSnap.Explorer;
+    using AssetSnap.Front.Nodes;
 	using Godot;
 	public class CoreInput : Core
 	{
@@ -33,7 +34,7 @@ namespace AssetSnap.Core
 		*/
 		public int Handle(Camera3D Camera, InputEvent @event)
 		{
-			if (null == _GlobalExplorer)
+			if (null == ExplorerUtils.Get())
 			{
 				return (int)EditorPlugin.AfterGuiInput.Pass;
 			}
@@ -43,7 +44,7 @@ namespace AssetSnap.Core
 			{
 				if (ScrollAllowed() == GlobalExplorer.ScrollState.SCROLL_DISABLED)
 				{
-					_GlobalExplorer.AllowScroll = GlobalExplorer.ScrollState.SCROLL_ENABLED;
+					ExplorerUtils.Get().AllowScroll = GlobalExplorer.ScrollState.SCROLL_ENABLED;
 					return (int)EditorPlugin.AfterGuiInput.Stop;
 				}
 				else
@@ -53,9 +54,9 @@ namespace AssetSnap.Core
 			}
 
 			if (
-				_GlobalExplorer.GetHandle() is AsMeshInstance3D meshInstance3D && meshInstance3D.IsPlaced() ||
-				_GlobalExplorer.GetHandle() is AsGrouped3D grouped3D && grouped3D.IsPlaced() ||
-				_GlobalExplorer.GetHandle() is AsNode3D node3D && node3D.IsPlaced()
+				ExplorerUtils.Get().GetHandle() is AsMeshInstance3D meshInstance3D && meshInstance3D.IsPlaced() ||
+				ExplorerUtils.Get().GetHandle() is AsGrouped3D grouped3D && grouped3D.IsPlaced() ||
+				ExplorerUtils.Get().GetHandle() is AsNode3D node3D && node3D.IsPlaced()
 			)
 			{
 				return (int)EditorPlugin.AfterGuiInput.Pass;
@@ -65,11 +66,11 @@ namespace AssetSnap.Core
 			MaybeProjectFromCamera(Camera, @event);
 
 			// Run the input driver, depending on wheather it's drag or normal
-			_GlobalExplorer.InputDriver._Input(Camera, @event);
+			ExplorerUtils.Get().InputDriver._Input(Camera, @event);
 
 			if (ScrollAllowed() == GlobalExplorer.ScrollState.SCROLL_DISABLED)
 			{
-				_GlobalExplorer.AllowScroll = GlobalExplorer.ScrollState.SCROLL_ENABLED;
+				ExplorerUtils.Get().AllowScroll = GlobalExplorer.ScrollState.SCROLL_ENABLED;
 				return (int)EditorPlugin.AfterGuiInput.Stop;
 			}
 			else
@@ -90,11 +91,11 @@ namespace AssetSnap.Core
 		{
 			if (@event is InputEventMouseMotion _MotionEvent)
 			{
-				if (_GlobalExplorer._CurrentMouseInput != EventMouse.EventClick)
+				if (ExplorerUtils.Get()._CurrentMouseInput != EventMouse.EventClick)
 				{
-					_GlobalExplorer.ProjectRayOrigin = Camera.ProjectRayOrigin(_MotionEvent.Position);
-					_GlobalExplorer.ProjectRayNormal = Camera.ProjectRayNormal(_MotionEvent.Position);
-					_GlobalExplorer._CurrentMouseInput = EventMouse.EventMove;
+					ExplorerUtils.Get().ProjectRayOrigin = Camera.ProjectRayOrigin(_MotionEvent.Position);
+					ExplorerUtils.Get().ProjectRayNormal = Camera.ProjectRayNormal(_MotionEvent.Position);
+					ExplorerUtils.Get()._CurrentMouseInput = EventMouse.EventMove;
 				}
 			}
 		}
@@ -106,7 +107,7 @@ namespace AssetSnap.Core
 		*/
 		public bool ShouldDrag()
 		{
-			bool value = _GlobalExplorer.Settings.GetKey("allow_drag_add").As<bool>();
+			bool value = ExplorerUtils.Get().Settings.GetKey("allow_drag_add").As<bool>();
 
 			if (value is bool valueBool)
 			{
@@ -123,7 +124,7 @@ namespace AssetSnap.Core
 		*/
 		public GlobalExplorer.ScrollState ScrollAllowed()
 		{
-			return _GlobalExplorer.AllowScroll;
+			return ExplorerUtils.Get().AllowScroll;
 		}
 
 		/*
@@ -133,7 +134,7 @@ namespace AssetSnap.Core
 		*/
 		public bool HasHandle()
 		{
-			Node NodeHandle = _GlobalExplorer.GetHandle();
+			Node NodeHandle = ExplorerUtils.Get().GetHandle();
 			return null != NodeHandle;
 		}
 

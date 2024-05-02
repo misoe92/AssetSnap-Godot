@@ -46,7 +46,7 @@ namespace AssetSnap.Component
 			{
 				foreach( string traitString in UsingTraits ) 
 				{
-					AddTrait(Type.GetType(traitString), Container);
+					AddTrait(Type.GetType(traitString), this);
 				}
 			}
 			
@@ -65,7 +65,6 @@ namespace AssetSnap.Component
 			if( instance is Trait.Base trait ) 
 			{
 				trait.OwnerName = Name;
-
 				container.AddChild(trait);
 				// Check if the trait is already bound
 				if (!boundTraits.Contains(trait))
@@ -262,12 +261,6 @@ namespace AssetSnap.Component
 			}
 					
 			return null;
-		}
-
-		public override void _ExitTree()
-		{
-			// Clear();
-			base._ExitTree();
 		}
 	}
 }

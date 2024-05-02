@@ -58,7 +58,7 @@ namespace AssetSnap.Front.Components.Library
 		{
 			base.Initialize();
 			Initiated = true;
-			Library.ItemCountUpdated += (int count) => { _OnItemCountUpdated(count); }; 
+			Library.ItemCountUpdated += _OnItemCountUpdated; 
 			ItemCount = Library.ItemCount;
 			
 			Trait<Labelable>()
@@ -106,7 +106,7 @@ namespace AssetSnap.Front.Components.Library
 
 		public override void _ExitTree()
 		{
-			Library.ItemCountUpdated -= (int count) => { _OnItemCountUpdated(count); }; 
+			Library.ItemCountUpdated -= _OnItemCountUpdated; 
 			base._ExitTree();
 		}
 	}

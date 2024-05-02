@@ -236,11 +236,10 @@ namespace AssetSnap.Front.Components.Groups.Builder
 					ListingEntry SingleEntry = GlobalExplorer.GetInstance().Components.Single<ListingEntry>(true);
 
 					SingleEntry.title = title;
-					SingleEntry.Container = this;
 					SingleEntry.Initialize();
 
 					_Instances.Add(title, SingleEntry);
-					// AddChild(SingleEntry);
+					AddChild(SingleEntry);
 				}
 			}
 		}

@@ -219,7 +219,7 @@ namespace AssetSnap.Front.Nodes
 						asMeshInstance3D.Owner = group.Owner;
 					}
 
-					node.QueueFree();
+					node.Free();
 				}
 				
 			}
@@ -292,6 +292,8 @@ namespace AssetSnap.Front.Nodes
 						node3D.AddChild(asMeshInstance3D);
 						asMeshInstance3D.Owner = group.Owner;
 					}
+
+					node.Free();
 				}
 			}
 		}
@@ -414,6 +416,7 @@ namespace AssetSnap.Front.Nodes
 						asMeshInstance3D.Owner = group.Owner;
 					}
 
+					node.Free();
 				}
 			}
 

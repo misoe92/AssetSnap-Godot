@@ -114,11 +114,10 @@ public partial class AsLibraryPanelContainer : PanelContainer
 
 				Library.ClearActivePanelState(this);
 				SetState(true);
+				PrepareMeshInstance();
 
 				Library._LibrarySettings._LSSnapToHeight.SetState(true);
 				Library._LibrarySettings._LSSnapToHeight.Sync();
-
-				PrepareMeshInstance();
 
 				ExplorerUtils.Get().SetFocusToNode(_Instance);
 
