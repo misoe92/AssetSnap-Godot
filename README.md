@@ -81,7 +81,7 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-[![Product Name Screen Shot][product-screenshot]](https://example.com)
+![image](https://github.com/misoe92/AssetSnap-Godot/assets/38956582/a513a5e4-54de-40b1-afe4-57fcee358afe)
 
 This toolkit was started as a way for me to give my nephew an easier entry in to game development, more specifically 3D game development. This toolkit essentially aims to statisfy all the level building needs that you might have. And if it does not yet do this, please post an issue and we will see on how we can fit your need into the calculation. It is a work in progress, so bugs still might occur. Therefore usage in professional environment should still be cautious. Will update this part of the text when the product is polished enough for a professional usage case. 
 
@@ -101,7 +101,7 @@ Groups inner structure are persistent, meaning if you change an group 3D object 
 Preview your creation in a 3D Preview environment while you are building it. Allowing you to fly around your 3D object to ensure all the details are as they need to be.
 
 ### Libraries
-![image](https://github.com/misoe92/AssetSnap-Godot/assets/38956582/39809aa6-8288-4e93-b03a-8bd871a8938f)
+![image](https://github.com/misoe92/AssetSnap-Godot/assets/38956582/8e00a72f-7ade-4c0e-96ab-0611cdcc4fc7)
 
 Create libraries that houses a folder and all of it 3D models, allowing you to search, place, and perform various actions on the models when placing them in the 3D world.
 
