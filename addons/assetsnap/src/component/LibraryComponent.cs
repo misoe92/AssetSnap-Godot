@@ -23,22 +23,20 @@
 #if TOOLS
 namespace AssetSnap.Component
 {
+	using AssetSnap.Explorer;
 	using Godot;
 
 	[Tool]
 	public partial class LibraryComponent : TraitableComponent
 	{
-		protected Library.Instance _Library;
-		
 		public Library.Instance Library 
 		{
-			get => _Library;
-			set
-			{
-				_Library = value;
-				_OnLibraryChange();
+			get {
+				return ExplorerUtils.Get().GetLibraryByName(LibraryName);
 			}
 		}
+
+		public string LibraryName { get; set; }
 		
 		/*
 		** Virtual method which are called each time
@@ -71,13 +69,6 @@ namespace AssetSnap.Component
 
 				asMeshInstance3D.AddSetting(key, value);
 			}
-		}
-
-		public override void _ExitTree()
-		{
-			Library = null;
-			
-			base._ExitTree();
 		}
 	}
 }
