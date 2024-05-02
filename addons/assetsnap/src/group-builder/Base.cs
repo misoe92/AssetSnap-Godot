@@ -82,7 +82,7 @@ namespace AssetSnap.GroupBuilder
 		{
 			if (
 				null == Plugin.Singleton ||
-				null == Plugin.Singleton.GetInternalContainer()
+				false == Plugin.Singleton.HasInternalContainer()
 			)
 			{
 				return false;
@@ -98,7 +98,7 @@ namespace AssetSnap.GroupBuilder
 		{
 			if (
 				null == Plugin.Singleton ||
-				null == Plugin.Singleton.GetInternalContainer()
+				false == Plugin.Singleton.HasInternalContainer()
 			)
 			{
 				return false;
@@ -111,6 +111,11 @@ namespace AssetSnap.GroupBuilder
 
 		public AsGroupContextMenu GetMenu()
 		{
+			if( false == Plugin.Singleton.HasInternalContainer() ) 
+			{
+				return null;
+			}
+			
 			return Plugin.Singleton
 				.GetInternalContainer()
 				.GetNode("GroupContextMenu") as AsGroupContextMenu;
@@ -118,6 +123,11 @@ namespace AssetSnap.GroupBuilder
 
 		public void CreateMenu()
 		{
+			if( false == Plugin.Singleton.HasInternalContainer() ) 
+			{
+				return;
+			}
+			
 			AsGroupContextMenu menu = new()
 			{
 				Name = "GroupContextMenu"
@@ -180,8 +190,8 @@ namespace AssetSnap.GroupBuilder
 
 				if (HasGroupContainer())
 				{
-					_GroupContainer.Container = Container;
 					_GroupContainer.Initialize();
+					Container.AddChild(_GroupContainer);
 
 					if (Components.HasAll(InnerComponents.ToArray()))
 					{
@@ -190,14 +200,14 @@ namespace AssetSnap.GroupBuilder
 
 						if (HasSidebar())
 						{
-							_Sidebar.Container = _GroupContainer.GetLeftInnerContainer();
 							_Sidebar.Initialize();
+							_GroupContainer.GetLeftInnerContainer().AddChild(_Sidebar);
 						}
 
 						if (HasListing())
 						{
-							_Editor.Container = _GroupContainer.GetRightInnerContainer();
 							_Editor.Initialize();
+							_GroupContainer.GetRightInnerContainer().AddChild(_Editor);
 						}
 
 						StatesUtils.SetLoad("GroupBuilderContainer", true);

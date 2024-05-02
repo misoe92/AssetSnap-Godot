@@ -30,53 +30,64 @@ namespace AssetSnap.ContextMenu
 	using AssetSnap.Static;
 	using Godot;
 	
-	public partial class Base
+	public partial class Base : Node, ISerializationListener
 	{
-		public string Name = "";
 		private readonly PackedScene _Scene = GD.Load<PackedScene>("res://addons/assetsnap/scenes/ContextMenu.tscn");
-		private AsContextMenu _NodeInstance;
+		public static bool _Instantiated = false;
 		private List<string> Components = new()
 		{
 			"LibrarySnapRotate",
 			"LibrarySnapScale",
 		}; 
 		
-		public Base()
-		{
-			Name = "AssetSnapContextMenu";
-		}
-		
 		private static Base _Instance;
 		public static Base Singleton
 		{
 			get
 			{
-				if( null == _Instance ) 
-				{
-					_Instance = new();
-				}
-
 				return _Instance;
 			}
 		}
-	
+		
+		public Base()
+		{
+			Name = "AssetSnapContextMenu";
+			_Instance = this;
+		}
+		
+		public void OnBeforeSerialize()
+		{
+			//
+		}
+
+		public void OnAfterDeserialize()
+		{
+			_Instance = this;
+		}
+		
 		/*
 		** Initializes the context handler
 		*/ 
 		public void Initialize()
 		{
-			if( false == _ShouldUseOverlay()) 
+			if( false == _ShouldUseOverlay())
 			{
 				return;
 			}
+			
+			if(	null != Plugin.Singleton && false == HasNode("AsContextMenu") ) 
+			{
+				AsContextMenu _NodeInstance = _Scene.Instantiate<AsContextMenu>();
+				AddChild(_NodeInstance);
+			}
 
-			if ( HasComponents() ) 
+			if ( HasComponents() )
 			{
 				InitializeComponents();
-			}  
+			}
 		}
 		
-		public void _Ready()
+		public override void _Ready()
 		{
 			_Initialize();
 		}
@@ -95,7 +106,7 @@ namespace AssetSnap.ContextMenu
 			
 			SetVisible(true);
 			
-			if( _NodeInstance is AsContextMenu ContextMenu ) 
+			if( GetInstance() is AsContextMenu ContextMenu ) 
 			{
 				Node3D Handle = GlobalExplorer.GetInstance().GetHandle();
 				
@@ -141,7 +152,7 @@ namespace AssetSnap.ContextMenu
 				return;
 			}
 			
-			if( _NodeInstance is AsContextMenu ContextMenu ) 
+			if( GetInstance() is AsContextMenu ContextMenu ) 
 			{
 				ContextMenu.SetRotationX(Rotation.X);
 				ContextMenu.SetRotationY(Rotation.Y);
@@ -166,7 +177,7 @@ namespace AssetSnap.ContextMenu
 				return;
 			}
 			
-			if( _NodeInstance is AsContextMenu ContextMenu ) 
+			if( GetInstance() is AsContextMenu ContextMenu ) 
 			{
 				ContextMenu.SetScaleX(Scale.X);
 				ContextMenu.SetScaleY(Scale.Y);
@@ -179,13 +190,22 @@ namespace AssetSnap.ContextMenu
 		
 		public AsContextMenu GetInstance()
 		{	
-			if(	null == _NodeInstance && null != Plugin.Singleton) 
+			if( false == HasInstance() )
 			{
-				_NodeInstance = _Scene.Instantiate<AsContextMenu>();
-				Plugin.Singleton.GetInternalContainer().AddChild(_NodeInstance);
+				return null;
 			}
-			
-			return _NodeInstance;
+
+			return GetNode("AsContextMenu") as AsContextMenu;
+		}
+		
+		public bool HasInstance()
+		{
+			if( false == HasNode("AsContextMenu") || false == EditorPlugin.IsInstanceValid( GetNode("AsContextMenu") ) ) 
+			{
+				return false;
+			}
+
+			return true;
 		}
 		
 		/*
@@ -200,7 +220,7 @@ namespace AssetSnap.ContextMenu
 				return Vector3.Zero;
 			}
 			
-			if( _NodeInstance is AsContextMenu ContextMenu ) 
+			if( GetInstance() is AsContextMenu ContextMenu ) 
 			{
 				return new Vector3(ContextMenu.GetRotationX(), ContextMenu.GetRotationY(), ContextMenu.GetRotationZ());
 			}
@@ -220,7 +240,7 @@ namespace AssetSnap.ContextMenu
 				return Vector3.Zero;
 			}
 			
-			if( _NodeInstance is AsContextMenu ContextMenu ) 
+			if( GetInstance() is AsContextMenu ContextMenu ) 
 			{
 				return new Vector3(ContextMenu.GetScaleX(), ContextMenu.GetScaleY(), ContextMenu.GetScaleZ());
 			}
@@ -254,6 +274,11 @@ namespace AssetSnap.ContextMenu
 		*/
 		public void SetVisible(bool state)
 		{
+			if( false == HasInstance() ) 
+			{
+				return;
+			}
+			
 			GetInstance().Visible = state;
 			GetInstance().Active = state;
 		}
@@ -280,7 +305,12 @@ namespace AssetSnap.ContextMenu
 		*/
 		public bool IsContextMenuValid()
 		{
-			return EditorPlugin.IsInstanceValid(GetInstance()) && null != GetInstance().GetParent();
+			return
+				EditorPlugin.IsInstanceValid(Plugin.Singleton) && 
+				Plugin.Singleton.HasInternalContainer() &&
+				null != GetInstance() &&
+				EditorPlugin.IsInstanceValid(GetInstance()) &&
+				null != GetInstance().GetParent();
 		}
 		
 		/*
@@ -302,29 +332,31 @@ namespace AssetSnap.ContextMenu
 		*/
 		public void InitializeComponents()
 		{
+			if( false == Plugin.Singleton.HasInternalContainer() ) 
+			{
+				return;
+			}
+			
 			SnapRotate _LibrarySnapRotate = ExplorerUtils.Get().Components.Single<AssetSnap.Front.Components.Library.SnapRotate>();
 			SnapScale _LibrarySnapScale = ExplorerUtils.Get().Components.Single<AssetSnap.Front.Components.Library.SnapScale>();
 			SnapGrab _LibrarySnapGrab = ExplorerUtils.Get().Components.Single<AssetSnap.Front.Components.Library.SnapGrab>();
 			
 			if( null != _LibrarySnapRotate ) 
 			{
-				_LibrarySnapRotate.Library = ExplorerUtils.Get().CurrentLibrary;
-				_LibrarySnapRotate.Container = Plugin.Singleton.GetInternalContainer();
 				_LibrarySnapRotate.Initialize();
+				AddChild(_LibrarySnapRotate);
 			}
 			
 			if( null != _LibrarySnapScale ) 
 			{
-				_LibrarySnapScale.Library = ExplorerUtils.Get().CurrentLibrary;
-				_LibrarySnapScale.Container = Plugin.Singleton.GetInternalContainer();
 				_LibrarySnapScale.Initialize();
+				AddChild(_LibrarySnapScale);
 			}
 			
 			if( null != _LibrarySnapGrab ) 
 			{
-				_LibrarySnapGrab.Library = ExplorerUtils.Get().CurrentLibrary;
-				_LibrarySnapGrab.Container = Plugin.Singleton.GetInternalContainer();
 				_LibrarySnapGrab.Initialize();
+				AddChild(_LibrarySnapGrab);
 			}
 		}
 	
