@@ -48,13 +48,12 @@ namespace AssetSnap.Core
 			new ASNode.Types.AsOptimizedMultiMeshGroupType().Initialize();
 			new ASNode.Types.AsMultiMeshType().Initialize();
 
-			Plugin.Singleton.AddChild(ExplorerUtils.Get().Components);
-			Plugin.Singleton.AddChild(ExplorerUtils.Get().Library);
-			// Plugin.Singleton.AddChild(ExplorerUtils.Get().GroupBuilder);
+			new Library.Base();
+			new ContextMenu.Base();
 			
 			_GlobalExplorer._Plugin.FoldersLoaded += () => { _OnLoadContainers(); };
 
-			/** Initialize **/  
+			/** Initialize **/
 			_GlobalExplorer.Waypoints.Initialize();
 			_GlobalExplorer.ContextMenu.Initialize();
 			_GlobalExplorer.Snap.Initialize();
@@ -67,6 +66,10 @@ namespace AssetSnap.Core
 			 
 			_GlobalExplorer.Inspector.Initialize();
 			_GlobalExplorer.Inspector.AddToDock();
+			
+			Plugin.Singleton.AddChild(ExplorerUtils.Get().Library);
+			Plugin.Singleton.AddChild(ExplorerUtils.Get().Components);
+			Plugin.Singleton.AddChild(ExplorerUtils.Get().ContextMenu);
 			
 			_GlobalExplorer.Settings.MaybeEmitFoldersLoaded();
 		} 
