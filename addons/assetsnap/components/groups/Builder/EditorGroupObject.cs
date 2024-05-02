@@ -122,11 +122,11 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			if (_GlobalExplorer.Components.HasAll(Components.ToArray()))
 			{
 				_GroupBuilderEditorGroupObjectOrigin = GlobalExplorer.GetInstance().Components.Single<Origin>(true);
-				_GroupBuilderEditorGroupObjectOrigin.Container = RowInnerContainer;
 				_GroupBuilderEditorGroupObjectOrigin.Parent = this;
 				_GroupBuilderEditorGroupObjectOrigin.Index = Index;
 				_GroupBuilderEditorGroupObjectOrigin.Path = Path;
 				_GroupBuilderEditorGroupObjectOrigin.Initialize();
+				RowInnerContainer.AddChild(_GroupBuilderEditorGroupObjectOrigin);
 			}
 		}
 
@@ -140,11 +140,11 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			if (_GlobalExplorer.Components.HasAll(Components.ToArray()))
 			{
 				_GroupBuilderEditorGroupObjectRotation = GlobalExplorer.GetInstance().Components.Single<Rotation>(true);
-				_GroupBuilderEditorGroupObjectRotation.Container = RowInnerContainer;
 				_GroupBuilderEditorGroupObjectRotation.Index = Index;
 				_GroupBuilderEditorGroupObjectRotation.Parent = this;
 				_GroupBuilderEditorGroupObjectRotation.Path = Path;
 				_GroupBuilderEditorGroupObjectRotation.Initialize();
+				RowInnerContainer.AddChild(_GroupBuilderEditorGroupObjectRotation);
 			}
 		}
 
@@ -158,11 +158,11 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			if (_GlobalExplorer.Components.HasAll(Components.ToArray()))
 			{
 				_GroupBuilderEditorGroupObjectScale = GlobalExplorer.GetInstance().Components.Single<Scale>(true);
-				_GroupBuilderEditorGroupObjectScale.Container = RowInnerContainer;
 				_GroupBuilderEditorGroupObjectScale.Index = Index;
 				_GroupBuilderEditorGroupObjectScale.Parent = this;
 				_GroupBuilderEditorGroupObjectScale.Path = Path;
 				_GroupBuilderEditorGroupObjectScale.Initialize();
+				RowInnerContainer.AddChild(_GroupBuilderEditorGroupObjectScale);
 			}
 		}
 
@@ -176,10 +176,10 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			if (_GlobalExplorer.Components.HasAll(Components.ToArray()))
 			{
 				_GroupBuilderEditorGroupObjectActions = GlobalExplorer.GetInstance().Components.Single<Actions>(true);
-				_GroupBuilderEditorGroupObjectActions.Container = RowInnerContainer;
 				_GroupBuilderEditorGroupObjectActions.Index = Index;
 				_GroupBuilderEditorGroupObjectActions.Path = Path;
 				_GroupBuilderEditorGroupObjectActions.Initialize();
+				RowInnerContainer.AddChild(_GroupBuilderEditorGroupObjectActions);
 			}
 		}
 
@@ -193,9 +193,9 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			if (_GlobalExplorer.Components.HasAll(Components.ToArray()))
 			{
 				_GroupBuilderEditorGroupObjectAdvanced = GlobalExplorer.GetInstance().Components.Single<Advanced>(true);
-				_GroupBuilderEditorGroupObjectAdvanced.Container = RowInnerContainer;
 				_GroupBuilderEditorGroupObjectAdvanced.Parent = this;
 				_GroupBuilderEditorGroupObjectAdvanced.Initialize();
+				RowInnerContainer.AddChild(_GroupBuilderEditorGroupObjectAdvanced);
 			}
 		}
 
@@ -236,11 +236,11 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			if (_GlobalExplorer.Components.HasAll(Components.ToArray()))
 			{
 				_GroupBuilderEditorGroupObjectAdvancedContainer = GlobalExplorer.GetInstance().Components.Single<AdvancedContainer>(true);
-				_GroupBuilderEditorGroupObjectAdvancedContainer.Container = container;
 				_GroupBuilderEditorGroupObjectAdvancedContainer.Index = Index;
 				_GroupBuilderEditorGroupObjectAdvancedContainer.Options = Options;
 				_GroupBuilderEditorGroupObjectAdvancedContainer.Path = Path;
 				_GroupBuilderEditorGroupObjectAdvancedContainer.Initialize();
+				container.AddChild(_GroupBuilderEditorGroupObjectAdvancedContainer);
 			}
 		}
 

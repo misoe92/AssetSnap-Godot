@@ -104,11 +104,12 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 			if (_GlobalExplorer.Components.HasAll(Components.ToArray()))
 			{
 				_GroupBuilderEditorGroupObjectAdvancedContainerLevelOfDetails = GlobalExplorer.GetInstance().Components.Single<LevelOfDetails>(true);
-				_GroupBuilderEditorGroupObjectAdvancedContainerLevelOfDetails.Container = innerContainer;
 				_GroupBuilderEditorGroupObjectAdvancedContainerLevelOfDetails.Index = Index;
 				_GroupBuilderEditorGroupObjectAdvancedContainerLevelOfDetails.Options = Options;
 				_GroupBuilderEditorGroupObjectAdvancedContainerLevelOfDetails.Path = Path;
 				_GroupBuilderEditorGroupObjectAdvancedContainerLevelOfDetails.Initialize();
+
+				innerContainer.AddChild(_GroupBuilderEditorGroupObjectAdvancedContainerLevelOfDetails);
 			}
 		}
 		
@@ -122,11 +123,11 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 			if (_GlobalExplorer.Components.HasAll(Components.ToArray()))
 			{
 				_GroupBuilderEditorGroupObjectAdvancedContainerSnapLayer = GlobalExplorer.GetInstance().Components.Single<SnapLayer>(true);
-				_GroupBuilderEditorGroupObjectAdvancedContainerSnapLayer.Container = innerContainer;
 				_GroupBuilderEditorGroupObjectAdvancedContainerSnapLayer.Index = Index;
 				_GroupBuilderEditorGroupObjectAdvancedContainerSnapLayer.Options = Options;
 				_GroupBuilderEditorGroupObjectAdvancedContainerSnapLayer.Path = Path;
 				_GroupBuilderEditorGroupObjectAdvancedContainerSnapLayer.Initialize();
+				innerContainer.AddChild(_GroupBuilderEditorGroupObjectAdvancedContainerSnapLayer);
 			}
 		}
 
@@ -140,11 +141,11 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 			if (_GlobalExplorer.Components.HasAll(Components.ToArray()))
 			{
 				_GroupBuilderEditorGroupObjectAdvancedContainerSphereCollision = GlobalExplorer.GetInstance().Components.Single<SphereCollision>(true);
-				_GroupBuilderEditorGroupObjectAdvancedContainerSphereCollision.Container = innerContainer;
 				_GroupBuilderEditorGroupObjectAdvancedContainerSphereCollision.Index = Index;
 				_GroupBuilderEditorGroupObjectAdvancedContainerSphereCollision.Options = Options;
 				_GroupBuilderEditorGroupObjectAdvancedContainerSphereCollision.Path = Path;
 				_GroupBuilderEditorGroupObjectAdvancedContainerSphereCollision.Initialize();
+				innerContainer.AddChild(_GroupBuilderEditorGroupObjectAdvancedContainerSphereCollision);
 			}
 		}
 
@@ -158,11 +159,11 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 			if (_GlobalExplorer.Components.HasAll(Components.ToArray()))
 			{
 				_GroupBuilderEditorGroupObjectAdvancedContainerConvexCollision = GlobalExplorer.GetInstance().Components.Single<ConvexCollision>(true);
-				_GroupBuilderEditorGroupObjectAdvancedContainerConvexCollision.Container = innerContainer;
 				_GroupBuilderEditorGroupObjectAdvancedContainerConvexCollision.Index = Index;
 				_GroupBuilderEditorGroupObjectAdvancedContainerConvexCollision.Options = Options;
 				_GroupBuilderEditorGroupObjectAdvancedContainerConvexCollision.Path = Path;
 				_GroupBuilderEditorGroupObjectAdvancedContainerConvexCollision.Initialize();
+				innerContainer.AddChild(_GroupBuilderEditorGroupObjectAdvancedContainerConvexCollision);
 			}
 		}
 
@@ -176,11 +177,11 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 			if (_GlobalExplorer.Components.HasAll(Components.ToArray()))
 			{
 				_GroupBuilderEditorGroupObjectAdvancedContainerConcaveCollision = GlobalExplorer.GetInstance().Components.Single<ConcaveCollision>(true);
-				_GroupBuilderEditorGroupObjectAdvancedContainerConcaveCollision.Container = innerContainer;
 				_GroupBuilderEditorGroupObjectAdvancedContainerConcaveCollision.Index = Index;
 				_GroupBuilderEditorGroupObjectAdvancedContainerConcaveCollision.Options = Options;
 				_GroupBuilderEditorGroupObjectAdvancedContainerConcaveCollision.Path = Path;
 				_GroupBuilderEditorGroupObjectAdvancedContainerConcaveCollision.Initialize();
+				innerContainer.AddChild(_GroupBuilderEditorGroupObjectAdvancedContainerConcaveCollision);
 			}
 		}
 	}

@@ -296,8 +296,8 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			if (_GlobalExplorer.Components.HasAll(Components.ToArray()))
 			{
 				Topbar = _GlobalExplorer.Components.Single<EditorTopbar>();
-				Topbar.Container = this;
 				Topbar.Initialize();
+				AddChild(Topbar);
 			}
 		}
 
@@ -311,8 +311,8 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			if (_GlobalExplorer.Components.HasAll(Components.ToArray()))
 			{
 				Listing = _GlobalExplorer.Components.Single<EditorListing>();
-				Listing.Container = this;
 				Listing.Initialize();
+				AddChild(Listing);
 			}
 		}
 
@@ -326,8 +326,8 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			if (_GlobalExplorer.Components.HasAll(Components.ToArray()))
 			{
 				GroupOptions = _GlobalExplorer.Components.Single<EditorGroupOptions>();
-				GroupOptions.Container = this;
 				GroupOptions.Initialize();
+				AddChild(GroupOptions);
 			}
 		}
 	}

@@ -98,23 +98,23 @@ namespace AssetSnap.Front.Components.Library
 
 				if( _LibraryListTitle != null ) 
 				{
-					_LibraryListTitle.Container = ContainerOne;
-					_LibraryListTitle.Library = Library;
+					_LibraryListTitle.LibraryName = LibraryName;
 					_LibraryListTitle.Initialize();
+					ContainerOne.AddChild(_LibraryListTitle);
 				}
 				
 				if( _LibrarySearch != null ) 
 				{
-					_LibrarySearch.Container = ContainerTwo;
-					_LibrarySearch.Library = Library;
+					_LibrarySearch.LibraryName = LibraryName;
 					_LibrarySearch.Initialize();
+					ContainerTwo.AddChild(_LibrarySearch);
 				}
 				
 				if( _LibraryItems != null ) 
 				{
-					_LibraryItems.Container = ContainerThree;
-					_LibraryItems.Library = Library;
+					_LibraryItems.LibraryName = LibraryName;
 					_LibraryItems.Initialize();
+					ContainerThree.AddChild(_LibraryItems);
 				}
 			}
 

@@ -279,18 +279,18 @@ namespace AssetSnap.Front.Components.Groups.Builder
 
 				if (null != _GroupBuilderEditorGroupOptionPlacementSimple)
 				{
-					_GroupBuilderEditorGroupOptionPlacementSimple.Container = Trait<Containerable>().Select(2).GetInnerContainer(0);
 					_GroupBuilderEditorGroupOptionPlacementSimple.Parent = this;
 					_GroupBuilderEditorGroupOptionPlacementSimple.Initialize();
+					Trait<Containerable>().Select(2).GetInnerContainer(0).AddChild(_GroupBuilderEditorGroupOptionPlacementSimple);
 
 					_GroupBuilderEditorGroupOptionPlacementSimple.GroupOptionChanged += (string Name, Variant value) => { _UpdateGroupOption(Name, value); };
 				}
 
 				if (null != _GroupBuilderEditorGroupOptionPlacementOptimized)
 				{
-					_GroupBuilderEditorGroupOptionPlacementOptimized.Container = Trait<Containerable>().Select(2).GetInnerContainer(0);
 					_GroupBuilderEditorGroupOptionPlacementOptimized.Parent = this;
 					_GroupBuilderEditorGroupOptionPlacementOptimized.Initialize();
+					Trait<Containerable>().Select(2).GetInnerContainer(0).AddChild(_GroupBuilderEditorGroupOptionPlacementOptimized);
 
 					_GroupBuilderEditorGroupOptionPlacementOptimized.GroupOptionChanged += (string Name, Variant value) => { _UpdateGroupOption(Name, value); };
 				}
@@ -306,36 +306,36 @@ namespace AssetSnap.Front.Components.Groups.Builder
 
 				if (null != _GroupBuilderEditorGroupOptionSnapToObject)
 				{
-					_GroupBuilderEditorGroupOptionSnapToObject.Container = Trait<Containerable>().Select(2).GetInnerContainer(1);
 					_GroupBuilderEditorGroupOptionSnapToObject.Parent = this;
 					_GroupBuilderEditorGroupOptionSnapToObject.Initialize();
+					Trait<Containerable>().Select(2).GetInnerContainer(1).AddChild(_GroupBuilderEditorGroupOptionSnapToObject);
 
 					_GroupBuilderEditorGroupOptionSnapToObject.GroupOptionChanged += (string Name, Variant value) => { _UpdateGroupOption(Name, value); };
 				}
 
 				if (null != _GroupBuilderEditorGroupOptionSnapToObjectOffsetX)
 				{
-					_GroupBuilderEditorGroupOptionSnapToObjectOffsetX.Container = Trait<Containerable>().Select(2).GetInnerContainer(1);
 					_GroupBuilderEditorGroupOptionSnapToObjectOffsetX.Parent = this;
 					_GroupBuilderEditorGroupOptionSnapToObjectOffsetX.Initialize();
+					Trait<Containerable>().Select(2).GetInnerContainer(1).AddChild(_GroupBuilderEditorGroupOptionSnapToObjectOffsetX);
 
 					_GroupBuilderEditorGroupOptionSnapToObjectOffsetX.GroupOptionChanged += (string Name, Variant value) => { _UpdateGroupOption(Name, value); };
 				}
 
 				if (null != _GroupBuilderEditorGroupOptionSnapToObjectOffsetZ)
 				{
-					_GroupBuilderEditorGroupOptionSnapToObjectOffsetZ.Container = Trait<Containerable>().Select(2).GetInnerContainer(1);
 					_GroupBuilderEditorGroupOptionSnapToObjectOffsetZ.Parent = this;
 					_GroupBuilderEditorGroupOptionSnapToObjectOffsetZ.Initialize();
+					Trait<Containerable>().Select(2).GetInnerContainer(1).AddChild(_GroupBuilderEditorGroupOptionSnapToObjectOffsetZ);
 
 					_GroupBuilderEditorGroupOptionSnapToObjectOffsetZ.GroupOptionChanged += (string Name, Variant value) => { _UpdateGroupOption(Name, value); };
 				}
 
 				if (null != _GroupBuilderEditorGroupOptionSnapLayer)
 				{
-					_GroupBuilderEditorGroupOptionSnapLayer.Container = Trait<Containerable>().Select(2).GetInnerContainer(1);
 					_GroupBuilderEditorGroupOptionSnapLayer.Parent = this;
 					_GroupBuilderEditorGroupOptionSnapLayer.Initialize();
+					Trait<Containerable>().Select(2).GetInnerContainer(1).AddChild(_GroupBuilderEditorGroupOptionSnapLayer);
 
 					_GroupBuilderEditorGroupOptionSnapLayer.GroupOptionChanged += (string Name, Variant value) => { _UpdateGroupOption(Name, value); };
 				}
@@ -364,54 +364,54 @@ namespace AssetSnap.Front.Components.Groups.Builder
 
 				if (null != _GroupBuilderEditorGroupOptionSnapToHeight)
 				{
-					_GroupBuilderEditorGroupOptionSnapToHeight.Container = Trait<Containerable>().Select(2).GetInnerContainer(2);
 					_GroupBuilderEditorGroupOptionSnapToHeight.Parent = this;
 					_GroupBuilderEditorGroupOptionSnapToHeight.Initialize();
+					Trait<Containerable>().Select(2).GetInnerContainer(2).AddChild(_GroupBuilderEditorGroupOptionSnapToHeight);
 
 					_GroupBuilderEditorGroupOptionSnapToHeight.GroupOptionChanged += (string Name, Variant value) => { _UpdateGroupOption(Name, value); };
 				}
 
 				if (null != _GroupBuilderEditorGroupOptionSnapToHeightValue)
 				{
-					_GroupBuilderEditorGroupOptionSnapToHeightValue.Container = Trait<Containerable>().Select(2).GetInnerContainer(2);
 					_GroupBuilderEditorGroupOptionSnapToHeightValue.Parent = this;
 					_GroupBuilderEditorGroupOptionSnapToHeightValue.Initialize();
+					Trait<Containerable>().Select(2).GetInnerContainer(2).AddChild(_GroupBuilderEditorGroupOptionSnapToHeightValue);
 
 					_GroupBuilderEditorGroupOptionSnapToHeightValue.GroupOptionChanged += (string Name, Variant value) => { _UpdateGroupOption(Name, value); };
 				}
 
 				if (null != _GroupBuilderEditorGroupOptionSnapToX)
 				{
-					_GroupBuilderEditorGroupOptionSnapToX.Container = Trait<Containerable>().Select(2).GetInnerContainer(2);
 					_GroupBuilderEditorGroupOptionSnapToX.Parent = this;
 					_GroupBuilderEditorGroupOptionSnapToX.Initialize();
+					Trait<Containerable>().Select(2).GetInnerContainer(2).AddChild(_GroupBuilderEditorGroupOptionSnapToX);
 
 					_GroupBuilderEditorGroupOptionSnapToX.GroupOptionChanged += (string Name, Variant value) => { _UpdateGroupOption(Name, value); };
 				}
 
 				if (null != _GroupBuilderEditorGroupOptionSnapToXValue)
 				{
-					_GroupBuilderEditorGroupOptionSnapToXValue.Container = Trait<Containerable>().Select(2).GetInnerContainer(2);
 					_GroupBuilderEditorGroupOptionSnapToXValue.Parent = this;
 					_GroupBuilderEditorGroupOptionSnapToXValue.Initialize();
+					Trait<Containerable>().Select(2).GetInnerContainer(2).AddChild(_GroupBuilderEditorGroupOptionSnapToXValue);
 
 					_GroupBuilderEditorGroupOptionSnapToXValue.GroupOptionChanged += (string Name, Variant value) => { _UpdateGroupOption(Name, value); };
 				}
 
 				if (null != _GroupBuilderEditorGroupOptionSnapToZ)
 				{
-					_GroupBuilderEditorGroupOptionSnapToZ.Container = Trait<Containerable>().Select(2).GetInnerContainer(2);
 					_GroupBuilderEditorGroupOptionSnapToZ.Parent = this;
 					_GroupBuilderEditorGroupOptionSnapToZ.Initialize();
+					Trait<Containerable>().Select(2).GetInnerContainer(2).AddChild(_GroupBuilderEditorGroupOptionSnapToZ);
 
 					_GroupBuilderEditorGroupOptionSnapToZ.GroupOptionChanged += (string Name, Variant value) => { _UpdateGroupOption(Name, value); };
 				}
 
 				if (null != _GroupBuilderEditorGroupOptionSnapToZValue)
 				{
-					_GroupBuilderEditorGroupOptionSnapToZValue.Container = Trait<Containerable>().Select(2).GetInnerContainer(2);
 					_GroupBuilderEditorGroupOptionSnapToZValue.Parent = this;
 					_GroupBuilderEditorGroupOptionSnapToZValue.Initialize();
+					Trait<Containerable>().Select(2).GetInnerContainer(2).AddChild(_GroupBuilderEditorGroupOptionSnapToZValue);
 
 					_GroupBuilderEditorGroupOptionSnapToZValue.GroupOptionChanged += (string Name, Variant value) => { _UpdateGroupOption(Name, value); };
 				}
@@ -429,45 +429,45 @@ namespace AssetSnap.Front.Components.Groups.Builder
 
 				if (null != _GroupBuilderEditorGroupOptionSphereCollision)
 				{
-					_GroupBuilderEditorGroupOptionSphereCollision.Container = Trait<Containerable>().Select(2).GetInnerContainer(0);
 					_GroupBuilderEditorGroupOptionSphereCollision.Parent = this;
 					_GroupBuilderEditorGroupOptionSphereCollision.Initialize();
+					Trait<Containerable>().Select(2).GetInnerContainer(0).AddChild(_GroupBuilderEditorGroupOptionSphereCollision);
 
 					_GroupBuilderEditorGroupOptionSphereCollision.GroupOptionChanged += (string Name, Variant value) => { _UpdateGroupOption(Name, value); };
 				}
 
 				if (null != _GroupBuilderEditorGroupOptionConcaveCollision)
 				{
-					_GroupBuilderEditorGroupOptionConcaveCollision.Container = Trait<Containerable>().Select(2).GetInnerContainer(0);
 					_GroupBuilderEditorGroupOptionConcaveCollision.Parent = this;
 					_GroupBuilderEditorGroupOptionConcaveCollision.Initialize();
+					Trait<Containerable>().Select(2).GetInnerContainer(0).AddChild(_GroupBuilderEditorGroupOptionConcaveCollision);
 
 					_GroupBuilderEditorGroupOptionConcaveCollision.GroupOptionChanged += (string Name, Variant value) => { _UpdateGroupOption(Name, value); };
 				}
 
 				if (null != _GroupBuilderEditorGroupOptionConvexCollision)
 				{
-					_GroupBuilderEditorGroupOptionConvexCollision.Container = Trait<Containerable>().Select(2).GetInnerContainer(0);
 					_GroupBuilderEditorGroupOptionConvexCollision.Parent = this;
 					_GroupBuilderEditorGroupOptionConvexCollision.Initialize();
+					Trait<Containerable>().Select(2).GetInnerContainer(0).AddChild(_GroupBuilderEditorGroupOptionConvexCollision);
 
 					_GroupBuilderEditorGroupOptionConvexCollision.GroupOptionChanged += (string Name, Variant value) => { _UpdateGroupOption(Name, value); };
 				}
 
 				if (null != _GroupBuilderEditorGroupOptionConvexClean)
 				{
-					_GroupBuilderEditorGroupOptionConvexClean.Container = Trait<Containerable>().Select(2).GetInnerContainer(0);
 					_GroupBuilderEditorGroupOptionConvexClean.Parent = this;
 					_GroupBuilderEditorGroupOptionConvexClean.Initialize();
+					Trait<Containerable>().Select(2).GetInnerContainer(0).AddChild(_GroupBuilderEditorGroupOptionConvexClean);
 
 					_GroupBuilderEditorGroupOptionConvexClean.GroupOptionChanged += (string Name, Variant value) => { _UpdateGroupOption(Name, value); };
 				}
 
 				if (null != _GroupBuilderEditorGroupOptionConvexSimplify)
 				{
-					_GroupBuilderEditorGroupOptionConvexSimplify.Container = Trait<Containerable>().Select(2).GetInnerContainer(0);
 					_GroupBuilderEditorGroupOptionConvexSimplify.Parent = this;
 					_GroupBuilderEditorGroupOptionConvexSimplify.Initialize();
+					Trait<Containerable>().Select(2).GetInnerContainer(0).AddChild(_GroupBuilderEditorGroupOptionConvexSimplify);
 
 					_GroupBuilderEditorGroupOptionConvexSimplify.GroupOptionChanged += (string Name, Variant value) => { _UpdateGroupOption(Name, value); };
 				}
@@ -480,9 +480,9 @@ namespace AssetSnap.Front.Components.Groups.Builder
 
 				if (null != _GroupBuilderEditorGroupOptionFadeMode)
 				{
-					_GroupBuilderEditorGroupOptionFadeMode.Container = Trait<Containerable>().Select(2).GetInnerContainer(0);
 					_GroupBuilderEditorGroupOptionFadeMode.Parent = this;
 					_GroupBuilderEditorGroupOptionFadeMode.Initialize();
+					Trait<Containerable>().Select(2).GetInnerContainer(0).AddChild(_GroupBuilderEditorGroupOptionFadeMode);
 
 					_GroupBuilderEditorGroupOptionFadeMode.GroupOptionChanged += (string Name, Variant value) => { _UpdateGroupOption(Name, value); };
 				}
@@ -495,9 +495,9 @@ namespace AssetSnap.Front.Components.Groups.Builder
 
 				if (null != _GroupBuilderEditorGroupOptionDragOffset)
 				{
-					_GroupBuilderEditorGroupOptionDragOffset.Container = Trait<Containerable>().Select(2).GetInnerContainer(1);
 					_GroupBuilderEditorGroupOptionDragOffset.Parent = this;
 					_GroupBuilderEditorGroupOptionDragOffset.Initialize();
+					Trait<Containerable>().Select(2).GetInnerContainer(1).AddChild(_GroupBuilderEditorGroupOptionDragOffset);
 
 					_GroupBuilderEditorGroupOptionDragOffset.GroupOptionChanged += (string Name, Variant value) => { _UpdateGroupOption(Name, value); };
 				}
@@ -513,36 +513,36 @@ namespace AssetSnap.Front.Components.Groups.Builder
 
 				if (null != _GroupBuilderEditorGroupOptionVisibilityBegin)
 				{
-					_GroupBuilderEditorGroupOptionVisibilityBegin.Container = Trait<Containerable>().Select(2).GetInnerContainer(1);
 					_GroupBuilderEditorGroupOptionVisibilityBegin.Parent = this;
 					_GroupBuilderEditorGroupOptionVisibilityBegin.Initialize();
+					Trait<Containerable>().Select(2).GetInnerContainer(1).AddChild(_GroupBuilderEditorGroupOptionVisibilityBegin);
 
 					_GroupBuilderEditorGroupOptionVisibilityBegin.GroupOptionChanged += (string Name, Variant value) => { _UpdateGroupOption(Name, value); };
 				}
 				
 				if (null != _GroupBuilderEditorGroupOptionVisibilityBeginMargin)
 				{
-					_GroupBuilderEditorGroupOptionVisibilityBeginMargin.Container = Trait<Containerable>().Select(2).GetInnerContainer(1);
 					_GroupBuilderEditorGroupOptionVisibilityBeginMargin.Parent = this;
 					_GroupBuilderEditorGroupOptionVisibilityBeginMargin.Initialize();
+					Trait<Containerable>().Select(2).GetInnerContainer(1).AddChild(_GroupBuilderEditorGroupOptionVisibilityBeginMargin);
 
 					_GroupBuilderEditorGroupOptionVisibilityBeginMargin.GroupOptionChanged += (string Name, Variant value) => { _UpdateGroupOption(Name, value); };
 				}
 				
 				if (null != _GroupBuilderEditorGroupOptionVisibilityEnd)
 				{
-					_GroupBuilderEditorGroupOptionVisibilityEnd.Container = Trait<Containerable>().Select(2).GetInnerContainer(1);
 					_GroupBuilderEditorGroupOptionVisibilityEnd.Parent = this;
 					_GroupBuilderEditorGroupOptionVisibilityEnd.Initialize();
+					Trait<Containerable>().Select(2).GetInnerContainer(1).AddChild(_GroupBuilderEditorGroupOptionVisibilityEnd);
 
 					_GroupBuilderEditorGroupOptionVisibilityEnd.GroupOptionChanged += (string Name, Variant value) => { _UpdateGroupOption(Name, value); };
 				}
 				
 				if (null != _GroupBuilderEditorGroupOptionVisibilityEndMargin)
 				{
-					_GroupBuilderEditorGroupOptionVisibilityEndMargin.Container = Trait<Containerable>().Select(2).GetInnerContainer(1);
 					_GroupBuilderEditorGroupOptionVisibilityEndMargin.Parent = this;
 					_GroupBuilderEditorGroupOptionVisibilityEndMargin.Initialize();
+					Trait<Containerable>().Select(2).GetInnerContainer(1).AddChild(_GroupBuilderEditorGroupOptionVisibilityEndMargin);
 
 					_GroupBuilderEditorGroupOptionVisibilityEndMargin.GroupOptionChanged += (string Name, Variant value) => { _UpdateGroupOption(Name, value); };
 				}
@@ -556,18 +556,18 @@ namespace AssetSnap.Front.Components.Groups.Builder
 
 				if (null != _GroupBuilderEditorGroupOptionLevelOfDetailsState)
 				{
-					_GroupBuilderEditorGroupOptionLevelOfDetailsState.Container = Trait<Containerable>().Select(2).GetInnerContainer(2);
 					_GroupBuilderEditorGroupOptionLevelOfDetailsState.Parent = this;
 					_GroupBuilderEditorGroupOptionLevelOfDetailsState.Initialize();
+					Trait<Containerable>().Select(2).GetInnerContainer(2).AddChild(_GroupBuilderEditorGroupOptionLevelOfDetailsState);
 
 					_GroupBuilderEditorGroupOptionLevelOfDetailsState.GroupOptionChanged += (string Name, Variant value) => { _UpdateGroupOption(Name, value); };
 				}
 				
 				if (null != _GroupBuilderEditorGroupOptionLevelOfDetails)
 				{
-					_GroupBuilderEditorGroupOptionLevelOfDetails.Container = Trait<Containerable>().Select(2).GetInnerContainer(2);
 					_GroupBuilderEditorGroupOptionLevelOfDetails.Parent = this;
 					_GroupBuilderEditorGroupOptionLevelOfDetails.Initialize();
+					Trait<Containerable>().Select(2).GetInnerContainer(2).AddChild(_GroupBuilderEditorGroupOptionLevelOfDetails);
 
 					_GroupBuilderEditorGroupOptionLevelOfDetails.GroupOptionChanged += (string Name, Variant value) => { _UpdateGroupOption(Name, value); };
 				}
