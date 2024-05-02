@@ -238,10 +238,15 @@ As of 0.1.1
 
 As of 0.1.2
 - [x] Upgraded settings UI
-- [ ] Level of detail Control
-- [ ] Better Decal UI
+- [X] Level of detail Control
+- [X] Better Decal UI
 - [x] Better folder structure for components
 - [x] Stability fixes
+
+As of 0.1.3
+- [ ] Upgraded control around the preview of groups
+- [ ] Upgraded UI in the group builder
+- [ ] And more
 
 See the [open issues](https://github.com/misoe92/AssetSnap-Godot/issues) for a full list of proposed features (and known issues).
 
