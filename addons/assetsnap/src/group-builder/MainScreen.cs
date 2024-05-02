@@ -106,6 +106,11 @@ namespace AssetSnap.GroupBuilder
 
 		public override void _Process(double delta)
 		{
+			if( false == IsInstanceValid(this) ) 
+			{
+				return;
+			}
+			
 			// Check if a group has been set
 			// If so, render a representation of that group.
 			if (IsInstanceValid(Viewport) || false == HasGroup())
@@ -133,18 +138,21 @@ namespace AssetSnap.GroupBuilder
 
 					_marginContainer.AddChild(label);
 					AddChild(_marginContainer);
-
+ 
 					return;
 				}
 
 				return;
 			}
 
-			RemoveChild(_marginContainer);
-			_marginContainer.QueueFree();
-
-			_InitializeToolbar();
-			_InitializePreview();
+			if( IsInstanceValid(_marginContainer) ) 
+			{
+				RemoveChild(_marginContainer);
+				_marginContainer.QueueFree();
+				
+				_InitializeToolbar();
+				_InitializePreview();
+			}
 
 			base._Process(delta);
 		}
