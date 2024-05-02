@@ -68,7 +68,9 @@ namespace AssetSnap.Component
 		private new Control.SizeFlags SizeFlagsVertical = Control.SizeFlags.ShrinkCenter;
 		private ButtonType WorkingButtonType = ButtonType.DefaultButton;
 		private Control.CursorShape DefaultCursorShape = Control.CursorShape.PointingHand;
+		private Control.MouseFilterEnum MouseFilter = Control.MouseFilterEnum.Pass;
 		private Texture2D Icon;
+		private Theme Theme;
 		private HorizontalAlignment IconAlignment;
 		private string Text = "";
 		private string TooltipText = "";
@@ -102,7 +104,9 @@ namespace AssetSnap.Component
 				MouseDefaultCursorShape = DefaultCursorShape,
 				SizeFlagsHorizontal = SizeFlagsHorizontal,
 				SizeFlagsVertical = SizeFlagsVertical,
-				Visible = Visible
+				Visible = Visible,
+				MouseFilter = MouseFilter,
+				Theme = Theme,
 			};
 			
 			if( null != Icon ) 
@@ -114,7 +118,7 @@ namespace AssetSnap.Component
 			WorkingButton.SetMeta("index", Iteration);
 
 			// Connect the button to it's action
-			if( _Actions.Count >= Iteration ) 
+			if( _Actions.Count > Iteration ) 
 			{
 				Callable actionCallable = _Actions[Iteration];
 				Godot.Error error = WorkingButton.Connect( Button.SignalName.Pressed, actionCallable);
@@ -244,6 +248,19 @@ namespace AssetSnap.Component
 		{
 			TooltipText = text;
 			
+			return this;
+		}
+		
+		public Buttonable SetTheme( Theme theme ) 
+		{
+			Theme = theme;
+				
+			return this;
+		}
+		
+		public Buttonable SetMouseFilter(Control.MouseFilterEnum filter)
+		{
+			MouseFilter = filter;
 			return this;
 		}
 		
