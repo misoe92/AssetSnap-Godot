@@ -46,7 +46,7 @@ namespace AssetSnap.Trait
 		public static TraitGlobal Singleton {
 			get
 			{
-				if( _Instance == null ) 
+				if( _Instance == null || false == EditorPlugin.IsInstanceValid( _Instance ) ) 
 				{
 					_Instance = new()
 					{
