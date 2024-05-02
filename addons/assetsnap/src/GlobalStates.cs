@@ -98,11 +98,11 @@ namespace AssetSnap
 			get => _EditingTitle;
 			set
 			{
-				// if( value != _EditingTitle ) 
-				// {
-				_EditingTitle = value;
-				StateChanged("EditingTitle", value);
-				// }
+				if( value != _EditingTitle ) 
+				{
+					_EditingTitle = value;
+					StateChanged("EditingTitle", value);
+				}
 			}
 		}
 
@@ -151,6 +151,7 @@ namespace AssetSnap
 			{
 				if (value != _MultiDrop)
 				{
+					GD.Print(value);
 					_MultiDrop = value;
 					StateChanged("MultiDrop", value);
 				}

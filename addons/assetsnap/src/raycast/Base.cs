@@ -27,17 +27,12 @@ namespace AssetSnap.Raycast
 
 	public partial class Base
 	{
-		private RayCast3D _Node;
 		private Vector3 _TargetPosition;
 		private GodotObject _Collider;
 		
 		public RayCast3D Node 
 		{
-			get => _Node;
-			set
-			{
-				_Node = value;
-			}
+			get => GetNode();
 		}
 		
 		public Vector3 TargetPosition 
@@ -68,6 +63,7 @@ namespace AssetSnap.Raycast
 				return _Instance;
 			}
 		}
+		
 		/*
 		** Initializes the raycast handler
 		**
@@ -76,7 +72,6 @@ namespace AssetSnap.Raycast
 		public void Initialize()
 		{
 			InitializeNode();
-			AddNodeTo(GlobalExplorer.GetInstance()._Plugin);
 			Hide();
 		}
 		
@@ -184,12 +179,22 @@ namespace AssetSnap.Raycast
 		*/
 		public RayCast3D GetNode()
 		{
-			if( false == EditorPlugin.IsInstanceValid( Node ) ) 
+			if(
+				false == GlobalExplorer.GetInstance()._Plugin.GetInternalContainer().HasNode( "RayCast" ) ||
+				false == EditorPlugin.IsInstanceValid(GlobalExplorer.GetInstance()._Plugin.GetInternalContainer().GetNode("RayCast"))
+			) 
 			{
-				return null;
+				if( false == GlobalExplorer.GetInstance()._Plugin.GetInternalContainer().HasNode( "RayCast" ) )
+				{
+					InitializeNode();
+				}
+				else 
+				{
+					return null;
+				}
 			}
 			
-			return Node;
+			return GlobalExplorer.GetInstance()._Plugin.GetInternalContainer().GetNode("RayCast") as RayCast3D;
 		}
 		
 		/*
@@ -229,20 +234,15 @@ namespace AssetSnap.Raycast
 		*/
 		private void InitializeNode()
 		{
-			Node = new() 
+			RayCast3D Node = new() 
 			{
-				Name = "Raycast"
+				Name = "RayCast"
 			};
-		}
-		
-		/*
-		** Adds the raycast to a given node
-		**
-		** @return void
-		*/	
-		private void AddNodeTo( Node To )
-		{
-			To.AddChild(Node);
+			
+			GlobalExplorer.GetInstance()
+				._Plugin
+				.GetInternalContainer()
+				.AddChild(Node);
 		}
 		
 		/*
@@ -253,24 +253,8 @@ namespace AssetSnap.Raycast
 		private void ClearNode()
 		{
 			// Node.GetParent().RemoveChild(Node);
-			Node.QueueFree();
+			GetNode().QueueFree();
 		}
-
-		// public override void _ExitTree()
-		// {
-		// 	if( IsInstanceValid(Node) )
-		// 	{ 
-		// 		Node.QueueFree();
-		// 	}
-			
-		// 	// if( IsInstanceValid(_Collider)) 
-		// 	// {
-		// 	// 	_Collider.Free();
-		// 	// }
-			
-		// 	base._ExitTree();
-		// }
-		
 	}
 }
 #endif

@@ -50,6 +50,7 @@ namespace AssetSnap.Core
 
 			new Library.Base();
 			new ContextMenu.Base();
+			new Debug.Inspector();
 			
 			_GlobalExplorer._Plugin.FoldersLoaded += () => { _OnLoadContainers(); };
 

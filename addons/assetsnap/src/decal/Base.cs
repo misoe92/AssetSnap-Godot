@@ -25,7 +25,7 @@ namespace AssetSnap.Decal
 {
 	using AssetSnap.Explorer;
 	using AssetSnap.Front.Nodes;
-	using AssetSnap.Instance.Input;
+	using AssetSnap.States;
 	using Godot;
 
 	public partial class Base
@@ -105,10 +105,9 @@ namespace AssetSnap.Decal
 
 			InitializeNode();
 			SetInitialPosition();
-			AddNodeTo(GlobalExplorer.GetInstance()._Plugin);
 			Hide();
 		}
-
+		
 		/*
 		** Exits from the tree
 		**
@@ -121,6 +120,7 @@ namespace AssetSnap.Decal
 
 		public Vector3 GetPosition()
 		{
+			
 			return GetNode().Transform.Origin;
 		}
 
@@ -132,20 +132,20 @@ namespace AssetSnap.Decal
 		*/
 		public void _UpdateDecalPreview(bool State)
 		{
-			if (false == EditorPlugin.IsInstanceValid(_GlobalExplorer.GetHandle()) || false == EditorPlugin.IsInstanceValid(_Decal))
+			if (false == EditorPlugin.IsInstanceValid(ExplorerUtils.Get().GetHandle()) || false == EditorPlugin.IsInstanceValid(GetNode()))
 			{
 				return;
 			}
 
-			if (_GlobalExplorer.States.PlacingMode == GlobalStates.PlacingModeEnum.Group)
+			if (StatesUtils.Get().PlacingMode == GlobalStates.PlacingModeEnum.Group)
 			{
-				AsGrouped3D group = _GlobalExplorer.States.GroupedObject;
+				AsGrouped3D group = StatesUtils.Get().GroupedObject;
 				Node child = null;
 				bool ChildFound = false;
 
-				if (_Decal.GetChildCount() > 0)
+				if (GetNode().GetChildCount() > 0)
 				{
-					child = _Decal.GetChild(0);
+					child = GetNode().GetChild(0);
 					ChildFound = true;
 					ClearCurrentChildren(child, group);
 				}
@@ -153,15 +153,15 @@ namespace AssetSnap.Decal
 				PlaceDecalPreview(State, ChildFound, child, group);
 			}
 
-			if (_GlobalExplorer.States.PlacingMode == GlobalStates.PlacingModeEnum.Model)
+			if (StatesUtils.Get().PlacingMode == GlobalStates.PlacingModeEnum.Model)
 			{
-				Node model = _GlobalExplorer.GetHandle();
+				Node model = ExplorerUtils.Get().GetHandle();
 				Node Model = null;
 				bool ChildFound = false;
 
-				if (_Decal.GetChildCount() > 0)
+				if (GetNode().GetChildCount() > 0)
 				{
-					Model = _Decal.GetChild(0);
+					Model = GetNode().GetChild(0);
 					ChildFound = true;
 
 					ClearCurrentChildren(Model, model);
@@ -184,28 +184,14 @@ namespace AssetSnap.Decal
 		public void Show()
 		{
 			/** Only show if we have an actual model to show **/
-			if (
-				ExplorerUtils.Get().GetHandle() == null ||
-				ExplorerUtils.Get().GetHandle() is AsMeshInstance3D meshInstance3D &&
-				meshInstance3D.IsPlaced() ||
-				ExplorerUtils.Get().GetHandle() is AsGrouped3D grouped3d &&
-				grouped3d.IsPlaced() ||
-				ExplorerUtils.Get().GetHandle() is AsNode3D asnode3d && asnode3d.IsPlaced() ||
-				ExplorerUtils.Get().InputDriver is DragAddInputDriver _input &&
-				_input.IsDragging()
-			)
-			{
-				return;
-			}
-
-			if (null == _Decal)
+			if (null == GetNode())
 			{
 				GD.PushError("Decal not instantiated");
 				return;
 			}
 
-			_Decal.Visible = true;
-			_GlobalExplorer.States.DecalVisible = GlobalStates.VisibilityStateEnum.Visible;
+			GetNode().Visible = true;
+			StatesUtils.Get().DecalVisible = GlobalStates.VisibilityStateEnum.Visible;
 		}
 
 		/*
@@ -215,13 +201,13 @@ namespace AssetSnap.Decal
 		*/
 		public void Hide()
 		{
-			if (_Decal == null || false == _Decal.Visible)
+			if (GetNode() == null || false == GetNode().Visible)
 			{
 				return;
 			}
-
-			_Decal.Visible = false;
-			_GlobalExplorer.States.DecalVisible = GlobalStates.VisibilityStateEnum.Hidden;
+			
+			GetNode().Visible = false;
+			StatesUtils.Get().DecalVisible = GlobalStates.VisibilityStateEnum.Hidden;
 		}
 
 		/*
@@ -231,7 +217,13 @@ namespace AssetSnap.Decal
 		*/
 		public Node3D GetNode()
 		{
-			return _Decal;
+			if( false == Plugin.Singleton.GetInternalContainer().HasNode("AsDecal") ) 
+			{
+				InitializeNode();
+				SetInitialPosition();
+			}
+			
+			return Plugin.Singleton.GetInternalContainer().GetNode("AsDecal") as Node3D;
 		}
 
 		/*
@@ -262,22 +254,12 @@ namespace AssetSnap.Decal
 		*/
 		public bool IsHidden()
 		{
-			return _Decal.Visible == false;
-		}
-
-		/*
-		** Clears the models parent if it has one
-		**
-		** @param Node model
-		** @return void
-		*/
-		private void MaybeClearModelParent(Node model)
-		{
-			if (model.GetParent() != null)
+			if( false == EditorPlugin.IsInstanceValid(GetNode()))
 			{
-				// Already placed
-				model.GetParent().RemoveChild(model);
+				return true;
 			}
+			
+			return GetNode().Visible == false;
 		}
 
 		/*
@@ -292,7 +274,7 @@ namespace AssetSnap.Decal
 		{
 			if (EditorPlugin.IsInstanceValid(Model) && Model != model)
 			{
-				_Decal.RemoveChild(Model);
+				GetNode().RemoveChild(Model);
 			}
 		}
 
@@ -323,7 +305,7 @@ namespace AssetSnap.Decal
 			if (true == State && false == ChildFound)
 			{
 				EditorInterface.Singleton.EditNode(model);
-				_Decal.AddChild(model);
+				GetNode().AddChild(model);
 				if (model is AsMeshInstance3D meshInstance3D)
 				{
 					ModelMeshInstance = meshInstance3D;
@@ -354,7 +336,9 @@ namespace AssetSnap.Decal
 		*/
 		private void InitializeNode()
 		{
-			_Decal = new();
+			AsDecal3D _Decal = new();
+			Plugin.Singleton.GetInternalContainer().AddChild(_Decal);
+			StatesUtils.Get().DecalSpawned = GlobalStates.SpawnStateEnum.Spawned;
 		}
 
 		/*
@@ -365,20 +349,9 @@ namespace AssetSnap.Decal
 		*/
 		private void SetInitialPosition()
 		{
-			Transform3D Trans = _Decal.Transform;
+			Transform3D Trans = GetNode().Transform;
 			Trans.Origin = new Vector3(0, 0, 0);
-			_Decal.Transform = Trans;
-		}
-
-		/*
-		** Adds the decal node to a given node
-		**
-		** @return void
-		*/
-		private void AddNodeTo(Node To)
-		{
-			To.AddChild(_Decal);
-			_GlobalExplorer.States.DecalSpawned = GlobalStates.SpawnStateEnum.Spawned;
+			GetNode().Transform = Trans;
 		}
 
 		/*
@@ -390,16 +363,6 @@ namespace AssetSnap.Decal
 		{
 			return null != _GlobalExplorer && null != _GlobalExplorer.Settings;
 		}
-
-		// public override void _ExitTree()
-		// {
-		// 	if( IsInstanceValid(Decal)) 
-		// 	{
-		// 		Decal.QueueFree();
-		// 	}
-
-		// 	base._ExitTree();
-		// }
 	}
 }
 #endif

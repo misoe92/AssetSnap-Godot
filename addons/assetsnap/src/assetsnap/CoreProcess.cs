@@ -243,7 +243,6 @@ namespace AssetSnap.Core
 				// If it is we show it
 				ExplorerUtils.Get().Decal.Show();
 			}
-
 			// Checks if current mouse is event is motion
 			if (MouseEventIsMove() && ExplorerUtils.Get().HasProjectNormal() && ExplorerUtils.Get().HasProjectOrigin())
 			{
@@ -453,27 +452,6 @@ namespace AssetSnap.Core
 				ExplorerUtils.Get().Raycast.TargetPosition = new Vector3(0, 1000, 0);
 				ExplorerUtils.Get().Raycast.Update();
 			}
-		}
-
-		/*
-		** Fetches the instance of our current
-		** library settings
-		**
-		** @return LibrarySettings
-		*/
-		private Settings GetLibrarySettings()
-		{
-			if (false == HasLibrary())
-			{
-				return null;
-			}
-
-			if (false == HasLibrarySettings())
-			{
-				return null;
-			}
-
-			return ExplorerUtils.Get().CurrentLibrary._LibrarySettings;
 		}
 
 		/*

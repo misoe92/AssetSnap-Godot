@@ -151,7 +151,6 @@ namespace AssetSnap.Front.Components.Library
 				
 			if( null == leftInnerContainer || null == middleInnerContainer || null == rightInnerContainer)	
 			{
-				GD.Print("No found: ", filename);
 				return;
 			}
 

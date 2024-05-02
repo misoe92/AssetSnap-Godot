@@ -21,7 +21,6 @@
 // SOFTWARE.
 
 #if TOOLS
-using AssetSnap.Library;
 using Godot;
 
 namespace AssetSnap.Static

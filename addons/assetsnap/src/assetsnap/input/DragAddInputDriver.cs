@@ -26,6 +26,7 @@ namespace AssetSnap.Instance.Input
 	using AssetSnap.Front.Nodes;
 	using AssetSnap.Nodes;
 	using AssetSnap.States;
+	using AssetSnap.Static;
 	using Godot;
 
 	public class DragAddInputDriver : BaseInputDriver
@@ -74,7 +75,6 @@ namespace AssetSnap.Instance.Input
 		*/
 		public override int _Input(Camera3D Camera, InputEvent Event)
 		{
-			StatesUtils.Get().MultiDrop = true;
 			GlobalExplorer explorer = GlobalExplorer.GetInstance();
 			/** Check if Ctrl is pressed **/
 			if (
@@ -82,6 +82,11 @@ namespace AssetSnap.Instance.Input
 				Event is InputEventMouseButton _MouseButtonInitialEvent
 			)
 			{
+				if (SettingsStatic.CanMultiDrop() && InputsStatic.ShiftInputPressed(_MouseButtonInitialEvent) && InputsStatic.AltInputPressed(_MouseButtonInitialEvent))
+				{
+					StatesUtils.Get().MultiDrop = true;
+				}
+				
 				if (
 					_MouseButtonInitialEvent.ButtonIndex == MouseButton.Left &&
 					false == _MouseButtonInitialEvent.Pressed &&
@@ -91,7 +96,7 @@ namespace AssetSnap.Instance.Input
 				{
 					Dragging = true;
 					DragFrom = explorer.GetPositionDrawn();
-					explorer.Decal.Hide();
+					// explorer.Decal.Hide();
 					return (int)EditorPlugin.AfterGuiInput.Stop;
 				}
 			}

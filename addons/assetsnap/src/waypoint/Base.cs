@@ -143,12 +143,12 @@ namespace AssetSnap.Waypoint
 
 		private bool IsSimpleMode()
 		{
-			return GlobalExplorer.GetInstance().States.PlacingType == GlobalStates.PlacingTypeEnum.Simple;
+			return StatesUtils.Get().PlacingType == GlobalStates.PlacingTypeEnum.Simple;
 		}
 
 		private bool IsOptimizedMode()
 		{
-			return GlobalExplorer.GetInstance().States.PlacingType == GlobalStates.PlacingTypeEnum.Optimized;
+			return StatesUtils.Get().PlacingType == GlobalStates.PlacingTypeEnum.Optimized;
 		}
 
 		private void SimpleSpawn(Node3D model, Vector3 Origin, Vector3 Rotation, Vector3 Scale)
@@ -162,7 +162,7 @@ namespace AssetSnap.Waypoint
 			if (model is AsMeshInstance3D meshInstance3D)
 			{
 				int InstanceId = _OptimizedSpawn(meshInstance3D, Origin, Rotation, Scale);
-				GlobalExplorer.GetInstance().States.EditingObject = null;
+				StatesUtils.Get().EditingObject = null;
 				meshInstance3D.Free();
 			}
 
@@ -171,7 +171,7 @@ namespace AssetSnap.Waypoint
 				foreach (AsMeshInstance3D child in node3D.GetChildren())
 				{
 					int InstanceId = _OptimizedSpawn(child, Origin, Rotation, Scale);
-					GlobalExplorer.GetInstance().States.EditingObject = null;
+					StatesUtils.Get().EditingObject = null;
 				}
 				node3D.Free();
 			}
@@ -439,7 +439,7 @@ namespace AssetSnap.Waypoint
 				_model.GetParent().RemoveChild(_model);
 			}
 
-			SceneTree Tree = _GlobalExplorer._Plugin.GetTree();
+			SceneTree Tree = Plugin.Singleton.GetTree();
 			if (SettingsStatic.ShouldPushToScene())
 			{
 				if (_ParentContainer != null)
@@ -489,7 +489,7 @@ namespace AssetSnap.Waypoint
 				}
 				else
 				{
-					_GlobalExplorer._Plugin.AddChild(_model);
+					Plugin.Singleton.AddChild(_model);
 				}
 			}
 
