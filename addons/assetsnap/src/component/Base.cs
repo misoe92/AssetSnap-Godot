@@ -283,6 +283,7 @@ namespace AssetSnap.Component
 		*/
 		public T Single<T>( bool unique = false )
 		{
+			int CurrentCount = _Instances.Count;
 			string key = typeof(T).FullName.Replace("AssetSnap.Front.Components.", "").Split(".").Join("");
 
 			if( false == Has(key) ) 
@@ -315,10 +316,9 @@ namespace AssetSnap.Component
 			if( unique ) 
 			{
 				BaseComponent component = Activator.CreateInstance<T>() as BaseComponent;
-				component.Name = component.Name + _Instances.Count;
+				component.Name = component.Name + CurrentCount;
 				component.TypeString = typeof(T).ToString();
-				if( null != component.GetParent() && component.GetParent() == Plugin.Singleton
-				.GetInternalContainer() ) 
+				if( null != component.GetParent() && component.GetParent() == Plugin.Singleton.GetInternalContainer() ) 
 				{
 					Plugin.Singleton
 						.GetInternalContainer()
