@@ -62,9 +62,6 @@ namespace AssetSnap.Front.Nodes
 		
 		public override void _Ready() 
 		{
-			 // block unloading with a strong handle
-			var handle = System.Runtime.InteropServices.GCHandle.Alloc(this); 
-			
 			Action ResizeAction = () => { _OnResize(); };
 			
 			EditorInterface.Singleton.GetBaseControl().Connect(Control.SignalName.Resized, Callable.From(ResizeAction));
