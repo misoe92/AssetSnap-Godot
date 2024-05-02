@@ -95,7 +95,11 @@ namespace AssetSnap.Snap
 				UpdateTransform();
 			}
 
-			if (ShouldShowBoundary())
+			if (ShouldHideBoundary())
+			{
+				RemoveBoundaries();
+			}
+			else if (ShouldShowBoundary())
 			{
 				if (ShouldSnapToHeight() && false == IsAngleActive(GlobalStates.SnapAngleEnums.Y))
 				{
@@ -138,10 +142,6 @@ namespace AssetSnap.Snap
 				{
 					StatesUtils.Get().BoundarySpawned = GlobalStates.SpawnStateEnum.Null;
 				}
-			}
-			else if (ShouldHideBoundary())
-			{
-				RemoveBoundaries();
 			}
 		}
 
@@ -280,17 +280,25 @@ namespace AssetSnap.Snap
 		private bool ShouldShowBoundary()
 		{
 			return
+				(
 					StatesUtils.Get().SnapToHeight == GlobalStates.LibraryStateEnum.Enabled ||
 					StatesUtils.Get().SnapToX == GlobalStates.LibraryStateEnum.Enabled ||
-					StatesUtils.Get().SnapToZ == GlobalStates.LibraryStateEnum.Enabled;
+					StatesUtils.Get().SnapToZ == GlobalStates.LibraryStateEnum.Enabled
+				)
+				&&
+					null != StatesUtils.Get().EditingObject;
 		}
 
 		private bool ShouldHideBoundary()
 		{
 			return
-				StatesUtils.Get().SnapToHeight == GlobalStates.LibraryStateEnum.Disabled &&
-				StatesUtils.Get().SnapToX == GlobalStates.LibraryStateEnum.Disabled &&
-				StatesUtils.Get().SnapToZ == GlobalStates.LibraryStateEnum.Disabled &&
+				(
+					StatesUtils.Get().SnapToHeight == GlobalStates.LibraryStateEnum.Disabled &&
+					StatesUtils.Get().SnapToX == GlobalStates.LibraryStateEnum.Disabled &&
+					StatesUtils.Get().SnapToZ == GlobalStates.LibraryStateEnum.Disabled ||
+					null == StatesUtils.Get().EditingObject
+				)
+				&&
 				StatesUtils.Get().BoundarySpawned == GlobalStates.SpawnStateEnum.Spawned;
 		}
 	}

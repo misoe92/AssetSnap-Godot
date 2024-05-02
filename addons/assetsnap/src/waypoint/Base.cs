@@ -24,17 +24,13 @@
 namespace AssetSnap.Waypoint
 {
 	using System;
-	using System.Collections.Generic;
-	using AssetSnap.Explorer;
 	using AssetSnap.Front.Nodes;
-	using AssetSnap.Nodes;
 	using AssetSnap.States;
 	using AssetSnap.Static;
 	using Godot;
 
 	public partial class Base
 	{
-		private GlobalExplorer _GlobalExplorer;
 		private Node _ParentContainer;
 		public WaypointList WaypointList;
 		public float SnapDistance = 1.0f;
@@ -56,7 +52,6 @@ namespace AssetSnap.Waypoint
 		public void Initialize()
 		{
 			WaypointList = new();
-			_GlobalExplorer = GlobalExplorer.GetInstance();
 		}
 
 		/*
@@ -104,7 +99,7 @@ namespace AssetSnap.Waypoint
 
 				if (_model is AssetSnap.Front.Nodes.AsMeshInstance3D meshInstance3D)
 				{
-					meshInstance3D.SetLibraryName(GlobalExplorer.GetInstance().CurrentLibrary.GetName());
+					meshInstance3D.SetLibraryName(StatesUtils.Get().CurrentLibrary.GetName());
 				}
 
 				if (_model is AsNode3D node3d)
@@ -122,7 +117,6 @@ namespace AssetSnap.Waypoint
 				{
 					OptimizedSpawn(model, Origin, Rotation, Scale);
 				}
-
 			}
 			catch (Exception e)
 			{

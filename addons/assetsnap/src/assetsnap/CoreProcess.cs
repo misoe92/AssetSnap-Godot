@@ -114,6 +114,19 @@ namespace AssetSnap.Core
 			{
 				ExplorerUtils.Get().ContextMenu.Show();
 			}
+			
+			if( 
+				StatesUtils.Get().EditingObject != null &&
+				null != StatesUtils.Get().EditingObject.GetParent() &&
+				StatesUtils.Get().EditingObject.GetParent().Name == "AsDecal"
+			) 
+			{
+				ExplorerUtils.Get().Decal.Show();
+			}
+			else 
+			{
+				ExplorerUtils.Get().Decal.Hide();
+			}
 
 			if (
 				false == HasRayProjections() ||
@@ -121,10 +134,7 @@ namespace AssetSnap.Core
 				(false == HasHandle() && false == HandleIsGroup())
 			)
 			{
-				if (HasDecal())
-				{
-					ExplorerUtils.Get().Decal.Hide();
-				}
+				
 			}
 			else
 			{
@@ -237,12 +247,6 @@ namespace AssetSnap.Core
 		*/
 		private void ProcessModelHandle()
 		{
-			// Checks if our decal is hidden
-			if (ExplorerUtils.Get().Decal.IsHidden())
-			{
-				// If it is we show it
-				ExplorerUtils.Get().Decal.Show();
-			}
 			// Checks if current mouse is event is motion
 			if (MouseEventIsMove() && ExplorerUtils.Get().HasProjectNormal() && ExplorerUtils.Get().HasProjectOrigin())
 			{
@@ -284,7 +288,6 @@ namespace AssetSnap.Core
 				{
 					// Use mouse position and hard set height to 0
 					ItemTransform.Origin = new Vector3(0, 0.25f, 0);
-					ExplorerUtils.Get().Decal.Hide();
 				}
 
 				// Sets transform and resets the current mouse input
@@ -295,13 +298,6 @@ namespace AssetSnap.Core
 
 		private void ProcessGroupHandle()
 		{
-			// Checks if our decal is hidden
-			if (ExplorerUtils.Get().Decal.IsHidden())
-			{
-				// If it is we show it
-				ExplorerUtils.Get().Decal.Show();
-			}
-
 			// Checks if current mouse is event is motion
 			if (MouseEventIsMove() && ExplorerUtils.Get().HasProjectNormal() && ExplorerUtils.Get().HasProjectOrigin())
 			{
@@ -342,7 +338,6 @@ namespace AssetSnap.Core
 				{
 					// Use mouse position and hard set height to 0
 					ItemTransform.Origin = new Vector3(0, 0.25f, 0);
-					ExplorerUtils.Get().Decal.Hide();
 				}
 
 				// Sets transform and resets the current mouse input
