@@ -34,7 +34,6 @@ namespace AssetSnap.Front.Components.Library
 		private string _Folder;
 
 		private Godot.Collections.Array<HBoxContainer> Containers = new();
-		private Godot.Collections.Array<ListEntry> Items = new();
 
 		public string Folder
 		{
@@ -73,7 +72,6 @@ namespace AssetSnap.Front.Components.Library
 			base.Initialize();
 
 			Containers = new();
-			Items = new();
 			Initiated = true;
 
 			SizeFlagsHorizontal = SizeFlags.ExpandFill;
@@ -142,20 +140,20 @@ namespace AssetSnap.Front.Components.Library
 		**
 		** @return void
 		*/
-		public void Update()
+		public  void Update()
 		{
 			// _Library.RemoveAllPanelState();
 			foreach (HBoxContainer child in Trait<Containerable>().Select(1).GetInnerContainer().GetChildren())
 			{
 				if (IsInstanceValid(child))
 				{
-					_Library.RemoveAllPanelState();
+					// _Library.RemoveAllPanelState();
 					Trait<Containerable>().Select(1).GetInnerContainer().RemoveChild(child);
 					child.QueueFree();
 				}
 			}
 
-			IterateFiles(Folder, Trait<Containerable>().Select(1).GetInnerContainer());
+			 IterateFiles(Folder, Trait<Containerable>().Select(1).GetInnerContainer());
 		}
 
 		/*
@@ -168,12 +166,13 @@ namespace AssetSnap.Front.Components.Library
 		{
 			List<string> Components = new()
 			{
-				"LibraryListEntry",
+				"Library.ListEntry",
 			};
 
 			if (GlobalExplorer.GetInstance().Components.HasAll(Components.ToArray()))
 			{
 				int iteration = 0;
+				int total_iteration = 0;
 				int rows = 0;
 				int max_iteration = 4;
 
@@ -214,25 +213,25 @@ namespace AssetSnap.Front.Components.Library
 					if (IsValidExtension(extension))
 					{
 						ListEntry SingleEntry = GlobalExplorer.GetInstance().Components.Single<ListEntry>(true);
-						SingleEntry.Name = "LibraryEntry-" + ((rows + 1) * iteration);
+						SingleEntry.Name = "LibraryEntry-" + file_name + "-" + total_iteration;
 
-						SingleEntry.Container = CurrentBoxContainer;
 						SingleEntry.Folder = folderPath;
 						SingleEntry.Filename = file_name;
-						SingleEntry.Library = Library;
-						SingleEntry.Initialize();
-
-						Items.Add(SingleEntry);
+						SingleEntry.LibraryName = LibraryName;
+						SingleEntry._Initialize();
+						CurrentBoxContainer.AddChild(SingleEntry);
 
 						if (iteration == max_iteration)
 						{
 							iteration = 0;
 							rows += 1;
+							total_iteration += 1;
 
 							CurrentBoxContainer = _SetupListContainer(BoxContainer);
 						}
 						else
 						{
+							total_iteration += 1;
 							iteration += 1;
 						}
 					}
