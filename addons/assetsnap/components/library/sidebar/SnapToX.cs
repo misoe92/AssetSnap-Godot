@@ -20,11 +20,16 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using AssetSnap.Component;
+using Godot;
+
 namespace AssetSnap.Front.Components.Library.Sidebar
 {
-	using AssetSnap.Component;
-	using Godot;
-
+	/// <summary>
+	/// A component for snapping objects to the X axis.
+	/// </summary>
 	[Tool]
 	public partial class SnapToX : LSSnapComponent
 	{
@@ -35,11 +40,9 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		private readonly string _GlueTooltip = "Will glue the model to the X axis set here, which will only make it able to move on 2 vectors. (Y,Z)";
 		private readonly string _SpinBoxTooltip = "Sets the value on the X axis that the object will snap to";
 
-		/*
-		** Constructor of the component
-		** 
-		** @return void
-		*/
+		/// <summary>
+		/// Constructor of the SnapToX component.
+		/// </summary>
 		public SnapToX()
 		{
 			Name = "LSSnapToX";
@@ -54,11 +57,9 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			//_include = false;
 		}
 		
-		/*
-		** Initializing the component
-		** 
-		** @return void
-		*/
+		/// <summary>
+		/// Initializes the SnapToX component.
+		/// </summary>
 		public override void Initialize()
 		{
 			base.Initialize();
@@ -71,6 +72,10 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			Plugin.GetInstance().StatesChanged += (Godot.Collections.Array data) => { MaybeUpdateValue(data); };
 		}
 
+		/// <summary>
+        /// Updates the value of the component if necessary.
+        /// </summary>
+        /// <param name="data">Data to update.</param>
 		public override void MaybeUpdateValue(Godot.Collections.Array data)
 		{
 			if( data[0].As<string>() == "SnapToX" || data[0].As<string>() == "SnapToXValue" ) 
@@ -93,12 +98,10 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			}
 		}
 		
-		/*
-		** Initializing the checkbox that holds
-		** the state value of the component
-		** 
-		** @return void
-		*/
+		/// <summary>
+        /// Initializes the checkbox for snapping to the X axis.
+        /// </summary>
+        /// <param name="BoxContainer">The VBoxContainer to add the checkbox to.</param>
 		private void _InitializeCheckBox( VBoxContainer BoxContainer ) 
 		{
 			Callable _callable = Callable.From(() => { _OnCheckboxPressed(); });
@@ -118,13 +121,10 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 				.AddToContainer( BoxContainer );
 		}
 		
-		
-		/*
-		** Initializing the checkbox that holds
-		** the state value of the using glue option
-		** 
-		** @return void
-		*/
+		/// <summary>
+        /// Initializes the checkbox for snapping to the X axis glue.
+        /// </summary>
+        /// <param name="BoxContainer">The VBoxContainer to add the checkbox to.</param>
 		private void _InitializeGlue( VBoxContainer BoxContainer ) 
 		{
 			Callable _callable = Callable.From(() => { _OnGlueCheckboxPressed(); });
@@ -145,12 +145,10 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 				.AddToContainer( BoxContainer );
 		}
 		
-		/*
-		** Initializing the spinbox that holds
-		** the value of the component
-		** 
-		** @return void
-		*/
+		/// <summary>
+        /// Initializes the spinbox for setting the value of the X axis.
+        /// </summary>
+        /// <param name="BoxContainer">The VBoxContainer to add the spinbox to.</param>
 		private void _InitializeSpinBox( VBoxContainer BoxContainer ) 
 		{
 			Callable _callable = Callable.From((double value) => { _OnSpinBoxValueChange((float)value); });
@@ -173,12 +171,9 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 				.AddToContainer( BoxContainer );
 		}
 		
-		/*
-		** Updates spawn settings and the internal
-		** value for snapping to the Y Axis
-		** 
-		** @return void
-		*/
+		/// <summary>
+        /// Updates spawn settings and the internal value for snapping to the X axis.
+        /// </summary>
 		private void _OnCheckboxPressed()
 		{
 			bool state = false;
@@ -198,12 +193,9 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			UpdateSpawnSettings("SnapToXGlue", state);
 		}
 		
-		/*
-		** Updates spawn settings and the internal
-		** value for using glue
-		** 
-		** @return void
-		*/
+		/// <summary>
+        /// Updates spawn settings and the internal value for using glue.
+        /// </summary>
 		private void _OnGlueCheckboxPressed()
 		{
 			bool state = false;
@@ -221,12 +213,10 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			UpdateSpawnSettings("SnapToXGlue", state);
 		}
 		
-		/*
-		** Updates SpawnSettings on the model
-		** when component value is changed
-		** 
-		** @return void
-		*/
+		/// <summary>
+        /// Updates SpawnSettings on the model when the component value is changed.
+        /// </summary>
+        /// <param name="value">The new value for the X axis.</param>
 		private void _OnSpinBoxValueChange(float value)
 		{
 			_value = value;
@@ -235,12 +225,9 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			UpdateSpawnSettings("SnapXValue", value);
 		}
 		
-		/*
-		** Syncronizes it's value to a global
-		** central state controller
-		**
-		** @return void
-		*/
+		/// <summary>
+        /// Synchronizes the component's value with the global state controller.
+        /// </summary>
 		public override void Sync() 
 		{
 			if( IsValid() )
@@ -254,3 +241,5 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		}
 	}
 }
+
+#endif

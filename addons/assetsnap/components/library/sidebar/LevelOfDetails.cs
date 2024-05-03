@@ -20,16 +20,23 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using AssetSnap.Component;
+using AssetSnap.States;
+using Godot;
+
 namespace AssetSnap.Front.Components.Library.Sidebar
 {
-	using AssetSnap.Component;
-	using AssetSnap.Explorer;
-	using AssetSnap.States;
-	using Godot;
-
+	/// <summary>
+	/// A component representing the level of details settings in the library sidebar.
+	/// </summary>
 	[Tool]
 	public partial class LevelOfDetails : LibraryComponent
 	{
+		/// <summary>
+		/// Gets or sets the state of the level of details settings.
+		/// </summary>
 		public bool state 
 		{
 			get => GetState();
@@ -48,11 +55,9 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		private readonly string _CheckboxTitle = "Use specified level";
 		private readonly string _CheckboxTooltip = "When enabled you will be able to choose a Level of details level for all components spawned.";
 
-		/*
-		** Constructor for the component
-		** 
-		** @return void
-		*/	
+		/// <summary>
+		/// Constructor for the LevelOfDetails component.
+		/// </summary>
 		public LevelOfDetails()
 		{
 			Name = "LSLevelOfDetails";
@@ -67,6 +72,10 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			//_include = false;
 		}
 		
+		/// <summary>
+		/// Gets the state of the level of details settings.
+		/// </summary>
+		/// <returns>True if the level of details settings are enabled, otherwise false.</returns>
 		public bool GetState()
 		{
 			if(
@@ -79,11 +88,9 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			return HasTrait<Checkable>() && false != Trait<Checkable>().IsValid() && false != Trait<Checkable>().Select(0).IsValid() ? Trait<Checkable>().Select(0).GetValue() : false;	
 		}
 		
-		/*
-		** Initializes the component
-		** 
-		** @return void
-		*/	
+		/// <summary>
+		/// Initializes the LevelOfDetails component.
+		/// </summary>	
 		public override void Initialize()
 		{
 			base.Initialize();
@@ -140,12 +147,9 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			Plugin.GetInstance().StatesChanged += (Godot.Collections.Array data) => { MaybeUpdateValue(); };
 		}
 		
-		/*
-		** Handles synchronization of the checkboxes
-		** so it matches the state of the model
-		** 
-		** @return void
-		*/	
+		/// <summary>
+		/// Handles synchronization of the checkboxes so it matches the state of the model.
+		/// </summary>
 		public void MaybeUpdateValue()
 		{
 			if( 
@@ -156,12 +160,9 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			}
 		}
 		
-		/*
-		** Updates spawn settings values on
-		** change
-		** 
-		** @return void
-		*/	
+		/// <summary>
+		/// Handles the checkbox press event.
+		/// </summary>
 		private void _OnCheckboxPressed()
 		{
 			if( StatesUtils.Get().LevelOfDetailsState == GlobalStates.LibraryStateEnum.Disabled ) 
@@ -174,21 +175,27 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			}
 		}
 		
+		/// <summary>
+		/// Handles the change in level of details value.
+		/// </summary>
+		/// <param name="value">The new value for the level of details.</param>
 		private void _OnLevelOfDetailsChanged( double value ) 
 		{
 			StatesUtils.Get().LevelOfDetails = (float)value;
 		}
 		
+		/// <summary>
+        /// Checks if the level of details checkbox is checked.
+        /// </summary>
+        /// <returns>True if the checkbox is checked, otherwise false.</returns>
 		private bool IsCheckboxChecked()
 		{
 			return state == true;
 		}
 		
-		/*
-		** Resets the component
-		** 
-		** @return void
-		*/	
+		/// <summary>
+		/// Resets the component to its default state.
+		/// </summary>	
 		public void Reset()
 		{
 			StatesUtils.Get().LevelOfDetailsState = GlobalStates.LibraryStateEnum.Disabled;
@@ -196,6 +203,10 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			state = false;
 		}
 		
+		/// <summary>
+		/// Checks if the component is in a valid state.
+		/// </summary>
+		/// <returns>True if the component is valid, otherwise false.</returns>
 		public bool IsValid()
 		{
 			return
@@ -206,12 +217,9 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 				false != HasTrait<Checkable>();
 		}
 		
-		/*
-		** Syncronizes it's value to a global
-		** central state controller
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Synchronizes the component's value to a global central state controller.
+		/// </summary>
 		public override void Sync() 
 		{
 			if( StatesUtils.Get().LevelOfDetailsState == GlobalStates.LibraryStateEnum.Enabled ) 
@@ -221,3 +229,5 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		}
 	}
 }
+
+#endif

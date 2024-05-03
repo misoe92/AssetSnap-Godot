@@ -20,22 +20,25 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using AssetSnap.Component;
+using Godot;
+
 namespace AssetSnap.Front.Components.Library.Sidebar
 {
-	using AssetSnap.Component;
-	using Godot;
-
+	/// <summary>
+	/// Component representing a snap layer in the library sidebar.
+	/// </summary>
 	[Tool]
 	public partial class SnapLayer : LibraryComponent
 	{
 		private readonly string _Title = "Snap layer";
 		private readonly string _Tooltip = "Defines which layer the object placed will be placed on, only objects on the same layer snaps to each other.";
 
-		/*
-		** Component constructor
-		**  
-		** @return void
-		*/	
+		/// <summary>
+		/// Constructor for SnapLayer component.
+		/// </summary>
 		public SnapLayer()
 		{
 			Name = "LSSnapLayer";
@@ -48,11 +51,9 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			//_include = false;
 		}
 		 
-		/*
-		** Initializes the component
-		** 
-		** @return void
-		*/
+		/// <summary>
+		/// Initializes the SnapLayer component.
+		/// </summary>
 		public override void Initialize()
 		{
 			base.Initialize();
@@ -80,6 +81,10 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			Plugin.GetInstance().StatesChanged += (Godot.Collections.Array data) => { MaybeUpdateValue(data); };
 		}
 		
+		/// <summary>
+		/// Updates the SnapLayer value if relevant data is received.
+		/// </summary>
+		/// <param name="data">Array containing relevant data.</param>
 		private void MaybeUpdateValue(Godot.Collections.Array data)
 		{
 			if( data[0].As<string>() == "SnapLayer" ) 
@@ -90,28 +95,28 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			} 
 		}
 		
-		/*
-		** Synchronizes spawn setting value
-		** when changed
-		** 
-		** @return void
-		*/
+		/// <summary>
+		/// Handles the change in spin box value.
+		/// </summary>
+		/// <param name="value">The new value of the spin box.</param>
 		private void _OnSpinBoxValueChange( int value )
 		{
 			_GlobalExplorer.States.SnapLayer = value;						
 			UpdateSpawnSettings("SnapLayer", value);
 		}
 		
-		/*
-		** Resets the component
-		** 
-		** @return void
-		*/
+		/// <summary>
+		/// Resets the SnapLayer component.
+		/// </summary>
 		public void Reset()
 		{
 			_GlobalExplorer.States.SnapLayer = 0;
 		}
 		
+		/// <summary>
+        /// Checks if the SnapLayer component is valid.
+        /// </summary>
+        /// <returns>True if the component is valid, otherwise false.</returns>
 		public bool IsValid()
 		{
 			return
@@ -122,12 +127,9 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 				false != HasTrait<Spinboxable>();
 		}
 		
-		/*
-		** Syncronizes it's value to a global
-		** central state controller
-		**
-		** @return void
-		*/
+		/// <summary>
+        /// Syncronizes the SnapLayer value to a global central state controller.
+        /// </summary>
 		public override void Sync() 
 		{
 			if( false == IsValid() ) 
@@ -139,3 +141,5 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		}
 	}
 }
+
+#endif

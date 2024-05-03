@@ -20,23 +20,26 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using AssetSnap.Component;
+using AssetSnap.Front.Nodes;
+using Godot;
+
 namespace AssetSnap.Front.Components.Library.Sidebar
 {
-	using AssetSnap.Component;
-	using AssetSnap.Front.Nodes;
-	using Godot;
-
+	/// <summary>
+    /// Represents a simple sphere collision component.
+    /// </summary>
 	[Tool]
 	public partial class SimpleSphereCollision : LSCollisionComponent
 	{
 		private readonly string _Title = "Simple Sphere";
 		private readonly string _CheckboxTooltip = "Simple sphere collision, is fast.";
 
-		/*
-		** Constructor of the component
-		** 
-		** @return void
-		*/
+		/// <summary>
+        /// Constructor of the component.
+        /// </summary>
 		public SimpleSphereCollision()
 		{
 			Name = "LSSimpleSphereCollision";
@@ -49,11 +52,9 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			// _include = false; 
 		}
 		
-		/*
-		** Initializes the component
-		**
-		** @return void
-		*/
+		/// <summary>
+        /// Initializes the component.
+        /// </summary>
 		public override void Initialize()
 		{
 			base.Initialize();
@@ -77,12 +78,10 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			Plugin.GetInstance().StatesChanged += (Godot.Collections.Array data) => { MaybeUpdateValue(data); };
 		}
 		
-		/*
-		** Synchronizes the state of various checkboxes with
-		** their internal state.
-		**
-		** @return void
-		*/
+		/// <summary>
+        /// Synchronizes the state of various checkboxes with their internal state.
+        /// </summary>
+        /// <param name="data">An array containing the data to update.</param>
 		public override void MaybeUpdateValue(Godot.Collections.Array data)
 		{
 			if (data[0].As<string>() == "SphereCollision")
@@ -91,12 +90,9 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			}
 		}
 
-		/*
-		** Updates collisions and spawn settings
-		** of the model
-		**
-		** @return void
-		*/
+		/// <summary>
+        /// Updates collisions and spawn settings of the model.
+        /// </summary>
 		private void _OnCheckboxPressed()
 		{
 			if( false == Initiated ) 
@@ -137,33 +133,26 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 
 		}
 
-		/*
-		** Checks if the component state
-		** is active
-		** 
-		** @return bool
-		*/
+		/// <summary>
+        /// Checks if the component state is active.
+        /// </summary>
+        /// <returns>True if the component state is active, otherwise false.</returns>
 		public override bool IsActive() 
 		{
 			return _GlobalExplorer.States.SphereCollision == GlobalStates.LibraryStateEnum.Enabled;
 		}
 		
-		/*
-		** Resets the state back to disabled
-		**
-		** @return void
-		*/
+		/// <summary>
+        /// Resets the state back to disabled.
+        /// </summary>
 		public void Reset()
 		{
 			_GlobalExplorer.States.SphereCollision = GlobalStates.LibraryStateEnum.Disabled;
 		}
 		
-		/*
-		** Syncronizes it's value to a global
-		** central state controller
-		**
-		** @return void
-		*/
+		/// <summary>
+        /// Syncronizes its value to a global central state controller.
+        /// </summary>
 		public override void Sync() 
 		{
 			if(
@@ -177,3 +166,5 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		}
 	}
 }
+
+#endif

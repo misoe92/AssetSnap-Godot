@@ -20,12 +20,17 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using AssetSnap.Component;
+using AssetSnap.Front.Nodes;
+using Godot;
+
 namespace AssetSnap.Front.Components.Library.Sidebar
 {
-	using AssetSnap.Component;
-	using AssetSnap.Front.Nodes;
-	using Godot;
-
+	/// <summary>
+	/// Represents a component for convex polygon collision handling.
+	/// </summary>
 	[Tool]
 	public partial class ConvexPolygonCollision : LSCollisionComponent
 	{
@@ -37,11 +42,9 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		private readonly string _simplifyCheckboxTooltip = "If simplify is true, the geometry can be further simplified to reduce the number of vertices. Disabled by default.";
 		private bool Exited = false;
 
-		/*
-		** Constructor of the component
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Constructor of the component.
+		/// </summary>
 		public ConvexPolygonCollision()
 		{
 			Name = "LSConvexPolygonCollision";
@@ -54,11 +57,9 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			//_include = false;
 		} 
 		
-		/*
-		** Initializes the component
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Initializes the component.
+		/// </summary>
 		public override void Initialize()
 		{
 			base.Initialize();
@@ -122,12 +123,9 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			Plugin.GetInstance().StatesChanged += (Godot.Collections.Array data) => { MaybeUpdateValue(data); };
 		}
 
-		/*
-		** Synchronizes the state of various checkboxes with
-		** their internal state.
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Synchronizes the state of various checkboxes with their internal state.
+		/// </summary>
 		public override void MaybeUpdateValue(Godot.Collections.Array data)
 		{
 			if( data[0].As<string>() == "ConvexCollision" || data[0].As<string>() == "ConvexClean" || data[0].As<string>() == "ConvexSimplify" ) 
@@ -172,6 +170,9 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			}
 		}
 		
+		/// <summary>
+		/// Sets the state of the clean checkbox.
+		/// </summary>
 		public void SetCleanCheckboxState( bool state ) 
 		{
 			if( false == IsValid() )
@@ -182,6 +183,9 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			Trait<Checkable>().Select(1).SetValue( state );
 		}
 		
+		/// <summary>
+		/// Sets the state of the simplify checkbox.
+		/// </summary>
 		public void SetSimplifyCheckboxState( bool state ) 
 		{
 			if( false == IsValid() )
@@ -192,6 +196,9 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			Trait<Checkable>().Select(2).SetValue( state );
 		}
 		
+		/// <summary>
+		/// Sets the visibility of the clean checkbox.
+		/// </summary>
 		public void SetCleanCheckboxVisibility( bool state ) 
 		{
 			if( false == IsValid() )
@@ -202,6 +209,9 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			Trait<Checkable>().Select(1).SetVisible( state );
 		}
 		
+		/// <summary>
+		/// Sets the visibility of the simplify checkbox.
+		/// </summary>
 		public void SetSimplifyCheckboxVisibility( bool state )
 		{
 			if( false == IsValid() )
@@ -212,13 +222,9 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			Trait<Checkable>().Select(2).SetVisible( state );
 		}
 		
-		
-		/*
-		** Updates the state 
-		** and updates staticbody collision
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Handles checkbox press event.
+		/// </summary>
 		private void _OnCheckboxPressed()
 		{
 			Node3D handle = _GlobalExplorer.GetHandle();
@@ -256,12 +262,9 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			
 		}
 		
-		/*
-		** Updates the clean state 
-		** and updates staticbody collision
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Handles clean checkbox press event.
+		/// </summary>
 		private void _OnCleanCheckboxPressed()
 		{
 			bool state = false; 
@@ -289,12 +292,9 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			UpdateSpawnSettings(key, state);
 		}
 							
-		/*
-		** Updates the simplify state 
-		** and updates staticbody collision
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Handles simplify checkbox press event.
+		/// </summary>
 		private void _OnSimplifyCheckboxPressed()
 		{
 			bool state = false; 
@@ -321,27 +321,34 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			string key = "_LSConvexPolygonCollisionSimplify.state";
 			UpdateSpawnSettings(key, state);
 		}
-			
+		
+		/// <summary>
+		/// Checks if the simplify checkbox is active.
+		/// </summary>
 		public bool IsSimplifyActive()
 		{
 			return _GlobalExplorer.States.ConvexSimplify == GlobalStates.LibraryStateEnum.Enabled;
 		}
-			
+		
+		/// <summary>
+		/// Checks if the clean checkbox is active.
+		/// </summary>
 		public bool IsCleanActive()
 		{
 			return _GlobalExplorer.States.ConvexClean == GlobalStates.LibraryStateEnum.Enabled;
-		}		
-		/*
-		** Checks if the collision should use
-		** the ConvexPolygon collision
-		**
-		** @return bool
-		*/
+		}
+		
+		/// <summary>
+		/// Checks if the collision should use the ConvexPolygon collision.
+		/// </summary>
 		public override bool IsActive() 
 		{
 			return _GlobalExplorer.States.ConvexCollision == GlobalStates.LibraryStateEnum.Enabled;
 		}
 		
+		/// <summary>
+		/// Checks if the clean checkbox is checked.
+		/// </summary>
 		private bool CleanCheckboxChecked()
 		{
 			if( false == IsValid() )
@@ -351,7 +358,10 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			
 			return Trait<Checkable>().Select(1).GetValue();
 		}
-					
+		
+		/// <summary>
+		/// Checks if the clean checkbox is visible.
+		/// </summary>	
 		private bool CleanCheckboxVisible()
 		{
 			if( false == IsValid() )
@@ -362,7 +372,9 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			return Trait<Checkable>().Select(1).IsVisible();
 		}
 		
-
+		/// <summary>
+		/// Checks if the simplify checkbox is checked.
+		/// </summary>
 		private bool SimplifyCheckboxChecked()
 		{
 			if( false == IsValid() )
@@ -372,7 +384,10 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 
 			return Trait<Checkable>().Select(2).GetValue();
 		}
-					
+		
+		/// <summary>
+        /// Checks if the simplify checkbox is visible.
+        /// </summary>
 		private bool SimplifyCheckboxVisible()
 		{
 			if( false == IsValid() )
@@ -383,11 +398,9 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			return Trait<Checkable>().Select(2).IsVisible();
 		}
 		
-		/*
-		** Resets the state back to disabled
-		**
-		** @return void
-		*/
+		/// <summary>
+        /// Resets the state back to disabled.
+        /// </summary>
 		public void Reset()
 		{
 			_GlobalExplorer.States.ConvexCollision = GlobalStates.LibraryStateEnum.Disabled; 
@@ -395,12 +408,9 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			_GlobalExplorer.States.ConvexSimplify = GlobalStates.LibraryStateEnum.Disabled; 
 		}
 			
-		/*
-		** Syncronizes it's value to a global
-		** central state controller
-		**
-		** @return void
-		*/
+		/// <summary>
+        /// Syncronizes its value to a global central state controller.
+        /// </summary>
 		public override void Sync() 
 		{
 			if( true == Initiated && Trait<Checkable>().Select(0).IsValid() )
@@ -420,3 +430,5 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		}
 	}
 }
+
+#endif
