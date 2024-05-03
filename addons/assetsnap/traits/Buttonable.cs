@@ -23,15 +23,22 @@
 #if TOOLS
 using System;
 using Godot;
+
 namespace AssetSnap.Component
 {
-	
+	/// <summary>
+	/// A tool class for creating customizable buttons with various functionalities.
+	/// </summary>	
 	[Tool]
 	public partial class Buttonable : Trait.Base
 	{
 		/*
 		** Enums
 		*/
+		
+		/// <summary>
+		/// Enumeration of different button types.
+		/// </summary>
 		public enum ButtonType
 		{
 			DefaultButton,
@@ -55,7 +62,7 @@ namespace AssetSnap.Component
 		public Godot.Collections.Array<Callable> _Actions = new Godot.Collections.Array<Callable>();
 		
 		/*
-		** Private
+		** Private fields
 		*/
 		private new Godot.Collections.Dictionary<string, int> Margin = new()
 		{
@@ -75,21 +82,19 @@ namespace AssetSnap.Component
 		private string Text = "";
 		private string TooltipText = "";
 
+		/// <summary>
+		/// Constructor for the Buttonable class.
+		/// </summary>
 		public Buttonable()
 		{
 			Name = "Buttonable";
 			TypeString = GetType().ToString();
 		}
 		
-		/*
-		** Public methods
-		*/
-		
-		/*
-		** Instantiate an instance of the trait
-		**
-		** @return Buttonable
-		*/	
+		/// <summary>
+		/// Instantiate an instance of the trait.
+		/// </summary>
+		/// <returns>Returns the instantiated Buttonable instance.</returns>	
 		public Buttonable Instantiate()
 		{
 			base._Instantiate();
@@ -143,13 +148,11 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		/*
-		** Selects an placed button in the
-		** nodes array by Iteration
-		**
-		** @param int index
-		** @return Buttonable
-		*/
+		/// <summary>
+		/// Selects a placed button in the nodes array by Iteration.
+		/// </summary>
+		/// <param name="index">The index of the button to select.</param>
+		/// <returns>Returns the updated Buttonable instance.</returns>
 		public Buttonable Select(int index)
 		{			
 			base._Select(index);
@@ -163,13 +166,11 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		/*
-		** Selects an placed button in the
-		** nodes array by name
-		**
-		** @param string name
-		** @return Buttonable
-		*/
+		/// <summary>
+		/// Selects a placed button in the nodes array by name.
+		/// </summary>
+		/// <param name="name">The name of the button to select.</param>
+		/// <returns>Returns the updated Buttonable instance.</returns>
 		public Buttonable SelectByName( string name ) 
 		{
 			foreach( Button button in Nodes ) 
@@ -184,13 +185,10 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		/*
-		** Adds the currently chosen button
-		** to a specified container
-		**
-		** @param Node Container
-		** @return void
-		*/
+		/// <summary>
+		/// Adds the currently chosen button to a specified container.
+		/// </summary>
+		/// <param name="Container">The container to which the chosen button will be added.</param>
 		public void AddToContainer( Node Container )
 		{
 			if( false == Dependencies.ContainsKey(TraitName + "_WorkingNode")) 
@@ -201,16 +199,11 @@ namespace AssetSnap.Component
 			_AddToContainer(Container, Dependencies[TraitName + "_WorkingNode"].As<Button>());
 		}
 		
-		/*
-		** Setter Methods
-		*/
-		
-		/*
-		** Sets the name of the current button
-		**
-		** @param string text
-		** @return Buttonable
-		*/
+		/// <summary>
+		/// Sets the name of the current button.
+		/// </summary>
+		/// <param name="text">The name to set.</param>
+		/// <returns>Returns the updated Buttonable instance.</returns>
 		public Buttonable SetName( string text ) 
 		{
 			base._SetName(text);
@@ -218,12 +211,11 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		/*
-		** Sets the text of the current button
-		**
-		** @param string text
-		** @return Buttonable
-		*/
+		/// <summary>
+		/// Sets the text of the current button.
+		/// </summary>
+		/// <param name="text">The text to set.</param>
+		/// <returns>Returns the updated Buttonable instance.</returns>
 		public Buttonable SetText( string text ) 
 		{
 			if( text == "" ) 
@@ -238,12 +230,11 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		/*
-		** Sets the tooltip text of the current button
-		**
-		** @param string text
-		** @return Buttonable
-		*/
+		/// <summary>
+		/// Sets the tooltip text of the current button.
+		/// </summary>
+		/// <param name="text">The tooltip text to set.</param>
+		/// <returns>Returns the updated Buttonable instance.</returns>
 		public Buttonable SetTooltipText( string text ) 
 		{
 			TooltipText = text;
@@ -251,6 +242,11 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
+		/// <summary>
+		/// Sets the theme of the current button.
+		/// </summary>
+		/// <param name="theme">The theme to set.</param>
+		/// <returns>Returns the updated Buttonable instance.</returns>
 		public Buttonable SetTheme( Theme theme ) 
 		{
 			Theme = theme;
@@ -258,19 +254,22 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
+		/// <summary>
+        /// Sets the mouse filter for the current button.
+        /// </summary>
+        /// <param name="filter">The mouse filter to set.</param>
+        /// <returns>Returns the updated Buttonable instance.</returns>
 		public Buttonable SetMouseFilter(Control.MouseFilterEnum filter)
 		{
 			MouseFilter = filter;
 			return this;
 		}
 		
-		/*
-		** Sets the visibility state of the
-		** currently chosen button
-		**
-		** @param bool state
-		** @return Buttonable
-		*/
+		/// <summary>
+        /// Sets the visibility state of the currently chosen button.
+        /// </summary>
+        /// <param name="state">The visibility state to set.</param>
+        /// <returns>Returns the updated Buttonable instance.</returns>
 		public Buttonable SetVisible( bool state ) 
 		{
 			base._SetVisible(state);
@@ -283,13 +282,11 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		/*
-		** Sets the horizontal size flag, which controls the x
-		** axis, and how it should act.
-		**
-		** @param Control.SizeFlags flag
-		** @return Buttonable
-		*/
+		/// <summary>
+		/// Sets the horizontal size flag, which controls the x axis, and how it should act.
+		/// </summary>
+		/// <param name="flag">The Control.SizeFlags flag to set.</param>
+		/// <returns>Returns the updated Buttonable instance.</returns>
 		public override Buttonable SetHorizontalSizeFlags(Control.SizeFlags flag)
 		{
 			base.SetHorizontalSizeFlags(flag);
@@ -297,13 +294,11 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		/*
-		** Sets the vertical size flag, which controls the y
-		** axis, and how it should act.
-		**
-		** @param Control.SizeFlags flag
-		** @return Buttonable
-		*/
+		/// <summary>
+		/// Sets the vertical size flag, which controls the y axis, and how it should act.
+		/// </summary>
+		/// <param name="flag">The Control.SizeFlags flag to set.</param>
+		/// <returns>Returns the updated Buttonable instance.</returns>
 		public override Buttonable SetVerticalSizeFlags(Control.SizeFlags flag)
 		{
 			base.SetVerticalSizeFlags(flag);
@@ -311,14 +306,11 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		/*
-		** Sets the theme type of the button,
-		** which lays out a set of specified rules
-		** from the theme that the button follows
-		**
-		** @param ButtonType type
-		** @return Buttonable
-		*/
+		/// <summary>
+        /// Sets the theme type of the button.
+        /// </summary>
+        /// <param name="type">The button type to set.</param>
+        /// <returns>Returns the updated Buttonable instance.</returns>
 		public Buttonable SetType( ButtonType type ) 
 		{
 			WorkingButtonType = type;
@@ -326,13 +318,11 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		/*
-		** Sets the cursorshape of the
-		** currently chosen button
-		**
-		** @param Control.CursorShape shape
-		** @return Buttonable
-		*/
+		/// <summary>
+        /// Sets the cursor shape of the currently chosen button.
+        /// </summary>
+        /// <param name="shape">The cursor shape to set.</param>
+        /// <returns>Returns the updated Buttonable instance.</returns>
 		public Buttonable SetCursorShape( Control.CursorShape shape ) 
 		{
 			DefaultCursorShape = shape;
@@ -340,13 +330,11 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		/*
-		** Sets the icon of the
-		** currently chosen button
-		**
-		** @param Texture2D icon
-		** @return Buttonable
-		*/
+		/// <summary>
+        /// Sets the icon of the currently chosen button.
+        /// </summary>
+        /// <param name="icon">The icon to set.</param>
+        /// <returns>Returns the updated Buttonable instance.</returns>
 		public Buttonable SetIcon( Texture2D icon )
 		{
 			Icon = icon;
@@ -359,14 +347,11 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		/*
-		** Sets the icon alignment
-		** of the currently chosen
-		** button
-		**
-		** @param HorizontalAlignment alignment
-		** @return Buttonable
-		*/
+		/// <summary>
+        /// Sets the icon alignment of the currently chosen button.
+        /// </summary>
+        /// <param name="alignment">The icon alignment to set.</param>
+        /// <returns>Returns the updated Buttonable instance.</returns>
 		public Buttonable SetIconAlignment( HorizontalAlignment alignment )
 		{
 			IconAlignment = alignment;
@@ -374,13 +359,11 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		/*
-		** Sets the action for the
-		** currently chosen button
-		**
-		** @param Action action
-		** @return Buttonable
-		*/
+		/// <summary>
+        /// Sets the action for the currently chosen button.
+        /// </summary>
+        /// <param name="action">The action to set.</param>
+        /// <returns>Returns the updated Buttonable instance.</returns>
 		public Buttonable SetAction( Action action ) 
 		{
 			_Actions.Add(Callable.From(action));
@@ -388,14 +371,12 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		/*
-		** Sets margin values for 
-		** the currently chosen button
-		**
-		** @param int value
-		** @param string side
-		** @return Buttonable
-		*/
+		/// <summary>
+        /// Sets margin values for the currently chosen button.
+        /// </summary>
+        /// <param name="value">The margin value.</param>
+        /// <param name="side">The side for which to set the margin.</param>
+        /// <returns>Returns the updated Buttonable instance.</returns>
 		public Buttonable SetMargin( int value, string side = "" ) 
 		{
 			if( side == "" ) 
@@ -413,31 +394,18 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		/*
-		** Booleans
-		*/
-		
-		/*
-		** Checks if the currently
-		** chosen button is visible
-		**
-		** @return bool
-		*/
+		/// <summary>
+        /// Checks if the currently chosen button is visible.
+        /// </summary>
+        /// <returns>Returns true if the button is visible; otherwise, false.</returns>
 		public bool IsVisible()
 		{
 			return Visible;
 		}
 		
-		/*
-		** Private
-		*/
-		
-		/*
-		** Resets the trait to
-		** a cleared state
-		**
-		** @return void
-		*/
+		/// <summary>
+        /// Resets the trait to a cleared state.
+        /// </summary>
 		private void Reset()
 		{
 			Text = "";
