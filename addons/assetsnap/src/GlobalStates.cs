@@ -21,6 +21,7 @@
 // SOFTWARE.
 
 #if TOOLS
+
 namespace AssetSnap
 {
 	using System;
@@ -31,6 +32,9 @@ namespace AssetSnap
 	using AssetSnap.Front.Nodes;
 	using Godot;
 
+	/// <summary>
+	/// This class represents the global states for the AssetSnap tool.
+	/// </summary>
 	[Tool]
 	public partial class GlobalStates : LoadStates
 	{
@@ -91,6 +95,9 @@ namespace AssetSnap
 		private Node _CurrentScene = null;
 		private Library.Instance _CurrentLibrary = null;
 
+		/// <summary>
+		/// Gets or sets the title of the currently edited object.
+		/// </summary>
 		[ExportCategory("General")]
 		[Export]
 		public string EditingTitle
@@ -106,6 +113,9 @@ namespace AssetSnap
 			}
 		}
 
+		/// <summary>
+		/// Gets or sets the currently edited object.
+		/// </summary>
 		[Export]
 		public Node3D EditingObject
 		{
@@ -129,6 +139,9 @@ namespace AssetSnap
 			}
 		}
 
+		/// <summary>
+		/// Gets or sets a value indicating whether the currently edited object is placed in the scene.
+		/// </summary>
 		[Export]
 		public bool EditingObjectIsPlaced
 		{
@@ -722,7 +735,6 @@ namespace AssetSnap
 		}
 
 		public Godot.Collections.Dictionary<Mesh, Godot.Collections.Array<AsOptimizedMultiMeshGroup3D>> OptimizedGroups = new();
-
 		public string Name = "GlobalStates";
 
 		private static GlobalStates _Instance;
@@ -739,6 +751,11 @@ namespace AssetSnap
 			}
 		}
 
+		/// <summary>
+		/// Checks if the class has a field or property with the given name.
+		/// </summary>
+		/// <param name="name">The name of the field or property to check.</param>
+		/// <returns>True if the class has a field or property with the given name, otherwise false.</returns>
 		public bool Has(string name)
 		{
 			// Get all fields and properties of the class
@@ -761,6 +778,12 @@ namespace AssetSnap
 			return false;
 		}
 		
+		/// <summary>
+		/// Checks if the value associated with a key matches the provided value.
+		/// </summary>
+		/// <param name="key">The key to check.</param>
+		/// <param name="value">The value to compare.</param>
+		/// <returns>True if the value associated with the key matches the provided value, otherwise false.</returns>
 		public bool Is(string key, Variant value) 
 		{
 			Variant KeyValue = Key(key);
@@ -792,6 +815,11 @@ namespace AssetSnap
 			return false;
 		}
 
+		/// <summary>
+		/// Retrieves the value associated with a given key.
+		/// </summary>
+		/// <param name="name">The name of the key.</param>
+		/// <returns>The value associated with the key.</returns>
 		public Variant Key(string name)
 		{
 			// Get the type of the class
@@ -851,6 +879,11 @@ namespace AssetSnap
 			return "";
 		}
 
+		/// <summary>
+        /// Sets the value associated with a given key.
+        /// </summary>
+        /// <param name="name">The name of the key.</param>
+        /// <param name="value">The value to set.</param>
 		public void Set(string name, Variant value)
 		{
 			// Get the type of the class
@@ -901,8 +934,6 @@ namespace AssetSnap
 				else if (property != null)
 					property.SetValue(this, typedValue);
 			}
-
-			// StateChanged(name, value);
 		}
 	}
 }
