@@ -21,13 +21,15 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using AssetSnap.Component;
+using AssetSnap.Explorer;
+using AssetSnap.Static;
+using Godot;
+	
 namespace AssetSnap.Front.Components
 {
-	using AssetSnap.Component;
-	using AssetSnap.Explorer;
-	using AssetSnap.Static;
-	using Godot;
-
 	[Tool]
 	public partial class SettingsSpinBox : TraitableComponent
 	{
@@ -233,3 +235,5 @@ namespace AssetSnap.Front.Components
 		}
 	}
 }
+
+#endif

@@ -20,46 +20,74 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using System;
+using AssetSnap.Explorer;
+using Godot;
+
 namespace AssetSnap.Front.Nodes
 {
-	using System;
-	using AssetSnap.Explorer;
-	using Godot;
-
+	/// <summary>
+	/// Custom StaticBody3D node used for collision handling in AssetSnap.
+	/// </summary>
 	[Tool]
 	public partial class AsStaticBody3D : StaticBody3D
 	{
 		private bool IsModelPlaced { get; set; } = false;
+		private Vector3 InstanceOrigin;
 
 		[ExportGroup("Settings")]
 
+		/// <summary>
+		/// The parent node for this static body.
+		/// </summary>
 		[Export]
 		public Node3D Parent { get; set; }
 
+		/// <summary>
+		/// The axis-aligned bounding box of the model.
+		/// </summary>
 		[Export]
 		public Aabb ModelAabb { get; set; }
 
+		/// <summary>
+		/// The type of collision for the model.
+		/// </summary>
 		[Export]
 		public AssetSnap.Nodes.ModelCollision.Type CollisionType { get; set; }
 
+		/// <summary>
+		/// The convex type of collision for the model.
+		/// </summary>
 		[Export]
 		public AssetSnap.Nodes.ModelCollision.ConvexType CollisionSubType { get; set; } = AssetSnap.Nodes.ModelCollision.ConvexType.None;
 
+		/// <summary>
+		/// Indicates whether multi-mesh is being used.
+		/// </summary>
 		[Export]
 		public bool UsingMultiMesh { get; set; } = false;
 
-		private Vector3 InstanceOrigin;
 
+		/// <summary>
+		/// Constructor for AsStaticBody3D class.
+		/// </summary>
 		public AsStaticBody3D()
 		{
 			SetMeta("AsBody", true);
 		}
 
+		/// <summary>
+		/// Checks if the node has been placed in the scene.
+		/// </summary>
+		/// <returns>True if the node has been placed, false otherwise.</returns>
 		public bool IsPlaced()
 		{
 			return GetParent() != null;
 		}
 
+		/// <summary>
+		/// Initializes the static body node.
+		/// </summary>
 		public void Initialize()
 		{
 			try
@@ -89,6 +117,11 @@ namespace AssetSnap.Front.Nodes
 			}
 		}
 
+		/// <summary>
+		/// Updates the static body node.
+		/// </summary>
+		/// <param name="Type">The type of update.</param>
+		/// <param name="Value">The value of the update.</param>
 		public void Update(string Type, Vector3 Value)
 		{
 			if ("Scale" == Type)
@@ -101,6 +134,9 @@ namespace AssetSnap.Front.Nodes
 			}
 		}
 
+		/// <summary>
+		/// Updates the collision of the static body node.
+		/// </summary>
 		public void UpdateCollision()
 		{
 			// Remove current collisions and free them
@@ -114,6 +150,9 @@ namespace AssetSnap.Front.Nodes
 			Initialize();
 		}
 
+		/// <summary>
+		/// Initializes the collision instance based on the specified collision type.
+		/// </summary>
 		private void _InitializeCollisionInstance()
 		{
 			SceneTree Tree = Plugin.Singleton.GetTree();
@@ -141,6 +180,11 @@ namespace AssetSnap.Front.Nodes
 			}
 		}
 
+		/// <summary>
+		/// Creates simple collision shapes and adds them to the node's children.
+		/// </summary>
+		/// <param name="Tree">The SceneTree instance.</param>
+		/// <param name="IsSphere">Specifies whether to create a sphere shape (default: false).</param>
 		private void _SimpleCollisions(SceneTree Tree, bool IsSphere = false)
 		{
 			try
@@ -167,6 +211,11 @@ namespace AssetSnap.Front.Nodes
 			}
 		}
 
+		/// <summary>
+		/// Creates simple collision shapes.
+		/// </summary>
+		/// <param name="IsSphere">Specifies whether to create a sphere shape.</param>
+		/// <returns>The created shape.</returns>
 		private Shape3D CreateSimpleShape(bool IsSphere)
 		{
 			Shape3D _Shape = null;
@@ -212,6 +261,10 @@ namespace AssetSnap.Front.Nodes
 			return _Shape;
 		}
 
+		/// <summary>
+		/// Creates convex collision shapes and adds them to the node's children.
+		/// </summary>
+		/// <param name="Tree">The SceneTree instance.</param>
 		private void _ConvexCollisions(SceneTree Tree)
 		{
 			ConvexPolygonShape3D _Shape = new();
@@ -265,16 +318,30 @@ namespace AssetSnap.Front.Nodes
 			_Collision.Owner = Tree.EditedSceneRoot;
 		}
 
+		/// <summary>
+		/// Checks if the given state corresponds to a clean condition.
+		/// </summary>
+		/// <param name="state">The state value.</param>
+		/// <returns>True if the state indicates a clean condition, false otherwise.</returns>
 		private bool _IsClean(int state)
 		{
 			return state == 1 || state == 3;
 		}
 
+		/// <summary>
+		/// Checks if the given state corresponds to a simplified condition.
+		/// </summary>
+		/// <param name="state">The state value.</param>
+		/// <returns>True if the state indicates a simplified condition, false otherwise.</returns>
 		private bool _IsSimplify(int state)
 		{
 			return state == 2 || state == 3;
 		}
 
+		/// <summary>
+		/// Adds concave collision shapes to the node's children.
+		/// </summary>
+		/// <param name="Tree">The SceneTree instance.</param>
 		private void _ConcaveCollisions(SceneTree Tree)
 		{
 			// We merely need to add it to our main node
@@ -286,6 +353,10 @@ namespace AssetSnap.Front.Nodes
 
 		}
 
+		/// <summary>
+		/// Creates a concave collision shape.
+		/// </summary>
+		/// <returns>The concave collision shape.</returns>
 		private CollisionShape3D CreateConcaveCollision()
 		{
 			ConcavePolygonShape3D _Shape = new();
@@ -324,6 +395,10 @@ namespace AssetSnap.Front.Nodes
 			return _Collision;
 		}
 
+		/// <summary>
+		/// Applies transformation to the collision shape.
+		/// </summary>
+		/// <param name="_Collision">The collision shape to transform.</param>
 		private void _ApplyCollisionTransform(CollisionShape3D _Collision)
 		{
 			Aabb aabb = new();
@@ -349,12 +424,19 @@ namespace AssetSnap.Front.Nodes
 			ColTrans.Origin.Y += aabb.Size.Y / 2;
 			_Collision.Transform = ColTrans;
 		}
-
+		
+		/// <summary>
+		/// Applies meta information to the collision shape.
+		/// </summary>
+		/// <param name="_Collision">The collision shape to apply meta information.</param>
 		private void _ApplyCollisionMeta(CollisionShape3D _Collision)
 		{
 			_Collision.SetMeta("AsCollision", true);
 		}
 
+		/// <summary>
+		/// Called when the node is about to be removed from the scene tree.
+		/// </summary>
 		public override void _ExitTree()
 		{
 			base._ExitTree();
