@@ -20,14 +20,20 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using AssetSnap.Explorer;
+using Godot;
+
 namespace AssetSnap.Abstracts
 {
-	using AssetSnap.Explorer;
-	using Godot;
-
+	/// <summary>
+	/// Base class for component-based functionality.
+	/// </summary>
 	[Tool]
 	public abstract partial class AbstractComponentBase : VBoxContainer
 	{
+		/// <summary>
+        /// Gets the global explorer instance.
+        /// </summary>
 		protected GlobalExplorer _GlobalExplorer { get => ExplorerUtils.Get(); }
 		// protected Plugin _Plugin { get => _GlobalExplorer._Plugin; }
 		// protected Component.Base Components { get => _GlobalExplorer.Components; }
@@ -41,11 +47,10 @@ namespace AssetSnap.Abstracts
 		// protected BaseInputDriver InputDriver { get => _GlobalExplorer.InputDriver; }
 		// protected SettingsConfig Settings { get => _GlobalExplorer.Settings; }
 
-		/*
-		** Fetches handle from the global class
-		**
-		** @return Node3D
-		*/
+		/// <summary>
+        /// Fetches the handle from the global explorer.
+        /// </summary>
+        /// <returns>The handle node.</returns>
 		public Node3D GetHandle() 
 		{
 			return _GlobalExplorer.GetHandle();

@@ -22,14 +22,43 @@
 
 using Godot;
 
-[Tool]
-public partial class GroupedConnection
+namespace AssetSnap.Front.Nodes
 {
-	public int InstanceId { get; set; }
-	public AsGrouped3D Source;
-	public Mesh InstanceMesh { get; set; }
-	
-	public virtual void Update(Transform3D transform){}
-	public virtual void UpdateUsing(Transform3D transform, Godot.Collections.Dictionary<string, Variant> Options){}
-	
+	/// <summary>
+	/// Partial class representing a grouped connection.
+	/// </summary>
+	[Tool]
+	public partial class GroupedConnection
+	{
+		/// <summary>
+		/// Gets or sets the instance ID.
+		/// </summary>
+		public int InstanceId { get; set; }
+		
+		/// <summary>
+		/// Gets or sets the source of the grouped connection.
+		/// </summary>
+		public AsGrouped3D Source;
+		
+		/// <summary>
+		/// Gets or sets the mesh of the instance.
+		/// </summary>
+		public Mesh InstanceMesh { get; set; }
+		
+		/// <summary>
+		/// Updates the grouped connection using the given transform.
+		/// </summary>
+		/// <param name="transform">The transform to apply to the connection.</param>
+		/// <returns>Void.</returns>
+		public virtual void Update(Transform3D transform){}
+		
+		/// <summary>
+        /// Updates the grouped connection using the given transform and options.
+        /// </summary>
+        /// <param name="transform">The transform to apply to the connection.</param>
+        /// <param name="Options">The dictionary of options to apply.</param>
+        /// <returns>Void.</returns>
+		public virtual void UpdateUsing(Transform3D transform, Godot.Collections.Dictionary<string, Variant> Options){}
+		
+	}
 }

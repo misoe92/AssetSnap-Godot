@@ -20,81 +20,154 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using System;
+using System.Reflection;
+using Godot;
+
 namespace AssetSnap.Front.Nodes
 {
-	using System;
-	using System.Reflection;
-	using Godot;
-
+	/// <summary>
+	/// Represents a group resource.
+	/// </summary>
 	[Tool]
 	public partial class GroupResource : Resource
 	{
+		/// <summary>
+		/// The name of the group resource.
+		/// </summary>
 		[Export]
 		public string Name { get; set; } = "";
 
+		/// <summary>
+		/// The title of the group resource.
+		/// </summary>
 		[Export]
 		public string Title { get; set; } = "";
 
+		/// <summary>
+		/// The paths of resource.
+		/// </summary>
 		[Export]
 		public Godot.Collections.Array<string> _Paths { get; set; } = new();
 
+		/// <summary>
+		/// The origins of resource.
+		/// </summary>
 		[Export]
 		public Godot.Collections.Dictionary<int, Vector3> _Origins { get; set; } = new();
 
+		/// <summary>
+		/// The rotations of resource.
+		/// </summary>
 		[Export]
 		public Godot.Collections.Dictionary<int, Vector3> _Rotations { get; set; } = new();
 
+		/// <summary>
+		/// The scales of resource.
+		/// </summary>
 		[Export]
 		public Godot.Collections.Dictionary<int, Vector3> _Scales { get; set; } = new();
 
+		/// <summary>
+		/// The options for resource children.
+		/// </summary>
 		[Export]
 		public Godot.Collections.Array<Godot.Collections.Dictionary<string, Variant>> _Options { get; set; } = new();
 
+		/// <summary>
+		/// The snap layer value.
+		/// </summary>
 		[Export]
 		public int SnapLayer { get; set; } = 0;
 
+		/// <summary>
+		/// The X value for snapping to object offset.
+		/// </summary>
 		[Export]
 		public float SnapToObjectOffsetXValue { get; set; } = 0.0f;
 
+		/// <summary>
+		/// The Z value for snapping to object offset.
+		/// </summary>
 		[Export]
 		public float SnapToObjectOffsetZValue { get; set; } = 0.0f;
 
+		/// <summary>
+		/// The snap to height value.
+		/// </summary>
 		[Export]
 		public float SnapToHeightValue { get; set; } = 0.0f;
 
+		/// <summary>
+		/// The snap to X value.
+		/// </summary>
 		[Export]
 		public float SnapToXValue { get; set; } = 0.0f;
 
+		/// <summary>
+		/// The snap to Z value.
+		/// </summary>
 		[Export]
 		public float SnapToZValue { get; set; } = 0.0f;
 
+		/// <summary>
+		/// Indicates whether sphere collision is enabled.
+		/// </summary>
 		[Export]
 		public bool SphereCollision { get; set; } = false;
 
+		/// <summary>
+		/// Indicates whether convex collision is enabled.
+		/// </summary>
 		[Export]
 		public bool ConvexCollision { get; set; } = false;
 
+		/// <summary>
+		/// Indicates whether convex clean is enabled.
+		/// </summary>
 		[Export]
 		public bool ConvexClean { get; set; } = false;
 
+		/// <summary>
+		/// Indicates whether convex simplify is enabled.
+		/// </summary>
 		[Export]
 		public bool ConvexSimplify { get; set; } = false;
 
+		/// <summary>
+		/// Indicates whether concave collision is enabled.
+		/// </summary>
 		[Export]
 		public bool ConcaveCollision { get; set; } = false;
 
+		/// <summary>
+		/// Indicates whether snapping to object is enabled.
+		/// </summary>
 		[Export]
 		public bool SnapToObject { get; set; } = false;
 
+		/// <summary>
+		/// Indicates whether snapping to height is enabled.
+		/// </summary>
 		[Export]
 		public bool SnapToHeight { get; set; } = false;
 
+		/// <summary>
+		/// Indicates whether snapping to X is enabled.
+		/// </summary>
 		[Export]
 		public bool SnapToX { get; set; } = false;
 
+		/// <summary>
+        /// Indicates whether snapping to Z is enabled.
+        /// </summary>
 		[Export]
 		public bool SnapToZ { get; set; } = false;
 
+		/// <summary>
+		/// Iterates over each property and performs an action.
+		/// </summary>
+		/// <param name="action">The action to perform on each property.</param>
 		public void EachProperty(Action<string, Variant> action)
 		{
 			Godot.Collections.Array<string> properties = new()
@@ -150,6 +223,11 @@ namespace AssetSnap.Front.Nodes
 			}
 		}
 
+		/// <summary>
+		/// Adds children to a grouped 3D object.
+		/// </summary>
+		/// <param name="group">The grouped 3D object.</param>
+		/// <param name="childOptions">Options for each child.</param>
 		public void AddChildren(AsGrouped3D group, Godot.Collections.Array<Godot.Collections.Dictionary<string, Variant>> childOptions)
 		{
 			for (int i = 0; i < _Paths.Count; i++)
@@ -225,6 +303,11 @@ namespace AssetSnap.Front.Nodes
 			}
 		}
 
+		/// <summary>
+		/// Adds colliding children to a grouped 3D object.
+		/// </summary>
+		/// <param name="group">The grouped 3D object.</param>
+		/// <param name="childOptions">Options for each child.</param>
 		public void AddCollidingChildren(AsGrouped3D group, Godot.Collections.Array<Godot.Collections.Dictionary<string, Variant>> childOptions)
 		{
 			// Add all children
@@ -298,6 +381,10 @@ namespace AssetSnap.Front.Nodes
 			}
 		}
 
+		/// <summary>
+		/// Builds a grouped 3D object.
+		/// </summary>
+		/// <returns>The built grouped 3D object.</returns>
 		public AsGrouped3D Build()
 		{
 			// Initialize variables to store distances

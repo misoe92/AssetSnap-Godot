@@ -19,12 +19,15 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+
 using AssetSnap.Explorer;
 using AssetSnap.Library;
 using AssetSnap.Nodes;
 using AssetSnap.States;
 using Godot;
 
+namespace AssetSnap.Front.Nodes
+{
 [Tool]
 public partial class AsNode3D : Node3D, IDriverableModel
 {

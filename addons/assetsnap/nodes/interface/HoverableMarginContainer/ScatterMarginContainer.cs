@@ -20,20 +20,22 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using AssetSnap.Explorer;
+using Godot;
+
 namespace AssetSnap.Front.Nodes.Hoverable
 {
-    using AssetSnap.Explorer;
-    using Godot;
-
+	/// <summary>
+    /// Partial class representing a margin container that responds to hover events and applies a Scatter modifier on click.
+    /// </summary>
 	[Tool]
 	public partial class ScatterMarginContainer : HoverableMarginContainer
 	{
-		/*
-		** Applies the Scatter modifier on click
-		**
-		** @param InputEvent @event
-		** @return void
-		*/
+		/// <summary>
+        /// Handles the mouse click event to apply the Scatter modifier.
+        /// </summary>
+        /// <param name="event">The input event representing the mouse click.</param>
+        /// <returns>Void.</returns>
 		public override void _MouseClick( InputEvent @event )
 		{
 			if( @event is InputEventMouseButton EventMouseButton ) 

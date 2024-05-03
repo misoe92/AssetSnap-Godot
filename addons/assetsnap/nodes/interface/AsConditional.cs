@@ -21,16 +21,23 @@
 // SOFTWARE.
 
 #if TOOLS
+
+using Godot;
+
 namespace AssetSnap.Front.Nodes
 {
-	using Godot;
-
+	/// <summary>
+	/// Represents a control for conditional visibility based on the presence of certain values in a list.
+	/// </summary>
 	[Tool]
 	public partial class AsConditional : Control
 	{
 		private Control Control_;
 		private Callable _Callable;
 		
+		/// <summary>
+		/// Gets or sets the control to be observed for conditional visibility.
+		/// </summary>
 		[Export]
 		public Control _Control 
 		{
@@ -41,15 +48,17 @@ namespace AssetSnap.Front.Nodes
 			}
 		}
 
+		/// <summary>
+        /// Gets or sets an array of values to check for in the associated control.
+        /// </summary>
 		[Export]
 		public string[] values;
 
-		/*
-		** Handles visibility state of the node
-		**
-		** @param double delta
-		** @return void
-		*/
+		/// <summary>
+        /// Handles the visibility state of the node based on the presence of certain values in the associated control.
+        /// </summary>
+        /// <param name="delta">The time elapsed since the last frame, in seconds.</param>
+        /// <returns>void</returns>
 		public override void _Process(double delta)
 		{
 			if(Control_ == null || _Control.GetParent() == null || GetParent<Control>().Visible == false) 
@@ -79,4 +88,5 @@ namespace AssetSnap.Front.Nodes
 		}
 	} 
 }
+
 #endif

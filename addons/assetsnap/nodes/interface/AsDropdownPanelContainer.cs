@@ -21,10 +21,14 @@
 // SOFTWARE.
 
 #if TOOLS
+
+using Godot;
+
 namespace AssetSnap.Front.Nodes
 {
-	using Godot;
-
+	/// <summary>
+    /// Represents a dropdown panel container for displaying dropdown menus.
+    /// </summary>
 	[Tool]
 	public partial class AsDropdownPanelContainer : PanelContainer
 	{
@@ -33,8 +37,7 @@ namespace AssetSnap.Front.Nodes
 		public VBoxContainer panelInnerContainer;
 		public Button SelectedBlock;
 		public VBoxContainer ItemsInnerContainer;
-		
-		
 	}
 }
+
 #endif

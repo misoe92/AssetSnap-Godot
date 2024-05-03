@@ -23,6 +23,7 @@
 using System.Collections.Generic;
 using AssetSnap.Explorer;
 using AssetSnap.Front.Components.Library;
+using AssetSnap.Front.Nodes;
 using Godot;
 
 namespace AssetSnap.Library

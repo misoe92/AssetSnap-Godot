@@ -21,25 +21,34 @@
 // SOFTWARE.
 
 #if TOOLS
+
 using Godot;
 
-public partial class AsModelViewerRect : TextureRect
+namespace AssetSnap.Front.Nodes
 {
-	/*
-	** Sets the preview texture after it has 
-	** fully loaded
-	** 
-	** @return void
-	*/
-	public void _MeshPreviewReady(string Path, Texture2D preview, Texture2D texture_preview, TextureRect textureRect)
+	/// <summary>
+	/// Represents a TextureRect for displaying preview textures of a model.
+	/// </summary>
+	public partial class AsModelViewerRect : TextureRect
 	{
-		if( null == preview && null == texture_preview ) 
+		/// <summary>
+        /// Sets the preview texture after it has fully loaded.
+        /// </summary>
+        /// <param name="Path">The path to the preview texture.</param>
+        /// <param name="preview">The preview texture.</param>
+        /// <param name="texture_preview">The texture preview.</param>
+        /// <param name="textureRect">The TextureRect to set the texture on.</param>
+		public void _MeshPreviewReady(string Path, Texture2D preview, Texture2D texture_preview, TextureRect textureRect)
 		{
-			GD.Print("Invalid preview: ", Path);
-			return;
+			if( null == preview && null == texture_preview ) 
+			{
+				GD.Print("Invalid preview: ", Path);
+				return;
+			}
+			
+			textureRect.Texture = preview;
 		}
-		
-		textureRect.Texture = preview;
 	}
 }
+
 #endif
