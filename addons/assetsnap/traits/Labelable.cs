@@ -26,6 +26,9 @@ using Godot;
 
 namespace AssetSnap.Component
 {
+	/// <summary>
+	/// A trait for creating and managing labeled UI elements.
+	/// </summary>
 	[Tool]
 	public partial class Labelable : ContainerTrait
 	{
@@ -43,10 +46,6 @@ namespace AssetSnap.Component
 		};
 
 		/*
-		** Public
-		*/
-
-		/*
 		** Protected
 		*/
 		protected string Title = "";
@@ -55,9 +54,9 @@ namespace AssetSnap.Component
 		protected TextServer.AutowrapMode AutowrapMode = TextServer.AutowrapMode.Off;
 		protected HorizontalAlignment _HorizontalAlignment;
 
-		/*
-		** Public methods
-		*/
+		/// <summary>
+		/// Default constructor for Labelable.
+		/// </summary>
 		public Labelable()
 		{
 			Name = "Labelable";
@@ -74,11 +73,10 @@ namespace AssetSnap.Component
 			SizeFlagsVertical = Control.SizeFlags.ShrinkBegin;
 		}
 
-		/*
-		** Instantiate an instance of the trait
-		**
-		** @return Labelable
-		*/
+		/// <summary>
+		/// Instantiate an instance of the trait.
+		/// </summary>
+		/// <returns>Returns the instantiated Labelable.</returns>
 		public override Labelable Instantiate()
 		{
 			base._Instantiate();
@@ -91,7 +89,6 @@ namespace AssetSnap.Component
 			}
 
 			base.Instantiate();
-			// GD.Print("Labeltrait: ", TraitName);
 			if (Title == "")
 			{
 				GD.PushWarning("Title not found");
@@ -145,13 +142,12 @@ namespace AssetSnap.Component
 			return this;
 		}
 
-		/*
-		** Selects an placed label in the
-		** nodes array by index
-		**
-		** @param int index
-		** @return Labelable
-		*/
+		/// <summary>
+		/// Selects a placed label in the nodes array by index.
+		/// </summary>
+		/// <param name="index">The index of the label to select.</param>
+		/// <param name="debug">Whether to output debug information.</param>
+		/// <returns>Returns the selected Labelable.</returns>
 		public override Labelable Select(int index, bool debug = false)
 		{
 			base._Select(index);
@@ -181,13 +177,11 @@ namespace AssetSnap.Component
 			return this;
 		}
 
-		/*
-		** Selects an placed label in the
-		** nodes array by name
-		**
-		** @param string name
-		** @return Labelable
-		*/
+		/// <summary>
+		/// Selects a placed label in the nodes array by name.
+		/// </summary>
+		/// <param name="name">The name of the label to select.</param>
+		/// <returns>Returns the selected Labelable.</returns>
 		public override Labelable SelectByName(string name)
 		{
 			base._SelectByName(name);
@@ -195,13 +189,11 @@ namespace AssetSnap.Component
 			return this;
 		}
 
-		/*
-		** Adds the currently chosen button
-		** to a specified container
-		**
-		** @param Node Container
-		** @return void
-		*/
+		/// <summary>
+		/// Adds the currently chosen button to a specified container.
+		/// </summary>
+		/// <param name="Container">The container to add the button to.</param>
+		/// <param name="index">The optional index at which to add the button.</param>
 		public void AddToContainer(Node Container, int? index = null)
 		{
 			if (null == Dependencies)
@@ -222,16 +214,11 @@ namespace AssetSnap.Component
 			Reset();
 		}
 
-		/*
-		** Setter Methods
-		*/
-
-		/*
-		** Sets the name of the current label
-		**
-		** @param string text
-		** @return Labelable
-		*/
+		/// <summary>
+		/// Sets the name of the current label.
+		/// </summary>
+		/// <param name="text">The name to set.</param>
+		/// <returns>Returns the modified Labelable.</returns>
 		public Labelable SetName(string text)
 		{
 			base._SetName(text);
@@ -239,12 +226,11 @@ namespace AssetSnap.Component
 			return this;
 		}
 
-		/*
-		** Sets the text of the current button
-		**
-		** @param string text
-		** @return Labelable
-		*/
+		/// <summary>
+		/// Sets the text of the current label.
+		/// </summary>
+		/// <param name="text">The text to set.</param>
+		/// <returns>Returns the modified Labelable.</returns>
 		public Labelable SetText(string text)
 		{
 			Title = text;
@@ -260,12 +246,11 @@ namespace AssetSnap.Component
 			return this;
 		}
 
-		/*
-		** Sets the text of the current button
-		**
-		** @param string text
-		** @return Labelable
-		*/
+		/// <summary>
+		/// Sets the suffix of the current label.
+		/// </summary>
+		/// <param name="text">The suffix to set.</param>
+		/// <returns>Returns the modified Labelable.</returns>
 		public Labelable SetSuffix(string text)
 		{
 			Suffix = text;
@@ -273,14 +258,11 @@ namespace AssetSnap.Component
 			return this;
 		}
 
-		/*
-		** Sets the theme type of the button,
-		** which lays out a set of specified rules
-		** from the theme that the button follows
-		**
-		** @param TitleType type
-		** @return Labelable
-		*/
+		/// <summary>
+		/// Sets the theme type of the label.
+		/// </summary>
+		/// <param name="type">The type of the label.</param>
+		/// <returns>Returns the modified Labelable.</returns>
 		public Labelable SetType(TitleType type)
 		{
 			Type = type;
@@ -288,6 +270,11 @@ namespace AssetSnap.Component
 			return this;
 		}
 
+		/// <summary>
+        /// Sets the horizontal size flag for the container, controlling the behavior of the x-axis.
+        /// </summary>
+        /// <param name="flag">The size flag to set.</param>
+        /// <returns>The updated <see cref="Labelable"/> instance.</returns>
 		public override Labelable SetContainerHorizontalSizeFlag(Control.SizeFlags flag)
 		{
 			base.SetContainerHorizontalSizeFlag(flag);
@@ -295,14 +282,11 @@ namespace AssetSnap.Component
 			return this;
 		}
 
-
-		/*
-		** Sets the alignment for the text
-		** of the current label
-		**
-		** @param HorizontalAlignment alignment
-		** @return Labelable
-		*/
+		/// <summary>
+		/// Sets the alignment for the text of the current label.
+		/// </summary>
+		/// <param name="alignment">The alignment to set.</param>
+		/// <returns>Returns the modified Labelable.</returns>
 		public Labelable SetAlignment(HorizontalAlignment alignment)
 		{
 			_HorizontalAlignment = alignment;
@@ -310,14 +294,12 @@ namespace AssetSnap.Component
 			return this;
 		}
 
-		/*
-		** Sets the dimensions for 
-		** the current label
-		**
-		** @param int width
-		** @param int height
-		** @return Labelable
-		*/
+		/// <summary>
+		/// Sets the dimensions for the current label.
+		/// </summary>
+		/// <param name="width">The width of the label.</param>
+		/// <param name="height">The height of the label.</param>
+		/// <returns>Returns the modified Labelable.</returns>
 		public override Labelable SetDimensions(int width, int height)
 		{
 			base.SetDimensions(width, height);
@@ -325,13 +307,11 @@ namespace AssetSnap.Component
 			return this;
 		}
 
-		/*
-		** Sets the horizontal size flag, which controls the x
-		** axis, and how it should act.
-		**
-		** @param Control.SizeFlags flag
-		** @return Labelable
-		*/
+		/// <summary>
+		/// Sets the horizontal size flag, which controls the x axis, and how it should act.
+		/// </summary>
+		/// <param name="flag">The size flag to set.</param>
+		/// <returns>Returns the modified Labelable.</returns>
 		public override Labelable SetHorizontalSizeFlags(Control.SizeFlags flag)
 		{
 			base.SetHorizontalSizeFlags(flag);
@@ -339,13 +319,11 @@ namespace AssetSnap.Component
 			return this;
 		}
 
-		/*
-		** Sets the horizontal size flag, which controls the y
-		** axis, and how it should act.
-		**
-		** @param Control.SizeFlags flag
-		** @return Labelable
-		*/
+		/// <summary>
+		/// Sets the vertical size flag, which controls the y axis, and how it should act.
+		/// </summary>
+		/// <param name="flag">The size flag to set.</param>
+		/// <returns>Returns the modified Labelable.</returns>
 		public override Labelable SetVerticalSizeFlags(Control.SizeFlags flag)
 		{
 			base.SetVerticalSizeFlags(flag);
@@ -353,14 +331,11 @@ namespace AssetSnap.Component
 			return this;
 		}
 
-		/*
-		** Sets the auto wrap of the label
-		** allowing it to break lines based
-		** on rules
-		**
-		** @param TextServer.AutowrapMode mode
-		** @return Labelable
-		*/
+		/// <summary>
+		/// Sets the auto wrap of the label, allowing it to break lines based on rules.
+		/// </summary>
+		/// <param name="mode">The auto wrap mode to set.</param>
+		/// <returns>Returns the modified Labelable.</returns>
 		public Labelable SetAutoWrap(TextServer.AutowrapMode mode)
 		{
 			AutowrapMode = mode;
@@ -368,14 +343,12 @@ namespace AssetSnap.Component
 			return this;
 		}
 
-		/*
-		** Sets margin values for 
-		** the currently chosen label
-		**
-		** @param int value
-		** @param string side
-		** @return Labelable
-		*/
+		/// <summary>
+		/// Sets margin values for the currently chosen label.
+		/// </summary>
+		/// <param name="value">The margin value to set.</param>
+		/// <param name="side">The side for which to set the margin.</param>
+		/// <returns>Returns the modified Labelable.</returns>
 		public override Labelable SetMargin(int value, string side = "")
 		{
 			base.SetMargin(value, side);
@@ -383,40 +356,29 @@ namespace AssetSnap.Component
 			return this;
 		}
 
-		/*
-		** Getter Methods
-		*/
-
-		/*
-		** Fetches the text from the label
-		**
-		** @return string
-		*/
+		/// <summary>
+		/// Fetches the text from the label.
+		/// </summary>
+		/// <returns>Returns the text of the label.</returns>
 		public string GetTitle()
 		{
 			return Title;
 		}
 
-		/*
-		** Fetches the inner container
-		** of the label
-		**
-		** @return Container
-		*/
+		/// <summary>
+		/// Fetches the inner container of the label.
+		/// </summary>
+		/// <returns>Returns the inner container of the label.</returns>
 		public Container GetInnerContainer()
 		{
 			return base.GetInnerContainer(0);
 		}
 
-		/*
-		** Booleans
-		*/
-
-		/*
-		** Checks if the label is valid
-		**
-		** @return bool
-		*/
+		/// <summary>
+		/// Checks if the label is valid.
+		/// </summary>
+		/// <param name="debug">Whether to output debug information.</param>
+		/// <returns>Returns true if the label is valid, otherwise false.</returns>
 		public override bool IsValid(bool debug = false)
 		{
 			if (base.IsValid(debug))
@@ -439,16 +401,9 @@ namespace AssetSnap.Component
 			return false;
 		}
 
-		/*
-		** Private
-		*/
-
-		/*
-		** Resets the trait to
-		** a cleared state
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Resets the trait to a cleared state.
+		/// </summary>
 		protected override void Reset()
 		{
 			Title = "";
