@@ -60,9 +60,8 @@ namespace AssetSnap.Component
 		protected HorizontalAlignment _HorizontalAlignment;
 		protected Godot.Collections.Array<string> Items = new();
 
-		/*
-		** Public methods
-		*/
+		/* The `public Selectable()` constructor in the `Selectable` class is initializing the properties of
+		a `Selectable` object. Here's a breakdown of what it's doing: */
 		public Selectable()
 		{
 			Name = "Selectable";

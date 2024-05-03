@@ -30,12 +30,7 @@ namespace AssetSnap.Nodes
 		{
 			Aabb aabb = new Aabb();
 
-
-			if (node is Node3D node3d && false == node3d.Visible)
-			{
-				return aabb;
-			}
-			else if (node is MeshInstance3D meshInstance3D)
+			if (node is MeshInstance3D meshInstance3D)
 			{
 				if (false == node.IsInsideTree())
 				{
@@ -44,7 +39,7 @@ namespace AssetSnap.Nodes
 
 				aabb = meshInstance3D.GlobalTransform * meshInstance3D.GetAabb();
 			}
-			else if (node is AsNode3D)
+			else if (node is Node3D)
 			{
 				for (int i = 0; i < node.GetChildCount(); i++)
 				{

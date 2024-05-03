@@ -169,7 +169,8 @@ namespace AssetSnap.Core
 			}
 
 			if (
-				null == ExplorerUtils.Get().States.CurrentScene ||
+				null == StatesUtils.Get().CurrentScene ||
+				null != ExplorerUtils.Get().GroupMainScreen &&
 				true == ExplorerUtils.Get().GroupMainScreen.Visible
 			)
 			{
