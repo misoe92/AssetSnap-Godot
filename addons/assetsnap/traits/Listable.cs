@@ -28,6 +28,9 @@ using Godot;
 
 namespace AssetSnap.Component
 {
+	/// <summary>
+	/// A trait for managing lists of components within a container.
+	/// </summary>
 	[Tool]
 	public partial class Listable : Trait.Base
 	{
@@ -45,20 +48,19 @@ namespace AssetSnap.Component
 		private string ComponentName = "";
 		private int count = 0;
 		
-		/*
-		** Public methods
-		*/
+		/// <summary>
+		/// Default constructor for Listable.
+		/// </summary>
 		public Listable()
 		{
 			Name = "Listable";
 			TypeString = GetType().ToString();
 		}
 		
-		/*
-		** Instantiate an instance of the trait
-		**
-		** @return Listable
-		*/
+		/// <summary>
+		/// Instantiate an instance of the trait.
+		/// </summary>
+		/// <returns>Returns the instantiated Listable.</returns>
 		public Listable Instantiate()
 		{
 			base._Instantiate();
@@ -116,13 +118,12 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		/*
-		** Selects an placed list in the
-		** nodes array by index
-		**
-		** @param int index
-		** @return Listable
-		*/
+		/// <summary>
+		/// Selects a placed list in the nodes array by index.
+		/// </summary>
+		/// <param name="index">The index of the list to select.</param>
+		/// <param name="debug">Whether to output debug information.</param>
+		/// <returns>Returns the selected Listable.</returns>
 		public override Listable Select( int index, bool debug = false ) 
 		{
 			base._Select(index, debug);
@@ -143,13 +144,11 @@ namespace AssetSnap.Component
 			return this;
 		}	
 		
-		/*
-		** Selects an placed list in the
-		** nodes array by name
-		**
-		** @param string name
-		** @return Listable
-		*/
+		/// <summary>
+		/// Selects a placed list in the nodes array by name.
+		/// </summary>
+		/// <param name="name">The name of the list to select.</param>
+		/// <returns>Returns the selected Listable.</returns>
 		public Listable SelectByName( string name ) 
 		{
 			base._SelectByName(name);
@@ -157,13 +156,11 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		/*
-		** Adds a callback to be ran on each entry of
-		** the list
-		**
-		** @param Action<int, BaseComponent> OnIteration
-		** @return Listable
-		*/
+		/// <summary>
+		/// Adds a callback to be run on each entry of the list.
+		/// </summary>
+		/// <param name="OnIteration">The callback to be executed.</param>
+		/// <returns>Returns the modified Listable.</returns>
 		public Listable Each( Action<int, GodotObject> OnIteration ) 
 		{
 			OnIterationAction = OnIteration;
@@ -171,13 +168,10 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		/*
-		** Adds the currently chosen list
-		** to a specified container
-		**
-		** @param Node Container
-		** @return void
-		*/
+		/// <summary>
+		/// Adds the currently chosen list to a specified container.
+		/// </summary>
+		/// <param name="Container">The container to add the list to.</param>
 		public void AddToContainer( Node Container ) 
 		{
 			if( false == Dependencies.ContainsKey(TraitName + "_WorkingNode") ) 
@@ -188,16 +182,11 @@ namespace AssetSnap.Component
 			base._AddToContainer(Container, Dependencies[TraitName + "_WorkingNode"].As<VBoxContainer>());
 		}
 		
-		/*
-		** Setter Methods
-		*/
-		
-		/*
-		** Sets the name of the current list
-		**
-		** @param string text
-		** @return Listable
-		*/
+		/// <summary>
+		/// Sets the name of the current list.
+		/// </summary>
+		/// <param name="text">The name to set.</param>
+		/// <returns>Returns the modified Listable.</returns>
 		public Listable SetName( string text ) 
 		{
 			Name = text;
@@ -206,13 +195,12 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		/*
-		** Sets the dimensions of the list
-		**
-		** @param int width
-		** @param int height
-		** @return Listable
-		*/
+		/// <summary>
+		/// Sets the dimensions of the list.
+		/// </summary>
+		/// <param name="width">The width to set.</param>
+		/// <param name="height">The height to set.</param>
+		/// <returns>Returns the modified Listable.</returns>
 		public override Listable SetDimensions( int width, int height )
 		{
 			base.SetDimensions(width, height);
@@ -220,13 +208,11 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		/*
-		** Sets the total count
-		** for the list
-		**
-		** @param int count
-		** @return Listable
-		*/
+		/// <summary>
+		/// Sets the total count for the list.
+		/// </summary>
+		/// <param name="_count">The count to set.</param>
+		/// <returns>Returns the modified Listable.</returns>
 		public Listable SetCount( int _count ) 
 		{
 			count = _count;
@@ -234,13 +220,11 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		/*
-		** Sets the component
-		** to be used
-		**
-		** @param string componentName
-		** @return Listable
-		*/
+		/// <summary>
+		/// Sets the component to be used.
+		/// </summary>
+		/// <param name="componentName">The name of the component to set.</param>
+		/// <returns>Returns the modified Listable.</returns>
 		public Listable SetComponent( string componentName ) 
 		{
 			ComponentName = componentName;
@@ -248,13 +232,11 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		/*
-		** Sets the horizontal size flag, which controls the x
-		** axis, and how it should act.
-		**
-		** @param Control.SizeFlags flag
-		** @return Listable
-		*/
+		/// <summary>
+		/// Sets the horizontal size flag, which controls the x axis.
+		/// </summary>
+		/// <param name="flag">The size flag to set.</param>
+		/// <returns>Returns the modified Listable.</returns>
 		public override Listable SetHorizontalSizeFlags(Control.SizeFlags flag)
 		{
 			base.SetHorizontalSizeFlags(flag);
@@ -262,13 +244,11 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		/*
-		** Sets the horizontal size flag, which controls the y
-		** axis, and how it should act.
-		**
-		** @param Control.SizeFlags flag
-		** @return Listable
-		*/
+		/// <summary>
+		/// Sets the horizontal size flag, which controls the y axis.
+		/// </summary>
+		/// <param name="flag">The size flag to set.</param>
+		/// <returns>Returns the modified Listable.</returns>
 		public override Listable SetVerticalSizeFlags(Control.SizeFlags flag)
 		{
 			base.SetVerticalSizeFlags(flag);
@@ -276,6 +256,11 @@ namespace AssetSnap.Component
 			return this;
 		}
 
+		/// <summary>
+        /// Clears the list at the specified index.
+        /// </summary>
+        /// <param name="index">The index of the list to clear.</param>
+        /// <param name="debug">Whether to output debug information.</param>
 		public override void Clear(int index = 0, bool debug = false)
 		{
 			if( null == TypeString || null == OwnerName || null == Plugin.Singleton || null == Plugin.Singleton.traitGlobal ) 
@@ -337,16 +322,9 @@ namespace AssetSnap.Component
 			base.Clear(index, debug);
 		}
 
-		/*
-		** Private Methods
-		*/
-
-		/*
-		** Resets the trait to
-		** a cleared state
-		**
-		** @return void
-		*/
+		/// <summary>
+        /// Resets the trait
+        /// </summary>
 		private void Reset()
 		{
 			count = 0;
