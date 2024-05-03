@@ -161,7 +161,7 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		/// </summary>
 		public void Reset()
 		{
-			Container container = Trait<Containerable>()
+			Godot.Container container = Trait<Containerable>()
 				.Select(2)
 				.GetInnerContainer();
 
@@ -260,15 +260,15 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		/// </summary>
 		private void _FinalizeFields()
 		{
-			Container containerOne = Trait<Containerable>()
+			Godot.Container containerOne = Trait<Containerable>()
 				.Select(0)
 				.GetInnerContainer();
 
-			Container containerTwoOne = Trait<Containerable>()
+			Godot.Container containerTwoOne = Trait<Containerable>()
 				.Select(1)
 				.GetInnerContainer(0);
 
-			Container containerTwoTwo = Trait<Containerable>()
+			Godot.Container containerTwoTwo = Trait<Containerable>()
 				.Select(1)
 				.GetInnerContainer(1);
 

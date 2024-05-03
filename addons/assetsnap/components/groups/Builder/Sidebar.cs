@@ -214,11 +214,11 @@ namespace AssetSnap.Front.Components.Groups.Builder
 				.SetOrientation(Containerable.ContainerOrientation.Horizontal)
 				.Instantiate();
 
-			Container InnerContainerLeft = Trait<Containerable>()
+			Godot.Container InnerContainerLeft = Trait<Containerable>()
 				.Select(0)
 				.GetInnerContainer(0);
 
-			Container InnerContainerRight = Trait<Containerable>()
+			Godot.Container InnerContainerRight = Trait<Containerable>()
 				.Select(0)
 				.GetInnerContainer(1);
 
@@ -308,7 +308,7 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		/// Sets up the title of the group list.
 		/// </summary>
 		/// <param name="container">The container to add the title to.</param>
-		private void _SetupListTitle(Container container)
+		private void _SetupListTitle(Godot.Container container)
 		{
 			Trait<Labelable>()
 				.SetName("GroupBuilderSidebarTitle")
@@ -328,7 +328,7 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		/// Sets up the button for creating a new group.
 		/// </summary>
 		/// <param name="container">The container to add the button to.</param>
-		private void _SetupNewGroupButton(Container container)
+		private void _SetupNewGroupButton(Godot.Container container)
 		{
 			Trait<Containerable>()
 				.SetName("NewGroupButtonContainer")

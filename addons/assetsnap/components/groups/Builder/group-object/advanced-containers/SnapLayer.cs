@@ -20,15 +20,23 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using AssetSnap.Component;
+using AssetSnap.Static;
+using Godot;
+
 namespace AssetSnap.Front.Components.Groups.Builder.GroupObject.AdvancedContainers
 {
-	using AssetSnap.Component;
-	using AssetSnap.Static;
-	using Godot;
-
+	/// <summary>
+	/// Represents a snap layer within the advanced group builder component.
+	/// </summary>
 	[Tool]
 	public partial class SnapLayer : AdvancedGroupComponent
 	{
+		/// <summary>
+		/// Initializes a new instance of the <see cref="SnapLayer"/> class.
+		/// </summary>
 		public SnapLayer()
 		{
 			Text = "Snap Layer";
@@ -41,11 +49,17 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject.AdvancedContaine
 			};
 		}
 		
+		/// <summary>
+		/// Registers traits specific to the snap layer.
+		/// </summary>
 		protected override void _RegisterTraits()
 		{
 			base._RegisterTraits();
 		}
 		
+		/// <summary>
+		/// Initializes the fields of the snap layer.
+		/// </summary>
 		protected override void _InitializeFields()
 		{
 			base._InitializeFields();
@@ -63,6 +77,9 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject.AdvancedContaine
 				.SetMargin(130, "left");
 		}
 
+		/// <summary>
+		/// Finalizes the fields of the snap layer.
+		/// </summary>
 		protected override void _FinalizeFields()
 		{
 			Container InnerContainer = Trait<Containerable>()
@@ -78,6 +95,10 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject.AdvancedContaine
 			base._FinalizeFields();
 		}
 
+		/// <summary>
+        /// Handles the event when the snap layer value changes.
+        /// </summary>
+        /// <param name="value">The new snap layer value.</param>
 		private void _OnSnapLayerChanged( int value )
 		{
 			GlobalExplorer.GetInstance().GroupBuilder._Editor.SetOption(Index, "SnapLayer", value);
@@ -85,3 +106,5 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject.AdvancedContaine
 		}
 	}
 }
+
+#endif

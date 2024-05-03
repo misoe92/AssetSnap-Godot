@@ -20,17 +20,27 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using AssetSnap.Component;
+using Godot;
+
 namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 {
-	using AssetSnap.Component;
-	using Godot;
-
+	/// <summary>
+	/// Represents the origin of a group object in the Groups Builder.
+	/// </summary>
 	[Tool]
 	public partial class Origin : GroupObjectComponent
 	{
-
+		/// <summary>
+		/// The parent editor group object.
+		/// </summary>
 		public EditorGroupObject Parent;
 
+		/// <summary>
+		/// Constructor for the Origin class.
+		/// </summary>
 		public Origin()
 		{
 			Name = "GroupsBuilderGroupObjectOrigin";
@@ -46,6 +56,11 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 			SizeFlagsVertical = Control.SizeFlags.ExpandFill;
 		}
 
+		/// <summary>
+		/// Gets the value at the specified index from the spinboxable trait.
+		/// </summary>
+		/// <param name="index">The index of the value to retrieve.</param>
+		/// <returns>The value at the specified index.</returns>
 		public double GetValue(int index)
 		{
 			return Trait<Spinboxable>()
@@ -53,6 +68,9 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 				.GetValue();
 		}
 
+		/// <summary>
+		/// Initializes the fields of the Origin component.
+		/// </summary>
 		protected override void _InitializeFields()
 		{
 			if (Parent == null)
@@ -151,6 +169,9 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 				.AddThemeConstantOverride("minimum_character_width", 2);
 		}
 
+		/// <summary>
+		/// Finalizes the fields of the Origin component.
+		/// </summary>
 		protected override void _FinalizeFields()
 		{
 			Trait<Labelable>()
@@ -217,6 +238,9 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 				);
 		}
 
+		/// <summary>
+        /// Handles the event when the value of the spinboxes changes.
+        /// </summary>
 		private void _OnValueChange()
 		{
 			Rotation Rotation = Parent._GroupBuilderEditorGroupObjectRotation;
@@ -233,3 +257,5 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 		}
 	}
 }
+
+#endif

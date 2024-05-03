@@ -20,15 +20,23 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using AssetSnap.Component;
+using AssetSnap.States;
+using Godot;
+
 namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 {
-	using AssetSnap.Component;
-	using AssetSnap.States;
-	using Godot;
-
+	/// <summary>
+	/// Component for enabling/disabling snapping to height functionality in group builder options.
+	/// </summary>
 	[Tool]
 	public partial class SnapToHeight : GroupOptionCheckableComponent
 	{
+		/// <summary>
+		/// Constructor for SnapToHeight class.
+		/// </summary>
 		public SnapToHeight()
 		{
 			Name = "GroupsBuilderGroupOptionsSnapToHeight";
@@ -39,6 +47,9 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 			};
 		}
 
+		/// <summary>
+		/// Initializes fields for SnapToHeight component.
+		/// </summary>
 		protected override void _InitializeFields()
 		{
 			Trait<Checkable>()
@@ -49,6 +60,9 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 				.Instantiate();
 		}
 
+		/// <summary>
+        /// Event handler for checkbox state change.
+        /// </summary>
 		private void _OnCheck()
 		{
 			_GlobalExplorer.GroupBuilder._Editor.Group.SnapToHeight = !_GlobalExplorer.GroupBuilder._Editor.Group.SnapToHeight;
@@ -69,3 +83,5 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 		}
 	}
 }
+
+#endif

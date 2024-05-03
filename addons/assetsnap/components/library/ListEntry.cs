@@ -23,6 +23,7 @@
 #if TOOLS
 
 using AssetSnap.Component;
+using AssetSnap.Front.Nodes;
 using AssetSnap.Nodes;
 using AssetSnap.Settings;
 using Godot;

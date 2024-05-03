@@ -20,15 +20,23 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using AssetSnap.Component;
+using AssetSnap.States;
+using Godot;
+
 namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 {
-	using AssetSnap.Component;
-	using AssetSnap.States;
-	using Godot;
-
+	/// <summary>
+	/// Component for managing visibility fade modes within group options.
+	/// </summary>
 	[Tool]
 	public partial class VisibilityFadeMode : GroupOptionSelectableComponent
 	{
+		/// <summary>
+		/// Constructor for VisibilityFadeMode class.
+		/// </summary>
 		public VisibilityFadeMode()
 		{
 			Name = "GroupsBuilderGroupOptionsVisibilityFadeMode";
@@ -38,7 +46,9 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 				{ typeof(Selectable).ToString() },
 			};
 		}
-		
+		/// <summary>
+		/// Initializes the fields for the visibility fade mode component.
+		/// </summary>
 		protected override void _InitializeFields()
 		{
 			Trait<Selectable>()
@@ -55,6 +65,10 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 				.Instantiate();
 		}
 
+		/// <summary>
+        /// Handles the event when the value of the visibility fade mode changes.
+        /// </summary>
+        /// <param name="index">The index of the selected item.</param>
 		private void _OnValueChanged( int index )
 		{
 			if( StatesUtils.Get().PlacingMode == GlobalStates.PlacingModeEnum.Group ) 
@@ -68,3 +82,5 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 		}
 	}
 }
+
+#endif

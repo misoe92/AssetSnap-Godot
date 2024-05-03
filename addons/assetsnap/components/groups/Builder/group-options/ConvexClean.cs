@@ -20,14 +20,22 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using AssetSnap.Component;
+using Godot;
+
 namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 {
-	using AssetSnap.Component;
-	using Godot;
-
+	/// <summary>
+	/// Represents an option for cleaning convex groups.
+	/// </summary>
 	[Tool]
 	public partial class ConvexClean : GroupOptionCheckableComponent
 	{
+		/// <summary>
+		/// Initializes a new instance of the <see cref="ConvexClean"/> class.
+		/// </summary>
 		public ConvexClean()
 		{
 			Name = "GroupsBuilderGroupOptionsConvexClean";
@@ -38,6 +46,9 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 			};
 		}
 		
+		/// <summary>
+		/// Initializes fields specific to the ConvexClean option.
+		/// </summary>
 		protected override void _InitializeFields()
 		{
 			Trait<Checkable>()
@@ -49,6 +60,9 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 				.Instantiate();
 		}
 		
+		/// <summary>
+        /// Handles the check event of the ConvexClean option.
+        /// </summary>
 		private void _OnCheck()
 		{
 			_GlobalExplorer.GroupBuilder._Editor.Group.ConvexClean = !_GlobalExplorer.GroupBuilder._Editor.Group.ConvexClean;
@@ -68,3 +82,5 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 		}
 	}
 }
+
+#endif

@@ -20,14 +20,22 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using AssetSnap.Component;
+using Godot;
+
 namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 {
-	using AssetSnap.Component;
-	using Godot;
-
+	/// <summary>
+	/// Component allowing snapping group objects to different positions.
+	/// </summary>
 	[Tool]
 	public partial class SnapToObjectPosition : GroupOptionCheckableComponent
 	{
+		/// <summary>
+		/// Initializes a new instance of the <see cref="SnapToObjectPosition"/> class.
+		/// </summary>
 		public SnapToObjectPosition()
 		{
 			Name = "GroupsBuilderGroupOptionsSnapToObjectPosition";
@@ -38,6 +46,9 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 			};
 		}
 		
+		/// <summary>
+		/// Initializes the fields of the group option component.
+		/// </summary>
 		protected override void _InitializeFields()
 		{
 			Trait<Checkable>()
@@ -65,6 +76,9 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 				.Instantiate();
 		}
 		
+		/// <summary>
+		/// Finalizes the fields of the group option component.
+		/// </summary>
 		protected override void _FinalizeFields()
 		{
 			base._FinalizeFields();
@@ -82,6 +96,9 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 				);
 		}
 		
+		/// <summary>
+        /// Sets the snap position of the group to the top.
+        /// </summary>
 		private void _OnSnapGroupToTop()
 		{
 			_GlobalExplorer.States.GroupSnapsTo = GlobalStates.SnapPosition.Top;
@@ -95,7 +112,9 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 				.SetValue(false);
 		}
 		
-		
+		/// <summary>
+        /// Sets the snap position of the group to the middle.
+        /// </summary>
 		private void _OnSnapGroupToMiddle()
 		{
 			_GlobalExplorer.States.GroupSnapsTo = GlobalStates.SnapPosition.Middle;
@@ -109,7 +128,9 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 				.SetValue(false);
 		}
 		
-		
+		/// <summary>
+        /// Sets the snap position of the group to the bottom.
+        /// </summary>
 		private void _OnSnapGroupToBottom()
 		{
 			_GlobalExplorer.States.GroupSnapsTo = GlobalStates.SnapPosition.Bottom;
@@ -124,3 +145,5 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 		}
 	}
 }
+
+#endif

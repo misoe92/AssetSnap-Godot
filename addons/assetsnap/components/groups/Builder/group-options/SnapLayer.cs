@@ -20,14 +20,22 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using AssetSnap.Component;
+using Godot;
+
 namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 {
-	using AssetSnap.Component;
-	using Godot;
-
+	/// <summary>
+	/// Component for handling snap layer settings in the group builder.
+	/// </summary>
 	[Tool]
 	public partial class SnapLayer : GroupOptionSpinboxableComponent
 	{
+		/// <summary>
+		/// Constructor for SnapLayer class.
+		/// </summary>
 		public SnapLayer()
 		{
 			Name = "GroupsBuilderGroupOptionsSnapLayer";
@@ -38,6 +46,9 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 			};
 		}
 		
+		/// <summary>
+		/// Initializes fields for the SnapLayer component.
+		/// </summary>
 		protected override void _InitializeFields()
 		{
 			Trait<Spinboxable>()
@@ -56,6 +67,10 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 				.GetLineEdit().AddThemeConstantOverride("minimum_character_width", 24);
 		}
 
+		/// <summary>
+        /// Event handler for value change in the snap layer spinbox.
+        /// </summary>
+        /// <param name="value">The new snap layer value.</param>
 		private void _OnValueChanged( int value )
 		{
 			_GlobalExplorer.GroupBuilder._Editor.Group.SnapLayer = value;
@@ -71,3 +86,5 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 		}
 	}
 }
+
+#endif

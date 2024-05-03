@@ -20,15 +20,23 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using AssetSnap.Component;
+using AssetSnap.Static;
+using Godot;
+
 namespace AssetSnap.Front.Components.Groups.Builder.GroupObject.AdvancedContainers
 {
-	using AssetSnap.Component;
-	using AssetSnap.Static;
-	using Godot;
-
+	/// <summary>
+	/// A component representing sphere collision behavior within a group object.
+	/// </summary>
 	[Tool]
 	public partial class SphereCollision : AdvancedGroupComponent
 	{
+		/// <summary>
+		/// Constructor for the SphereCollision component.
+		/// </summary>
 		public SphereCollision()
 		{
 			Text = "Sphere Collision";
@@ -41,11 +49,17 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject.AdvancedContaine
 			};
 		}
 		
+		/// <summary>
+		/// Registers traits specific to the SphereCollision component.
+		/// </summary>
 		protected override void _RegisterTraits()
 		{
 			base._RegisterTraits();
 		}
 		
+		/// <summary>
+		/// Initializes fields and UI elements specific to the SphereCollision component.
+		/// </summary>
 		protected override void _InitializeFields()
 		{
 			base._InitializeFields();
@@ -58,6 +72,9 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject.AdvancedContaine
 				.Instantiate();
 		}
 
+		/// <summary>
+		/// Finalizes fields and UI elements specific to the SphereCollision component.
+		/// </summary>
 		protected override void _FinalizeFields()
 		{
 			Container InnerContainer = Trait<Containerable>()
@@ -73,6 +90,10 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject.AdvancedContaine
 			base._FinalizeFields();
 		}
 
+		/// <summary>
+        /// Handles changes in the sphere collision state.
+        /// </summary>
+        /// <param name="state">The new state of sphere collision.</param>
 		private void _OnUseSphereCollision( bool state )
 		{
 			_GlobalExplorer.GroupBuilder._Editor.SetOption(Index, "SphereCollision", state);
@@ -90,3 +111,5 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject.AdvancedContaine
 		}
 	}
 }
+
+#endif

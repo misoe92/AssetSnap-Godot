@@ -20,17 +20,28 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using AssetSnap.Component;
+using AssetSnap.Explorer;
+using Godot;
+
 namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 {
-	using AssetSnap.Component;
-	using AssetSnap.Explorer;
-	using Godot;
-
+	/// <summary>
+	/// Represents a component responsible for handling scaling functionalities of a group object.
+	/// </summary>
 	[Tool]
 	public partial class Scale : GroupObjectComponent
 	{
+		/// <summary>
+		/// The parent editor group object.
+		/// </summary>
 		public EditorGroupObject Parent;
 
+		/// <summary>
+		/// Constructor for the Scale class.
+		/// </summary>
 		public Scale()
 		{
 			Name = "GroupsBuilderGroupObjectScale";
@@ -46,6 +57,11 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 			SizeFlagsVertical = Control.SizeFlags.ExpandFill;
 		}
 
+		/// <summary>
+		/// Gets the value of the scale at the specified index.
+		/// </summary>
+		/// <param name="index">The index of the scale.</param>
+		/// <returns>The value of the scale at the specified index.</returns>
 		public double GetValue(int index)
 		{
 			return Trait<Spinboxable>()
@@ -53,6 +69,9 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 				.GetValue();
 		}
 
+		/// <summary>
+		/// Initializes the fields of the Scale component.
+		/// </summary>
 		protected override void _InitializeFields()
 		{
 			if (Parent == null)
@@ -151,6 +170,9 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 				.AddThemeConstantOverride("minimum_character_width", 2);
 		}
 
+		/// <summary>
+		/// Finalizes the fields of the Scale component.
+		/// </summary>
 		protected override void _FinalizeFields()
 		{
 			Trait<Labelable>()
@@ -217,6 +239,9 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 				);
 		}
 
+		/// <summary>
+        /// Handles the event when the value of a spin box changes.
+        /// </summary>
 		private void _OnValueChange()
 		{
 			Rotation Rotation = Parent._GroupBuilderEditorGroupObjectRotation;
@@ -233,3 +258,5 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 		}
 	}
 }
+
+#endif

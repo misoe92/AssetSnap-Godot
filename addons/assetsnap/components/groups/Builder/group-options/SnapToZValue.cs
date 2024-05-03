@@ -20,17 +20,24 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using AssetSnap.Component;
+using AssetSnap.Explorer;
+using AssetSnap.States;
+using Godot;
+
 namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 {
-	using AssetSnap.Component;
-    using AssetSnap.Explorer;
-
-    using AssetSnap.States;
-    using Godot;
-
+	/// <summary>
+	/// Component allowing snapping to a specified Z value in the groups builder.
+	/// </summary>
 	[Tool]
 	public partial class SnapToZValue : GroupOptionSpinboxableComponent
 	{
+		/// <summary>
+		/// Constructor for SnapToZValue class.
+		/// </summary>
 		public SnapToZValue()
 		{
 			Name = "GroupsBuilderGroupOptionsSnapToZValue";
@@ -41,6 +48,9 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 			};
 		}
 
+		/// <summary>
+		/// Initializes the fields required for the component.
+		/// </summary>
 		protected override void _InitializeFields()
 		{
 			Trait<Spinboxable>()
@@ -60,6 +70,10 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 				.GetLineEdit().AddThemeConstantOverride("minimum_character_width", 24);
 		}
 
+		/// <summary>
+        /// Event handler for value change in the spinbox.
+        /// </summary>
+        /// <param name="value">The new value selected in the spinbox.</param>
 		private void _OnValueChanged(float value)
 		{
 			if (
@@ -77,3 +91,5 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 		}
 	}
 }
+
+#endif

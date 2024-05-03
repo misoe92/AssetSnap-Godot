@@ -20,14 +20,22 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using AssetSnap.Component;
+using Godot;
+
 namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 {
-	using AssetSnap.Component;
-	using Godot;
-
+	/// <summary>
+	/// Component for enabling snapping to the X axis in group builder options.
+	/// </summary>
 	[Tool]
 	public partial class SnapToX : GroupOptionCheckableComponent
 	{
+		/// <summary>
+		/// Constructor for SnapToX component.
+		/// </summary>
 		public SnapToX()
 		{
 			Name = "GroupsBuilderGroupOptionsSnapToX";
@@ -37,6 +45,9 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 			};
 		}
 		
+		/// <summary>
+		/// Initializes the fields for SnapToX component.
+		/// </summary>
 		protected override void _InitializeFields()
 		{
 			Trait<Checkable>()
@@ -47,6 +58,9 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 				.Instantiate();
 		}
 		
+		/// <summary>
+        /// Handles the check event for snapping to the X axis.
+        /// </summary>
 		private void _OnCheck()
 		{
 			_GlobalExplorer.GroupBuilder._Editor.Group.SnapToX = !_GlobalExplorer.GroupBuilder._Editor.Group.SnapToX;
@@ -67,3 +81,5 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 		}
 	}
 }
+
+#endif

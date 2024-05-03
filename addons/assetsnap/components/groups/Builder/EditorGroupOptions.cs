@@ -607,15 +607,15 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		/// </summary>
 		private void _FinalizeFields()
 		{
-			Container containerOne = Trait<Containerable>()
+			Godot.Container containerOne = Trait<Containerable>()
 				.Select(0)
 				.GetInnerContainer();
 
-			Container containerTwoOne = Trait<Containerable>()
+			Godot.Container containerTwoOne = Trait<Containerable>()
 				.Select(1)
 				.GetInnerContainer(0);
 
-			Container containerTwoTwo = Trait<Containerable>()
+			Godot.Container containerTwoTwo = Trait<Containerable>()
 				.Select(1)
 				.GetInnerContainer(1);
 
@@ -846,7 +846,7 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		/// Initializes the title for snap object position in the specified container.
 		/// </summary>
 		/// <param name="Container">The container to add the title to.</param>
-		private void _InitializeGroupOptionSnapObjectPositionTitle(Container Container)
+		private void _InitializeGroupOptionSnapObjectPositionTitle(Godot.Container Container)
 		{
 			Container.AddChild(_GenerateTitle("InitializeGroupOptionSnapObjectPositionTitle", "Snap object position"));
 		}
@@ -855,7 +855,7 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		/// Initializes the title for snap object options in the specified container.
 		/// </summary>
 		/// <param name="Container">The container to add the title to.</param>
-		private void _InitializeGroupOptionSnapObjectTitle(Container Container)
+		private void _InitializeGroupOptionSnapObjectTitle(Godot.Container Container)
 		{
 			Container.AddChild(_GenerateTitle("InitializeGroupOptionSnapObjectTitleContainer", "Snap to object options"));
 		}
@@ -864,7 +864,7 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		/// Initializes the title for snap options in the specified container.
 		/// </summary>
 		/// <param name="Container">The container to add the title to.</param>
-		private void _InitializeGroupOptionSnapTitle(Container Container)
+		private void _InitializeGroupOptionSnapTitle(Godot.Container Container)
 		{
 			Container.AddChild(_GenerateTitle("InitializeGroupOptionSnapTitleContainer", "Snap options"));
 		}
@@ -873,7 +873,7 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		/// Initializes the title for collision options in the specified container.
 		/// </summary>
 		/// <param name="Container">The container to add the title to.</param>
-		private void _InitializeGroupOptionCollisionTitle(Container Container)
+		private void _InitializeGroupOptionCollisionTitle(Godot.Container Container)
 		{
 			Container.AddChild(_GenerateTitle("InitializeGroupOptionCollisionTitleContainer", "Collision options"));
 		}
@@ -882,7 +882,7 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		/// Initializes the title for drag options in the specified container.
 		/// </summary>
 		/// <param name="Container">The container to add the title to.</param>
-		private void _InitializeGroupOptionDragTitle(Container Container)
+		private void _InitializeGroupOptionDragTitle(Godot.Container Container)
 		{
 			Container.AddChild(_GenerateTitle("InitializeGroupOptionDragTitleContainer", "Drag options"));
 		}
@@ -891,7 +891,7 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		/// Initializes the title for placement modes in the specified container.
 		/// </summary>
 		/// <param name="Container">The container to add the title to.</param>
-		private void _InitializeGroupOptionPlacementModeTitle(Container Container)
+		private void _InitializeGroupOptionPlacementModeTitle(Godot.Container Container)
 		{
 			Container.AddChild(_GenerateTitle("_InitializeGroupOptionPlacementModeTitle", "Placement Modes"));
 		}
@@ -900,7 +900,7 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		/// Initializes the title for level of details in the specified container.
 		/// </summary>
 		/// <param name="Container">The container to add the title to.</param>
-		private void _InitializeGroupOptionLODTitle(Container Container)
+		private void _InitializeGroupOptionLODTitle(Godot.Container Container)
 		{
 			Container.AddChild(_GenerateTitle("_InitializeGroupOptionLODTitle", "Level of details"));
 		}
@@ -909,7 +909,7 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		/// Initializes the title for visibility range in the specified container.
 		/// </summary>
 		/// <param name="Container">The container to add the title to.</param>
-		private void _InitializeGroupOptionVisibilityRangeTitle(Container Container ) 
+		private void _InitializeGroupOptionVisibilityRangeTitle(Godot.Container Container ) 
 		{
 			Container.AddChild(_GenerateTitle("_InitializeGroupOptionVisibilityTitle", "Visibility"));
 		}
@@ -918,7 +918,7 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		/// Initializes the title for fade mode in the specified container.
 		/// </summary>
 		/// <param name="Container">The container to add the title to.</param>
-		private void _InitializeGroupOptionFadeModeTitle(Container Container)
+		private void _InitializeGroupOptionFadeModeTitle(Godot.Container Container)
 		{
 			Container.AddChild(_GenerateTitle("_InitializeGroupOptionVisibilityFadeModeTitle", "Visibility Fade Mode"));
 		}

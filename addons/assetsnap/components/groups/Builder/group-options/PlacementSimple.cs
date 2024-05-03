@@ -20,14 +20,22 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using AssetSnap.Component;
+using Godot;
+
 namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 {
-	using AssetSnap.Component;
-	using Godot;
-
+	/// <summary>
+	/// Represents a simple placement group option for the group builder.
+	/// </summary>
 	[Tool]
 	public partial class PlacementSimple : GroupOptionCheckableComponent
 	{
+		/// <summary>
+		/// Constructor for PlacementSimple class.
+		/// </summary>
 		public PlacementSimple()
 		{
 			Name = "GroupsBuilderGroupOptionsPlacementSimple";
@@ -38,6 +46,9 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 			};
 		}
 		
+		/// <summary>
+		/// Initializes the fields for the PlacementSimple component.
+		/// </summary>
 		protected override void _InitializeFields()
 		{
 			Trait<Checkable>()
@@ -48,6 +59,9 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 				.Instantiate();
 		}
 
+		/// <summary>
+        /// Handles the check event for the simple placement option.
+        /// </summary>
 		private void _OnCheck()
 		{
 			_GlobalExplorer.States.PlacingType = GlobalStates.PlacingTypeEnum.Simple;
@@ -58,3 +72,5 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 		}
 	}
 }
+
+#endif

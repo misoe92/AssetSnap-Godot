@@ -20,14 +20,22 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using AssetSnap.Component;
+using Godot;
+
 namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 {
-	using AssetSnap.Component;
-	using Godot;
-
+	/// <summary>
+	/// Provides functionality for snapping groups to objects in the group builder.
+	/// </summary>
 	[Tool]
 	public partial class SnapToObject : GroupOptionCheckableComponent
 	{
+		/// <summary>
+		/// Constructor for SnapToObject class.
+		/// </summary>
 		public SnapToObject()
 		{
 			Name = "GroupsBuilderGroupOptionsSnapToObject";
@@ -38,6 +46,9 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 			};
 		}
 		
+		/// <summary>
+		/// Initializes the fields required for SnapToObject component.
+		/// </summary>
 		protected override void _InitializeFields()
 		{
 			Trait<Checkable>()
@@ -48,6 +59,9 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 				.Instantiate();
 		}
 		
+		/// <summary>
+        /// Handles the event when the snap to object option is toggled.
+        /// </summary>
 		private void _OnSnapToObject()
 		{
 			_GlobalExplorer.GroupBuilder._Editor.Group.SnapToObject = !_GlobalExplorer.GroupBuilder._Editor.Group.SnapToObject;
@@ -68,3 +82,5 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 		}
 	}
 }
+
+#endif

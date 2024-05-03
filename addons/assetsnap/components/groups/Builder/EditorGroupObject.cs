@@ -67,13 +67,13 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		public Godot.Collections.Dictionary<string, Variant> Options { get; set; }
 
 		/** Components **/
-		private Advanced _GroupBuilderEditorGroupObjectAdvanced;
-		private Actions _GroupBuilderEditorGroupObjectActions;
-		public AdvancedContainer _GroupBuilderEditorGroupObjectAdvancedContainer;
+		private GroupObject.Advanced _GroupBuilderEditorGroupObjectAdvanced;
+		private GroupObject.Actions _GroupBuilderEditorGroupObjectActions;
+		public GroupObject.AdvancedContainer _GroupBuilderEditorGroupObjectAdvancedContainer;
 
-		public Origin _GroupBuilderEditorGroupObjectOrigin;
-		public Scale _GroupBuilderEditorGroupObjectScale;
-		public Rotation _GroupBuilderEditorGroupObjectRotation;
+		public GroupObject.Origin _GroupBuilderEditorGroupObjectOrigin;
+		public GroupObject.Scale _GroupBuilderEditorGroupObjectScale;
+		public GroupObject.Rotation _GroupBuilderEditorGroupObjectRotation;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="EditorGroupObject"/> class.
@@ -104,11 +104,11 @@ namespace AssetSnap.Front.Components.Groups.Builder
 
 			_InitializeFields();
 
-			Container RowInnerContainer = Trait<Containerable>()
+			Godot.Container RowInnerContainer = Trait<Containerable>()
 				.Select(0)
 				.GetInnerContainer();
 
-			Container RowOuterContainer = Trait<Containerable>()
+			Godot.Container RowOuterContainer = Trait<Containerable>()
 				.Select(0)
 				.GetOuterContainer();
 
@@ -156,7 +156,7 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		/// Initializes the origin container.
 		/// </summary>
 		/// <param name="RowInnerContainer">The inner container.</param>
-		private void _InitializeOriginContainer(Container RowInnerContainer)
+		private void _InitializeOriginContainer(Godot.Container RowInnerContainer)
 		{
 			List<string> Components = new()
 			{
@@ -178,7 +178,7 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		/// Initializes the rotation container.
 		/// </summary>
 		/// <param name="RowInnerContainer">The inner container.</param>
-		private void _InitializeRotationContainer(Container RowInnerContainer)
+		private void _InitializeRotationContainer(Godot.Container RowInnerContainer)
 		{
 			List<string> Components = new()
 			{
@@ -200,7 +200,7 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		/// Initializes the scale container.
 		/// </summary>
 		/// <param name="RowInnerContainer">The inner container.</param>
-		private void _InitializeScaleContainer(Container RowInnerContainer)
+		private void _InitializeScaleContainer(Godot.Container RowInnerContainer)
 		{
 			List<string> Components = new()
 			{
@@ -222,7 +222,7 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		/// Initializes the actions container.
 		/// </summary>
 		/// <param name="RowInnerContainer">The inner container.</param>
-		private void _InitializeActionsContainer(Container RowInnerContainer)
+		private void _InitializeActionsContainer(Godot.Container RowInnerContainer)
 		{
 			List<string> Components = new()
 			{
@@ -231,7 +231,7 @@ namespace AssetSnap.Front.Components.Groups.Builder
 
 			if (_GlobalExplorer.Components.HasAll(Components.ToArray()))
 			{
-				_GroupBuilderEditorGroupObjectActions = GlobalExplorer.GetInstance().Components.Single<Actions>(true);
+				_GroupBuilderEditorGroupObjectActions = GlobalExplorer.GetInstance().Components.Single<Groups.Builder.GroupObject.Actions>(true);
 				_GroupBuilderEditorGroupObjectActions.Index = Index;
 				_GroupBuilderEditorGroupObjectActions.Path = Path;
 				_GroupBuilderEditorGroupObjectActions.Initialize();
@@ -243,7 +243,7 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		/// Initializes the advanced container.
 		/// </summary>
 		/// <param name="RowInnerContainer">The inner container.</param>
-		private void _InitializeAdvancedContainer(Container RowInnerContainer)
+		private void _InitializeAdvancedContainer(Godot.Container RowInnerContainer)
 		{
 			List<string> Components = new()
 			{
@@ -265,7 +265,7 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		/// <param name="FileName">Name of the file to preview.</param>
 		/// <param name="FolderPath">Path of the folder containing the file.</param>
 		/// <param name="BoxContainer">The container to add the preview to.</param>
-		private void _InitializePreviewContainer(string FileName, string FolderPath, Container BoxContainer)
+		private void _InitializePreviewContainer(string FileName, string FolderPath, Godot.Container BoxContainer)
 		{
 			Trait<Thumbnaileable>()
 				.SetName("GroupObjectsPreviewRect")
@@ -290,7 +290,7 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		/// Initializes the advanced container control.
 		/// </summary>
 		/// <param name="container">The container to add the control to.</param>
-		private void _InitializeAdvancedContainerControl(Container container)
+		private void _InitializeAdvancedContainerControl(Godot.Container container)
 		{
 			List<string> Components = new()
 			{

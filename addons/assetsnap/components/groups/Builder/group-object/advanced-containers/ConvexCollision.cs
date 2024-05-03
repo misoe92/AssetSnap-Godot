@@ -20,15 +20,23 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using AssetSnap.Component;
+using AssetSnap.Static;
+using Godot;
+
 namespace AssetSnap.Front.Components.Groups.Builder.GroupObject.AdvancedContainers
 {
-	using AssetSnap.Component;
-	using AssetSnap.Static;
-	using Godot;
-
+	/// <summary>
+	/// Component representing convex collision options within a group object.
+	/// </summary>
 	[Tool]
 	public partial class ConvexCollision : AdvancedGroupComponent
 	{
+		/// <summary>
+		/// Constructor for ConvexCollision class.
+		/// </summary>
 		public ConvexCollision()
 		{
 			Text = "Convex Collision";
@@ -41,12 +49,17 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject.AdvancedContaine
 			};
 		}
 
+		/// <summary>
+		/// Registers traits for the ConvexCollision component.
+		/// </summary>
 		protected override void _RegisterTraits()
 		{
 			base._RegisterTraits();
 		}
 
-		
+		/// <summary>
+		/// Initializes fields and UI elements for the ConvexCollision component.
+		/// </summary>
 		protected override void _InitializeFields()
 		{
 			base._InitializeFields();
@@ -75,9 +88,12 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject.AdvancedContaine
 				.Instantiate();
 		}
 
+		/// <summary>
+		/// Finalizes UI setup for the ConvexCollision component.
+		/// </summary>
 		protected override void _FinalizeFields()
 		{
-			Container InnerContainer = Trait<Containerable>()
+			Godot.Container InnerContainer = Trait<Containerable>()
 				.Select(0)
 				.GetInnerContainer();
 
@@ -102,6 +118,10 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject.AdvancedContaine
 			base._FinalizeFields();			
 		}
 
+		/// <summary>
+		/// Handles the action when using convex collision option.
+		/// </summary>
+		/// <param name="state">The state of the convex collision option.</param>
 		private void _OnUseConvexCollision( bool state )
 		{
 			_GlobalExplorer.GroupBuilder._Editor.SetOption(Index, "ConvexCollision", state);
@@ -121,6 +141,10 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject.AdvancedContaine
 			_TriggerGroupedUpdate();
 		}
 		
+		/// <summary>
+		/// Handles the action when using convex clean option.
+		/// </summary>
+		/// <param name="state">The state of the convex clean option.</param>
 		private void _OnUseConvexClean( bool state )
 		{
 			_GlobalExplorer.GroupBuilder._Editor.SetOption(Index, "ConvexClean", state);
@@ -128,6 +152,10 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject.AdvancedContaine
 			_TriggerGroupedUpdate();
 		}
 		
+		/// <summary>
+        /// Handles the action when using convex simplify option.
+        /// </summary>
+        /// <param name="state">The state of the convex simplify option.</param>
 		private void _OnUseConvexSimplify( bool state )
 		{
 			_GlobalExplorer.GroupBuilder._Editor.SetOption(Index, "ConvexSimplify", state);
@@ -136,3 +164,5 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject.AdvancedContaine
 		}
 	}
 }
+
+#endif

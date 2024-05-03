@@ -20,14 +20,22 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using AssetSnap.Component;
+using Godot;
+
 namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 {
-	using AssetSnap.Component;
-	using Godot;
-
+	/// <summary>
+	/// Represents an option for snapping to the Z-axis in a group builder.
+	/// </summary>
 	[Tool]
 	public partial class SnapToZ : GroupOptionCheckableComponent
 	{
+		/// <summary>
+		/// Initializes a new instance of the <see cref="SnapToZ"/> class.
+		/// </summary>
 		public SnapToZ()
 		{
 			Name = "GroupsBuilderGroupOptionsSnapToZ";
@@ -38,6 +46,9 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 			};
 		}
 		
+		/// <summary>
+		/// Initializes the fields of the SnapToZ component.
+		/// </summary>
 		protected override void _InitializeFields()
 		{
 			Trait<Checkable>()
@@ -48,6 +59,9 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 				.Instantiate();
 		}
 		
+		/// <summary>
+        /// Handles the event when the snap to Z option is checked or unchecked.
+        /// </summary>
 		private void _OnCheck()
 		{
 			_GlobalExplorer.GroupBuilder._Editor.Group.SnapToZ = !_GlobalExplorer.GroupBuilder._Editor.Group.SnapToZ;
@@ -68,3 +82,5 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 		}
 	}
 }
+
+#endif
