@@ -20,61 +20,13 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#if TOOLS
+using Godot;
 
-using AssetSnap.Front.Nodes;
-
-namespace AssetSnap.Snap
+namespace AssetSnap.Front.Nodes
 {
-	/// <summary>
-	/// Defines the base class for snap boundaries.
-	/// </summary>
-	public class BaseSnapBoundary
+	[Tool]
+	public partial class AsSnapBoundary : Node3D
 	{
-		/// <summary>
-		/// Gets or sets the snap boundary node.
-		/// </summary>
-		public AsSnapBoundary Node 
-		{
-			get => _Node;
-			set 
-			{
-				_Node = value;
-			}
-		}
-
-		/// <summary>
-		/// Gets or sets the visibility of the snap boundary.
-		/// </summary>
-		public bool Visible 
-		{
-			get => _Node.Visible;
-			set 
-			{
-				_Node.Visible = value;
-			}
-		}
 		
-		private AsSnapBoundary _Node;
-		
-		/// <summary>
-		/// Determines whether the snap boundary is active.
-		/// </summary>
-		/// <returns>True if the snap boundary is active, otherwise false.</returns>
-		public virtual bool IsActive()
-		{
-			return false;	
-		}
-		
-		/// <summary>
-		/// Gets the snap boundary.
-		/// </summary>
-		/// <returns>The snap boundary.</returns>
-		public AsSnapBoundary GetBoundary()
-		{
-			return Node;
-		}
 	}
 }
-
-#endif

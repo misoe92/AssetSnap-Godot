@@ -22,6 +22,7 @@
 
 using System.Threading.Tasks;
 using AssetSnap.Explorer;
+using AssetSnap.Front.Nodes;
 using AssetSnap.Static;
 using Godot;
 

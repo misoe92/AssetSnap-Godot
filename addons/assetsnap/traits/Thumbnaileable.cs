@@ -22,6 +22,7 @@
 
 #if TOOLS
 using System.Collections.Generic;
+using AssetSnap.Front.Nodes;
 using AssetSnap.Nodes;
 using AssetSnap.Trait;
 using Godot;

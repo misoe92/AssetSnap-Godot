@@ -49,7 +49,6 @@ namespace AssetSnap.Core
 			new ASNode.Types.AsMeshInstanceType().Initialize();
 			new ASNode.Types.AsMultiMeshInstanceType().Initialize();
 			new ASNode.Types.AsOptimizedMultiMeshGroupType().Initialize();
-			new ASNode.Types.AsMultiMeshType().Initialize();
 
 			new Library.Base();
 			new ContextMenu.Base();

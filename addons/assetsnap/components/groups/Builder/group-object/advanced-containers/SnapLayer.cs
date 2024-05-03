@@ -82,7 +82,7 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject.AdvancedContaine
 		/// </summary>
 		protected override void _FinalizeFields()
 		{
-			Container InnerContainer = Trait<Containerable>()
+			Godot.Container InnerContainer = Trait<Containerable>()
 				.Select(0)
 				.GetInnerContainer();
 
