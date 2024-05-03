@@ -51,7 +51,9 @@ namespace AssetSnap.Snap
 
 			_BoundaryBody = new()
 			{
-				Name = "SnapToHeightBoundaryBody"
+				Name = "SnapToHeightBoundaryBody",
+				CollisionLayer = 100,
+				CollisionMask = 100,
 			};
 
 			_BoundaryMeshInstance = new()
