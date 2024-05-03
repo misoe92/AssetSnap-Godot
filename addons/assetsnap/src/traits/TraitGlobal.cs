@@ -19,12 +19,14 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+using Godot;
+using Godot.Collections;
 
 namespace AssetSnap.Trait
 {
-	using Godot;
-	using Godot.Collections;
-
+	/// <summary>
+	/// This class manages global traits and their instances.
+	/// </summary>
 	[Tool]
 	public partial class TraitGlobal : Node, ISerializationListener
 	{
@@ -65,6 +67,14 @@ namespace AssetSnap.Trait
 
 		public bool IsSingleton = false;
 
+		/// <summary>
+		/// Retrieves the name associated with the given index, type, and owner.
+		/// </summary>
+		/// <param name="index">The index of the name.</param>
+		/// <param name="typeString">The type string.</param>
+		/// <param name="owner">The owner of the name.</param>
+		/// <param name="debug">Optional debug flag. If true, error messages will be printed.</param>
+		/// <returns>The retrieved name.</returns>
 		public string GetName( int index, string typeString, string owner, bool debug = false ) 
 		{
 			string typeKey = FormatTypeString(typeString);
@@ -102,6 +112,13 @@ namespace AssetSnap.Trait
 			return Names[owner][typeKey][index];
 		}
 		
+		/// <summary>
+		/// Adds a name to the dictionary.
+		/// </summary>
+		/// <param name="index">The index of the name.</param>
+		/// <param name="name">The name to add.</param>
+		/// <param name="owner">The owner of the name.</param>
+		/// <param name="typeString">The type string.</param>
 		public void AddName( int index, string name, string owner, string typeString ) 
 		{
 			if( null == typeString || null == owner ) 
@@ -131,6 +148,13 @@ namespace AssetSnap.Trait
 
 		}
 		
+		/// <summary>
+		/// Removes a name from the dictionary.
+		/// </summary>
+		/// <param name="index">The index of the name to remove.</param>
+		/// <param name="owner">The owner of the name.</param>
+		/// <param name="typeString">The type string.</param>
+		/// <param name="debug">Optional debug flag. If true, error messages will be printed.</param>
 		public void RemoveName( int index, string owner, string typeString, bool debug = false )
 		{
 			// GD.Print(typeString, "::", owner, " removes");
@@ -182,11 +206,23 @@ namespace AssetSnap.Trait
 			}
 		}
 		
+		/// <summary>
+		/// Formats the given type string.
+		/// </summary>
+		/// <param name="typeString">The type string to format.</param>
+		/// <returns>The formatted type string.</returns>
 		public string FormatTypeString(string TypeString ) 
 		{
 			return TypeString.Split(".").Join("");
 		}
 		
+		/// <summary>
+		/// Retrieves all instances of the given type and owner.
+		/// </summary>
+		/// <param name="typeString">The type string.</param>
+		/// <param name="owner">The owner of the instances.</param>
+		/// <param name="debug">Optional debug flag. If true, error messages will be printed.</param>
+		/// <returns>The dictionary containing all instances.</returns>
 		public Dictionary<int, GodotObject> AllInstances(string typeString, string owner, bool debug = false)
 		{
 			if( null == typeString || null == owner ) 
@@ -223,6 +259,14 @@ namespace AssetSnap.Trait
 			return Instances[owner][typeKey];
 		}
 		
+		/// <summary>
+		/// Checks if an instance exists at the specified index, type, and owner.
+		/// </summary>
+		/// <param name="index">The index of the instance.</param>
+		/// <param name="typeString">The type string.</param>
+		/// <param name="owner">The owner of the instance.</param>
+		/// <param name="debug">Optional debug flag. If true, error messages will be printed.</param>
+		/// <returns>True if the instance exists, false otherwise.</returns>
 		public bool HasInstance( int index, string typeString, string owner, bool debug = false ) 
 		{
 			if( null == typeString || null == owner ) 
@@ -268,7 +312,15 @@ namespace AssetSnap.Trait
 
 			return res;
 		}
-	
+
+		/// <summary>
+		/// Retrieves an instance at the specified index, type, and owner.
+		/// </summary>
+		/// <param name="index">The index of the instance.</param>
+		/// <param name="typeString">The type string.</param>
+		/// <param name="owner">The owner of the instance.</param>
+		/// <param name="debug">Optional debug flag. If true, error messages will be printed.</param>
+		/// <returns>The retrieved instance if found; otherwise, null.</returns>
 		public GodotObject GetInstance( int index, string typeString, string owner, bool debug = false )
 		{
 			if( null == typeString || null == owner ) 
@@ -317,6 +369,15 @@ namespace AssetSnap.Trait
 			return Instances[owner][typeKey][index];
 		}
 		
+		/// <summary>
+		/// Adds an instance to the collection.
+		/// </summary>
+		/// <param name="index">The index of the instance.</param>
+		/// <param name="Instance">The instance to add.</param>
+		/// <param name="owner">The owner of the instance.</param>
+		/// <param name="typeString">The type string.</param>
+		/// <param name="dependencies">Dictionary containing dependencies for the instance.</param>
+		/// <returns>True if the instance was successfully added; otherwise, false.</returns>
 		public bool AddInstance( int index, Node Instance, string owner, string typeString, Godot.Collections.Dictionary<string, Variant> dependencies ) 
 		{
 			if( null == typeString || null == owner || null == Instance ) 
@@ -368,6 +429,14 @@ namespace AssetSnap.Trait
 			return true;
 		}
 		
+		/// <summary>
+		/// Removes an instance at the specified index, type, and owner.
+		/// </summary>
+		/// <param name="index">The index of the instance.</param>
+		/// <param name="typeString">The type string.</param>
+		/// <param name="owner">The owner of the instance.</param>
+		/// <param name="debug">Optional debug flag. If true, error messages will be printed.</param>
+		/// <returns>True if the instance was successfully removed; otherwise, false.</returns>
 		public bool RemoveInstance( int index, string typeString, string owner, bool debug = false )
 		{
 			if( null == typeString || null == owner ) 
@@ -456,7 +525,13 @@ namespace AssetSnap.Trait
 			return false;
 		}
 		
-		
+		/// <summary>
+		/// Retrieves the dependencies for the instance at the specified index, type, and owner.
+		/// </summary>
+		/// <param name="index">The index of the instance.</param>
+		/// <param name="typeString">The type string.</param>
+		/// <param name="name">The name of the instance.</param>
+		/// <returns>The dictionary containing dependencies for the instance.</returns>
 		public Godot.Collections.Dictionary<string, Variant> GetDependencies( int index, string typeString, string name )
 		{
 			string typeKey = typeString.Split(".").Join("");
@@ -481,11 +556,21 @@ namespace AssetSnap.Trait
 			return InstanceDependencies[name][typeKey][index];
 		}
 		
+		/// <summary>
+		/// Counts the total number of instances.
+		/// </summary>
+		/// <returns>The total number of instances.</returns>
 		public int Count()
 		{
 			return Instances.Count;
 		}
 		
+		/// <summary>
+		/// Counts the total number of instances owned by the specified owner.
+		/// </summary>
+		/// <param name="owner">The owner whose instances to count.</param>
+		/// <param name="debug">Optional debug flag. If true, error messages will be printed.</param>
+		/// <returns>The total number of instances owned by the specified owner.</returns>
 		public int CountOwner( string owner, bool debug = false )
 		{
 			int count = 0;
@@ -509,103 +594,20 @@ namespace AssetSnap.Trait
 			return count;
 		}
 
+		/// <summary>
+		/// Called before serialization.
+		/// </summary>
 		public void OnBeforeSerialize()
 		{
-			// throw new NotImplementedException();
+			// 
 		}
 
+		/// <summary>
+		/// Called after deserialization.
+		/// </summary>
 		public void OnAfterDeserialize()
 		{
 			_Instance = this;
-			// throw new NotImplementedException();
-		}
-
-		public override void _ExitTree()
-		{
-			// foreach( (string key, Godot.Collections.Dictionary<string, Godot.Collections.Dictionary<int, GodotObject>> instance) in Instances) 
-			// {
-			// 	foreach(( string innerKey, Godot.Collections.Dictionary<int, GodotObject> innerInstance) in instance ) 
-			// 	{
-			// 		foreach((int index, GodotObject _object ) in innerInstance ) 
-			// 		{
-			// 			if( IsInstanceValid(_object) && _object is Node node ) 
-			// 			{
-			// 				if( IsInstanceValid(node) && node.HasMethod( Node.MethodName.Free ) ) 
-			// 				{
-			// 					if( null != node.GetParent() ) 
-			// 					{
-			// 						node.GetParent().RemoveChild(node);
-			// 					}
-
-			// 					node.QueueFree();
-			// 				}
-			// 				else 
-			// 				{
-			// 					GD.Print("Could not free", node.Name);
-			// 				}
-			// 			}
-			// 		}
-			// 	}
-			// }
-			
-			// foreach( (string key, Godot.Collections.Dictionary<string,Godot.Collections.Dictionary<int, Godot.Collections.Dictionary<string, Variant>>> instance) in InstanceDependencies) 
-			// {
-			// 	foreach(( string innerKey, Godot.Collections.Dictionary<int, Godot.Collections.Dictionary<string, Variant>> innerInstance) in instance ) 
-			// 	{
-			// 		foreach((int index, Godot.Collections.Dictionary<string, Variant> finalInstance ) in innerInstance ) 
-			// 		{
-			// 			foreach((string finalKey, Variant _object ) in finalInstance ) 
-			// 			{
-			// 				if( IsInstanceValid(_object.AsGodotObject()) && _object.AsGodotObject() is Node node ) 
-			// 				{
-			// 					if( IsInstanceValid(node) && node.HasMethod( Node.MethodName.Free ) ) 
-			// 					{
-			// 						if( null != node.GetParent() ) 
-			// 						{
-			// 							node.GetParent().RemoveChild(node);
-			// 						}
-
-			// 						node.QueueFree();
-			// 					}
-			// 					else 
-			// 					{
-			// 						GD.Print("Could not free", node.Name);
-			// 					}
-			// 				}
-			// 			}
-			// 		}
-			// 	}
-			// }
-
-			// Instances = new();
-			// InstanceDependencies = new();
-			
-
-			// foreach( GodotObject _object in DisposeQueue ) 
-			// {
-			// 	if( IsInstanceValid(_object) && _object is Node node ) 
-			// 	{
-			// 		if( IsInstanceValid(node) && node.HasMethod( Node.MethodName.Free ) ) 
-			// 		{
-			// 			if( null != node.GetParent() ) 
-			// 			{
-			// 				node.GetParent().RemoveChild(node);
-			// 			}
-
-			// 			node.QueueFree();
-			// 		}
-			// 		else 
-			// 		{
-			// 			GD.Print("Could not free", node.Name);
-			// 		}
-			// 	}
-			// 	else 
-			// 	{
-			// 		GD.Print("Not valid");
-			// 	}
-			// }
-			// DisposeQueue = new();
-			base._ExitTree();
 		}
 	}
 }
