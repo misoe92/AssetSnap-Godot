@@ -30,10 +30,17 @@ namespace AssetSnap
 	using AssetSnap.States;
 	using Godot;
 
+	/// <summary>
+	/// Partial class for managing global methods and interaction with AssetSnap.
+	/// </summary>
 	[Tool]
 	public partial class GlobalExplorer : NodeExplorer
 	{
 		private static GlobalExplorer Instance;
+		
+		/// <summary>
+		/// Singleton instance of the GlobalExplorer.
+		/// </summary>
 		public static GlobalExplorer Singleton
 		{
 			get
@@ -47,19 +54,19 @@ namespace AssetSnap
 			}
 		}
 
-		/*
-		** The input driver which are currently in use
-		*/
+		/// <summary>
+		/// Gets the input driver currently in use.
+		/// </summary>
+		/// <returns>The input driver instance.</returns>
 		public Instance.Input.BaseInputDriver InputDriver
 		{
 			get => DragIsAllowed() ? DragAddInputDriver.GetInstance() : BaseInputDriver.GetInstance();
 		}
 
-		/*
-		** Fetches singleton instance of the GlobalExplorer
-		**
-		** @return GlobalExplorer  
-		*/
+		/// <summary>
+		/// Initializes the GlobalExplorer singleton instance.
+		/// </summary>
+		/// <returns>The initialized GlobalExplorer instance.</returns>
 		public static GlobalExplorer InitializeExplorer()
 		{
 			if (null == Instance)
@@ -86,11 +93,20 @@ namespace AssetSnap
 			return Instance;
 		}
 
+		/// <summary>
+		/// Retrieves the singleton instance of GlobalExplorer.
+		/// </summary>
+		/// <returns>The singleton instance of GlobalExplorer.</returns>
 		public static GlobalExplorer GetInstance()
 		{
 			return Singleton;
 		}
 
+		/// <summary>
+		/// Retrieves a library instance by its name.
+		/// </summary>
+		/// <param name="name">The name of the library instance to retrieve.</param>
+		/// <returns>The library instance.</returns>
 		public Library.Instance GetLibraryByName(string name)
 		{
 			foreach (Library.Instance instance in Library.Libraries)
@@ -104,6 +120,11 @@ namespace AssetSnap
 			return null;
 		}
 
+		/// <summary>
+		/// Retrieves a library instance by its index.
+		/// </summary>
+		/// <param name="index">The index of the library instance to retrieve.</param>
+		/// <returns>The library instance.</returns>
 		public Library.Instance GetLibraryByIndex(int index)
 		{
 			if (index > -1 && Library.Libraries.Count > index && EditorPlugin.IsInstanceValid(Library.Libraries[index]))
@@ -114,6 +135,10 @@ namespace AssetSnap
 			return null;
 		}
 
+		/// <summary>
+		/// Prints the names of child nodes.
+		/// </summary>
+		/// <param name="which">The node whose child names to print.</param>
 		public void PrintChildNames(Node which)
 		{
 			foreach (Node child in which.GetChildren())
@@ -131,6 +156,10 @@ namespace AssetSnap
 			}
 		}
 
+		/// <summary>
+		/// Sets focus to a specific 3D node.
+		/// </summary>
+		/// <param name="Node">The 3D node to set focus to.</param>
 		public void SetFocusToNode(Node3D Node)
 		{
 			if (null == Node)
@@ -195,6 +224,12 @@ namespace AssetSnap
 			}
 		}
 
+		/// <summary>
+		/// Checks whether a Control has a specified property.
+		/// </summary>
+		/// <param name="control">The Control to check.</param>
+		/// <param name="propertyName">The name of the property to check for.</param>
+		/// <returns>True if the Control has the specified property; otherwise, false.</returns>
 		public static bool HasProperty(Control control, string propertyName)
 		{
 			Type type = control.GetType();
@@ -202,6 +237,14 @@ namespace AssetSnap
 			return propertyInfo != null;
 		}
 
+		/// <summary>
+		/// Attempts to retrieve the value of a property from a Control.
+		/// </summary>
+		/// <typeparam name="T">The type of the property value.</typeparam>
+		/// <param name="control">The Control to retrieve the property from.</param>
+		/// <param name="propertyName">The name of the property to retrieve.</param>
+		/// <param name="value">The retrieved value of the property.</param>
+		/// <returns>True if the property value was successfully retrieved; otherwise, false.</returns>
 		public static bool TryGetProperty<T>(Control control, string propertyName, out T value)
 		{
 			value = default(T);
@@ -226,6 +269,10 @@ namespace AssetSnap
 			}
 		}
 
+		/// <summary>
+        /// Prints the fields of a Node.
+        /// </summary>
+        /// <param name="which">The Node whose fields to print.</param>
 		public void PrintFields(Node which)
 		{
 			Type type = which.GetType();
@@ -240,11 +287,10 @@ namespace AssetSnap
 			}
 		}
 
-		/*
-		** Checks whether or not it's allowed to perform drag adding of models
-		**
-		** @return bool
-		*/
+		/// <summary>
+        /// Checks whether drag adding of models is allowed.
+        /// </summary>
+        /// <returns>True if drag adding is allowed; otherwise, false.</returns>
 		private bool DragIsAllowed()
 		{
 			bool value = Settings.GetKey("allow_drag_add").As<bool>();
