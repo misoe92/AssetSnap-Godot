@@ -67,10 +67,6 @@ namespace AssetSnap.Component
 		protected HorizontalAlignment _HorizontalAlignment;
 		protected Godot.Collections.Array<string> Items = new();
 
-		/*
-		** Public methods
-		*/
-		
 		/// <summary>
 		/// Constructor for the Selectable component.
 		/// </summary>

@@ -229,7 +229,8 @@ namespace AssetSnap.Raycast
 		{
 			RayCast3D Node = new() 
 			{
-				Name = "RayCast"
+				Name = "RayCast",
+				CollisionMask = 100,
 			};
 			
 			GlobalExplorer.GetInstance()

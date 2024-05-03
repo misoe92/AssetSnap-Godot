@@ -67,9 +67,29 @@ namespace AssetSnap.Nodes
 		/// </summary>
 		public void Enter()
 		{
+			Godot.Environment environment = new()
+			{
+				BackgroundMode = Godot.Environment.BGMode.Sky,
+			};
+
+			ProceduralSkyMaterial skyMaterial = new();
+
+			Sky sky = new()
+			{
+				SkyMaterial = skyMaterial,
+				RadianceSize = Sky.RadianceSizeEnum.Size256
+			};
+
+			// Set the procedural sky parameters
+			environment.Sky = sky;
+
+			// Set the ambient light
+			environment.AmbientLightSource = Godot.Environment.AmbientSource.Sky;
+			environment.AmbientLightEnergy = 1;
+			
 			World3D world = new()
 			{
-				Environment = Plugin.Singleton.GetViewport().World3D.Environment
+				Environment = environment
 			};
 
 			_viewport = new()
@@ -80,27 +100,27 @@ namespace AssetSnap.Nodes
 				// DebugDraw = Viewport.DebugDrawEnum.Disabled,
 				RenderTargetUpdateMode = SubViewport.UpdateMode.Always,
 				// ProcessMode = Node.ProcessModeEnum.Disabled,
-				// GuiDisableInput = true,
+				GuiDisableInput = true,
 				TransparentBg = true,
-				// PhysicsObjectPicking = false,
+				PhysicsObjectPicking = false,
 
 				CanvasItemDefaultTextureFilter = Viewport.DefaultCanvasItemTextureFilter.NearestWithMipmaps,
 				CanvasItemDefaultTextureRepeat = Viewport.DefaultCanvasItemTextureRepeat.Disabled,
 
 				Msaa3D = ProjectSettings.GetSetting("rendering/anti_aliasing/quality/msaa_3d").As<Viewport.Msaa>(),
-				// FsrSharpness = ProjectSettings.GetSetting("rendering/scaling_3d/fsr_sharpness").As<float>(),
-				// PositionalShadowAtlas16Bits = ProjectSettings.GetSetting("rendering/lights_and_shadows/positional_shadow/atlas_16_bits").As<bool>(),
-				// PositionalShadowAtlasQuad0 = ProjectSettings.GetSetting("rendering/lights_and_shadows/positional_shadow/atlas_quadrant_0_subdiv").As<Viewport.PositionalShadowAtlasQuadrantSubdiv>(),
-				// PositionalShadowAtlasQuad1 = ProjectSettings.GetSetting("rendering/lights_and_shadows/positional_shadow/atlas_quadrant_1_subdiv").As<Viewport.PositionalShadowAtlasQuadrantSubdiv>(),
-				// PositionalShadowAtlasQuad2 = ProjectSettings.GetSetting("rendering/lights_and_shadows/positional_shadow/atlas_quadrant_2_subdiv").As<Viewport.PositionalShadowAtlasQuadrantSubdiv>(),
-				// PositionalShadowAtlasQuad3 = ProjectSettings.GetSetting("rendering/lights_and_shadows/positional_shadow/atlas_quadrant_3_subdiv").As<Viewport.PositionalShadowAtlasQuadrantSubdiv>(),
-				// PositionalShadowAtlasSize = ProjectSettings.GetSetting("rendering/lights_and_shadows/positional_shadow/atlas_size").As<int>(),
+				FsrSharpness = ProjectSettings.GetSetting("rendering/scaling_3d/fsr_sharpness").As<float>(),
+				PositionalShadowAtlas16Bits = ProjectSettings.GetSetting("rendering/lights_and_shadows/positional_shadow/atlas_16_bits").As<bool>(),
+				PositionalShadowAtlasQuad0 = ProjectSettings.GetSetting("rendering/lights_and_shadows/positional_shadow/atlas_quadrant_0_subdiv").As<Viewport.PositionalShadowAtlasQuadrantSubdiv>(),
+				PositionalShadowAtlasQuad1 = ProjectSettings.GetSetting("rendering/lights_and_shadows/positional_shadow/atlas_quadrant_1_subdiv").As<Viewport.PositionalShadowAtlasQuadrantSubdiv>(),
+				PositionalShadowAtlasQuad2 = ProjectSettings.GetSetting("rendering/lights_and_shadows/positional_shadow/atlas_quadrant_2_subdiv").As<Viewport.PositionalShadowAtlasQuadrantSubdiv>(),
+				PositionalShadowAtlasQuad3 = ProjectSettings.GetSetting("rendering/lights_and_shadows/positional_shadow/atlas_quadrant_3_subdiv").As<Viewport.PositionalShadowAtlasQuadrantSubdiv>(),
+				PositionalShadowAtlasSize = ProjectSettings.GetSetting("rendering/lights_and_shadows/positional_shadow/atlas_size").As<int>(),
 
-				// Scaling3DMode = ProjectSettings.GetSetting("rendering/scaling_3d/mode").As<Viewport.Scaling3DModeEnum>(),
-				// Scaling3DScale = ProjectSettings.GetSetting("rendering/scaling_3d/scale").As<float>(),
+				Scaling3DMode = ProjectSettings.GetSetting("rendering/scaling_3d/mode").As<Viewport.Scaling3DModeEnum>(),
+				Scaling3DScale = ProjectSettings.GetSetting("rendering/scaling_3d/scale").As<float>(),
 
-				// ScreenSpaceAA = ProjectSettings.GetSetting("rendering/anti_aliasing/quality/screen_space_aa").As<Viewport.ScreenSpaceAAEnum>(),
-				// TextureMipmapBias = ProjectSettings.GetSetting("rendering/textures/default_filters/texture_mipmap_bias").As<float>(),
+				ScreenSpaceAA = ProjectSettings.GetSetting("rendering/anti_aliasing/quality/screen_space_aa").As<Viewport.ScreenSpaceAAEnum>(),
+				TextureMipmapBias = ProjectSettings.GetSetting("rendering/textures/default_filters/texture_mipmap_bias").As<float>(),
 			};
 
 			Plugin.Singleton
@@ -263,91 +283,98 @@ namespace AssetSnap.Nodes
 		/// <returns>The generated preview image.</returns>
 		public async Task<Image> GeneratePreviewImage(string path, int width, int height, string LibraryName)
 		{
-			string[] pathSplit = path.Split("/");
-			string FilenameWithExt = pathSplit[pathSplit.Length - 1];
-			string FilenameWithoutExt = FilenameWithExt.Split(".")[0];
+			try 
+			{
+				string[] pathSplit = path.Split("/");
+				string FilenameWithExt = pathSplit[pathSplit.Length - 1];
+				string FilenameWithoutExt = FilenameWithExt.Split(".")[0];
 
-			// Load the FBX scene
-			Node3D node = null;
-			if (path.Contains(".fbx") || path.Contains(".gltf") || path.Contains(".glb"))
-			{
-				PackedScene fbxScene = GD.Load<PackedScene>(path);
-				node = fbxScene.Instantiate<Node3D>();
-			}
-			else if (path.Contains(".obj"))
-			{
-				node = new()
+				// Load the FBX scene
+				Node3D node = null;
+				if (path.Contains(".fbx") || path.Contains(".gltf") || path.Contains(".glb"))
 				{
-					Name = "ObjectPreviewer"
-				};
-
-				Mesh mesh = GD.Load<Mesh>(path);
-				MeshInstance3D meshinstance3D = new()
+					PackedScene fbxScene = GD.Load<PackedScene>(path);
+					node = fbxScene.Instantiate<Node3D>();
+				}
+				else if (path.Contains(".obj"))
 				{
-					Mesh = mesh,
-				};
+					node = new()
+					{
+						Name = "ObjectPreviewer"
+					};
 
-				node.AddChild(meshinstance3D);
+					Mesh mesh = GD.Load<Mesh>(path);
+					MeshInstance3D meshinstance3D = new()
+					{
+						Mesh = mesh,
+					};
+
+					node.AddChild(meshinstance3D);
+				}
+
+				if (node == null)
+				{
+					throw new Exception("No model was found");
+				}
+
+				// Add the model to the viewport
+				_viewport.AddChild(node);
+
+				// Correct the camera focus
+				_AdjustCameraFocus(node);
+
+				await Plugin.Singleton.ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
+				// Take image with Camera
+				Image preview = _MakePreview();
+
+				// Save camera image
+				_SavePreview(FilenameWithoutExt, preview, "", LibraryName);
+
+				// -90
+				node.RotationDegrees = new Vector3(0, -90, 0);
+				await Plugin.Singleton.ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
+
+				preview = _MakePreview();
+				// Save camera image
+				_SavePreview(FilenameWithoutExt, preview, "minus-90", LibraryName);
+
+				// -180
+				node.RotationDegrees = new Vector3(0, -180, 0);
+				await Plugin.Singleton.ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
+
+				preview = _MakePreview();
+				// Save camera image
+				_SavePreview(FilenameWithoutExt, preview, "minus-180", LibraryName);
+
+				// 90
+				node.RotationDegrees = new Vector3(0, 90, 0);
+				await Plugin.Singleton.ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
+
+				preview = _MakePreview();
+				// Save camera image
+				_SavePreview(FilenameWithoutExt, preview, "90", LibraryName);
+
+				// 180
+				node.RotationDegrees = new Vector3(0, 180, 0);
+				await Plugin.Singleton.ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
+
+				preview = _MakePreview();
+				// Save camera image
+				_SavePreview(FilenameWithoutExt, preview, "180", LibraryName);
+
+				Aabb aabb = NodeUtils.CalculateNodeAabb(node);
+				ExplorerUtils.Get().Settings.AddModelSizeToCache(FilenameWithoutExt, aabb.Size);
+				_viewport.RemoveChild(node);
+				node.QueueFree();
+
+				// Return saved image
+				return preview;
 			}
-
-			if (node == null)
+			catch( Exception e ) 
 			{
-				GD.PushError("No model was found");
-				return null;
+				GD.PushError(e.Message);
+				return new Image();	
 			}
-
-			// Add the model to the viewport
-			_viewport.AddChild(node);
-
-			// Correct the camera focus
-			_AdjustCameraFocus(node);
-
-			await Plugin.Singleton.ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
-			// Take image with Camera
-			Image preview = _MakePreview();
-
-			// Save camera image
-			_SavePreview(FilenameWithoutExt, preview, "", LibraryName);
-
-			// -90
-			node.RotationDegrees = new Vector3(0, -90, 0);
-			await Plugin.Singleton.ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
-
-			preview = _MakePreview();
-			// Save camera image
-			_SavePreview(FilenameWithoutExt, preview, "minus-90", LibraryName);
-
-			// -180
-			node.RotationDegrees = new Vector3(0, -180, 0);
-			await Plugin.Singleton.ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
-
-			preview = _MakePreview();
-			// Save camera image
-			_SavePreview(FilenameWithoutExt, preview, "minus-180", LibraryName);
-
-			// 90
-			node.RotationDegrees = new Vector3(0, 90, 0);
-			await Plugin.Singleton.ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
-
-			preview = _MakePreview();
-			// Save camera image
-			_SavePreview(FilenameWithoutExt, preview, "90", LibraryName);
-
-			// 180
-			node.RotationDegrees = new Vector3(0, 180, 0);
-			await Plugin.Singleton.ToSignal(RenderingServer.Singleton, RenderingServer.SignalName.FramePostDraw);
-
-			preview = _MakePreview();
-			// Save camera image
-			_SavePreview(FilenameWithoutExt, preview, "180", LibraryName);
-
-			Aabb aabb = NodeUtils.CalculateNodeAabb(node);
-			ExplorerUtils.Get().Settings.AddModelSizeToCache(FilenameWithoutExt, aabb.Size);
-			_viewport.RemoveChild(node);
-			node.QueueFree();
-
-			// Return saved image
-			return preview;
 		}
 
 		/// <summary>
