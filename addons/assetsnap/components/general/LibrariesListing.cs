@@ -19,13 +19,19 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+
+#if TOOLS
+
+using AssetSnap.Component;
+using AssetSnap.Explorer;
+using AssetSnap.Settings;
+using Godot;
+
 namespace AssetSnap.Front.Components
 {
-	using AssetSnap.Component;
-	using AssetSnap.Explorer;
-	using AssetSnap.Settings;
-	using Godot;
-
+	/// <summary>
+	/// Component responsible for listing libraries.
+	/// </summary>
 	[Tool]
 	public partial class LibrariesListing : TraitableComponent
 	{
@@ -34,11 +40,9 @@ namespace AssetSnap.Front.Components
 		private int CurrentFolderCount = 0;
 		private Godot.Collections.Array<BaseComponent> _Entries = new();
 
-		/*
-		** Constructor of the class
-		** 
-		** @return void
-		*/
+		/// <summary>
+		/// Constructor of the class.
+		/// </summary>
 		public LibrariesListing()
 		{
 			Name = "LibrariesListing";
@@ -54,16 +58,17 @@ namespace AssetSnap.Front.Components
 			//_include = false;
 		}
 		
-		/*
-		** Initialization of the component
-		** 
-		** @return void
-		*/ 
+		/// <summary>
+		/// Initialization of the component.
+		/// </summary>
 		public override void Initialize()
 		{		
 			LoadInEntries();
 		}
 		
+		/// <summary>
+        /// Loads entries.
+        /// </summary>
 		public void LoadInEntries()
 		{
 			base.Initialize();
@@ -91,11 +96,9 @@ namespace AssetSnap.Front.Components
 			_SetupListTable(); 
 		}
 		
-		/*
-		** Set's up the list table
-		** 
-		** @return void
-		*/
+		/// <summary>
+        /// Sets up the list table.
+        /// </summary>
 		private void _SetupListTable()
 		{
 			if(
@@ -111,11 +114,9 @@ namespace AssetSnap.Front.Components
 			_SetupFolderListTable();
 		}
 		
-		/*
-		** Set's up the no folders list table
-		** 
-		** @return void
-		*/
+		/// <summary>
+        /// Sets up the no folders list table.
+        /// </summary>
 		private void _SetupNoFoldersTable()
 		{
 			if (null == Trait<Containerable>().Select(0).GetNode())
@@ -145,11 +146,9 @@ namespace AssetSnap.Front.Components
 			}
 		}
 		
-		/*
-		** Set's up the folders list table
-		** 
-		** @return void
-		*/
+		/// <summary>
+        /// Sets up the folders list table.
+        /// </summary>
 		private void _SetupFolderListTable()
 		{
 			if (null == Trait<Containerable>().Select(0).GetNode())
@@ -179,12 +178,9 @@ namespace AssetSnap.Front.Components
 			}
 		}
 		
-		/*
-		** Updates the list table, so it
-		** shows the newest changes.
-		** 
-		** @return void
-		*/
+		/// <summary>
+        /// Updates the list table to show the newest changes.
+        /// </summary>
 		private void _UpdateListTable()
 		{
 			if(
@@ -209,11 +205,9 @@ namespace AssetSnap.Front.Components
 			_SetupFolderListing();
 		}
 		
-		/*
-		** Setups the table with folders
-		**
-		** @return void
-		*/
+		/// <summary>
+        /// Sets up the table with folders.
+        /// </summary>
 		private void _SetupFolderListing()
 		{
 			if(
@@ -251,11 +245,9 @@ namespace AssetSnap.Front.Components
 				);
 		}
 		
-		/*
-		** Setups the label with no folders found.
-		**
-		** @return void
-		*/
+		/// <summary>
+        /// Sets up the label with no folders found.
+        /// </summary>
 		private void _SetupNoFolderLabel()
 		{
 			Container outerContainer = Trait<Containerable>()
@@ -290,3 +282,5 @@ namespace AssetSnap.Front.Components
 		}
 	}
 }
+
+#endif

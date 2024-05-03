@@ -20,23 +20,25 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using Godot;
+using AssetSnap.Component;
+using AssetSnap.Nodes;
+
 namespace AssetSnap.Front.Components
 {
-	using Godot;
-	using AssetSnap.Component;
-	using AssetSnap.Explorer;
-	using AssetSnap.Nodes;
-
+	/// <summary>
+	/// Represents a component handling general actions.
+	/// </summary>
 	[Tool]
 	public partial class Actions : TraitableComponent
 	{
 		private readonly string TitleText = "General actions";
 
-		/* 
-		** Class Constructor
-		** 
-		** @return void  
-		*/
+		/// <summary>
+		/// Constructor for the Actions component.
+		/// </summary>
 		public Actions()
 		{
 			Name = "Actions";
@@ -53,11 +55,9 @@ namespace AssetSnap.Front.Components
 			/* -- */
 		}
 
-		/* 
-		** Initializes component
-		** 
-		** @return void 
-		*/
+		/// <summary>
+		/// Initializes the Actions component.
+		/// </summary>
 		public override void Initialize()
 		{
 			base.Initialize();
@@ -119,13 +119,12 @@ namespace AssetSnap.Front.Components
 				);
 		}
 
-		/*
-		** Handles folder selection when Add Library
-		** button is clicked.
-		** 
-		** @param string FolderPath
-		** @return async<void>
-		*/
+		/// <summary>
+		/// Handles folder selection when the "Add Library" button is clicked.
+		/// </summary>
+		/// <param name="FolderPath">The path of the selected folder.</param>
+		/// <param name="fileDialog">The FileDialog instance.</param>
+		/// <returns>Async void.</returns>
 		private void _OnFolderSelected(string FolderPath, FileDialog fileDialog)
 		{
 			_GlobalExplorer.Settings.AddFolder(FolderPath);
@@ -133,12 +132,10 @@ namespace AssetSnap.Front.Components
 			fileDialog.QueueFree();
 		}
 
-		/* 
-		** Handles the button pressed event 
-		** of the button
-		** 
-		** @return void
-		*/
+		/// <summary>
+		/// Handles the button pressed event of the "Add Library" button.
+		/// </summary>
+		/// <returns>Void.</returns>
 		private void _OnButtonPressed()
 		{
 			// Create a FileDialog instance
@@ -154,9 +151,15 @@ namespace AssetSnap.Front.Components
 			fileDialog.PopupCentered();
 		}
 
+		/// <summary>
+        /// Handles clearing preview images.
+        /// </summary>
+        /// <returns>Void.</returns>
 		private void _OnClearImages()
 		{
 			ModelPreviewer.ClearPreviewImages("res://assetsnap/previews");
 		}
 	}
 }
+
+#endif
