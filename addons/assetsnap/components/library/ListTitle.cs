@@ -20,17 +20,25 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using AssetSnap.Component;
+using Godot;
+	
 namespace AssetSnap.Front.Components.Library
 {
-	using AssetSnap.Component;
-	using Godot;
-
+	/// <summary>
+	/// Represents a title component for a library list.
+	/// </summary>
 	[Tool]
 	public partial class ListTitle : LibraryComponent
 	{
 		private readonly string Title = "Library List";
 		private	Label _Label;
 		
+		/// <summary>
+        /// Constructs a new instance of ListTitle.
+        /// </summary>
 		public ListTitle()
 		{
 			Name = "LibraryListTitle";
@@ -43,11 +51,9 @@ namespace AssetSnap.Front.Components.Library
 			//_include = false;
 		}
 		
-		/*
-		** Initializes the component
-		**
-		** @return void
-		*/ 
+		/// <summary>
+        /// Initializes the component.
+        /// </summary>
 		public override void Initialize()
 		{
 			base.Initialize();
@@ -69,3 +75,5 @@ namespace AssetSnap.Front.Components.Library
 		}
 	}
 }
+
+#endif

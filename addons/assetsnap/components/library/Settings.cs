@@ -20,15 +20,19 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 #if TOOLS
+
+using System;
+using System.Collections.Generic;
+using System.Reflection;
+using AssetSnap.Component;
+using AssetSnap.Front.Components.Library.Sidebar;
+using Godot;
+
 namespace AssetSnap.Front.Components.Library
 {
-	using System;
-	using System.Collections.Generic;
-	using System.Reflection;
-	using AssetSnap.Component;
-	using AssetSnap.Front.Components.Library.Sidebar;
-	using Godot;
-
+	/// <summary>
+	/// Partial class for managing settings in the library component.
+	/// </summary>
 	[Tool]
 	public partial class Settings : LibraryComponent
 	{
@@ -51,11 +55,9 @@ namespace AssetSnap.Front.Components.Library
 		public LevelOfDetails _LSLevelOfDetails;
 		public VisibilityRange _LSVisibilityRange;
 		
-		/*
-		** Component constructor
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Constructor for the Settings class.
+		/// </summary>
 		public Settings()
 		{
 			Name = "LibrarySettings";
@@ -71,11 +73,9 @@ namespace AssetSnap.Front.Components.Library
 			//_include = false;
 		} 
 			
-		/*
-		** Initializes the settings component
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Initializes the settings component.
+		/// </summary>
 		public override void Initialize()
 		{
 			base.Initialize();
@@ -395,6 +395,9 @@ namespace AssetSnap.Front.Components.Library
 				.AddToContainer(this);
 		}
 		
+		/// <summary>
+        /// Synchronizes the settings with their corresponding components.
+        /// </summary>
 		public override void Sync()
 		{
 			if( null != _LSSnapObject && IsInstanceValid(_LSSnapObject)) 
@@ -443,11 +446,11 @@ namespace AssetSnap.Front.Components.Library
 			}
 		}
 			
-		/*
-		** Fetches a component by it's key name
-		**
-		** @return BaseComponent
-		*/
+		/// <summary>
+        /// Fetches a component by its key name.
+        /// </summary>
+        /// <param name="key">The key name of the component.</param>
+        /// <returns>The fetched component.</returns>
 		public BaseComponent AccessField( string key )
 		{
 			Type type = GetType();
@@ -464,11 +467,9 @@ namespace AssetSnap.Front.Components.Library
 			return default(BaseComponent);
 		}
 		
-		/*
-		** Clears all current setting values
-		**
-		** @return void
-		*/
+		/// <summary>
+        /// Clears all current setting values.
+        /// </summary>
 		public void ClearAll()
 		{
 			if( null != _LSSnapObject && IsInstanceValid(_LSSnapObject)) 
@@ -521,7 +522,11 @@ namespace AssetSnap.Front.Components.Library
 			}
 		}
 		
-	
+		/// <summary>
+        /// Checks if a field exists in the Settings class.
+        /// </summary>
+        /// <param name="fieldName">The name of the field to check.</param>
+        /// <returns>True if the field exists, otherwise false.</returns>
 		public bool FieldExists(string fieldName)
 		{
 			Type type = typeof(Settings);
@@ -534,4 +539,5 @@ namespace AssetSnap.Front.Components.Library
 		}
 	}
 }
+
 #endif

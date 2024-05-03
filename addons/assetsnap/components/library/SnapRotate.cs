@@ -20,33 +20,58 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using Godot;
+using AssetSnap.Component;
+using AssetSnap.Front.Nodes;
+using AssetSnap.Explorer;
+
 namespace AssetSnap.Front.Components.Library
 {
-	using Godot;
-	using AssetSnap.Component;
-	using AssetSnap.Front.Nodes;
-	using AssetSnap.Explorer;
-
+	/// <summary>
+	/// Component for snapping rotation values.
+	/// </summary>
 	[Tool]
 	public partial class SnapRotate : LibraryComponent
 	{
+		/// <summary>
+		/// A flag indicating whether rotation is active.
+		/// </summary>
 		public bool value = false;
+		
+		/// <summary>
+		/// The rotation angle along the X-axis.
+		/// </summary>
 		public float RotationX = 0.0f;
+		
+		/// <summary>
+		/// The rotation angle along the Y-axis.
+		/// </summary>
 		public float RotationY = 0.0f;
+		
+		/// <summary>
+		/// The rotation angle along the Z-axis.
+		/// </summary>
 		public float RotationZ = 0.0f;
+		
+		/// <summary>
+		/// The current input event.
+		/// </summary>
 		public InputEvent CurrentEvent;
 
+		/// <summary>
+        /// Default constructor for SnapRotate.
+        /// </summary>
 		public SnapRotate()
 		{
 			Name = "LibrarySnapRotate";
 			//_include = false;  
 		}
 		
-		/*
-		** Initialization of component
-		**
-		** @return void
-		*/
+		/// <summary>
+        /// Initialization of the SnapRotate component.
+        /// </summary>
 		public override void Initialize() 
 		{
 			UsingTraits = new(){};
@@ -77,12 +102,10 @@ namespace AssetSnap.Front.Components.Library
 			}
 		}
 		
-		/*
-		** Updates rotation values on
-		** input changes
-		**
-		** @return void
-		*/
+		/// <summary>
+        /// Updates rotation values on input changes.
+        /// </summary>
+        /// <param name="which">The type of change.</param>
 		private void _OnListStateChange( string which ) 
 		{
 			if( null == ExplorerUtils.Get().ContextMenu ) 
@@ -106,12 +129,10 @@ namespace AssetSnap.Front.Components.Library
 			}
 		}
 		
-		/*
-		** Checks if rotation is currently active
-		** and whether or not to apply it
-		**
-		** @return void
-		*/
+		/// <summary>
+        /// Handles input events for rotation.
+        /// </summary>
+        /// <param name="event">The input event.</param>
 		public override void _Input(InputEvent @event)
 		{
 			if(
@@ -156,11 +177,11 @@ namespace AssetSnap.Front.Components.Library
 			}
 		}
 		
-		/*
-		** Rotates on all angles
-		**
-		** @return void
-		*/
+		/// <summary>
+        /// Rotates the node on all angles.
+        /// </summary>
+        /// <param name="Rotation">The current rotation.</param>
+        /// <param name="Handle">The node handle.</param>
 		public void DoRotateAll( Vector3 Rotation, Node3D Handle )
 		{
 			Vector3 _RotationDegrees = Handle.RotationDegrees;
@@ -188,11 +209,11 @@ namespace AssetSnap.Front.Components.Library
 			ExplorerUtils.Get().ContextMenu.SetRotationValues(_RotationDegrees);
 		}
 		
-		/*
-		** Rotates on x angle
-		**
-		** @return void
-		*/
+		/// <summary>
+        /// Rotates the node along the X-axis.
+        /// </summary>
+        /// <param name="Rotation">The current rotation.</param>
+        /// <param name="Handle">The node handle.</param>
 		public void DoRotateX( Vector3 Rotation, Node3D Handle )
 		{
 			if( IsWheelUp() ) 
@@ -209,11 +230,11 @@ namespace AssetSnap.Front.Components.Library
 			}
 		}
 		
-		/*
-		** Rotates on y angle
-		**
-		** @return void
-		*/
+		/// <summary>
+        /// Rotates the node along the Y-axis.
+        /// </summary>
+        /// <param name="Rotation">The current rotation.</param>
+        /// <param name="Handle">The node handle.</param>
 		public void DoRotateY( Vector3 Rotation, Node3D Handle )
 		{
 			if( IsWheelUp() ) 
@@ -230,11 +251,11 @@ namespace AssetSnap.Front.Components.Library
 			}
 		}
 		
-		/*
-		** Rotates on z angle
-		**
-		** @return void
-		*/
+		/// <summary>
+        /// Rotates the node along the Z-axis.
+        /// </summary>
+        /// <param name="Rotation">The current rotation.</param>
+        /// <param name="Handle">The node handle.</param>
 		public void DoRotateZ( Vector3 Rotation, Node3D Handle )
 		{
 			if( IsWheelUp() ) 	
@@ -251,11 +272,15 @@ namespace AssetSnap.Front.Components.Library
 			}
 		}
 		
-		/*
-		** Applies the rotation changes
-		**
-		** @return Vector3
-		*/
+		/// <summary>
+        /// Applies the rotation changes.
+        /// </summary>
+        /// <param name="angle">The angle of rotation.</param>
+        /// <param name="Rotation">The current rotation.</param>
+        /// <param name="CurrentAngleRotation">The current angle of rotation.</param>
+        /// <param name="_default">The default rotation value.</param>
+        /// <param name="reverse">Whether to reverse the rotation.</param>
+        /// <returns>The updated rotation vector.</returns>
 		public Vector3 Apply( string angle, Vector3 Rotation, float CurrentAngleRotation, float _default, bool reverse = false )
 		{
 			bool specific = false;
@@ -324,11 +349,10 @@ namespace AssetSnap.Front.Components.Library
 			return Rotation;
 		}
 		
-		/*
-		** Checks if mouse wheel up is active
-		**
-		** @return bool
-		*/
+		/// <summary>
+        /// Checks if the mouse wheel up event is active.
+        /// </summary>
+        /// <returns>True if mouse wheel up is active, false otherwise.</returns>
 		public bool IsWheelUp()
 		{
 			if( CurrentEvent is InputEventMouseButton MouseButtonEvent ) 
@@ -339,11 +363,10 @@ namespace AssetSnap.Front.Components.Library
 			return false;
 		}
 		
-		/*
-		** Checks if mouse wheel down is active
-		**
-		** @return bool
-		*/
+		/// <summary>
+        /// Checks if the mouse wheel down event is active.
+        /// </summary>
+        /// <returns>True if mouse wheel down is active, false otherwise.</returns>
 		public bool IsWheelDown()
 		{
 			if( CurrentEvent is InputEventMouseButton MouseButtonEvent ) 
@@ -354,11 +377,11 @@ namespace AssetSnap.Front.Components.Library
 			return false;
 		} 
 		
-		/*
-		** Checks if rotation on all angles should occur
-		**
-		** @return bool
-		*/
+		/// <summary>
+        /// Checks if rotation on all angles should occur.
+        /// </summary>
+        /// <param name="angle">The angle of rotation.</param>
+        /// <returns>True if rotation on all angles should occur, false otherwise.</returns>
 		public bool ShouldRotateAll( int angle ) 
 		{
 			if( value == true && CurrentEvent is InputEventMouseButton MouseButtonEvent ) 
@@ -372,11 +395,11 @@ namespace AssetSnap.Front.Components.Library
 			return false;
 		}
 		
-		/*
-		** Checks if rotation on x angle should occur
-		**
-		** @return bool
-		*/
+		/// <summary>
+        /// Checks if rotation on the X-axis should occur.
+        /// </summary>
+        /// <param name="angle">The angle of rotation.</param>
+        /// <returns>True if rotation on the X-axis should occur, false otherwise.</returns>
 		public bool ShouldRotateX( int angle ) 
 		{
 			if( value == true && CurrentEvent is InputEventMouseButton MouseButtonEvent ) 
@@ -390,11 +413,11 @@ namespace AssetSnap.Front.Components.Library
 			return false;
 		}
 		
-		/*
-		** Checks if rotation on y angle should occur
-		**
-		** @return bool
-		*/
+		/// <summary>
+        /// Checks if rotation on the Y-axis should occur.
+        /// </summary>
+        /// <param name="angle">The angle of rotation.</param>
+        /// <returns>True if rotation on the Y-axis should occur, false otherwise.</returns>
 		public bool ShouldRotateY( int angle ) 
 		{
 			if( value == true && CurrentEvent is InputEventMouseButton MouseButtonEvent ) 
@@ -408,11 +431,11 @@ namespace AssetSnap.Front.Components.Library
 			return false;
 		}
 		
-		/*
-		** Checks if rotation on z angle should occur
-		**
-		** @return bool
-		*/
+		/// <summary>
+        /// Checks if rotation on the Z-axis should occur.
+        /// </summary>
+        /// <param name="angle">The angle of rotation.</param>
+        /// <returns>True if rotation on the Z-axis should occur, false otherwise.</returns>
 		public bool ShouldRotateZ( int angle ) 
 		{
 			if( value == true && CurrentEvent is InputEventMouseButton MouseButtonEvent ) 
@@ -426,25 +449,24 @@ namespace AssetSnap.Front.Components.Library
 			return false;
 		}
 
-		/*
-		** Checks if the rotation state
-		** is currently active
-		**
-		** @return bool
-		*/
+		/// <summary>
+        /// Checks if the rotation state is currently active.
+        /// </summary>
+        /// <returns>True if rotation is active, false otherwise.</returns>
 		public bool IsActive()
 		{
 			return value == true;
 		}
 		
-		/*
-		** Fetches the current rotation vector
-		**
-		** @return Vector3
-		*/
+		/// <summary>
+        /// Fetches the current rotation vector.
+        /// </summary>
+        /// <returns>The current rotation vector.</returns>
 		public Vector3 GetRotationVector() 
 		{
 			return new Vector3(RotationX, RotationY, RotationZ);
 		}
 	}
 }
+
+#endif

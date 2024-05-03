@@ -20,21 +20,27 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using System.Collections.Generic;
+using System.Linq;
+using AssetSnap.Component;
+using Godot;
+
 namespace AssetSnap.Front.Components.Library
 {
-	using System.Collections.Generic;
-	using System.Linq;
-	using AssetSnap.Component;
-	using AssetSnap.Nodes;
-	using Godot;
-
+	/// <summary>
+	/// Partial class for managing a listing of assets in the library.
+	/// </summary>
 	[Tool]
 	public partial class Listing : LibraryComponent
 	{
 		private string _Folder;
-
 		private Godot.Collections.Array<HBoxContainer> Containers = new();
 
+		/// <summary>
+        /// Gets or sets the folder path for the listing.
+        /// </summary>
 		public string Folder
 		{
 			get => _Folder;
@@ -44,11 +50,9 @@ namespace AssetSnap.Front.Components.Library
 			}
 		}
 
-		/*
-		** Constructor
-		**
-		** @return void
-		*/
+		/// <summary>
+        /// Constructor for the Listing class.
+        /// </summary>
 		public Listing()
 		{
 			Name = "LibraryListing";
@@ -62,11 +66,9 @@ namespace AssetSnap.Front.Components.Library
 			//_include = false; 
 		}
 
-		/*
-		** Initializes the component 
-		**
-		** @return void
-		*/
+		/// <summary>
+        /// Initializes the component.
+        /// </summary>
 		public override void Initialize()
 		{
 			base.Initialize();
@@ -135,11 +137,9 @@ namespace AssetSnap.Front.Components.Library
 				);
 		}
 
-		/*
-		** Updates the list 
-		**
-		** @return void
-		*/
+		/// <summary>
+        /// Updates the list.
+        /// </summary>
 		public  void Update()
 		{
 			// _Library.RemoveAllPanelState();
@@ -156,12 +156,11 @@ namespace AssetSnap.Front.Components.Library
 			 IterateFiles(Folder, Trait<Containerable>().Select(1).GetInnerContainer());
 		}
 
-		/*
-		** Iterates through the files inside the current folder
-		** and adds them as entries to the list
-		**
-		** @return void
-		*/
+		/// <summary>
+        /// Iterates through the files inside the current folder and adds them as entries to the list.
+        /// </summary>
+        /// <param name="folderPath">The path of the folder to iterate through.</param>
+        /// <param name="BoxContainer">The container to add the entries to.</param>
 		private void IterateFiles(string folderPath, Container BoxContainer)
 		{
 			List<string> Components = new()
@@ -239,23 +238,21 @@ namespace AssetSnap.Front.Components.Library
 			}
 		}
 
-		/*
-		** Check's if a extension is valid
-		** to be used as a model
-		**
-		** @TODO Move check to a better section/class
-		** @return HBoxContainer
-		*/
+		/// <summary>
+        /// Checks if an extension is valid to be used as a model.
+        /// </summary>
+        /// <param name="Extension">The file extension to check.</param>
+        /// <returns>True if the extension is valid, otherwise false.</returns>
 		private bool IsValidExtension(string Extension)
 		{
 			return Extension == ".obj" || Extension == ".fbx" || Extension == ".glb" || Extension == ".gltf";
 		}
 
-		/*
-		** Set's up the list container
-		**
-		** @return HBoxContainer
-		*/
+		/// <summary>
+        /// Sets up the list container.
+        /// </summary>
+        /// <param name="BoxContainer">The container to set up the list within.</param>
+        /// <returns>The initialized HBoxContainer.</returns>
 		private HBoxContainer _SetupListContainer(Container BoxContainer)
 		{
 			HBoxContainer _Con = new()
@@ -271,3 +268,5 @@ namespace AssetSnap.Front.Components.Library
 		}
 	}
 }
+
+#endif

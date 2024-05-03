@@ -20,12 +20,17 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using AssetSnap.Component;
+using AssetSnap.Front.Nodes;
+using Godot;
+
 namespace AssetSnap.Front.Components.Library
 {
-	using AssetSnap.Component;
-	using AssetSnap.Front.Nodes;
-	using Godot;
-
+	/// <summary>
+	/// Component representing a search functionality within a library.
+	/// </summary>
 	[Tool]
 	public partial class Search : LibraryComponent
 	{
@@ -42,11 +47,9 @@ namespace AssetSnap.Front.Components.Library
 
 		private Callable? SearchCallable;
 		
-		/*
-		** Component constructor
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Constructor for the Search component.
+		/// </summary>
 		public Search()
 		{
 			Name = "LibrarySearch";
@@ -60,11 +63,9 @@ namespace AssetSnap.Front.Components.Library
 			//_include = false;
 		}
 		
-		/*
-		** Initializes the component
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Initializes the Search component.
+		/// </summary>
 		public override void Initialize()
 		{
 			base.Initialize();
@@ -119,13 +120,10 @@ namespace AssetSnap.Front.Components.Library
 				.AddToContainer(this);
 		}
 
-		/*
-		** Checks if a search has been performed
-		** if it has it then queries an update on
-		** the listing
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Process method for handling continuous updates in the Search component.
+		/// </summary>
+		/// <param name="delta">Time elapsed since the last frame.</param>
 		public override void _Process(double delta) 
 		{
 			if( null == _SearchInput ) 
@@ -184,13 +182,10 @@ namespace AssetSnap.Front.Components.Library
 			}
 		}
 		
-		/*
-		** Updates the search query and
-		** sets the search state when input
-		** is received
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Event handler for updating the search query and setting the search state when input is received.
+		/// </summary>
+		/// <param name="text">The new search query text.</param>
 		private void _OnSearchQuery(string text)
 		{
 			if (text != "" || text == "" && value != "")
@@ -205,26 +200,28 @@ namespace AssetSnap.Front.Components.Library
 			value = text;
 		}
 		
-		/*
-		** Checks if search is ongoing
-		**
-		** @return bool
-		*/
+		/// <summary>
+		/// Checks if a search is ongoing.
+		/// </summary>
+		/// <returns>True if a search is ongoing, otherwise false.</returns>
 		public bool IsSearching()
 		{
 			return _Searching; 
 		}
 		
-		/*
-		** Checks if search text is valid
-		**
-		** @return bool
-		*/
+		/// <summary>
+		/// Checks if the provided search text is valid.
+		/// </summary>
+		/// <param name="text">The search text to validate.</param>
+		/// <returns>True if the search text is valid, otherwise false.</returns>
 		public bool SearchValid( string text )
 		{
 			return text.ToLower().Contains(value.ToLower());
 		}
 
+		/// <summary>
+        /// Clears the current search query.
+        /// </summary>
 		private void _ClearCurrentQuery()
 		{
 			_SearchInput.Clear();
@@ -232,3 +229,5 @@ namespace AssetSnap.Front.Components.Library
 		}
 	}
 }
+
+#endif

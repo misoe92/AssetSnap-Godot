@@ -20,18 +20,21 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using AssetSnap.Component;
+using AssetSnap.Nodes;
+using AssetSnap.Settings;
+using Godot;
+
 namespace AssetSnap.Front.Components.Library
 {
-	using System.Threading.Tasks;
-	using AssetSnap.Component;
-	using AssetSnap.Nodes;
-	using AssetSnap.Settings;
-	using Godot;
-
+	/// <summary>
+	/// Represents an entry in the library list.
+	/// </summary>
 	[Tool]
 	public partial class ListEntry : LibraryComponent
 	{
-
 		private readonly static Theme SnapTheme = GD.Load<Theme>("res://addons/assetsnap/assets/themes/SnapTheme.tres");
 		private readonly static Texture2D ChevronLeft = GD.Load<Texture2D>("res://addons/assetsnap/assets/icons/chevron-left.svg");
 		private readonly static Texture2D ChevronRight = GD.Load<Texture2D>("res://addons/assetsnap/assets/icons/chevron-right.svg");
@@ -74,11 +77,9 @@ namespace AssetSnap.Front.Components.Library
 		}
 
 
-		/*
-		** Class constructor
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Class constructor.
+		/// </summary>
 		public ListEntry()
 		{
 			Name = "LibraryListEntry";
@@ -91,16 +92,17 @@ namespace AssetSnap.Front.Components.Library
 			};
 		}
 
-		/*
-		** Initializes the component
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Initializes the component.
+		/// </summary>
 		public override void Initialize()
 		{
 			//
 		}
 		
+		/// <summary>
+		/// Initializes the component.
+		/// </summary>
 		public void _Initialize()
 		{
 			SizeFlagsHorizontal = SizeFlags.ShrinkBegin;
@@ -227,6 +229,11 @@ namespace AssetSnap.Front.Components.Library
 			Plugin.Singleton.ModelSizeCacheChanged += (string name, Vector3 value) => _OnModelSizeChanged( name, value );
 		}
 		
+		/// <summary>
+		/// Handles the event when the model size changes.
+		/// </summary>
+		/// <param name="name">The name of the model.</param>
+		/// <param name="value">The new size of the model.</param>
 		private void _OnModelSizeChanged( string name, Vector3 value )
 		{
 			if (name == Filename)
@@ -237,6 +244,9 @@ namespace AssetSnap.Front.Components.Library
 			}
 		}
 
+		/// <summary>
+		/// Handles the event when the mouse enters the middle container.
+		/// </summary>
 		private void _OnMiddleContainerMouseEnter()
 		{
 			leftInnerContainer.GetChild<Control>(0).Visible = false;
@@ -244,6 +254,9 @@ namespace AssetSnap.Front.Components.Library
 			absoluteContainer.Visible = true;
 		}
 
+		/// <summary>
+		/// Handles the event when the mouse leaves the middle container.
+		/// </summary>
 		private void _OnMiddleContainerMouseLeave()
 		{
 			leftInnerContainer.GetChild<Control>(0).Visible = true;
@@ -251,6 +264,13 @@ namespace AssetSnap.Front.Components.Library
 			absoluteContainer.Visible = false;
 		}
 
+		/// <summary>
+		/// Initializes the left arrow button.
+		/// </summary>
+		/// <param name="BoxContainer">The container to which the button will be added.</param>
+		/// <param name="FileName">The name of the file.</param>
+		/// <param name="FolderPath">The path of the folder.</param>
+		/// <param name="LibraryName">The name of the library.</param>
 		private void _InitializeLeftArrow(Container BoxContainer, string FileName, string FolderPath, string LibraryName)
 		{
 			Trait<Buttonable>()
@@ -269,6 +289,13 @@ namespace AssetSnap.Front.Components.Library
 				);
 		}
 
+		/// <summary>
+		/// Initializes the right arrow button.
+		/// </summary>
+		/// <param name="BoxContainer">The container to which the button will be added.</param>
+		/// <param name="FileName">The name of the file.</param>
+		/// <param name="FolderPath">The path of the folder.</param>
+		/// <param name="LibraryName">The name of the library.</param>
 		private void _InitializeRightArrow(Container BoxContainer, string FileName, string FolderPath, string LibraryName)
 		{
 			Trait<Buttonable>()
@@ -287,6 +314,9 @@ namespace AssetSnap.Front.Components.Library
 				);
 		}
 		
+		/// <summary>
+		/// Handles the event when the right arrow button is pressed.
+		/// </summary>
 		private void _OnRightArrowPressed()
 		{
 			if( EditorPlugin.IsInstanceValid(_TextureRect) ) 
@@ -305,6 +335,9 @@ namespace AssetSnap.Front.Components.Library
 			}
 		}
 		
+		/// <summary>
+		/// Handles the event when the left arrow button is pressed.
+		/// </summary>
 		private void _OnLeftArrowPressed()
 		{
 			if( EditorPlugin.IsInstanceValid(_TextureRect) ) 
@@ -323,6 +356,12 @@ namespace AssetSnap.Front.Components.Library
 			}
 		}
 		
+		/// <summary>
+		/// Sets the rotated image based on the current rotation angle.
+		/// </summary>
+		/// <param name="FileName">The name of the file.</param>
+		/// <param name="LibraryName">The name of the library.</param>
+		/// <returns>The rotated image.</returns>
 		private Texture2D SetRotatedImage(string FileName, string LibraryName)
 		{
 			Texture2D image = null;
@@ -352,12 +391,12 @@ namespace AssetSnap.Front.Components.Library
 			return image;
 		}
 
-		/*
-		** Initializes model preview image and
-		** it's container
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Initializes the preview container.
+		/// </summary>
+		/// <param name="FileName">The name of the file.</param>
+		/// <param name="FolderPath">The path of the folder.</param>
+		/// <param name="BoxContainer">The container to which the preview container will be added.</param>
 		private void _InitializePreviewContainer(string FileName, string FolderPath, Container BoxContainer)
 		{
 			_MarginContainer = new()
@@ -402,12 +441,10 @@ namespace AssetSnap.Front.Components.Library
 			BoxContainer.AddChild(_InnerContainer);
 		}
 
-		/*
-		** Initializes label and its container
-		** readable label
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Initializes the label container.
+		/// </summary>
+		/// <param name="BoxContainer">The container to which the label container will be added.</param>
 		private void _InitializeLabelContainer(PanelContainer BoxContainer)
 		{
 			// Label
@@ -457,12 +494,9 @@ namespace AssetSnap.Front.Components.Library
 			BoxContainer.AddChild(_PanelMarginContainer);
 		}
 
-		/*
-		** Converts the bound filename into a more
-		** readable label
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Prepares the filename for display as a label.
+		/// </summary>
 		private void PrepareFilenameTitles()
 		{
 			string filename = Filename;
@@ -474,6 +508,9 @@ namespace AssetSnap.Front.Components.Library
 			_FormattedFileName = filename.Substring(0, filename.Length > 18 ? 19 : filename.Length).Split("_").Join(" ").Split("-").Join(" ");
 		}
 
+		/// <summary>
+        /// Handles the _ExitTree event.
+        /// </summary>
 		public override void _ExitTree()
 		{
 			
@@ -481,3 +518,5 @@ namespace AssetSnap.Front.Components.Library
 		}
 	}
 }
+
+#endif

@@ -20,17 +20,25 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using Godot;
+using AssetSnap.Component;
+using AssetSnap.Front.Nodes;
+using AssetSnap.Explorer;
+using AssetSnap.States;
+
 namespace AssetSnap.Front.Components.Library
 {
-	using Godot;
-	using AssetSnap.Component;
-	using AssetSnap.Front.Nodes;
-	using AssetSnap.Explorer;
-	using AssetSnap.States;
-
+	/// <summary>
+	/// SnapGrab component for library handling.
+	/// </summary>
 	[Tool]
 	public partial class SnapGrab : LibraryComponent
 	{
+		/// <summary>
+        /// Constructor for SnapGrab component.
+        /// </summary>
 		public SnapGrab()
 		{
 			Name = "LibrarySnapGrab";
@@ -40,12 +48,11 @@ namespace AssetSnap.Front.Components.Library
 			//_include = false;  
 		}
 
-		/*
-		** Checks if rotation is currently active
-		** and whether or not to apply it
-		**
-		** @return void
-		*/
+		/// <summary>
+        /// Checks if rotation is currently active and whether or not to apply it.
+        /// </summary>
+        /// <param name="event">The input event.</param>
+        /// <returns>Void.</returns>
 		public async override void _Input(InputEvent @event)
 		{
 			if (false == _ShouldGrab())
@@ -138,12 +145,10 @@ namespace AssetSnap.Front.Components.Library
 			}
 		}
 
-		/*
-		** Returns the current state of
-		** object grabbing
-		**
-		** @return bool
-		*/
+		/// <summary>
+        /// Returns the current state of object grabbing.
+        /// </summary>
+        /// <returns>Boolean indicating if grabbing is allowed.</returns>
 		private bool _ShouldGrab()
 		{
 			if (null == ExplorerUtils.Get() || null == ExplorerUtils.Get().Settings)
@@ -156,3 +161,5 @@ namespace AssetSnap.Front.Components.Library
 		}
 	}
 }
+
+#endif
