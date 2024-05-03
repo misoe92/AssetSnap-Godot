@@ -20,15 +20,26 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using AssetSnap.Component;
+using AssetSnap.States;
+using Godot;
+
 namespace AssetSnap.Front.Components.Library.Sidebar
 {
-	using AssetSnap.Component;
-	using AssetSnap.States;
-	using Godot;
-
+	/// <summary>
+	/// Represents the visibility range component in the library sidebar.
+	/// </summary>
 	[Tool]
 	public partial class VisibilityRange : LibraryComponent
 	{
+		/// <summary>
+		/// Gets or sets the state of the visibility range component.
+		/// </summary>
+		/// <remarks>
+		/// This property represents whether the visibility range component is enabled or disabled.
+		/// </remarks>
 		public bool state 
 		{
 			get => GetState();
@@ -47,11 +58,9 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		private readonly string _Tooltip = "Value is specified in meters. And is calculated from the Camera position.";
 		private readonly string _MarginTooltip = "The margin will be taken into consideration when the calculation is made.";
 
-		/*
-		** Constructor for the component
-		** 
-		** @return void
-		*/	
+		/// <summary>
+		/// Constructor for the visibility range component.
+		/// </summary>
 		public VisibilityRange()
 		{
 			Name = "LSVisibilityRange";
@@ -67,6 +76,10 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			//_include = false;
 		}
 		
+		/// <summary>
+		/// Gets the state of the visibility range component.
+		/// </summary>
+		/// <returns>A boolean value indicating the state of the component.</returns>
 		public bool GetState()
 		{
 			if(
@@ -79,11 +92,9 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			return HasTrait<Checkable>() && false != Trait<Checkable>().IsValid() && false != Trait<Checkable>().Select(0).IsValid() ? Trait<Checkable>().Select(0).GetValue() : false;	
 		}
 		
-		/*
-		** Initializes the component
-		** 
-		** @return void
-		*/	
+		/// <summary>
+		/// Initializes the visibility range component.
+		/// </summary>
 		public override void Initialize()
 		{
 			base.Initialize();
@@ -203,12 +214,9 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			Plugin.GetInstance().StatesChanged += (Godot.Collections.Array data) => { MaybeUpdateValue(); };
 		}
 		
-		/*
-		** Handles synchronization of the checkboxes
-		** so it matches the state of the model
-		** 
-		** @return void
-		*/	
+		/// <summary>
+		/// Handles synchronization of the checkboxes so it matches the state of the model.
+		/// </summary>
 		public void MaybeUpdateValue()
 		{
 			if( 
@@ -219,48 +227,64 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			}
 		}
 		
-		/*
-		** Updates spawn settings values on
-		** change
-		** 
-		** @return void
-		*/	
+		/// <summary>
+		/// Handles the event when the visibility fade mode changes.
+		/// </summary>
+		/// <param name="index">The index of the selected item.</param>
 		private void _OnVisibilityFadeModeChanged( int index )
 		{
 			OptionButton selectable = Trait<Selectable>().Select(0).GetNode() as OptionButton;
 			StatesUtils.Get().VisibilityFadeMode = selectable.GetItemText(index);
 		}
 		
+		/// <summary>
+		/// Handles the event when the visibility range begin value changes.
+		/// </summary>
+		/// <param name="value">The new value of the visibility range begin.</param>
 		private void _OnVisibilityRangeBeginChanged( double value ) 
 		{
 			StatesUtils.Get().VisibilityRangeBegin = (float)value;
 		}
 		
+		/// <summary>
+		/// Handles the event when the visibility range begin margin value changes.
+		/// </summary>
+		/// <param name="value">The new value of the visibility range begin margin.</param>
 		private void _OnVisibilityRangeBeginMarginChanged( double value ) 
 		{
 			StatesUtils.Get().VisibilityRangeBeginMargin = (float)value;
 		}
 		
+		/// <summary>
+		/// Handles the event when the visibility range end value changes.
+		/// </summary>
+		/// <param name="value">The new value of the visibility range end.</param>
 		private void _OnVisibilityRangeEndChanged( double value ) 
 		{
 			StatesUtils.Get().VisibilityRangeEnd = (float)value;
 		}
 		
+		/// <summary>
+        /// Handles the event when the visibility range end margin value changes.
+        /// </summary>
+        /// <param name="value">The new value of the visibility range end margin.</param>
 		private void _OnVisibilityRangeEndMarginChanged( double value ) 
 		{
 			StatesUtils.Get().VisibilityRangeEndMargin = (float)value;
 		}
 		
+		/// <summary>
+		/// Checks if the checkbox is checked.
+		/// </summary>
+		/// <returns>A boolean value indicating whether the checkbox is checked.</returns>
 		private bool IsCheckboxChecked()
 		{
 			return state == true;
 		}
 		
-		/*
-		** Resets the component
-		** 
-		** @return void
-		*/	
+		/// <summary>
+		/// Resets the visibility range component.
+		/// </summary>
 		public void Reset()
 		{
 			// StatesUtils.Get().VisibilityRangeState = GlobalStates.LibraryStateEnum.Disabled;
@@ -268,6 +292,10 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			state = false;
 		}
 		
+		/// <summary>
+		/// Checks whether the visibility range component is valid.
+		/// </summary>
+		/// <returns>A boolean value indicating whether the component is valid.</returns>
 		public bool IsValid()
 		{
 			return
@@ -278,12 +306,9 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 				false != HasTrait<Checkable>();
 		}
 		
-		/*
-		** Syncronizes it's value to a global
-		** central state controller
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Synchronizes the value of the visibility range component to a global central state controller.
+		/// </summary>
 		public override void Sync() 
 		{
 			// if( StatesUtils.Get().VisibilityRangeState == GlobalStates.LibraryStateEnum.Enabled ) 
@@ -293,3 +318,5 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		}
 	}
 }
+
+#endif

@@ -20,16 +20,21 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using System.Collections.Generic;
+using AssetSnap.Component;
+using AssetSnap.Explorer;
+using AssetSnap.Front.Components.Groups.Builder.GroupOptions;
+using AssetSnap.Instance.Input;
+using AssetSnap.States;
+using Godot;
+
 namespace AssetSnap.Front.Components.Groups.Builder
 {
-	using System.Collections.Generic;
-	using AssetSnap.Component;
-	using AssetSnap.Explorer;
-	using AssetSnap.Front.Components.Groups.Builder.GroupOptions;
-	using AssetSnap.Instance.Input;
-	using AssetSnap.States;
-	using Godot;
-
+	/// <summary>
+	/// Provides options for editing a group in the editor.
+	/// </summary>
 	[Tool]
 	public partial class EditorGroupOptions : LibraryComponent
 	{
@@ -60,6 +65,9 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		private VisibilityEndMargin _GroupBuilderEditorGroupOptionVisibilityEndMargin;
 		private VisibilityFadeMode _GroupBuilderEditorGroupOptionFadeMode;
 		
+		/// <summary>
+		/// Initializes a new instance of the <see cref="EditorGroupOptions"/> class.
+		/// </summary>
 		public EditorGroupOptions()
 		{
 			Name = "GroupBuilderEditorGroupOptions";
@@ -76,6 +84,11 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			//_include = false;
 		}
 
+		/// <summary>
+		/// Removes the specified option instance.
+		/// </summary>
+		/// <param name="_object">The object to remove.</param>
+		/// <param name="debug">Whether to enable debug mode.</param>
 		private void RemoveOptionInstance(GroupOptionComponent _object, bool debug = false)
 		{
 			if (
@@ -88,6 +101,11 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			}
 		}
 
+		/// <summary>
+		/// Clears the specified option instance.
+		/// </summary>
+		/// <param name="_object">The object to clear.</param>
+		/// <param name="debug">Whether to enable debug mode.</param>
 		private void ClearOptionInstance(GroupOptionComponent _object, bool debug = false)
 		{
 			if (
@@ -99,6 +117,9 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			}
 		}
 
+		/// <summary>
+		/// Initializes the editor group options.
+		/// </summary>
 		public override void Initialize()
 		{
 			if (Initiated)
@@ -119,6 +140,9 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			_FinalizeFields();
 		}
 
+		/// <summary>
+		/// Initializes the fields for the editor group options.
+		/// </summary>
 		public void _InitializeFields()
 		{
 			Trait<Panelable>()
@@ -210,6 +234,9 @@ namespace AssetSnap.Front.Components.Groups.Builder
 				.Instantiate();
 		}
 
+		/// <summary>
+		/// Initializes the components for the editor group options.
+		/// </summary>
 		private void _InitializeComponents()
 		{
 			List<string> PlacementModesComponents = new()
@@ -575,17 +602,20 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			
 		}
 
+		/// <summary>
+		/// Finalizes the fields by setting up containers and adding elements to them.
+		/// </summary>
 		private void _FinalizeFields()
 		{
-			Container containerOne = Trait<Containerable>()
+			Godot.Container containerOne = Trait<Containerable>()
 				.Select(0)
 				.GetInnerContainer();
 
-			Container containerTwoOne = Trait<Containerable>()
+			Godot.Container containerTwoOne = Trait<Containerable>()
 				.Select(1)
 				.GetInnerContainer(0);
 
-			Container containerTwoTwo = Trait<Containerable>()
+			Godot.Container containerTwoTwo = Trait<Containerable>()
 				.Select(1)
 				.GetInnerContainer(1);
 
@@ -654,16 +684,27 @@ namespace AssetSnap.Front.Components.Groups.Builder
 				);
 		}
 
+		/// <summary>
+		/// Shows the control.
+		/// </summary>
 		public void DoShow()
 		{
 			Visible = true;
 		}
 
+		/// <summary>
+		/// Hides the control.
+		/// </summary>
 		public void DoHide()
 		{
 			Visible = false;
 		}
 
+		/// <summary>
+		/// Updates the specified group option.
+		/// </summary>
+		/// <param name="Name">The name of the option.</param>
+		/// <param name="value">The value of the option.</param>
 		public void _UpdateGroupOption(string Name, Variant value)
 		{
 			if (true == _GroupBuilderEditorGroupOptionSnapToObject.GetValue())
@@ -716,6 +757,9 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			}
 		}
 
+		/// <summary>
+		/// Updates all group options.
+		/// </summary>
 		public void _UpdateGroupOptions()
 		{
 			if (null == StatesUtils.Get().Group)
@@ -798,51 +842,93 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			}
 		}
 
-		private void _InitializeGroupOptionSnapObjectPositionTitle(Container Container)
+		/// <summary>
+		/// Initializes the title for snap object position in the specified container.
+		/// </summary>
+		/// <param name="Container">The container to add the title to.</param>
+		private void _InitializeGroupOptionSnapObjectPositionTitle(Godot.Container Container)
 		{
 			Container.AddChild(_GenerateTitle("InitializeGroupOptionSnapObjectPositionTitle", "Snap object position"));
 		}
 
-		private void _InitializeGroupOptionSnapObjectTitle(Container Container)
+		/// <summary>
+		/// Initializes the title for snap object options in the specified container.
+		/// </summary>
+		/// <param name="Container">The container to add the title to.</param>
+		private void _InitializeGroupOptionSnapObjectTitle(Godot.Container Container)
 		{
 			Container.AddChild(_GenerateTitle("InitializeGroupOptionSnapObjectTitleContainer", "Snap to object options"));
 		}
 
-		private void _InitializeGroupOptionSnapTitle(Container Container)
+		/// <summary>
+		/// Initializes the title for snap options in the specified container.
+		/// </summary>
+		/// <param name="Container">The container to add the title to.</param>
+		private void _InitializeGroupOptionSnapTitle(Godot.Container Container)
 		{
 			Container.AddChild(_GenerateTitle("InitializeGroupOptionSnapTitleContainer", "Snap options"));
 		}
 
-		private void _InitializeGroupOptionCollisionTitle(Container Container)
+		/// <summary>
+		/// Initializes the title for collision options in the specified container.
+		/// </summary>
+		/// <param name="Container">The container to add the title to.</param>
+		private void _InitializeGroupOptionCollisionTitle(Godot.Container Container)
 		{
 			Container.AddChild(_GenerateTitle("InitializeGroupOptionCollisionTitleContainer", "Collision options"));
 		}
 
-		private void _InitializeGroupOptionDragTitle(Container Container)
+		/// <summary>
+		/// Initializes the title for drag options in the specified container.
+		/// </summary>
+		/// <param name="Container">The container to add the title to.</param>
+		private void _InitializeGroupOptionDragTitle(Godot.Container Container)
 		{
 			Container.AddChild(_GenerateTitle("InitializeGroupOptionDragTitleContainer", "Drag options"));
 		}
 
-		private void _InitializeGroupOptionPlacementModeTitle(Container Container)
+		/// <summary>
+		/// Initializes the title for placement modes in the specified container.
+		/// </summary>
+		/// <param name="Container">The container to add the title to.</param>
+		private void _InitializeGroupOptionPlacementModeTitle(Godot.Container Container)
 		{
 			Container.AddChild(_GenerateTitle("_InitializeGroupOptionPlacementModeTitle", "Placement Modes"));
 		}
 		
-		private void _InitializeGroupOptionLODTitle(Container Container)
+		/// <summary>
+		/// Initializes the title for level of details in the specified container.
+		/// </summary>
+		/// <param name="Container">The container to add the title to.</param>
+		private void _InitializeGroupOptionLODTitle(Godot.Container Container)
 		{
 			Container.AddChild(_GenerateTitle("_InitializeGroupOptionLODTitle", "Level of details"));
 		}
 		
-		private void _InitializeGroupOptionVisibilityRangeTitle(Container Container ) 
+		/// <summary>
+		/// Initializes the title for visibility range in the specified container.
+		/// </summary>
+		/// <param name="Container">The container to add the title to.</param>
+		private void _InitializeGroupOptionVisibilityRangeTitle(Godot.Container Container ) 
 		{
 			Container.AddChild(_GenerateTitle("_InitializeGroupOptionVisibilityTitle", "Visibility"));
 		}
 		
-		private void _InitializeGroupOptionFadeModeTitle(Container Container)
+		/// <summary>
+		/// Initializes the title for fade mode in the specified container.
+		/// </summary>
+		/// <param name="Container">The container to add the title to.</param>
+		private void _InitializeGroupOptionFadeModeTitle(Godot.Container Container)
 		{
 			Container.AddChild(_GenerateTitle("_InitializeGroupOptionVisibilityFadeModeTitle", "Visibility Fade Mode"));
 		}
 
+		/// <summary>
+		/// Generates a title label inside a margin container.
+		/// </summary>
+		/// <param name="name">The name of the margin container.</param>
+		/// <param name="text">The text of the title label.</param>
+		/// <returns>The generated margin container with the title label.</returns>
 		private MarginContainer _GenerateTitle(string name, string text)
 		{
 			MarginContainer _innerContainer = new()
@@ -864,6 +950,9 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			return _innerContainer;
 		}
 
+		/// <summary>
+		/// Handles the event when the close options button is pressed.
+		/// </summary>
 		private void _OnCloseOptionsPressed()
 		{
 			DoHide();
@@ -871,3 +960,5 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		}
 	}
 }
+
+#endif

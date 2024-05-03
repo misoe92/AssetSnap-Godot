@@ -19,24 +19,32 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+
 #if TOOLS
+
+using System.Collections.Generic;
+using AssetSnap.Explorer;
+using AssetSnap.Front.Components.Groups.Builder;
+using AssetSnap.Front.Nodes;
+using AssetSnap.States;
+using Godot;
+
 namespace AssetSnap.GroupBuilder
 {
-	using System.Collections.Generic;
-	using AssetSnap.Explorer;
-	using AssetSnap.Front.Components.Groups.Builder;
-	using AssetSnap.Front.Nodes;
-	using AssetSnap.States;
-	using Godot;
-
+	/// <summary>
+	/// Base class for managing the group builder functionality.
+	/// </summary>
 	[Tool]
 	public partial class Base
 	{
+		/// <summary>
+		/// Indicates whether the group builder is initialized.
+		/// </summary>
 		public bool Initialized = false;
 
-		/*
-		** Public
-		*/
+		/// <summary>
+		/// Gets the singleton instance of the Base class.
+		/// </summary>
 		public static Base Singleton
 		{
 			get
@@ -70,14 +78,18 @@ namespace AssetSnap.GroupBuilder
 		};
 		private static Base _Instance;
 
-		/*
-		** Initializes the group builder
-		*/
+		/// <summary>
+		/// Initializes the group builder.
+		/// </summary>
 		public void Initialize()
 		{
 			StatesUtils.SetLoad("GroupBuilder", true);
 		}
-
+		
+		/// <summary>
+		/// Checks if the context menu is visible.
+		/// </summary>
+		/// <returns>True if the context menu is visible, false otherwise.</returns>
 		public bool MenuVisible()
 		{
 			if (
@@ -94,6 +106,10 @@ namespace AssetSnap.GroupBuilder
 					GetMenu().IsVisible();
 		}
 
+		/// <summary>
+		/// Checks if the context menu exists.
+		/// </summary>
+		/// <returns>True if the context menu exists, false otherwise.</returns>
 		public bool HasMenu()
 		{
 			if (
@@ -109,6 +125,10 @@ namespace AssetSnap.GroupBuilder
 				.HasNode("GroupContextMenu");
 		}
 
+		/// <summary>
+		/// Gets the context menu instance.
+		/// </summary>
+		/// <returns>The context menu instance, or null if not found.</returns>
 		public AsGroupContextMenu GetMenu()
 		{
 			if( false == Plugin.Singleton.HasInternalContainer() ) 
@@ -121,6 +141,9 @@ namespace AssetSnap.GroupBuilder
 				.GetNode("GroupContextMenu") as AsGroupContextMenu;
 		}
 
+		/// <summary>
+		/// Creates the context menu.
+		/// </summary>
 		public void CreateMenu()
 		{
 			if( false == Plugin.Singleton.HasInternalContainer() ) 
@@ -139,6 +162,11 @@ namespace AssetSnap.GroupBuilder
 				.AddChild(menu);
 		}
 
+		/// <summary>
+		/// Shows the context menu at the specified coordinates.
+		/// </summary>
+		/// <param name="coordinates">The coordinates to show the menu at.</param>
+		/// <param name="path">The path to the menu.</param>
 		public void ShowMenu(Vector2 coordinates, string path)
 		{
 			if (!HasMenu())
@@ -149,6 +177,10 @@ namespace AssetSnap.GroupBuilder
 			GetMenu().ShowMenu(coordinates, path);
 		}
 
+		/// <summary>
+		/// Hides the context menu if it is visible.
+		/// </summary>
+		/// <param name="coordinates">The coordinates to hide the menu at.</param>
 		public void MaybeHideMenu(Vector2 coordinates)
 		{
 			if (!HasMenu() || true == GetMenu().IsHidden())
@@ -159,9 +191,9 @@ namespace AssetSnap.GroupBuilder
 			GetMenu().MaybeHideMenu(coordinates);
 		}
 
-		/*
-		** Initializes the container in the assets tab
-		*/
+		/// <summary>
+		/// Initializes the container in the assets tab.
+		/// </summary>
 		public void InitializeContainer()
 		{
 			Component.Base Components = ExplorerUtils.Get().Components;
@@ -228,6 +260,9 @@ namespace AssetSnap.GroupBuilder
 			}
 		}
 
+		/// <summary>
+		/// Clears the container and its contents.
+		/// </summary>
 		public void ClearContainer()
 		{
 			_Sidebar.Clear();
@@ -249,15 +284,28 @@ namespace AssetSnap.GroupBuilder
 			}
 		}
 
+		/// <summary>
+		/// Checks if the sidebar exists.
+		/// </summary>
+		/// <returns>True if the sidebar exists, false otherwise.</returns>
 		public bool HasSidebar()
 		{
 			return null != _Sidebar;
 		}
 
+		/// <summary>
+		/// Checks if the editor listing exists.
+		/// </summary>
+		/// <returns>True if the editor listing exists, false otherwise.</returns>
 		public bool HasListing()
 		{
 			return null != _Editor;
 		}
+		
+		/// <summary>
+		/// Checks if the group container exists.
+		/// </summary>
+		/// <returns>True if the group container exists, false otherwise.</returns>
 		private bool HasGroupContainer()
 		{
 			return null != _GroupContainer;

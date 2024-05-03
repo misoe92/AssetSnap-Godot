@@ -20,28 +20,38 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using AssetSnap.States;
+using Godot;
+
 namespace AssetSnap.Component
 {
-    using AssetSnap.States;
-    using Godot;
-
+	/// <summary>
+	/// Base class for components related to Library Snap.
+	/// </summary>	
 	public partial class LSSnapComponent : LibraryComponent
 	{
 		protected GlobalStates.SnapAngleEnums Angle;
-		
-		/** Callables **/
 		protected Callable _SpinBoxCallable;
 		
 		public float _value = 0.0f;
 		public bool state = false;
 		public bool UsingGlue = false;
 		
+		/// <summary>
+		/// Initializes a new instance of the <see cref="LSSnapComponent"/> class.
+		/// </summary>
 		public LSSnapComponent()
 		{
 			Name = "LSSnapComponent";
 			//_include = false;
 		}
 		
+		/// <summary>
+		/// Updates the values based on the snap settings.
+		/// </summary>
+		/// <param name="data">Array of data.</param>
 		public virtual void MaybeUpdateValue(Godot.Collections.Array data)
 		{
 			if( IsSnapTo() && false == IsSnapToChecked() ) 
@@ -78,12 +88,10 @@ namespace AssetSnap.Component
 			}
 		}
 		
-		/*
-		** Sets the state of the main checkbox
-		** 
-		** @param bool state
-		** @return void
-		*/
+		/// <summary>
+		/// Sets the state of the main checkbox.
+		/// </summary>
+		/// <param name="state">The state to set.</param>
 		public void SetState( bool state )
 		{
 			if( IsValid() ) 
@@ -93,22 +101,21 @@ namespace AssetSnap.Component
 			}
 		}
 			
-		/*
-		** Applies glue to the boundary's Y axis
-		** 
-		** @return Vector3
-		*/
+		/// <summary>
+		/// Applies glue to the boundary's Y axis.
+		/// </summary>
+		/// <param name="Origin">The original vector.</param>
+		/// <returns>The modified vector with glue applied.</returns>
 		public Vector3 ApplyGlue( Vector3 Origin )
 		{
 			Origin.Y = _GlobalExplorer.States.SnapToHeightValue;
 			return Origin;
 		}
 				  
-		/*
-		** Checks if Snap to height is enabled
-		**
-		** @return bool
-		*/
+		/// <summary>
+		/// Checks if Snap to height is enabled.
+		/// </summary>
+		/// <returns><c>true</c> if Snap to height is enabled; otherwise, <c>false</c>.</returns>
 		public bool IsSnapTo()
 		{
 			switch( Angle ) 
@@ -126,11 +133,10 @@ namespace AssetSnap.Component
 			return false;
 		}
 
-		/*
-		** Checks if Snap to height glue is enabled
-		**
-		** @return bool
-		*/
+		/// <summary>
+		/// Checks if Snap to height glue is enabled.
+		/// </summary>
+		/// <returns><c>true</c> if Snap to height glue is enabled; otherwise, <c>false</c>.</returns>
 		public bool IsSnapToGlue()
 		{
 			switch( Angle ) 
@@ -148,11 +154,10 @@ namespace AssetSnap.Component
 			return false;
 		}
 		
-		/*
-		** Checks if Snap to x is checked
-		**
-		** @return bool
-		*/
+		/// <summary>
+		/// Checks if Snap to x is checked.
+		/// </summary>
+		/// <returns><c>true</c> if Snap to x is checked; otherwise, <c>false</c>.</returns>
 		protected bool IsSnapToChecked()
 		{
 			if( IsValid() ) 
@@ -163,11 +168,10 @@ namespace AssetSnap.Component
 			return false;
 		}
 		
-		/*
-		** Checks if Snap to x glue is checked
-		**
-		** @return bool
-		*/
+		/// <summary>
+		/// Checks if Snap to x glue is checked.
+		/// </summary>
+		/// <returns><c>true</c> if Snap to x glue is checked; otherwise, <c>false</c>.</returns>
 		protected bool IsSnapToGlueChecked()
 		{
 			if( IsValid() ) 
@@ -178,11 +182,10 @@ namespace AssetSnap.Component
 			return false;
 		}
 				
-		/*
-		** Checks if glue checkbox is shown
-		**
-		** @return bool
-		*/
+		/// <summary>
+		/// Checks if glue checkbox is shown.
+		/// </summary>
+		/// <returns><c>true</c> if glue checkbox is shown; otherwise, <c>false</c>.</returns>
 		protected bool IsGlueCheckboxShown()
 		{
 			if( IsValid() ) 
@@ -192,7 +195,11 @@ namespace AssetSnap.Component
 			
 			return false;
 		}
-				
+		
+		/// <summary>
+        /// Checks if the component is valid.
+        /// </summary>
+        /// <returns><c>true</c> if the component is valid; otherwise, <c>false</c>.</returns>	
 		public bool IsValid()
 		{
 			return
@@ -202,11 +209,9 @@ namespace AssetSnap.Component
 				false != HasTrait<Checkable>();
 		}
 		
-		/*
-		** Resets the component
-		** 
-		** @return void
-		*/
+		/// <summary>
+        /// Resets the component to its default state.
+        /// </summary>
 		public void Reset()
 		{
 			state = false;
@@ -215,3 +220,5 @@ namespace AssetSnap.Component
 		}
 	}
 }
+
+#endif

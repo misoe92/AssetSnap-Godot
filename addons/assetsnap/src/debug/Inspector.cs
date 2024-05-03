@@ -21,14 +21,18 @@
 // SOFTWARE.
 
 #if TOOLS
+
+using System;
+using System.Collections.Generic;
+using System.Reflection;
+using AssetSnap.Explorer;
+using Godot;
+
 namespace AssetSnap.Debug
 {
-	using System;
-	using System.Collections.Generic;
-	using System.Reflection;
-	using AssetSnap.Explorer;
-	using Godot;
-
+	/// <summary>
+	/// Partial class for managing the inspector in AssetSnap.
+	/// </summary>
 	public partial class Inspector : Node, ISerializationListener
 	{
 		private static readonly string ThemePath = "res://addons/assetsnap/assets/themes/SnapTheme.tres";
@@ -41,6 +45,10 @@ namespace AssetSnap.Debug
 		private Godot.Collections.Dictionary<string, Node> InspectorOptionInstances = new();
 		
 		private static Inspector _Instance;
+		
+		/// <summary>
+		/// Singleton instance of the Inspector class.
+		/// </summary>
 		public static Inspector Singleton 
 		{
 			get
@@ -49,22 +57,34 @@ namespace AssetSnap.Debug
 			}
 		}
 		
+		/// <summary>
+		/// Constructor for Inspector class.
+		/// </summary>
 		public Inspector()
 		{
 			Name = "Inspector";
 			_Instance = this;
 		}
 
+		/// <summary>
+		/// Method called before serialization.
+		/// </summary>
 		public void OnBeforeSerialize()
 		{
 			//
 		}
 
+		/// <summary>
+		/// Method called after deserialization.
+		/// </summary>
 		public void OnAfterDeserialize()
 		{
 			_Instance = this;
 		}
 
+		/// <summary>
+		/// Initializes the inspector.
+		/// </summary>
 		public void Initialize()
 		{
 			_GlobalExplorer = ExplorerUtils.Get();
@@ -99,6 +119,9 @@ namespace AssetSnap.Debug
 			_GlobalExplorer._Plugin.StatesChanged += (Godot.Collections.Array data) => { _OnUpdate(data); };
 		}	
 		
+		/// <summary>
+		/// Adds the inspector to the dock.
+		/// </summary>
 		public void AddToDock()
 		{
 			if( null == _GlobalExplorer || null == _Control ) 
@@ -109,6 +132,9 @@ namespace AssetSnap.Debug
 			_GlobalExplorer._Plugin.AddControlToDock( EditorPlugin.DockSlot.RightUl, _Control );
 		}
 		
+		/// <summary>
+		/// Initializes the inspector title with a predefined text and description.
+		/// </summary>
 		private void _InitializeInspectorTitle()
 		{
 			VBoxContainer LabelContainer = new()
@@ -146,6 +172,10 @@ namespace AssetSnap.Debug
 			_InnerContainer.AddChild(marginContainer);
 		}
 		
+		/// <summary>
+		/// Adds a title to the inspector with the specified text.
+		/// </summary>
+		/// <param name="titleText">The text of the title to be added.</param>
 		public void AddTitle( string titleText )
 		{
 			VBoxContainer LabelContainer = new()
@@ -177,6 +207,11 @@ namespace AssetSnap.Debug
 			_InnerContainer.AddChild(marginContainer);
 		}
 		
+		/// <summary>
+		/// Adds a checkbox with the specified name and value to the inspector.
+		/// </summary>
+		/// <param name="name">The name of the checkbox.</param>
+		/// <param name="value">The initial value of the checkbox.</param>
 		public void AddCheckbox( string name, bool value ) 
 		{
 			PanelContainer panelContainer = new()
@@ -231,6 +266,11 @@ namespace AssetSnap.Debug
 			_InnerContainer.AddChild(panelContainer);
 		}
 		
+		/// <summary>
+		/// Adds a label box with the specified name and value to the inspector.
+		/// </summary>
+		/// <param name="name">The name of the label box.</param>
+		/// <param name="value">The initial value of the label box.</param>
 		public void AddLabelBox(string name, string value )
 		{
 			PanelContainer panelContainer = new()
@@ -293,6 +333,11 @@ namespace AssetSnap.Debug
 			_InnerContainer.AddChild(panelContainer);
 		}
 		
+		/// <summary>
+		/// Adds a spinbox with the specified name and value to the inspector.
+		/// </summary>
+		/// <param name="name">The name of the spinbox.</param>
+		/// <param name="value">The initial value of the spinbox.</param>
 		public void AddSpinbox( string name, float value ) 
 		{
 			PanelContainer panelContainer = new()
@@ -355,6 +400,9 @@ namespace AssetSnap.Debug
 			_InnerContainer.AddChild(panelContainer);
 		}
 		
+		/// <summary>
+		/// Builds the child list of the inspector, adding fields and properties as appropriate.
+		/// </summary>
 		private void _BuildChildList()
 		{
 			Type type = _GlobalExplorer.States.GetType();
@@ -454,6 +502,11 @@ namespace AssetSnap.Debug
 			}
 		}
 		
+		/// <summary>
+		/// Gets the name of the export category for the specified property.
+		/// </summary>
+		/// <param name="propertyInfo">The property info.</param>
+		/// <returns>The name of the export category.</returns>
 		public string GetExportCategoryName(PropertyInfo propertyInfo)
 		{
 			// Check if the property has ExportCategory attribute
@@ -468,6 +521,9 @@ namespace AssetSnap.Debug
 			return "";
 		}
 		
+		/// <summary>
+		/// Clears the current children of the inspector.
+		/// </summary>
 		private void ClearCurrentChildren()
 		{
 			foreach( Node child in _InnerContainer.GetChildren() ) 
@@ -482,6 +538,10 @@ namespace AssetSnap.Debug
 			Categories = new();
 		}
 		
+		/// <summary>
+        /// Callback method invoked when the inspector needs to be updated.
+        /// </summary>
+        /// <param name="data">The data array containing information about the update.</param>
 		private void _OnUpdate( Godot.Collections.Array data )
 		{
 			string key = data[0].As<string>();
@@ -522,8 +582,6 @@ namespace AssetSnap.Debug
 					}
 				}
 			}
-			// ClearCurrentChildren();
-			// _BuildChildList();
 		}
 	}
 }

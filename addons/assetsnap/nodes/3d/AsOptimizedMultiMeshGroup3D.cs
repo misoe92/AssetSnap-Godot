@@ -20,13 +20,14 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using AssetSnap.States;
+using Godot;
+
 namespace AssetSnap.Front.Nodes
 {
-	using AssetSnap.Explorer;
-	using AssetSnap.States;
-
-	using Godot;
-
+	/// <summary>
+	/// Partial class for managing optimized multi-mesh groups in a 3D scene.
+	/// </summary>
 	[Tool]
 	public partial class AsOptimizedMultiMeshGroup3D : Node3D
 	{
@@ -34,13 +35,17 @@ namespace AssetSnap.Front.Nodes
 		protected bool disposed = false;
 		protected bool Initiated = false;
 		
+		/// <summary>
+		/// Gets or sets the current item count in the multi-mesh group.
+		/// </summary>
 		[Export]
 		public int CurrentItemCount { get; set; } = 0;
 		
 		[ExportCategory("Mesh")]
-		/*
-		** The object that will be spawned in this container
-		*/
+		
+		/// <summary>
+		/// Gets or sets the mesh object to be spawned in this container.
+		/// </summary>
 		[Export]
 		public Mesh Object
 		{
@@ -56,11 +61,10 @@ namespace AssetSnap.Front.Nodes
 		}
 		
 		[ExportCategory("MultiMesh Configuration")]
-		/*
-		** Chunk size of our child multi meshes.
-		** 
-		** Too many entries per chunk might cause issues
-		*/
+		
+		/// <summary>
+		/// Gets or sets the chunk size of child multi-meshes.
+		/// </summary>
 		[Export]
 		public int ChunkSize
 		{
@@ -75,7 +79,9 @@ namespace AssetSnap.Front.Nodes
 			}
 		}
 
-		
+		/// <summary>
+		/// Gets or sets the buffer of transform objects.
+		/// </summary>
 		[Export]
 		public Godot.Collections.Array<Transform3D> TransformBuffer
 		{
@@ -90,6 +96,9 @@ namespace AssetSnap.Front.Nodes
 			}
 		}
 		
+		/// <summary>
+		/// Gets or sets the buffer of rules represented as key-value pairs.
+		/// </summary>
 		[Export]
 		public Godot.Collections.Dictionary<string, Variant> RulesBuffer
 		{
@@ -109,6 +118,9 @@ namespace AssetSnap.Front.Nodes
 		private Godot.Collections.Array<Transform3D> _TransformBuffer = new();
 		private Godot.Collections.Dictionary<string, Variant> _RulesBuffer = new();
 
+		/// <summary>
+		/// Called when the node enters the scene tree.
+		/// </summary>
 		public override void _EnterTree()
 		{
 			if( null != GetParent() && IsInstanceValid( GetParent() ) ) 
@@ -129,6 +141,11 @@ namespace AssetSnap.Front.Nodes
 			Initiated = true;
 		}
 		
+		/// <summary>
+		/// Checks if the given rules are equal to the current rules buffer.
+		/// </summary>
+		/// <param name="rules">The rules to compare with.</param>
+		/// <returns>True if the rules are equal, false otherwise.</returns>
 		public bool RulesEqual( Godot.Collections.Dictionary<string, Variant> rules )
 		{
 			if( _RulesBuffer.Count != rules.Count ) 
@@ -165,6 +182,11 @@ namespace AssetSnap.Front.Nodes
 			return true;
 		}
 		
+		/// <summary>
+		/// Adds a transform to the transform buffer and updates the multi-mesh group.
+		/// </summary>
+		/// <param name="transform">The transform to add.</param>
+		/// <returns>The index of the added transform in the buffer.</returns>
 		public int AddToBuffer(Transform3D transform ) 
 		{
 			_TransformBuffer.Add(transform);
@@ -173,6 +195,11 @@ namespace AssetSnap.Front.Nodes
 			return _TransformBuffer.Count - 1;
 		}
 		
+		/// <summary>
+		/// Sets the rules buffer and updates the multi-mesh group.
+		/// </summary>
+		/// <param name="rules">The rules to set.</param>
+		/// <returns>The number of rules in the buffer.</returns>
 		public int SetRules(Godot.Collections.Dictionary<string, Variant> rules ) 
 		{
 			_RulesBuffer = rules;
@@ -181,22 +208,37 @@ namespace AssetSnap.Front.Nodes
 			return _RulesBuffer.Count - 1;
 		}
 		
+		/// <summary>
+		/// Updates the transform and options of a specific instance in the buffer.
+		/// </summary>
+		/// <param name="InstanceId">The instance ID.</param>
+		/// <param name="transform">The new transform.</param>
+		/// <param name="Options">The new options.</param>
 		public void UpdateBuffer( int InstanceId, Transform3D transform, Godot.Collections.Dictionary<string, Variant> Options)
 		{
 			_TransformBuffer[InstanceId] = transform;
 			Update();
 		}
 		
+		/// <summary>
+		/// Updates the multi-mesh group.
+		/// </summary>
 		public void Update()
 		{
 			_Update();
 		}
 		
+		/// <summary>
+		/// Clears the transform buffer.
+		/// </summary>
 		private void _ClearBuffer()
 		{
 			_TransformBuffer.Clear();
 		}
 		
+		/// <summary>
+		/// Updates the multi-mesh group based on the current transform buffer.
+		/// </summary>
 		private void _Update()
 		{
 			if( disposed ) 
@@ -246,6 +288,10 @@ namespace AssetSnap.Front.Nodes
 			}
 		}
 		
+		/// <summary>
+		/// Applies rules to the given multi-mesh instance.
+		/// </summary>
+		/// <param name="multiMeshInstance">The multi-mesh instance to apply rules to.</param>
 		private void ApplyRulesTo( AsMultiMeshInstance3D multiMeshInstance ) 
 		{
 			foreach( (string name, Variant value) in RulesBuffer ) 
@@ -279,6 +325,9 @@ namespace AssetSnap.Front.Nodes
 			}
 		}
 		
+		/// <summary>
+		/// Removes and frees all valid child nodes.
+		/// </summary>
 		private void ClearChildren()
 		{
 			foreach (Node child in GetChildren())
@@ -291,6 +340,9 @@ namespace AssetSnap.Front.Nodes
 			}
 		}
 
+		/// <summary>
+		/// Called when the node is about to be removed from the scene tree.
+		/// </summary>
 		public override void _ExitTree()
 		{
 			GlobalExplorer.GetInstance().States.OptimizedGroups.Remove(_Object);

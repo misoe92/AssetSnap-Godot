@@ -20,15 +20,23 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using AssetSnap.Component;
+using AssetSnap.States;
+using Godot;
+
 namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 {
-	using AssetSnap.Component;
-	using AssetSnap.States;
-	using Godot;
-
+	/// <summary>
+	/// Represents a group option for setting the visibility range beginning.
+	/// </summary>
 	[Tool]
 	public partial class VisibilityBegin : GroupOptionSpinboxableComponent
 	{
+		/// <summary>
+		/// Constructor for the VisibilityBegin class.
+		/// </summary>
 		public VisibilityBegin()
 		{
 			Name = "GroupsBuilderGroupOptionsVisibilityBegin";
@@ -39,6 +47,9 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 			};
 		}
 		
+		/// <summary>
+		/// Initializes the fields for the VisibilityBegin component.
+		/// </summary>
 		protected override void _InitializeFields()
 		{
 			Trait<Spinboxable>()
@@ -57,6 +68,10 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 				.GetLineEdit().AddThemeConstantOverride("minimum_character_width", 24);
 		}
 
+		/// <summary>
+        /// Handles the value changed event for the visibility range.
+        /// </summary>
+        /// <param name="value">The new value of the visibility range.</param>
 		private void _OnValueChanged( float value )
 		{
 			if( StatesUtils.Get().PlacingMode == GlobalStates.PlacingModeEnum.Group ) 
@@ -68,3 +83,5 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 		}
 	}
 }
+
+#endif

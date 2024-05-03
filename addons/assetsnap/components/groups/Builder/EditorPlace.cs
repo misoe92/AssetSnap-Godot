@@ -20,19 +20,27 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using AssetSnap.Component;
+using AssetSnap.Explorer;
+using AssetSnap.Instance.Input;
+using AssetSnap.States;
+using Godot;
+
 namespace AssetSnap.Front.Components.Groups.Builder
 {
-	using AssetSnap.Component;
-	using AssetSnap.Explorer;
-	using AssetSnap.Instance.Input;
-	using AssetSnap.States;
-	using Godot;
-
+	/// <summary>
+	/// Editor component for placing groups of objects in the 3D world.
+	/// </summary>
 	[Tool]
 	public partial class EditorPlace : LibraryComponent
 	{
 		private static readonly string Text = "Place";
 
+		/// <summary>
+		/// Constructor for EditorPlace class.
+		/// </summary>
 		public EditorPlace()
 		{
 			Name = "GroupBuilderEditorPlace";
@@ -47,6 +55,9 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			//_include = false;
 		}
 
+		/// <summary>
+		/// Initializes the EditorPlace component.
+		/// </summary>
 		public override void Initialize()
 		{
 			if (Initiated)
@@ -62,6 +73,9 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			_FinalizeFields();
 		}
 
+		/// <summary>
+		/// Shows the EditorPlace component.
+		/// </summary>
 		public void DoShow()
 		{
 			Trait<Buttonable>()
@@ -69,6 +83,9 @@ namespace AssetSnap.Front.Components.Groups.Builder
 				.SetVisible(true);
 		}
 
+		/// <summary>
+		/// Hides the EditorPlace component.
+		/// </summary>
 		public void DoHide()
 		{
 			Trait<Buttonable>()
@@ -76,6 +93,9 @@ namespace AssetSnap.Front.Components.Groups.Builder
 				.SetVisible(false);
 		}
 
+		/// <summary>
+		/// Handles the action when placing a group.
+		/// </summary>
 		private void _OnPlaceGroup()
 		{
 			ExplorerUtils.Get().GroupBuilder._Editor.OpenGroupOptions();
@@ -100,6 +120,9 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			}
 		}
 
+		/// <summary>
+		/// Initializes the fields of the EditorPlace component.
+		/// </summary>
 		private void _InitializeFields()
 		{
 			Trait<Buttonable>()
@@ -113,6 +136,9 @@ namespace AssetSnap.Front.Components.Groups.Builder
 				.Instantiate();
 		}
 
+		/// <summary>
+        /// Finalizes the fields of the EditorPlace component.
+        /// </summary>
 		private void _FinalizeFields()
 		{
 			Trait<Buttonable>()
@@ -123,3 +149,5 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		}
 	}
 }
+
+#endif

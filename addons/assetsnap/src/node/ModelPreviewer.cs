@@ -1,14 +1,44 @@
+// MIT License
+
+// Copyright (c) 2024 Mike Sørensen
+
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
+using System.Threading.Tasks;
+using AssetSnap.Explorer;
+using AssetSnap.Front.Nodes;
+using AssetSnap.Static;
+using Godot;
+
 namespace AssetSnap.Nodes
 {
-	using System;
-	using System.Threading.Tasks;
-	using AssetSnap.Explorer;
-	using AssetSnap.Static;
-	using Godot;
-
+	/// <summary>
+	/// Handles generating preview images for models.
+	/// </summary>
 	[Tool]
 	class ModelPreviewer
 	{
+		private static ModelPreviewer _Instance;
+		
+		/// <summary>
+		/// Gets the singleton instance of the ModelPreviewer.
+		/// </summary>
 		public static ModelPreviewer Singleton
 		{
 			get
@@ -22,9 +52,6 @@ namespace AssetSnap.Nodes
 			}
 		}
 
-
-		private static ModelPreviewer _Instance;
-
 		public Vector2I Size = new Vector2I(SettingsStatic.PreviewImageSize(), SettingsStatic.PreviewImageSize());
 
 		public Godot.Collections.Array<string> Queue = new();
@@ -35,9 +62,9 @@ namespace AssetSnap.Nodes
 		private SubViewport _viewport;
 		private Camera3D Camera;
 
-		/*
-		** Prepare conditions for preview image extraction
-		*/
+		/// <summary>
+		/// Prepares conditions for preview image extraction.
+		/// </summary>
 		public void Enter()
 		{
 			Godot.Environment environment = new()
@@ -122,6 +149,10 @@ namespace AssetSnap.Nodes
 			_viewport.AddChild(Camera);
 		}
 
+		/// <summary>
+		/// Clears the preview images in the specified directory.
+		/// </summary>
+		/// <param name="AbsolutePath">The absolute path of the directory containing the preview images.</param>
 		public static void ClearPreviewImages(string AbsolutePath)
 		{
 			if (DirAccess.DirExistsAbsolute(AbsolutePath))
@@ -161,6 +192,12 @@ namespace AssetSnap.Nodes
 			}
 		}
 
+		/// <summary>
+		/// Adds a model file path and associated TextureRect to the preview queue.
+		/// </summary>
+		/// <param name="FilePath">The file path of the model.</param>
+		/// <param name="_TextureRect">The TextureRect to associate with the model.</param>
+		/// <param name="LibraryName">The name of the library containing the model.</param>
 		public void AddToQueue(string FilePath, TextureRect _TextureRect, string LibraryName)
 		{
 			Queue.Add(FilePath);
@@ -168,9 +205,9 @@ namespace AssetSnap.Nodes
 			QueueLibrary.Add(LibraryName);
 		}
 
-		/*
-		** Cleanup after usage
-		*/
+		/// <summary>
+		/// Cleans up after usage.
+		/// </summary>
 		public void Leave()
 		{
 			Plugin.Singleton
@@ -181,11 +218,18 @@ namespace AssetSnap.Nodes
 			_viewport = null;
 		}
 
+		/// <summary>
+		/// Gets the number of items in the preview queue.
+		/// </summary>
+		/// <returns>The number of items in the queue.</returns>
 		public int Count()
 		{
 			return Queue.Count;
 		}
 
+		/// <summary>
+		/// Generates preview images for models in the queue.
+		/// </summary>
 		public async void GeneratePreviews()
 		{
 			int MaxCount = Queue.Count;
@@ -210,6 +254,14 @@ namespace AssetSnap.Nodes
 			}
 		}
 
+		/// <summary>
+		/// Generates a preview texture for the specified model.
+		/// </summary>
+		/// <param name="fbxPath">The file path of the model.</param>
+		/// <param name="width">The width of the preview image.</param>
+		/// <param name="height">The height of the preview image.</param>
+		/// <param name="LibraryName">The name of the library containing the model.</param>
+		/// <returns>The generated preview texture.</returns>
 		public async Task<Texture2D> GeneratePreviewTexture(string fbxPath, int width, int height, string LibraryName)
 		{
 			// Generate the preview image
@@ -221,6 +273,14 @@ namespace AssetSnap.Nodes
 			return imageTexture;
 		}
 
+		/// <summary>
+		/// Generates a preview image for the specified model.
+		/// </summary>
+		/// <param name="path">The file path of the model.</param>
+		/// <param name="width">The width of the preview image.</param>
+		/// <param name="height">The height of the preview image.</param>
+		/// <param name="LibraryName">The name of the library containing the model.</param>
+		/// <returns>The generated preview image.</returns>
 		public async Task<Image> GeneratePreviewImage(string path, int width, int height, string LibraryName)
 		{
 			try 
@@ -317,6 +377,10 @@ namespace AssetSnap.Nodes
 			}
 		}
 
+		/// <summary>
+		/// Adjusts the camera focus based on the provided node's AABB (Axis-Aligned Bounding Box).
+		/// </summary>
+		/// <param name="node">The node to focus the camera on.</param>
 		private void _AdjustCameraFocus(Node node)
 		{
 			Transform3D transform = new Transform3D(Basis.Identity, Vector3.Zero);
@@ -330,6 +394,10 @@ namespace AssetSnap.Nodes
 			Camera.GlobalTransform = transform.Orthonormalized();
 		}
 
+		/// <summary>
+		/// Renders the viewport to an Image and returns it as a preview.
+		/// </summary>
+		/// <returns>The generated preview Image.</returns>
 		private Image _MakePreview()
 		{
 			// Set the viewport size to the specified Size
@@ -344,6 +412,13 @@ namespace AssetSnap.Nodes
 			return preview;
 		}
 
+		/// <summary>
+		/// Saves the provided preview image to the specified directory with optional suffix and library name.
+		/// </summary>
+		/// <param name="name">The name of the preview image.</param>
+		/// <param name="preview">The preview image to save.</param>
+		/// <param name="suffix">An optional suffix to append to the filename.</param>
+		/// <param name="LibraryName">The name of the library containing the model.</param>
 		private void _SavePreview(string name, Image preview, string suffix = "", string LibraryName = "")
 		{
 			if (false == DirAccess.DirExistsAbsolute("res://assetsnap"))

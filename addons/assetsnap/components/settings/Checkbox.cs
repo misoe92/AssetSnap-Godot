@@ -20,19 +20,27 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using AssetSnap.Component;
+using AssetSnap.Explorer;
+using AssetSnap.Static;
+using Godot;
+
 namespace AssetSnap.Front.Components
 {
-	using AssetSnap.Component;
-	using AssetSnap.Explorer;
-	using AssetSnap.Static;
-	using Godot;
-
+	/// <summary>
+	/// A checkbox component for handling settings.
+	/// </summary>
 	[Tool]
 	public partial class SettingsCheckbox : TraitableComponent
 	{
 		private string _key;
 		private bool _value = false;
 		
+		/// <summary>
+		/// The key associated with this setting.
+		/// </summary>
 		public string key 
 		{
 			get => _key;
@@ -42,6 +50,9 @@ namespace AssetSnap.Front.Components
 			}
 		}
 		
+		/// <summary>
+        /// The value of the setting.
+        /// </summary>
 		public bool value 
 		{ 
 			get => _value;
@@ -51,11 +62,9 @@ namespace AssetSnap.Front.Components
 			}
 		}
 		
-		/*
-		** Constructor of the component
-		** 
-		** @return void
-		*/
+		/// <summary>
+        /// Constructor of the component.
+        /// </summary>
 		public SettingsCheckbox()
 		{
 			Name = "SettingsCheckbox";
@@ -71,11 +80,9 @@ namespace AssetSnap.Front.Components
 			//_include = false;
 		}
 		
-		/*
-		** Initializing the component
-		** 
-		** @return void
-		*/
+		/// <summary>
+        /// Initializes the component.
+        /// </summary>
 		public override void Initialize() 
 		{
 			base.Initialize();
@@ -165,11 +172,11 @@ namespace AssetSnap.Front.Components
 				);
 		}
 		
-		/*
-		** Configures the title
-		** 
-		** @return void
-		*/
+		/// <summary>
+        /// Configures the title.
+        /// </summary>
+        /// <param name="title">The title of the setting.</param>
+        /// <param name="description">The description of the setting.</param>
 		private void ConfigureTitle( string title, string description)
 		{
 			if( null != title || null != description )
@@ -200,34 +207,31 @@ namespace AssetSnap.Front.Components
 			}
 		}
 		
-		/*
-		** Fetches the title
-		** 
-		** @return string
-		*/
+		/// <summary>
+        /// Fetches the title of the setting.
+        /// </summary>
+        /// <param name="key">The key of the setting.</param>
+        /// <returns>The title of the setting.</returns>
 		public string GetTitle( string key )
 		{
 			string FinalKey = key + "_title";
 			return SettingsText.KeyToString(FinalKey);
 		}
 		
-		/*
-		** Fetches the description
-		** 
-		** @return string
-		*/
+		/// <summary>
+        /// Fetches the description of the setting.
+        /// </summary>
+        /// <param name="key">The key of the setting.</param>
+        /// <returns>The description of the setting.</returns>
 		public string GetDescription( string key )
 		{
 			string FinalKey = key + "_description";
 			return SettingsText.KeyToString(FinalKey);
 		}
 		
-		/*
-		** Updates the settings key and
-		** interval value
-		** 
-		** @return void
-		*/
+		/// <summary>
+        /// Updates the settings key and interval value.
+        /// </summary>
 		public void UpdateKey()
 		{
 			value = !value;
@@ -235,3 +239,5 @@ namespace AssetSnap.Front.Components
 		}
 	}
 }
+
+#endif

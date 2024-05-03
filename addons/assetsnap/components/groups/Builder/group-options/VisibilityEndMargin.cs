@@ -20,15 +20,23 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using AssetSnap.Component;
+using AssetSnap.States;
+using Godot;
+
 namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 {
-	using AssetSnap.Component;
-    using AssetSnap.States;
-    using Godot;
-
+	/// <summary>
+	/// Component defining the visibility end margin option for group builder group options.
+	/// </summary>
 	[Tool]
 	public partial class VisibilityEndMargin : GroupOptionSpinboxableComponent
 	{
+		/// <summary>
+		/// Constructor for the VisibilityEndMargin class.
+		/// </summary>
 		public VisibilityEndMargin()
 		{
 			Name = "GroupsBuilderGroupOptionsVisibilityEndMargin";
@@ -39,6 +47,9 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 			};
 		}
 		
+		/// <summary>
+		/// Initializes the fields required for the visibility end margin component.
+		/// </summary>
 		protected override void _InitializeFields()
 		{
 			Trait<Spinboxable>()
@@ -57,6 +68,10 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 				.GetLineEdit().AddThemeConstantOverride("minimum_character_width", 24);
 		}
 
+		/// <summary>
+        /// Callback function invoked when the value of the spinbox representing end margin changes.
+        /// </summary>
+        /// <param name="value">The new value of the spinbox representing end margin.</param>
 		private void _OnValueChanged( float value )
 		{
 			if( StatesUtils.Get().PlacingMode == GlobalStates.PlacingModeEnum.Group ) 
@@ -68,3 +83,5 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 		}
 	}
 }
+
+#endif

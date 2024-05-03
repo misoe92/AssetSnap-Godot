@@ -25,10 +25,17 @@ using Godot;
 
 namespace AssetSnap.Helpers
 {
+	/// <summary>
+	/// A static helper class for generating unique identifiers.
+	/// </summary>
 	public static class UniqueHelper
 	{
 		private const int RandomLength = 12;
-	
+
+		/// <summary>
+		/// Generates a unique identifier.
+		/// </summary>
+		/// <returns>A unique identifier string.</returns>
 		public static string GenerateId()
 		{
 			// Generate a random string
@@ -40,6 +47,11 @@ namespace AssetSnap.Helpers
 			return uniqueId;
 		}
 
+		/// <summary>
+        /// Generates a random string of specified length.
+        /// </summary>
+        /// <param name="length">The length of the random string.</param>
+        /// <returns>A random string of specified length.</returns>
 		private static string GenerateRandomString(int length)
 		{
 			// Define characters used for random string generation (only letters)

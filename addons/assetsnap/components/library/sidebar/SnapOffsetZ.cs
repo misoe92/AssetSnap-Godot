@@ -20,12 +20,17 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using AssetSnap.Component;
+using AssetSnap.States;
+using Godot;
+
 namespace AssetSnap.Front.Components.Library.Sidebar
 {
-	using AssetSnap.Component;
-	using AssetSnap.States;
-	using Godot;
-
+	/// <summary>
+	/// Represents a component for offsetting the Z axis when snapping to objects.
+	/// </summary>
 	[Tool]
 	public partial class SnapOffsetZ : LSObjectComponent
 	{
@@ -46,11 +51,9 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		private readonly string _Title = "Offset Z: ";
 		private readonly string _Tooltip = "Offsets the Z axis when snapping to object, enabling for precise operations.";
 
-		/*
-		** Constructor of the component
-		** 
-		** @return void
-		*/
+		/// <summary>
+		/// Constructor of the SnapOffsetZ component.
+		/// </summary>
 		public SnapOffsetZ()
 		{
 			Name = "LSSnapOffsetZ";
@@ -63,11 +66,9 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			//_include = false;
 		}
 
-		/*
-		** Initializes the component
-		** 
-		** @return void
-		*/
+		/// <summary>
+		/// Initializes the SnapOffsetZ component.
+		/// </summary>
 		public override void Initialize()
 		{
 			base.Initialize();
@@ -96,6 +97,10 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			Plugin.GetInstance().StatesChanged += (Godot.Collections.Array data) => { MaybeUpdateValue(data); };
 		}
 
+		/// <summary>
+        /// Handles updating the SnapOffsetZ component's value based on state changes.
+        /// </summary>
+        /// <param name="data">The array of data containing state change information.</param>
 		private void MaybeUpdateValue(Godot.Collections.Array data)
 		{
 			if (data[0].As<string>() == "SnapToObject" || data[0].As<string>() == "SnapToObjectOffsetZValue")
@@ -126,6 +131,10 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			}
 		}
 
+		/// <summary>
+		/// Sets the visibility state of the SnapOffsetZ component.
+		/// </summary>
+		/// <param name="state">The visibility state to set.</param>
 		public override void SetVisible(bool state)
 		{
 			if (false == IsValid())
@@ -138,6 +147,10 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 				.SetVisible(state);
 		}
 
+		/// <summary>
+        /// Checks if the SnapOffsetZ component is currently visible.
+        /// </summary>
+        /// <returns>True if the component is visible, otherwise false.</returns>
 		public override bool IsVisible()
 		{
 			if (false == IsValid())
@@ -150,40 +163,37 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 				.IsVisible();
 		}
 
-		/*
-		** Updates the spawn settings of the
-		** model when the component value
-		** is changed
-		** 
-		** @return void
-		*/
+		/// <summary>
+		/// Handles updating the value when the SpinBox value changes.
+		/// </summary>
+		/// <param name="value">The new value of the SpinBox.</param>
 		private void _OnSpinBoxValueChange(float value)
 		{
 			_GlobalExplorer.States.SnapToObjectOffsetZValue = value;
 			UpdateSpawnSettings("SnapToObjectOffsetZValue", value);
 		}
 
-		/*
-		** Fetches the current value
-		** of the component
-		** 
-		** @return float
-		*/
+		/// <summary>
+		/// Retrieves the current value of the SnapOffsetZ component.
+		/// </summary>
+		/// <returns>The current offset value.</returns>
 		public float GetValue()
 		{
 			return _GlobalExplorer.States.SnapToObjectOffsetZValue;
 		}
 
-		/*
-		** Resets the component
-		** 
-		** @return void
-		*/
+		/// <summary>
+		/// Resets the SnapOffsetZ component to its default value.
+		/// </summary>
 		public void Reset()
 		{
 			_GlobalExplorer.States.SnapToObjectOffsetZValue = 0.0f;
 		}
 
+		/// <summary>
+		/// Checks if the SnapOffsetZ component is valid.
+		/// </summary>
+		/// <returns>True if the component is valid, otherwise false.</returns>
 		public bool IsValid()
 		{
 			return
@@ -194,12 +204,9 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 				null != Trait<Spinboxable>();
 		}
 
-		/*
-		** Syncronizes it's value to a global
-		** central state controller
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Synchronizes the SnapOffsetZ component's value with a global state controller.
+		/// </summary>
 		public override void Sync()
 		{
 			if (false == IsValid())
@@ -211,3 +218,5 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		}
 	}
 }
+
+#endif

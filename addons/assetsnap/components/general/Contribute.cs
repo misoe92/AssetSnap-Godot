@@ -20,11 +20,16 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using AssetSnap.Component;
+using Godot;
+
 namespace AssetSnap.Front.Components
 {
-	using AssetSnap.Component;
-	using Godot;
-
+	/// <summary>
+    /// Component for displaying contributors.
+    /// </summary>
 	[Tool]
 	public partial class Contribute : TraitableComponent
 	{
@@ -39,11 +44,9 @@ namespace AssetSnap.Front.Components
 		private MarginContainer _ContributorsContainer;
 		private VBoxContainer _ContributorsInnerContainer;
 			
-		/*
-		** Class constructor
-		** 
-		** @return void
-		*/
+		/// <summary>
+        /// Class constructor.
+        /// </summary>
 		public Contribute()
 		{
 			Name = "Contribute";
@@ -58,11 +61,9 @@ namespace AssetSnap.Front.Components
 			/* -- */  
 		}
 
-		/*
-		** Initializing component
-		** 
-		** @return void
-		*/
+		/// <summary>
+        /// Initializes the component.
+        /// </summary>
 		public override void Initialize()
 		{
 			base.Initialize();
@@ -97,11 +98,9 @@ namespace AssetSnap.Front.Components
 			_SetupContributors();
 		}
 		
-		/*
-		** Sets up the contributor list
-		** 
-		** @return void
-		*/
+		/// <summary>
+        /// Sets up the contributor list.
+        /// </summary>
 		private void _SetupContributors()
 		{
 			_ContributorsContainer = new();
@@ -133,3 +132,5 @@ namespace AssetSnap.Front.Components
 		}
 	}
 }
+
+#endif

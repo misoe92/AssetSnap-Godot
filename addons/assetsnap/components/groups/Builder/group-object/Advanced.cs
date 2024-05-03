@@ -20,16 +20,27 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using AssetSnap.Component;
+using Godot;
+
 namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 {
-	using AssetSnap.Component;
-	using Godot;
-
+	/// <summary>
+	/// Component handling advanced options for group objects in the Groups Builder.
+	/// </summary>
 	[Tool]
 	public partial class Advanced : GroupObjectComponent
 	{
+		/// <summary>
+		/// The parent EditorGroupObject.
+		/// </summary>
 		public EditorGroupObject Parent;
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Advanced"/> class.
+		/// </summary>
 		public Advanced()
 		{
 			Name = "GroupsBuilderGroupObjectAdvanced";
@@ -41,6 +52,9 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 			};
 		}
 
+		/// <summary>
+		/// Initializes fields required for the Advanced component.
+		/// </summary>
 		protected override void _InitializeFields()
 		{
 			Trait<Containerable>()
@@ -74,6 +88,9 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 				.Instantiate();
 		}
 
+		/// <summary>
+		/// Finalizes the initialization of fields for the Advanced component.
+		/// </summary>
 		protected override void _FinalizeFields()
 		{
 			Trait<Buttonable>()
@@ -100,6 +117,9 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 				);
 		}
 
+		/// <summary>
+        /// Handles the action when advanced options are toggled.
+        /// </summary>
 		private void _OnToggleAdvanced()
 		{
 			Parent._GroupBuilderEditorGroupObjectAdvancedContainer.ToggleVisibility();
@@ -118,3 +138,5 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 		}
 	}
 }
+
+#endif

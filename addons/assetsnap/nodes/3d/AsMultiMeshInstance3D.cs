@@ -20,33 +20,40 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using AssetSnap.Nodes;
+using Godot;
+
 namespace AssetSnap.Front.Nodes
 {
-	using AssetSnap.Nodes;
-	using Godot;
-
+	/// <summary>
+	/// Represents a 3D multi-mesh instance with collision capabilities.
+	/// </summary>
 	[Tool]
 	public partial class AsMultiMeshInstance3D : MultiMeshInstance3D, ICollisionableModel
 	{
 		private bool _NoCollisions = false;
 		private bool _ForceCollisions = false;
+		private ModelCollision Collision;
 
 		[ExportCategory("Collisions")]
 
 		[Export]
 		public bool ForceCollisions { get => _ForceCollisions; set { _ForceCollisions = value; } }
-
 		[Export]
 		public bool NoCollisions { get => _NoCollisions; set { _NoCollisions = value; } }
 
-		private ModelCollision Collision;
-
+		/// <summary>
+		/// Constructor for AsMultiMeshInstance3D class.
+		/// </summary>
 		public AsMultiMeshInstance3D()
 		{
 			SetMeta("AsModel", true);
 			SetMeta("Collision", true);
 		}
 
+		/// <summary>
+		/// Called when the node enters the scene tree.
+		/// </summary>
 		public override void _EnterTree()
 		{
 			Collision = new();
@@ -54,6 +61,9 @@ namespace AssetSnap.Front.Nodes
 			base._EnterTree();
 		}
 
+		/// <summary>
+		/// Called when the node is ready.
+		/// </summary>
 		public async override void _Ready()
 		{
 			base._Ready();
@@ -78,11 +88,19 @@ namespace AssetSnap.Front.Nodes
 			}
 		}
 
+		/// <summary>
+		/// Gets the model type of the multi-mesh instance.
+		/// </summary>
+		/// <returns>The model type as ModelTypes.</returns>
 		public ModelDriver.ModelTypes GetModelType()
 		{
 			return ModelDriver.ModelTypes.Simple;
 		}
 
+		/// <summary>
+		/// Gets the collision body associated with this multi-mesh instance.
+		/// </summary>
+		/// <returns>The collision body as AsStaticBody3D, or null if not found.</returns>
 		public AsStaticBody3D GetCollisionBody()
 		{
 			Node child = GetChild(0);
@@ -94,17 +112,29 @@ namespace AssetSnap.Front.Nodes
 			return null;
 		}
 
+		/// <summary>
+		/// Checks if the multi-mesh instance has collision nodes.
+		/// </summary>
+		/// <returns>True if the multi-mesh instance has collision nodes, otherwise false.</returns>
 		public bool HasCollisions()
 		{
 			return GetChildCount() != 0;
 		}
 
+		/// <summary>
+		/// Applies collision to the multi-mesh instance.
+		/// </summary>
+		/// <param name="body">The collision body to apply.</param>
 		public void ApplyCollision(AsStaticBody3D body)
 		{
 			AddChild(body);
 			body.Initialize();
 		}
 
+		/// <summary>
+        /// Updates the viewability of the multi-mesh instance.
+        /// </summary>
+        /// <param name="owner">The owner node.</param>
 		public void UpdateViewability(Node owner = null)
 		{
 			if (null == GetParent())
@@ -137,7 +167,6 @@ namespace AssetSnap.Front.Nodes
 			{
 				GD.PushWarning("No collision body found @ AsMultiMeshInstance3D->UpdateViewability");
 			}
-
 		}
 	}
 }

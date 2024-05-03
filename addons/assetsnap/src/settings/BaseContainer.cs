@@ -20,13 +20,14 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using System.Collections.Generic;
+using AssetSnap.Front.Components;
+using AssetSnap.Front.Configs;
+using AssetSnap.States;
+using Godot;
+
 namespace AssetSnap.Settings
 {
-	using System.Collections.Generic;
-	using AssetSnap.Front.Components;
-	using AssetSnap.Front.Configs;
-	using AssetSnap.States;
-	using Godot;
 
 	public partial class BaseContainer : PanelContainer
 	{
@@ -41,17 +42,18 @@ namespace AssetSnap.Settings
 
 		public bool Initialized = false;
 
+		/// <summary>
+		/// Constructor for the BaseContainer class.
+		/// </summary>
 		public BaseContainer()
 		{
 			Name = "SettingsBaseContainer";
 		}
 
-		/*
-		** Initializes the settings container
-		**
-		** @param SettingsConfig Config
-		** @return void
-		*/
+		/// <summary>
+		/// Initializes the settings container.
+		/// </summary>
+		/// <param name="Config">The settings configuration.</param>
 		public void Initialize()
 		{
 			if (Initialized)
@@ -132,35 +134,32 @@ namespace AssetSnap.Settings
 			StatesUtils.SetLoad("Settings", true);
 		}
 
-		/*
-		** Fetches the setting type by method name
-		**
-		** @param string method
-		** @return string
-		*/
+		/// <summary>
+		/// Fetches the setting type by method name.
+		/// </summary>
+		/// <param name="method">The name of the method.</param>
+		/// <returns>The input type of the setting.</returns>
 		public string GetInputTypeByMethod(string method)
 		{
 			return (string)new Callable(this, method).Call();
 		}
 
-		/*
-		** Checks if the given type is existing
-		**
-		** @param string str
-		** @return bool
-		*/
+		/// <summary>
+		/// Checks if the given type method exists.
+		/// </summary>
+		/// <param name="str">The name of the method.</param>
+		/// <returns>True if the method exists, otherwise false.</returns>
 		public bool HasInputTypeMethod(string str)
 		{
 			var Type = GetType();
 			return Type.GetMethod(str) != null;
 		}
 
-		/*
-		** Fetches the settings container
-		**
-		** @param int Iteration
-		** @return VBoxContainer
-		*/
+		/// <summary>
+		/// Fetches the settings container based on iteration.
+		/// </summary>
+		/// <param name="Iteration">The iteration number.</param>
+		/// <returns>The settings container.</returns>
 		private VBoxContainer GetSettingsContainer(int Iteration)
 		{
 			VBoxContainer EntryContainer = SubContainerOne;
@@ -182,11 +181,9 @@ namespace AssetSnap.Settings
 			return EntryContainer;
 		}
 
-		/*
-		** Renders the various setting
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Renders various settings.
+		/// </summary>
 		private void RenderTypes()
 		{
 			var Iteration = 0;
@@ -234,15 +231,14 @@ namespace AssetSnap.Settings
 			}
 		}
 
-		/*
-		** Renders a string type setting
-		**
-		** @param string key
-		** @param string value
-		** @param string Type
-		** @param VBoxContainer _Container
-		** @return void
-		*/
+		/// <summary>
+		/// Renders a string type setting.
+		/// </summary>
+		/// <param name="key">The key of the setting.</param>
+		/// <param name="value">The value of the setting.</param>
+		/// <param name="Type">The type of the setting.</param>
+		/// <param name="_Container">The container to render the setting in.</param>
+		/// <returns>void</returns>
 		public void RenderStringType(string key, string value, string Type, VBoxContainer _Container)
 		{
 			switch (Type)
@@ -253,15 +249,14 @@ namespace AssetSnap.Settings
 			}
 		}
 
-		/*
-		** Renders a integer type setting
-		**
-		** @param string key
-		** @param float value
-		** @param string Type
-		** @param VBoxContainer _Container
-		** @return void
-		*/
+		/// <summary>
+		/// Renders an integer type setting.
+		/// </summary>
+		/// <param name="key">The key of the setting.</param>
+		/// <param name="value">The value of the setting.</param>
+		/// <param name="Type">The type of the setting.</param>
+		/// <param name="_Container">The container to render the setting in.</param>
+		/// <returns>void</returns>
 		public void RenderIntegerType(string key, float value, string Type, VBoxContainer _Container)
 		{
 			switch (Type)
@@ -285,15 +280,14 @@ namespace AssetSnap.Settings
 			}
 		}
 
-		/*
-		** Renders a boolable type setting
-		**
-		** @param string key
-		** @param bool value
-		** @param string Type
-		** @param VBoxContainer _Container
-		** @return void
-		*/
+		/// <summary>
+		/// Renders a boolean type setting.
+		/// </summary>
+		/// <param name="key">The key of the setting.</param>
+		/// <param name="value">The value of the setting.</param>
+		/// <param name="Type">The type of the setting.</param>
+		/// <param name="_Container">The container to render the setting in.</param>
+		/// <returns>void</returns>
 		public void RenderBoolType(string key, bool value, string Type, VBoxContainer _Container)
 		{
 			switch (Type)
@@ -317,162 +311,146 @@ namespace AssetSnap.Settings
 			}
 		}
 
-		/*
-		** Converts a key to a label
-		**
-		** @param string key
-		** @return string
-		*/
+		/// <summary>
+		/// Converts a key to a label.
+		/// </summary>
+		/// <param name="key">The key to convert.</param>
+		/// <returns>The converted label.</returns>
 		public string KeyToLabel(string key)
 		{
 			return key.Capitalize().Split('_').Join(" ");
 		}
 
-		/*
-		** Defines the input type of allow multi drop
-		**
-		** @return string
-		*/
+		/// <summary>
+		/// Defines the input type for allow multi drop.
+		/// </summary>
+		/// <returns>The input type for allow multi drop.</returns>
 		public string allow_multi_drop_type()
 		{
 			return "CheckBox";
 		}
 
-		/*
-		** Defines the input type of allow model grab
-		**
-		** @return string
-		*/
+		/// <summary>
+		/// Defines the input type for allowing model grab.
+		/// </summary>
+		/// <returns>The input type for allowing model grab.</returns>
 		public string allow_model_grab_type()
 		{
 			return "CheckBox";
 		}
 
-		/*
-		** Defines the input type of add_collisions
-		**
-		** @return string
-		*/
+		/// <summary>
+		/// Defines the input type for adding collisions.
+		/// </summary>
+		/// <returns>The input type for adding collisions.</returns>
 		public string add_collisions_type()
 		{
 			return "CheckBox";
 		}
 
-		/*
-		** Defines the input type of boundary_box_opacity
-		**
-		** @return string
-		*/
+		/// <summary>
+		/// Defines the input type for boundary box opacity.
+		/// </summary>
+		/// <returns>The input type for boundary box opacity.</returns>
 		public string boundary_box_opacity_type()
 		{
 			return "SpinBox";
 		}
 
-		/*
-		** Defines the input type of focus_placed_asset
-		**
-		** @return string
-		*/
+		/// <summary>
+		/// Defines the input type for focusing on placed asset.
+		/// </summary>
+		/// <returns>The input type for focusing on placed asset.</returns>
 		public string focus_placed_asset_type()
 		{
 			return "CheckBox";
 		}
 
-		/*
-		** Defines the input type of use_as_overlay
-		**
-		** @return string
-		*/
+		/// <summary>
+		/// Defines the input type for using as overlay.
+		/// </summary>
+		/// <returns>The input type for using as overlay.</returns>
 		public string use_as_overlay_type()
 		{
 			return "CheckBox";
 		}
 
-		/*
-		** Defines the input type of push_to_scene
-		**
-		** @return string
-		*/
+		/// <summary>
+		/// Defines the input type for pushing to scene.
+		/// </summary>
+		/// <returns>The input type for pushing to scene.</returns>
 		public string push_to_scene_type()
 		{
 			return "CheckBox";
 		}
 
-		/*
-		** Defines the input type of show_snap_boundary_box
-		**
-		** @return string
-		*/
+		/// <summary>
+		/// Defines the input type for showing snap boundary box.
+		/// </summary>
+		/// <returns>The input type for showing snap boundary box.</returns>
 		public string show_snap_boundary_box_type()
 		{
 			return "CheckBox";
 		}
 
-		/*
-		** Defines the input type of allow_drag_add
-		**
-		** @return string
-		*/
+		/// <summary>
+		/// Defines the input type for allowing drag and add.
+		/// </summary>
+		/// <returns>The input type for allowing drag and add.</returns>
 		public string allow_drag_add_type()
 		{
 			return "CheckBox";
 		}
 
-		/*
-		** Defines the input type of allow_group_builder
-		**
-		** @return string
-		*/
+		/// <summary>
+		/// Defines the input type for allowing group builder.
+		/// </summary>
+		/// <returns>The input type for allowing group builder.</returns>
 		public string allow_group_builder_type()
 		{
 			return "CheckBox";
 		}
 
-		/*
-		** Defines the input type of allow_group_builder
-		**
-		** @return string
-		*/
+		/// <summary>
+		/// Defines the input type for enabling model spawn in.
+		/// </summary>
+		/// <returns>The input type for enabling model spawn in.</returns>
 		public string enable_model_spawn_in_type()
 		{
 			return "CheckBox";
 		}
 
-		/*
-		** Defines the input type of allow_group_builder
-		**
-		** @return string
-		*/
+		/// <summary>
+		/// Defines the input type for the initial model spawn in level.
+		/// </summary>
+		/// <returns>The input type for the initial model spawn in level.</returns>
 		public string initial_model_spawn_in_level_type()
 		{
 			return "SpinBox";
 		}
 
-		/*
-		** Defines the input type of allow_group_builder
-		**
-		** @return string
-		*/
+		/// <summary>
+		/// Defines the input type for model preview size.
+		/// </summary>
+		/// <returns>The input type for model preview size.</returns>
 		public string model_preview_size_type()
 		{
 			return "SpinBox";
 		}
 
-		/*
-		** Defines the input type of allow_group_builder
-		**
-		** @return string
-		*/
+		/// <summary>
+		/// Defines the input type for model spawn in duration.
+		/// </summary>
+		/// <returns>The input type for model spawn in duration.</returns>
 		public string model_spawn_in_duration_type()
 		{
 			return "SpinBox";
 		}
 
-		/*
-		** Defines the input type of allow_group_builder
-		**
-		** @return string
-		*/
+		/// <summary>
+		/// Defines the input type for boundary box flat.
+		/// </summary>
+		/// <returns>The input type for boundary box flat.</returns>
 		public string boundary_box_flat_type()
 		{
 			return "CheckBox";

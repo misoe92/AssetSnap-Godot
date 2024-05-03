@@ -21,15 +21,19 @@
 // SOFTWARE.
 
 #if TOOLS
+
+using System;
+using System.Reflection;
+using AssetSnap.Abstracts;
+using AssetSnap.Explorer;
+using Godot;
+using Godot.Collections;
+
 namespace AssetSnap.Component
 {
-	using System;
-	using System.Reflection;
-	using AssetSnap.Abstracts;
-	using AssetSnap.Explorer;
-	using Godot;
-	using Godot.Collections;
-
+	/// <summary>
+	/// Base class for components, providing common functionality.
+	/// </summary>
 	[Tool]
 	public partial class BaseComponent : AbstractComponentBase
 	{
@@ -38,29 +42,27 @@ namespace AssetSnap.Component
 		protected bool Disposed = false;
 		/* -- */
 
+		/// <summary>
+		/// The type string representing the component's type.
+		/// </summary>
 		public string TypeString = "";
 		
+		/// <summary>
+		/// The list of traits used by this component.
+		/// </summary>
 		public Array<string> UsingTraits = new(){};
 		
-		/*
-		** Virtual method for entering
-		** Ensures that there is always a enter method
-		** to call
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Virtual method for entering. Ensures that there is always an enter method to call.
+		/// </summary>
 		public virtual void Enter()
 		{
 			//
 		}
 		
-		/*
-		** Virtual method for initialization
-		** Ensures that there is always a initialize method
-		** to call
-		** 
-		** @return void
-		*/
+		/// <summary>
+		/// Virtual method for initialization. Ensures that there is always an initialize method to call.
+		/// </summary>
 		public virtual void Initialize()
 		{
 			if( null != GetParent()) 
@@ -76,6 +78,11 @@ namespace AssetSnap.Component
 			}
 		}
 		
+		/// <summary>
+		/// Gets the value for a specified key.
+		/// </summary>
+		/// <param name="key">The key for which to retrieve the value.</param>
+		/// <returns>The value associated with the specified key.</returns>
 		public virtual Variant GetValueFor( string key )
 		{
 			Type type = GetType();
@@ -118,13 +125,12 @@ namespace AssetSnap.Component
 			return false;
 		}
 		
-		/*
-		** Dynamicly set of property on the component
-		**
-		** @param string key
-		** @param Variant value
-		** @return bool
-		*/
+		/// <summary>
+		/// Dynamically sets a property on the component.
+		/// </summary>
+		/// <param name="key">The name of the property to set.</param>
+		/// <param name="value">The value to set the property to.</param>
+		/// <returns>True if the property was successfully set, false otherwise.</returns>
 		public virtual bool SetProperty( string key, Variant value )
 		{
 			Type type = GetType();
@@ -165,13 +171,12 @@ namespace AssetSnap.Component
 			return false;
 		}
 		
-		/*
-		** Converts a variant type to a field type i.e Bool,float,int etc.
-		**
-		** @param Variant value
-		** @param Type targetType
-		** @return object
-		*/
+		/// <summary>
+		/// Converts a variant type to a field type (e.g., bool, float, int).
+		/// </summary>
+		/// <param name="value">The variant value to convert.</param>
+		/// <param name="targetType">The target type to convert to.</param>
+		/// <returns>The converted value.</returns>
 		private object ConvertVariantToFieldType(Variant value, Type targetType)
 		{
 			if (targetType == typeof(bool))
@@ -190,7 +195,11 @@ namespace AssetSnap.Component
 			// If the type is not supported, return null
 			return null;
 		}
-				
+			
+		/// <summary>
+        /// Clears the component.
+        /// </summary>
+        /// <param name="debug">Optional parameter to enable debugging output.</param>	
 		public virtual void Clear( bool debug = false )
 		{
 			ExplorerUtils.Get().Components.Remove(this);
@@ -201,4 +210,5 @@ namespace AssetSnap.Component
 		}
 	}
 }
+
 #endif 

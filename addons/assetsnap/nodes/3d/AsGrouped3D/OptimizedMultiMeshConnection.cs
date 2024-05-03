@@ -20,46 +20,55 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using AssetSnap.Front.Nodes;
 using Godot;
 
-[Tool]
-public partial class OptimizedMultiMeshConnection : GroupedConnection
+namespace AssetSnap.Front.Nodes
 {
-	public AsOptimizedMultiMeshGroup3D OptimizedMultiMesh { get; set; }
-	
-	/*
-	** Will update based on the source object
-	**
-	** @return void
-	*/
-	public override void Update( Transform3D transform )
+	/// <summary>
+	/// Partial class representing an optimized multi-mesh connection.
+	/// </summary>
+	[Tool]
+	public partial class OptimizedMultiMeshConnection : GroupedConnection
 	{
-		if( null == Source )
+		/// <summary>
+        /// Gets or sets the optimized multi-mesh group.
+        /// </summary>
+		public AsOptimizedMultiMeshGroup3D OptimizedMultiMesh { get; set; }
+		
+		/// <summary>
+        /// Updates the connection based on the source object.
+        /// </summary>
+        /// <param name="transform">The transform to apply to the connection.</param>
+        /// <returns>Void.</returns>
+		public override void Update( Transform3D transform )
 		{
-			GD.PushWarning("No source was found to update through");
-			return;
+			if( null == Source )
+			{
+				GD.PushWarning("No source was found to update through");
+				return;
+			}
+			
+			Godot.Collections.Dictionary<string, Variant> Options = new()
+			{
+				{ "ConcaveCollision", Source.ConcaveCollision ? Source.ConcaveCollision : false },
+				{ "ConvexCollision", Source.ConvexCollision ? Source.ConvexCollision : false },
+				{ "ConvexClean", Source.ConvexClean ? Source.ConvexClean : false },
+				{ "ConvexSimplify", Source.ConvexSimplify ? Source.ConvexSimplify : false },
+				{ "SphereCollision", Source.SphereCollision ? Source.SphereCollision : false },
+			};
+
+			OptimizedMultiMesh.UpdateBuffer(InstanceId, transform, Options);
 		}
 		
-		Godot.Collections.Dictionary<string, Variant> Options = new()
+		/// <summary>
+        /// Updates the connection using a collection of options.
+        /// </summary>
+        /// <param name="transform">The transform to apply to the connection.</param>
+        /// <param name="Options">The dictionary of options to apply.</param>
+        /// <returns>Void.</returns>
+		public override void UpdateUsing( Transform3D transform, Godot.Collections.Dictionary<string, Variant> Options )
 		{
-			{ "ConcaveCollision", Source.ConcaveCollision ? Source.ConcaveCollision : false },
-			{ "ConvexCollision", Source.ConvexCollision ? Source.ConvexCollision : false },
-			{ "ConvexClean", Source.ConvexClean ? Source.ConvexClean : false },
-			{ "ConvexSimplify", Source.ConvexSimplify ? Source.ConvexSimplify : false },
-			{ "SphereCollision", Source.SphereCollision ? Source.SphereCollision : false },
-		};
-
-		OptimizedMultiMesh.UpdateBuffer(InstanceId, transform, Options);
-	}
-	
-	/*
-	** Updating using an collection of options
-	**
-	** @return void
-	*/
-	public override void UpdateUsing( Transform3D transform, Godot.Collections.Dictionary<string, Variant> Options )
-	{
-		OptimizedMultiMesh.UpdateBuffer(InstanceId, transform, Options);
+			OptimizedMultiMesh.UpdateBuffer(InstanceId, transform, Options);
+		}
 	}
 }

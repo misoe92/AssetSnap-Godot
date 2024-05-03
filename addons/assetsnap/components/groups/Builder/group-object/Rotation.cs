@@ -20,17 +20,28 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using AssetSnap.Component;
+using AssetSnap.Explorer;
+using Godot;
+
 namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 {
-	using AssetSnap.Component;
-	using AssetSnap.Explorer;
-	using Godot;
-
+	/// <summary>
+	/// Component handling rotation of a group object.
+	/// </summary>
 	[Tool]
 	public partial class Rotation : GroupObjectComponent
 	{
+		/// <summary>
+		/// Parent group object.
+		/// </summary>
 		public EditorGroupObject Parent;
 
+		/// <summary>
+		/// Constructor for Rotation class.
+		/// </summary>
 		public Rotation()
 		{
 			Name = "GroupsBuilderGroupObjectRotation";
@@ -46,6 +57,11 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 			SizeFlagsVertical = Control.SizeFlags.ExpandFill;
 		}
 
+		/// <summary>
+		/// Gets the value of rotation at specified index.
+		/// </summary>
+		/// <param name="index">Index of rotation (X, Y, or Z).</param>
+		/// <returns>Value of rotation.</returns>
 		public double GetValue(int index)
 		{
 			return Trait<Spinboxable>()
@@ -53,6 +69,9 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 				.GetValue();
 		}
 
+		/// <summary>
+		/// Initializes fields required for rotation.
+		/// </summary>
 		protected override void _InitializeFields()
 		{
 			if (Parent == null)
@@ -151,6 +170,9 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 				.AddThemeConstantOverride("minimum_character_width", 3);
 		}
 
+		/// <summary>
+		/// Finalizes fields for rotation.
+		/// </summary>
 		protected override void _FinalizeFields()
 		{
 			Trait<Labelable>()
@@ -217,6 +239,9 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 				);
 		}
 
+		/// <summary>
+        /// Triggered when rotation value changes.
+        /// </summary>
 		private void _OnValueChange()
 		{
 			Scale Scale = Parent._GroupBuilderEditorGroupObjectScale;
@@ -233,3 +258,5 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 		}
 	}
 }
+
+#endif

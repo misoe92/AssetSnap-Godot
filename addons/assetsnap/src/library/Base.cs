@@ -20,20 +20,25 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using AssetSnap.Explorer;
+using AssetSnap.Front.Components;
+using Godot;
+
 namespace AssetSnap.Library
 {
-	using AssetSnap.Explorer;
-	using AssetSnap.Front.Components;
-	using Godot;
-
+ 	/// <summary>
+	/// Base class for managing libraries.
+	/// </summary>
 	[Tool]
 	public partial class Base : Node, ISerializationListener
 	{
 		[Export]
 		public Godot.Collections.Array<GodotObject> _Libraries = new();
-
 		private static Base _Instance;
-
+		
+		/// <summary>
+		/// Gets the singleton instance of the Base class.
+		/// </summary>
 		public static Base Singleton
 		{
 			get
@@ -47,27 +52,42 @@ namespace AssetSnap.Library
 			}
 		}
 
+		/// <summary>
+		/// Gets the array of libraries.
+		/// </summary>
 		public Godot.Collections.Array<GodotObject> Libraries
 		{
 			get => _Libraries;
 		}
 
+		/// <summary>
+		/// Constructor for the Base class.
+		/// </summary>
 		public Base()
 		{
 			Name = "LibraryBase";
 			_Instance = this;
 		}
 		
+		/// <summary>
+		/// This method is called before the object is serialized.
+		/// </summary>
 		public void OnBeforeSerialize()
 		{
 			//
 		}
 
+		/// <summary>
+		/// This method is called after the object has been deserialized.
+		/// </summary>
 		public void OnAfterDeserialize()
 		{
 			_Instance = this;
 		}
 
+		/// <summary>
+		/// Initializes the libraries.
+		/// </summary>
 		public void Initialize()
 		{
 			if (Libraries.Count > 0)
@@ -101,13 +121,12 @@ namespace AssetSnap.Library
 			}
 		}
 
-		/* 
-		** Creates a new instance of Library
-		**
-		** @param TabContainer _Container
-		** @param string _Folder
-		** @return void
-		*/
+		/// <summary>
+		/// Creates a new instance of Library.
+		/// </summary>
+		/// <param name="Dock">The tab container to dock.</param>
+		/// <param name="_Folder">The folder path.</param>
+		/// <param name="index">The index.</param>
 		public void New(TabContainer Dock, string _Folder, int index)
 		{
 			if (false == IsGlobalExplorerValid())
@@ -130,6 +149,11 @@ namespace AssetSnap.Library
 			_Base.Initialize();
 		}
 
+		/// <summary>
+		/// Checks if there is already a library with the specified folder path.
+		/// </summary>
+		/// <param name="Folder">The folder path to check.</param>
+		/// <returns>True if a library with the specified folder path exists; otherwise, false.</returns>
 		private bool AlreadyHaveFolder(string Folder)
 		{
 			foreach (Library.Instance instance in _Libraries)
@@ -143,6 +167,11 @@ namespace AssetSnap.Library
 			return false;
 		}
 
+		/// <summary>
+		/// Cleans up an old library with the specified folder path.
+		/// </summary>
+		/// <param name="Folder">The folder path of the library to clean up.</param>
+		/// <returns>True if an old library was cleaned up; otherwise, false.</returns>
 		private bool CleanOldLibrary(string Folder)
 		{
 			foreach (Library.Instance instance in _Libraries)
@@ -161,11 +190,9 @@ namespace AssetSnap.Library
 			return false;
 		}
 
-		/*
-		** Rebinds the settings container to the bottom dock
-		**
-		** @return LibrariesListing
-		*/
+		/// <summary>
+		/// Rebinds the settings container to the bottom dock.
+		/// </summary>
 		private void RebindSettingsContainer()
 		{
 			ExplorerUtils.Get().Settings.InitializeContainer();
@@ -176,6 +203,10 @@ namespace AssetSnap.Library
 			}
 		}
 
+		/// <summary>
+		/// Removes the specified library from the collection.
+		/// </summary>
+		/// <param name="library">The library instance to remove.</param>
 		public void RemoveLibrary(Instance library)
 		{
 			if (_Libraries.Count != 0)
@@ -186,6 +217,9 @@ namespace AssetSnap.Library
 			}
 		}
 
+		/// <summary>
+		/// Resets all libraries in the collection.
+		/// </summary>
 		public void Reset()
 		{
 			foreach (Instance Library in _Libraries)
@@ -195,42 +229,39 @@ namespace AssetSnap.Library
 			}
 		}
 
-		/*
-		** Get library listing
-		**
-		** @return LibrariesListing
-		*/
+		/// <summary>
+		/// Gets the library listing component.
+		/// </summary>
+		/// <returns>The library listing component.</returns>
 		private LibrariesListing GetLibraryListing()
 		{
 			LibrariesListing _LibrariesListing = ExplorerUtils.Get().Components.Single<LibrariesListing>();
 			return _LibrariesListing;
 		}
 
-		/*
-		** Checks if there are ny folders founds
-		*/
+		/// <summary>
+		/// Checks if there are any folders found.
+		/// </summary>
+		/// <returns>True if folders are found; otherwise, false.</returns>
 		private bool HasFolders()
 		{
 			return ExplorerUtils.Get().Settings.FolderCount != 0;
 		}
 
-		/*
-		** Checks if the library listing exists
-		**
-		** @return bool
-		*/
+		/// <summary>
+		/// Checks if the library listing exists.
+		/// </summary>
+		/// <returns>True if the library listing exists; otherwise, false.</returns>
 		private bool HasLibraryListing()
 		{
 			LibrariesListing _LibrariesListing = ExplorerUtils.Get().Components.Single<LibrariesListing>();
 			return null != _LibrariesListing;
 		}
 
-		/*
-		** Checks if the global class GlobalExplorer reference is
-		** available
-		**
-		** @return bool
-		*/
+		/// <summary>
+		/// Checks if the global class GlobalExplorer reference is available.
+		/// </summary>
+		/// <returns>True if GlobalExplorer is valid; otherwise, false.</returns>
 		private bool IsGlobalExplorerValid()
 		{
 			return ExplorerUtils.IsValid();

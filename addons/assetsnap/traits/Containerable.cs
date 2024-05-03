@@ -26,23 +26,25 @@ using Godot;
 
 namespace AssetSnap.Component
 {
+	/// <summary>
+	/// A containerable component that extends ContainerTrait, providing functionality for working with containers.
+	/// </summary>
 	[Tool]
 	public partial class Containerable : ContainerTrait
 	{
-		/*
-		** Public methods
-		*/
+		/// <summary>
+		/// Constructor for the Containerable class.
+		/// </summary>
 		public Containerable()
 		{
 			Name = "Containerable";
 			TypeString = GetType().ToString();
 		}
 
-		/*
-		** Instantiate an instance of the trait
-		**
-		** @return Containerable
-		*/
+		/// <summary>
+		/// Instantiate an instance of the trait.
+		/// </summary>
+		/// <returns>Returns the instantiated Containerable instance.</returns>
 		public override Containerable Instantiate()
 		{
 			base._Instantiate();
@@ -58,13 +60,12 @@ namespace AssetSnap.Component
 			return this;
 		}
 
-		/*
-		** Selects an placed container in the
-		** nodes array by index
-		**
-		** @param int index
-		** @return Containerable
-		*/
+		/// <summary>
+		/// Selects a placed container in the nodes array by index.
+		/// </summary>
+		/// <param name="index">The index of the container to select.</param>
+		/// <param name="debug">Optional parameter to enable debugging.</param>
+		/// <returns>Returns the updated Containerable instance.</returns>
 		public override Containerable Select(int index, bool debug = false)
 		{
 			base.Select(index, debug);
@@ -72,13 +73,11 @@ namespace AssetSnap.Component
 			return this;
 		}
 
-		/*
-		** Selects an placed container in the
-		** nodes array by name
-		**
-		** @param string name
-		** @return Containerable
-		*/
+		/// <summary>
+		/// Selects a placed container in the nodes array by name.
+		/// </summary>
+		/// <param name="name">The name of the container to select.</param>
+		/// <returns>Returns the updated Containerable instance.</returns>
 		public override Containerable SelectByName(string name)
 		{
 			base.SelectByName(name);
@@ -86,14 +85,11 @@ namespace AssetSnap.Component
 			return this;
 		}
 
-		/*
-		** Adds the currently chosen container
-		** to a specified container
-		**
-		** @param Node Container
-		** @param int|null index
-		** @return void
-		*/
+		/// <summary>
+		/// Adds the currently chosen container to a specified container.
+		/// </summary>
+		/// <param name="Container">The container to which the chosen container will be added.</param>
+		/// <param name="index">Optional index at which to add the container.</param>
 		public virtual void AddToContainer(Node Container, int? index = null)
 		{
 			if (null == Dependencies || false == Dependencies.ContainsKey(TraitName + "_MarginContainer"))
@@ -127,16 +123,11 @@ namespace AssetSnap.Component
 			base._AddToContainer(Container, Dependencies[TraitName + "_MarginContainer"].As<MarginContainer>(), index);
 		}
 
-		/*
-		** Setter Methods
-		*/
-
-		/*
-		** Sets the name of the current container
-		**
-		** @param string text
-		** @return Containerable
-		*/
+		/// <summary>
+		/// Sets a name for the current container.
+		/// </summary>
+		/// <param name="text">The name to set.</param>
+		/// <returns>Returns the updated Containerable instance.</returns>
 		public Containerable SetName(string text)
 		{
 			base._SetName(text);
@@ -144,12 +135,11 @@ namespace AssetSnap.Component
 			return this;
 		}
 
-		/*
-		** Sets the layout of the container
-		**
-		** @param ContainerLayout layout
-		** @return Containerable
-		*/
+		/// <summary>
+		/// Sets the layout of the container.
+		/// </summary>
+		/// <param name="layout">The layout to set.</param>
+		/// <returns>Returns the updated Containerable instance.</returns>
 		public override Containerable SetLayout(ContainerLayout layout)
 		{
 			base.SetLayout(layout);
@@ -157,13 +147,11 @@ namespace AssetSnap.Component
 			return this;
 		}
 
-		/*
-		** Sets the visibility state of the
-		** currently chosen container
-		**
-		** @param bool state
-		** @return Containerable
-		*/
+		/// <summary>
+		/// Sets the visibility state of the currently chosen container.
+		/// </summary>
+		/// <param name="state">The visibility state to set.</param>
+		/// <returns>Returns the updated Containerable instance.</returns>
 		public override Containerable SetVisible(bool state)
 		{
 			base.SetVisible(state);
@@ -171,12 +159,11 @@ namespace AssetSnap.Component
 			return this;
 		}
 
-		/*
-		** Toggles the visibility state of the
-		** currently chosen container
-		**
-		** @return Containerable
-		*/
+		/// <summary>
+		/// Toggles the visibility state of the currently chosen container.
+		/// </summary>
+		/// <param name="debug">Optional parameter to enable debugging.</param>
+		/// <returns>Returns the updated Containerable instance.</returns>
 		public override Containerable ToggleVisible( bool debug = false)
 		{
 			base.ToggleVisible(debug);
@@ -184,13 +171,12 @@ namespace AssetSnap.Component
 			return this;
 		}
 
-		/*
-		** Sets the size of the container
-		**
-		** @param int width
-		** @param int height
-		** @return Containerable
-		*/
+		/// <summary>
+		/// Sets the size of the container.
+		/// </summary>
+		/// <param name="width">The width to set.</param>
+		/// <param name="height">The height to set.</param>
+		/// <returns>Returns the updated Containerable instance.</returns>
 		public override Containerable SetDimensions(int width, int height)
 		{
 			base.SetDimensions(width, height);
@@ -198,12 +184,11 @@ namespace AssetSnap.Component
 			return this;
 		}
 
-		/*
-		** Sets the orientation of the container
-		**
-		** @param ContainerOrientation orientation
-		** @return Containerable
-		*/
+		/// <summary>
+		/// Sets the orientation of the container.
+		/// </summary>
+		/// <param name="orientation">The orientation to set.</param>
+		/// <returns>Returns the updated Containerable instance.</returns>
 		public override Containerable SetOrientation(ContainerOrientation orientation)
 		{
 			base.SetOrientation(orientation);
@@ -211,6 +196,11 @@ namespace AssetSnap.Component
 			return this;
 		}
 
+		/// <summary>
+		/// Sets the separation value for the container.
+		/// </summary>
+		/// <param name="seperation">The separation value to set.</param>
+		/// <returns>Returns the updated Containerable instance.</returns>
 		public override Containerable SetSeparation(int seperation)
 		{
 			base.SetSeparation(seperation);
@@ -218,12 +208,11 @@ namespace AssetSnap.Component
 			return this;
 		}
 
-		/*
-		** Sets the inner orientation of the container
-		**
-		** @param ContainerOrientation orientation
-		** @return Containerable
-		*/
+		/// <summary>
+		/// Sets the inner orientation of the container.
+		/// </summary>
+		/// <param name="orientation">The inner orientation to set.</param>
+		/// <returns>Returns the updated Containerable instance.</returns>
 		public override Containerable SetInnerOrientation(ContainerOrientation orientation)
 		{
 			base.SetInnerOrientation(orientation);
@@ -231,13 +220,11 @@ namespace AssetSnap.Component
 			return this;
 		}
 
-		/*
-		** Sets the horizontal size flag, which controls the x
-		** axis, and how it should act.
-		**
-		** @param Control.SizeFlags flag
-		** @return Containerable
-		*/
+		/// <summary>
+		/// Sets the horizontal size flag, which controls the x axis.
+		/// </summary>
+		/// <param name="flag">The size flag to set.</param>
+		/// <returns>Returns the updated Containerable instance.</returns>
 		public override Containerable SetHorizontalSizeFlags(Control.SizeFlags flag)
 		{
 			base.SetHorizontalSizeFlags(flag);
@@ -245,13 +232,11 @@ namespace AssetSnap.Component
 			return this;
 		}
 
-		/*
-		** Sets the horizontal size flag, which controls the y
-		** axis, and how it should act.
-		**
-		** @param Control.SizeFlags flag
-		** @return Containerable
-		*/
+		/// <summary>
+		/// Sets the vertical size flag, which controls the y axis.
+		/// </summary>
+		/// <param name="flag">The size flag to set.</param>
+		/// <returns>Returns the updated Containerable instance.</returns>
 		public override Containerable SetVerticalSizeFlags(Control.SizeFlags flag)
 		{
 			base.SetVerticalSizeFlags(flag);
@@ -259,14 +244,12 @@ namespace AssetSnap.Component
 			return this;
 		}
 
-		/*
-		** Sets margin values for 
-		** the currently chosen container
-		**
-		** @param int value
-		** @param string side
-		** @return Containerable
-		*/
+		/// <summary>
+		/// Sets margin values for the currently chosen container.
+		/// </summary>
+		/// <param name="value">The margin value.</param>
+		/// <param name="side">The side for which to set the margin.</param>
+		/// <returns>Returns the updated Containerable instance.</returns>
 		public override Containerable SetMargin(int value, string side = "")
 		{
 			base.SetMargin(value, side);
@@ -274,14 +257,12 @@ namespace AssetSnap.Component
 			return this;
 		}
 
-		/*
-		** Sets padding values for 
-		** the currently chosen container
-		**
-		** @param int value
-		** @param string side
-		** @return Containerable
-		*/
+		/// <summary>
+		/// Sets padding values for the currently chosen container.
+		/// </summary>
+		/// <param name="value">The padding value.</param>
+		/// <param name="side">The side for which to set the padding.</param>
+		/// <returns>Returns the updated Containerable instance.</returns>
 		public override Containerable SetPadding(int value, string side = "")
 		{
 			base.SetPadding(value, side);
@@ -289,33 +270,29 @@ namespace AssetSnap.Component
 			return this;
 		}
 
-		/*
-		** Getter Methods
-		*/
-
-		/*
-		** Returns the outer container
-		** of the container layout
-		**
-		** @return Container
-		*/
+		/// <summary>
+		/// Returns the outer container of the container layout.
+		/// </summary>
+		/// <returns>Returns the outer container.</returns>
 		public override Container GetOuterContainer()
 		{
 			return base.GetOuterContainer();
 		}
 
-		/*
-		** Returns a inner container
-		** depending on a specified index
-		**
-		** @param int(0) index
-		** @return Container
-		*/
+		/// <summary>
+		/// Returns an inner container depending on a specified index.
+		/// </summary>
+		/// <param name="index">The index of the inner container to retrieve. Default is 0.</param>
+		/// <returns>Returns the inner container.</returns>
 		public override Container GetInnerContainer(int index = 0)
 		{
 			return base.GetInnerContainer(index);
 		}
 
+		/// <summary>
+        /// Returns the parent container of the current container.
+        /// </summary>
+        /// <returns>Returns the parent container.</returns>
 		public Node GetContainerParent()
 		{
 			return GetParentContainer();

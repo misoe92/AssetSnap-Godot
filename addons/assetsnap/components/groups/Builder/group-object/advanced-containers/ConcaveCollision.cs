@@ -20,15 +20,23 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using AssetSnap.Component;
+using AssetSnap.Static;
+using Godot;
+
 namespace AssetSnap.Front.Components.Groups.Builder.GroupObject.AdvancedContainers
 {
-	using AssetSnap.Component;
-	using AssetSnap.Static;
-	using Godot;
-
+	/// <summary>
+	/// A component representing concave collision behavior for an advanced group object.
+	/// </summary>
 	[Tool]
 	public partial class ConcaveCollision : AdvancedGroupComponent
 	{
+		/// <summary>
+		/// Constructor for the ConcaveCollision class.
+		/// </summary>
 		public ConcaveCollision()
 		{
 			Text = "Concave Collision";
@@ -41,11 +49,17 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject.AdvancedContaine
 			};
 		}
 		
+		/// <summary>
+		/// Registers traits required for the concave collision component.
+		/// </summary>
 		protected override void _RegisterTraits()
 		{
 			base._RegisterTraits();
 		}
 		
+		/// <summary>
+		/// Initializes fields for the concave collision component.
+		/// </summary>
 		protected override void _InitializeFields()
 		{
 			base._InitializeFields();
@@ -58,9 +72,12 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject.AdvancedContaine
 				.Instantiate();
 		}
 
+		/// <summary>
+		/// Finalizes fields for the concave collision component.
+		/// </summary>
 		protected override void _FinalizeFields()
 		{
-			Container InnerContainer = Trait<Containerable>()
+			Godot.Container InnerContainer = Trait<Containerable>()
 				.Select(0)
 				.GetInnerContainer();
 
@@ -73,6 +90,10 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject.AdvancedContaine
 			base._FinalizeFields();
 		}
 
+		/// <summary>
+        /// Handles the action when using concave collision.
+        /// </summary>
+        /// <param name="state">The state indicating whether concave collision is enabled or not.</param>
 		private void _OnUseConcaveCollision( bool state )
 		{
 			_GlobalExplorer.GroupBuilder._Editor.SetOption(Index, "ConcaveCollision", state);
@@ -90,3 +111,5 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject.AdvancedContaine
 		}
 	}
 }
+
+#endif

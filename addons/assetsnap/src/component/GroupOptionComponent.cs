@@ -21,16 +21,29 @@
 // SOFTWARE.
 
 #if TOOLS
+
+using AssetSnap.Front.Nodes;
 using Godot;
 
 namespace AssetSnap.Component
 {
+	/// <summary>
+    /// Base class for components managing group options.
+    /// </summary>
 	[Tool]
 	public partial class GroupOptionComponent : TraitableComponent
 	{
+		/// <summary>
+		/// Event handler delegate for group option changed event.
+		/// </summary>
 		[Signal]
 		public delegate void GroupOptionChangedEventHandler(string name, Variant value);
 
+		/// <summary>
+		/// Updates the grouped data with the specified key and value.
+		/// </summary>
+		/// <param name="key">The key of the data to update.</param>
+		/// <param name="value">The value to set.</param>
 		protected void _MaybeUpdateGrouped(string key, Variant value)
 		{
 			Node3D Handle = _GlobalExplorer.GetHandle();
@@ -41,15 +54,23 @@ namespace AssetSnap.Component
 			}
 		}
 
+		/// <summary>
+		/// Emits the group option changed signal.
+		/// </summary>
 		protected void _HasGroupDataHasChanged()
 		{
 			EmitSignal(SignalName.GroupOptionChanged, Name, GetValueVariant());
 		}
 
+		/// <summary>
+		/// Gets the value of the group option as a Variant.
+		/// </summary>
+		/// <returns>The value of the group option as a Variant.</returns>
 		public virtual Variant GetValueVariant()
 		{
 			return false;
 		}
 	}
 }
+
 #endif

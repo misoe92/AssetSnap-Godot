@@ -20,21 +20,22 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using AssetSnap.ASNode.Types;
+using Godot;
+
 namespace AssetSnap.Core 
 {
-    using AssetSnap.ASNode.Types;
-	using Godot;
-
-	/*
-	** Handles all cleanup when the plugin exits the tree
-	*/
+	/// <summary>
+    /// Handles all cleanup when the plugin exits the tree.
+    /// </summary>
 	public class CoreExit : Core 
 	{
-		/*
-		** General cleanup when the plugin exits the tree
-		**
-		** @return void
-		*/
+		/// <summary>
+        /// General cleanup when the plugin exits the tree.
+        /// </summary>
+        /// <param name="plugin">The plugin instance.</param>
 		public static void CleanArea( Plugin plugin )
 		{
 			GlobalExplorer _GlobalExplorer = GlobalExplorer.GetInstance();
@@ -56,12 +57,11 @@ namespace AssetSnap.Core
 			}
 		}
 		
-		/*
-		** Removes an internal component given it's
-		** instance
-		**
-		** @return void  
-		*/
+		/// <summary>
+        /// Removes an internal component given its instance.
+        /// </summary>
+        /// <param name="obj">The object to remove.</param>
+        /// <param name="plugin">The plugin instance.</param>
 		public static void _RemoveEntry(Node obj, Plugin plugin)
 		{
 			if( EditorPlugin.IsInstanceValid(obj) ) 
@@ -71,3 +71,5 @@ namespace AssetSnap.Core
 		} 
 	}
 }
+
+#endif

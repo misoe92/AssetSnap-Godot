@@ -20,21 +20,27 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using AssetSnap.Component;
+using Godot;
+
 namespace AssetSnap.Front.Components
 {
-	using AssetSnap.Component;
-	using Godot;
-
+	/// <summary>
+	/// Represents an entry in the libraries listing.
+	/// </summary>
 	[Tool]
 	public partial class LibrariesListingEntry : TraitableComponent
 	{
+		/// <summary>
+		/// The title of the entry.
+		/// </summary>
 		public string title;
 		
-		/*
-		** Constructor of the class
-		**  
-		** @return void
-		*/
+		/// <summary>
+		/// Constructor of the LibrariesListingEntry class.
+		/// </summary>
 		public LibrariesListingEntry()
 		{
 			Name = "LibrariesListingEntry";
@@ -50,11 +56,9 @@ namespace AssetSnap.Front.Components
 			//_include = false;
 		}
 
-		/*
-		** Initialization of the component
-		** 
-		** @return void
-		*/
+		/// <summary>
+		/// Initialization of the component.
+		/// </summary>
 		public override void Initialize() 
 		{
 			base.Initialize();
@@ -211,12 +215,9 @@ namespace AssetSnap.Front.Components
 		
 		}
 		
-		/*
-		** Set visibility state and enables
-		** the ability to remove a folder
-		** 
-		** @return void
-		*/
+		/// <summary>
+		/// Set visibility state and enables the ability to remove a folder.
+		/// </summary>
 		private void _OnRemove()
 		{
 			Containerable baseContainer = Trait<Containerable>()
@@ -228,24 +229,19 @@ namespace AssetSnap.Front.Components
 			choiceContainer.Show();
 		}
 		
-		/*
-		** Confirms a removal of a folder
-		** 
-		** @return async<void>
-		*/
+		/// <summary>
+		/// Confirms a removal of a folder.
+		/// </summary>
 		private void _OnConfirm()
 		{
 			Plugin.Singleton.EmitSignal(Plugin.SignalName.OnRemoveFolder, title);
 		}
 		
-		/*
-		** Rejects removal of a folder and
-		** reverses the visibility
-		** 
-		** @param HBoxContainer _ChoiceContainer
-		** @param HBoxContainer _Container 
-		** @return void
-		*/
+		/// <summary>
+		/// Rejects removal of a folder and reverses the visibility.
+		/// </summary>
+		/// <param name="_ChoiceContainer">The choice container.</param>
+		/// <param name="_Container">The base container.</param>
 		private void _OnReject()
 		{
 			Containerable baseContainer = Trait<Containerable>()
@@ -257,9 +253,14 @@ namespace AssetSnap.Front.Components
 			choiceContainer.Hide();
 		}
 
+		/// <summary>
+        /// Overrides the _ExitTree method.
+        /// </summary>
 		public override void _ExitTree()
 		{
 			base._ExitTree();
 		}
 	}
 }
+
+#endif

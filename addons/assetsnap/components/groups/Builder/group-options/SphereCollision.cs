@@ -20,14 +20,22 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using AssetSnap.Component;
+using Godot;
+
 namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 {
-	using AssetSnap.Component;
-	using Godot;
-
+	/// <summary>
+	/// Component representing a sphere collision option in a group builder.
+	/// </summary>
 	[Tool]
 	public partial class SphereCollision : GroupOptionCheckableComponent
 	{
+		/// <summary>
+		/// Constructor for SphereCollision class.
+		/// </summary>
 		public SphereCollision()
 		{
 			Name = "GroupsBuilderGroupOptionsSphereCollision";
@@ -38,6 +46,9 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 			};
 		}
 		
+		/// <summary>
+		/// Initializes the fields of the SphereCollision component.
+		/// </summary>
 		protected override void _InitializeFields()
 		{
 			Trait<Checkable>()
@@ -47,7 +58,10 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 				.SetAction( Callable.From( () => { _OnCheck(); }) )
 				.Instantiate();
 		}
-	
+
+		/// <summary>
+        /// Handles the event when the sphere collision option is checked or unchecked.
+        /// </summary>
 		private void _OnCheck()
 		{
 			_GlobalExplorer.GroupBuilder._Editor.Group.SphereCollision = !_GlobalExplorer.GroupBuilder._Editor.Group.SphereCollision;
@@ -84,3 +98,5 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 		}
 	}
 }
+
+#endif

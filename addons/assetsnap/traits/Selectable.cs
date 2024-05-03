@@ -27,12 +27,19 @@ using Godot;
 
 namespace AssetSnap.Component
 {
+	/// <summary>
+	/// A selectable component for use in Godot projects.
+	/// </summary>
 	[Tool]
 	public partial class Selectable : ContainerTrait
 	{
 		/*
 		** Enums
 		*/
+		
+		/// <summary>
+		/// Types of selectable components.
+		/// </summary>
 		public enum Type
 		{
 			SelectableSmall,
@@ -60,8 +67,10 @@ namespace AssetSnap.Component
 		protected HorizontalAlignment _HorizontalAlignment;
 		protected Godot.Collections.Array<string> Items = new();
 
-		/* The `public Selectable()` constructor in the `Selectable` class is initializing the properties of
-		a `Selectable` object. Here's a breakdown of what it's doing: */
+		/// <summary>
+		/// Constructor for the Selectable component.
+		/// </summary>
+		/// <returns>Returns a new instance of Selectable.</returns>
 		public Selectable()
 		{
 			Name = "Selectable";
@@ -78,11 +87,10 @@ namespace AssetSnap.Component
 			SizeFlagsVertical = Control.SizeFlags.ShrinkBegin;
 		}
 
-		/*
-		** Instantiate an instance of the trait
-		**
-		** @return Selectable
-		*/
+		/// <summary>
+		/// Instantiate an instance of the trait.
+		/// </summary>
+		/// <returns>Returns the instantiated Selectable component.</returns>
 		public override Selectable Instantiate()
 		{
 			base._Instantiate();
@@ -147,6 +155,11 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
+		/// <summary>
+		/// Adds an item to the selectable component.
+		/// </summary>
+		/// <param name="text">The text of the item to add.</param>
+		/// <returns>Returns the modified Selectable component.</returns>
 		public Selectable AddItem( string text )
 		{
 			Items.Add(text);
@@ -160,13 +173,12 @@ namespace AssetSnap.Component
 			return this;
 		}
 
-		/*
-		** Selects an placed label in the
-		** nodes array by index
-		**
-		** @param int index
-		** @return Selectable
-		*/
+		/// <summary>
+		/// Selects an item in the component by index.
+		/// </summary>
+		/// <param name="index">The index of the item to select.</param>
+		/// <param name="debug">Whether to print debug information.</param>
+		/// <returns>Returns the modified Selectable component.</returns>
 		public override Selectable Select(int index, bool debug = false)
 		{
 			base._Select(index);
@@ -196,13 +208,11 @@ namespace AssetSnap.Component
 			return this;
 		}
 
-		/*
-		** Selects an placed label in the
-		** nodes array by name
-		**
-		** @param string name
-		** @return Selectable
-		*/
+		/// <summary>
+		/// Selects an item in the component by name.
+		/// </summary>
+		/// <param name="name">The name of the item to select.</param>
+		/// <returns>Returns the modified Selectable component.</returns>
 		public override Selectable SelectByName(string name)
 		{
 			base._SelectByName(name);
@@ -210,13 +220,11 @@ namespace AssetSnap.Component
 			return this;
 		}
 
-		/*
-		** Adds the currently chosen button
-		** to a specified container
-		**
-		** @param Node Container
-		** @return void
-		*/
+		/// <summary>
+		/// Adds the currently chosen button to a specified container.
+		/// </summary>
+		/// <param name="Container">The container to add the button to.</param>
+		/// <param name="index">Optional index to insert the button at.</param>
 		public void AddToContainer(Node Container, int? index = null)
 		{
 			if (null == Dependencies)
@@ -237,17 +245,11 @@ namespace AssetSnap.Component
 			Reset();
 		}
 
-		/*
-		** Setter Methods
-		*/
-		
-		/*
-		** Sets the action for the
-		** currently chosen button
-		**
-		** @param Action action
-		** @return Buttonable
-		*/
+		/// <summary>
+		/// Sets the action for the currently chosen button.
+		/// </summary>
+		/// <param name="action">The action to set.</param>
+		/// <returns>Returns the modified Selectable component.</returns>
 		public Selectable SetAction( Action<int> action ) 
 		{
 			_Actions.Add(Callable.From(action));
@@ -255,12 +257,11 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		/*
-		** Sets the name of the current label
-		**
-		** @param string text
-		** @return Selectable
-		*/
+		/// <summary>
+		/// Sets the name of the current label.
+		/// </summary>
+		/// <param name="text">The name to set.</param>
+		/// <returns>Returns the modified Selectable component.</returns>
 		public Selectable SetName(string text)
 		{
 			base._SetName(text);
@@ -268,12 +269,11 @@ namespace AssetSnap.Component
 			return this;
 		}
 
-		/*
-		** Sets the text of the current button
-		**
-		** @param string text
-		** @return Selectable
-		*/
+		/// <summary>
+		/// Sets the text of the current button.
+		/// </summary>
+		/// <param name="text">The text to set.</param>
+		/// <returns>Returns the modified Selectable component.</returns>
 		public Selectable SetText(string text)
 		{
 			Title = text;
@@ -289,12 +289,11 @@ namespace AssetSnap.Component
 			return this;
 		}
 
-		/*
-		** Sets the text of the current button
-		**
-		** @param string text
-		** @return Selectable
-		*/
+		/// <summary>
+		/// Sets the suffix of the current button.
+		/// </summary>
+		/// <param name="text">The suffix text to set.</param>
+		/// <returns>Returns the modified Selectable component.</returns>
 		public Selectable SetSuffix(string text)
 		{
 			Suffix = text;
@@ -302,14 +301,11 @@ namespace AssetSnap.Component
 			return this;
 		}
 
-		/*
-		** Sets the theme type of the button,
-		** which lays out a set of specified rules
-		** from the theme that the button follows
-		**
-		** @param TitleType type
-		** @return Selectable
-		*/
+		/// <summary>
+		/// Sets the theme type of the button.
+		/// </summary>
+		/// <param name="type">The type of theme to set.</param>
+		/// <returns>Returns the modified Selectable component.</returns>
 		public Selectable SetType(Type type)
 		{
 			_Type = type;
@@ -317,6 +313,11 @@ namespace AssetSnap.Component
 			return this;
 		}
 
+		/// <summary>
+        /// Sets the horizontal size flag for the container.
+        /// </summary>
+        /// <param name="flag">The horizontal size flag to set.</param>
+        /// <returns>Returns the modified Selectable component.</returns>
 		public override Selectable SetContainerHorizontalSizeFlag(Control.SizeFlags flag)
 		{
 			base.SetContainerHorizontalSizeFlag(flag);
@@ -324,14 +325,11 @@ namespace AssetSnap.Component
 			return this;
 		}
 
-
-		/*
-		** Sets the alignment for the text
-		** of the current label
-		**
-		** @param HorizontalAlignment alignment
-		** @return Selectable
-		*/
+		/// <summary>
+        /// Sets the alignment for the text of the current label.
+        /// </summary>
+        /// <param name="alignment">The horizontal alignment to set.</param>
+        /// <returns>Returns the modified Selectable component.</returns>
 		public Selectable SetAlignment(HorizontalAlignment alignment)
 		{
 			_HorizontalAlignment = alignment;
@@ -339,14 +337,12 @@ namespace AssetSnap.Component
 			return this;
 		}
 
-		/*
-		** Sets the dimensions for 
-		** the current label
-		**
-		** @param int width
-		** @param int height
-		** @return Selectable
-		*/
+		/// <summary>
+        /// Sets the dimensions for the current label.
+        /// </summary>
+        /// <param name="width">The width of the label.</param>
+        /// <param name="height">The height of the label.</param>
+        /// <returns>Returns the modified Selectable component.</returns>
 		public override Selectable SetDimensions(int width, int height)
 		{
 			base.SetDimensions(width, height);
@@ -354,13 +350,11 @@ namespace AssetSnap.Component
 			return this;
 		}
 
-		/*
-		** Sets the horizontal size flag, which controls the x
-		** axis, and how it should act.
-		**
-		** @param Control.SizeFlags flag
-		** @return Selectable
-		*/
+		/// <summary>
+        /// Sets the horizontal size flags for the container.
+        /// </summary>
+        /// <param name="flag">The horizontal size flags to set.</param>
+        /// <returns>Returns the modified Selectable component.</returns>
 		public override Selectable SetHorizontalSizeFlags(Control.SizeFlags flag)
 		{
 			base.SetHorizontalSizeFlags(flag);
@@ -368,13 +362,11 @@ namespace AssetSnap.Component
 			return this;
 		}
 
-		/*
-		** Sets the horizontal size flag, which controls the y
-		** axis, and how it should act.
-		**
-		** @param Control.SizeFlags flag
-		** @return Selectable
-		*/
+		/// <summary>
+        /// Sets the vertical size flags for the container.
+        /// </summary>
+        /// <param name="flag">The vertical size flags to set.</param>
+        /// <returns>Returns the modified Selectable component.</returns>
 		public override Selectable SetVerticalSizeFlags(Control.SizeFlags flag)
 		{
 			base.SetVerticalSizeFlags(flag);
@@ -382,14 +374,11 @@ namespace AssetSnap.Component
 			return this;
 		}
 
-		/*
-		** Sets the auto wrap of the label
-		** allowing it to break lines based
-		** on rules
-		**
-		** @param TextServer.AutowrapMode mode
-		** @return Selectable
-		*/
+		/// <summary>
+        /// Sets the auto wrap mode of the label.
+        /// </summary>
+        /// <param name="mode">The auto wrap mode to set.</param>
+        /// <returns>Returns the modified Selectable component.</returns>
 		public Selectable SetAutoWrap(TextServer.AutowrapMode mode)
 		{
 			AutowrapMode = mode;
@@ -397,14 +386,12 @@ namespace AssetSnap.Component
 			return this;
 		}
 
-		/*
-		** Sets margin values for 
-		** the currently chosen label
-		**
-		** @param int value
-		** @param string side
-		** @return Selectable
-		*/
+		/// <summary>
+        /// Sets margin values for the currently chosen label.
+        /// </summary>
+        /// <param name="value">The margin value to set.</param>
+        /// <param name="side">The side for which to set the margin.</param>
+        /// <returns>Returns the modified Selectable component.</returns>
 		public override Selectable SetMargin(int value, string side = "")
 		{
 			base.SetMargin(value, side);
@@ -412,40 +399,29 @@ namespace AssetSnap.Component
 			return this;
 		}
 
-		/*
-		** Getter Methods
-		*/
-
-		/*
-		** Fetches the text from the label
-		**
-		** @return string
-		*/
+		/// <summary>
+        /// Fetches the text from the label.
+        /// </summary>
+        /// <returns>Returns the text of the label.</returns>
 		public string GetTitle()
 		{
 			return Title;
 		}
 
-		/*
-		** Fetches the inner container
-		** of the label
-		**
-		** @return Container
-		*/
+		/// <summary>
+        /// Fetches the inner container of the label.
+        /// </summary>
+        /// <returns>Returns the inner container of the label.</returns>
 		public Container GetInnerContainer()
 		{
 			return base.GetInnerContainer(0);
 		}
 
-		/*
-		** Booleans
-		*/
-
-		/*
-		** Checks if the label is valid
-		**
-		** @return bool
-		*/
+		/// <summary>
+        /// Checks if the label is valid.
+        /// </summary>
+        /// <param name="debug">Whether to print debug information.</param>
+        /// <returns>Returns true if the label is valid, false otherwise.</returns>
 		public override bool IsValid(bool debug = false)
 		{
 			if (base.IsValid(debug))
@@ -468,16 +444,9 @@ namespace AssetSnap.Component
 			return false;
 		}
 
-		/*
-		** Private
-		*/
-
-		/*
-		** Resets the trait to
-		** a cleared state
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Resets the trait to a cleared state.
+		/// </summary>
 		protected override void Reset()
 		{
 			Title = "";

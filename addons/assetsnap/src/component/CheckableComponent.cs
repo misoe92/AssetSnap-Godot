@@ -21,16 +21,23 @@
 // SOFTWARE.
 
 #if TOOLS
+
+using AssetSnap.Explorer;
+using AssetSnap.States;
+using Godot;
+
 namespace AssetSnap.Component
 {
-	using AssetSnap.Explorer;
-
-	using AssetSnap.States;
-	using Godot;
-
+	/// <summary>
+	/// A component that provides functionality for checking the validity of certain conditions.
+	/// </summary>
 	[Tool]
 	public partial class CheckableComponent : LibraryComponent
 	{
+		/// <summary>
+        /// Checks if the component is currently valid.
+        /// </summary>
+        /// <returns>True if the component is valid, false otherwise.</returns>
 		public bool IsValid()
 		{
 			if (
@@ -60,4 +67,5 @@ namespace AssetSnap.Component
 		}
 	}
 }
+
 #endif

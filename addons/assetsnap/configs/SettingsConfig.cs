@@ -20,15 +20,18 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using AssetSnap.Settings;
+using AssetSnap.States;
+using Godot;
+
 namespace AssetSnap.Front.Configs
 {
-	using System;
-	using System.Collections.Generic;
-	using System.Linq;
-	using AssetSnap.Settings;
-	using AssetSnap.States;
-	using Godot;
-
+	/// <summary>
+	/// Represents the settings configuration.
+	/// </summary>
 	public partial class SettingsConfig : Config.BaseConfig
 	{
 		private string _ConfigPath;
@@ -37,7 +40,9 @@ namespace AssetSnap.Front.Configs
 		private BaseContainer _Container;
 		public bool Initialized = false;
 
-		private static SettingsConfig _Instance = null;
+		/// <summary>
+		/// Gets the singleton instance of SettingsConfig.
+		/// </summary>
 		public static SettingsConfig Singleton
 		{
 			get
@@ -51,47 +56,67 @@ namespace AssetSnap.Front.Configs
 				return _Instance;
 			}
 		}
+		private static SettingsConfig _Instance = null;
 
+		/// <summary>
+		/// Gets the name of the settings configuration.
+		/// </summary>
 		public string _Name
 		{
 			get => "Settings";
 		}
 
+		/// <summary>
+		/// Gets the configuration file.
+		/// </summary>
 		public ConfigFile Config
 		{
 			get => _Config;
 		}
 
+		/// <summary>
+		/// Gets the count of folders.
+		/// </summary>
 		public int FolderCount
 		{
 			get => _Folders.Length;
 		}
 
+		/// <summary>
+		/// Gets the array of folders.
+		/// </summary>
 		public string[] Folders
 		{
 			get => _Folders;
 		}
 
+		/// <summary>
+		/// Gets the settings dictionary.
+		/// </summary>
 		public Godot.Collections.Dictionary<string, Variant> Settings
 		{
 			get => _Settings;
 		}
 
+		/// <summary>
+		/// Gets the UI container.
+		/// </summary>
 		public BaseContainer Container
 		{
 			get => _Container;
 		}
 
+		/// <summary>
+		/// Constructor for SettingsConfig.
+		/// </summary>
 		public SettingsConfig()
 		{
 			Name = "AssetSnapConfig";
 		}
 
-		/* 
-		** Initializes settings config
-		** 
-		** @return void
-		*/
+		/// <summary>
+		/// Initializes the settings configuration.
+		/// </summary>
 		public void Initialize()
 		{
 			if (null == _Instance)
@@ -143,6 +168,9 @@ namespace AssetSnap.Front.Configs
 			}
 		}
 
+		/// <summary>
+		/// Emits the signal when folders are loaded.
+		/// </summary>
 		public void MaybeEmitFoldersLoaded()
 		{
 			if (null != Plugin.GetInstance())
@@ -151,12 +179,10 @@ namespace AssetSnap.Front.Configs
 			}
 		}
 
-		/*
-		** Resets the settings config
-		** 
-		** @param bool WithContainer[true]
-		** @return void
-		*/
+		/// <summary>
+		/// Resets the settings configuration.
+		/// </summary>
+		/// <param name="WithContainer">Determines whether to reset with container.</param>
 		public void Reset(bool WithContainer = true)
 		{
 			if (null != _Container && WithContainer)
@@ -170,11 +196,9 @@ namespace AssetSnap.Front.Configs
 			}
 		}
 
-		/*
-		** Initializes the settings UI Container
-		** 
-		** @return void 
-		*/
+		/// <summary>
+		/// Initializes the settings UI Container.
+		/// </summary>
 		public void InitializeContainer()
 		{
 			if (EditorPlugin.IsInstanceValid(_Container))
@@ -198,13 +222,11 @@ namespace AssetSnap.Front.Configs
 			StatesUtils.SetLoad("SettingsContainer", true);
 		}
 
-		/*
-		** Sets a config key value
-		** 
-		** @param string _key
-		** @param Variant _value
-		** @return void
-		*/
+		/// <summary>
+		/// Sets a config key value.
+		/// </summary>
+		/// <param name="_key">The key to set.</param>
+		/// <param name="_Value">The value to set.</param>
 		public override void SetKey(string _key, Variant _Value)
 		{
 			if (_Settings.ContainsKey(_key) == false)
@@ -225,11 +247,10 @@ namespace AssetSnap.Front.Configs
 			Reset(false);
 		}
 
-		/*
-		** Adds a folder to the array
-		** 
-		** @return void
-		*/
+		/// <summary>
+		/// Adds a folder to the array.
+		/// </summary>
+		/// <param name="path">The path of the folder to add.</param>
 		public void AddFolder(string path)
 		{
 			if (_Folders.Contains(path))
@@ -252,6 +273,11 @@ namespace AssetSnap.Front.Configs
 			MaybeEmitFoldersLoaded();
 		}
 
+		/// <summary>
+		/// Adds model size to cache.
+		/// </summary>
+		/// <param name="name">The name of the model.</param>
+		/// <param name="Size">The size of the model.</param>
 		public void AddModelSizeToCache(string name, Vector3 Size)
 		{
 			_Config.SetValue("ModelSizes", name, Size);
@@ -265,11 +291,21 @@ namespace AssetSnap.Front.Configs
 			Plugin.Singleton.EmitSignal(Plugin.SignalName.ModelSizeCacheChanged, new Variant[] { name, Size });
 		}
 
+		/// <summary>
+		/// Checks if model size exists.
+		/// </summary>
+		/// <param name="name">The name of the model.</param>
+		/// <returns>True if the model size exists, false otherwise.</returns>
 		public bool HasModelSize(string name)
 		{
 			return _Config.HasSection("ModelSizes") && _Config.GetSectionKeys("ModelSizes").Contains(name);
 		}
 
+		/// <summary>
+        /// Gets the model size.
+        /// </summary>
+        /// <param name="name">The name of the model.</param>
+        /// <returns>The size of the model.</returns>
 		public Vector3 GetModelSize(string name)
 		{
 			if (HasModelSize(name))
@@ -280,11 +316,10 @@ namespace AssetSnap.Front.Configs
 			return Vector3.Zero;
 		}
 
-		/*
-		** Removes an folder from the array
-		** 
-		** @return void
-		*/
+		/// <summary>
+        /// Removes a folder from the array.
+        /// </summary>
+        /// <param name="path">The path of the folder to remove.</param>
 		public void RemoveFolder(string path)
 		{
 			string[] keys = _Config.GetSectionKeys("Folders");
@@ -313,11 +348,11 @@ namespace AssetSnap.Front.Configs
 			MaybeEmitFoldersLoaded();
 		}
 
-		/*
-		** Initializes the settings UI Container
-		** 
-		** @return void
-		*/
+		/// <summary>
+        /// Gets the value associated with the specified key.
+        /// </summary>
+        /// <param name="_key">The key whose value to get.</param>
+        /// <returns>The value associated with the specified key.</returns>
 		public override Variant GetKey(string _key)
 		{
 			if (null == _Settings || false == _Settings.ContainsKey(_key))
@@ -328,22 +363,20 @@ namespace AssetSnap.Front.Configs
 			return _Settings[_key];
 		}
 
-		/*
-		** Converts key to label
-		** 
-		** @param string _key
-		** @return string
-		*/
+		/// <summary>
+        /// Converts a key to label.
+        /// </summary>
+        /// <param name="key">The key to convert.</param>
+        /// <returns>The label associated with the key.</returns>
 		public string KeyToLabel(string key)
 		{
 			return key.Capitalize().Split('_').Join(" ");
 		}
 
-		/*
-		** Fetches the settings
-		** 
-		** @return Godot.Collections.Dictionary<string,Variant>
-		*/
+		/// <summary>
+        /// Fetches the settings.
+        /// </summary>
+        /// <returns>The settings dictionary.</returns>
 		public Godot.Collections.Dictionary<string, Variant> GetSettings()
 		{
 			return _Settings;

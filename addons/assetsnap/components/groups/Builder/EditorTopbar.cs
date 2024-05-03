@@ -20,16 +20,23 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using System.Collections.Generic;
+using AssetSnap.Component;
+using Godot;
+
 namespace AssetSnap.Front.Components.Groups.Builder
 {
-	using System.Collections.Generic;
-	using AssetSnap.Component;
-	using Godot;
-
+	/// <summary>
+	/// The editor top bar for the group builder component.
+	/// </summary>
 	[Tool]
 	public partial class EditorTopbar : LibraryComponent
 	{
-
+		/// <summary>
+		/// Constructor for EditorTopbar.
+		/// </summary>
 		public EditorTopbar()
 		{
 			Name = "GroupBuilderEditorTopbar";
@@ -52,6 +59,9 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		private MarginContainer totalMarginContainer;
 		private Label _TotalItems;
 
+		/// <summary>
+		/// Initializes the EditorTopbar.
+		/// </summary>
 		public override void Initialize()
 		{
 			base.Initialize();
@@ -77,6 +87,10 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			AddChild(_MarginContainer);
 		}
 
+		/// <summary>
+		/// Updates the total items in the group.
+		/// </summary>
+		/// <param name="items">The total number of items in the group.</param>
 		public void UpdateTotalItems(int items)
 		{
 			if (null != totalMarginContainer && null != _TotalItems && 0 != items)
@@ -90,6 +104,9 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			}
 		}
 
+		/// <summary>
+		/// Updates the EditorTopbar.
+		/// </summary>
 		public void Update()
 		{
 			if (_GlobalExplorer.GroupBuilder._Editor.Group == null || false == IsInstanceValid(_GlobalExplorer.GroupBuilder._Editor.Group))
@@ -136,16 +153,28 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			UpdateTotalItems(_GlobalExplorer.GroupBuilder._Editor.Group._Paths.Count);
 		}
 
+		/// <summary>
+		/// Gets the title from the input field.
+		/// </summary>
+		/// <returns>The title from the input field.</returns>
 		public string GetTitle()
 		{
 			return TitleInput._InputField.Text;
 		}
 
+		/// <summary>
+		/// Checks if the title equals the specified name.
+		/// </summary>
+		/// <param name="Name">The name to compare with.</param>
+		/// <returns>True if the title equals the name; otherwise, false.</returns>
 		public bool TitleEquals(string Name)
 		{
 			return Name == TitleInput._InputField.Text;
 		}
 
+		/// <summary>
+		/// Initializes the private fields of EditorTopbar.
+		/// </summary>
 		private void _InitializeFields()
 		{
 			_MarginContainer = new();
@@ -160,7 +189,10 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			};
 		}
 
-
+		/// <summary>
+		/// Sets up the group title.
+		/// </summary>
+		/// <param name="container">The container to add the group title to.</param>
 		private void _SetupGroupTitle(HBoxContainer container)
 		{
 			List<string> Components = new()
@@ -224,6 +256,10 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			container.AddChild(hBoxContainer);
 		}
 
+		/// <summary>
+		/// Sets up the close button.
+		/// </summary>
+		/// <param name="container">The container to add the close button to.</param>
 		private void _SetupCloseButton(HBoxContainer container)
 		{
 			List<string> Components = new()
@@ -239,6 +275,10 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			}
 		}
 
+		/// <summary>
+        /// Sets up the place button.
+        /// </summary>
+        /// <param name="container">The container to add the place button to.</param>
 		private void _SetupPlaceButton(HBoxContainer container)
 		{
 			List<string> Components = new()
@@ -255,3 +295,5 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		}
 	}
 }
+
+#endif

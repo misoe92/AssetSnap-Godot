@@ -20,17 +20,24 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using AssetSnap.Component;
+using AssetSnap.Explorer;
+using AssetSnap.States;
+using Godot;
+
 namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 {
-	using AssetSnap.Component;
-	using AssetSnap.Explorer;
-	using AssetSnap.States;
-
-	using Godot;
-
+	/// <summary>
+	/// Component for snapping group placement along the X-axis.
+	/// </summary>
 	[Tool]
 	public partial class SnapToXValue : GroupOptionSpinboxableComponent
 	{
+		/// <summary>
+		/// Constructor for SnapToXValue class.
+		/// </summary>
 		public SnapToXValue()
 		{
 			Name = "GroupsBuilderGroupOptionsSnapToXValue";
@@ -41,6 +48,9 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 			};
 		}
 
+		/// <summary>
+		/// Initializes fields required for the component.
+		/// </summary>
 		protected override void _InitializeFields()
 		{
 			Trait<Spinboxable>()
@@ -60,6 +70,10 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 				.GetLineEdit().AddThemeConstantOverride("minimum_character_width", 24);
 		}
 
+		/// <summary>
+        /// Handles the event when the value of the spinbox is changed.
+        /// </summary>
+        /// <param name="value">The new value of the spinbox.</param>
 		private void _OnValueChanged(float value)
 		{
 			if (
@@ -77,3 +91,5 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 		}
 	}
 }
+
+#endif

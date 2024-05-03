@@ -20,19 +20,22 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using AssetSnap.Component;
+using Godot;
+
 namespace AssetSnap.Front.Components.Groups
 {
-	using AssetSnap.Component;
-	using Godot;
-
+	/// <summary>
+	/// Partial class representing a container component within a library.
+	/// </summary>
 	[Tool]
 	public partial class Container : LibraryComponent
 	{
-		/*
-		** Constructor of component
-		** 
-		** @return void
-		*/
+		/// <summary>
+		/// Constructor for the Container class.
+		/// </summary>
 		public Container()
 		{
 			Name = "GroupContainer";
@@ -46,11 +49,9 @@ namespace AssetSnap.Front.Components.Groups
 			// _include = false;
 		}
 		
-		/*
-		** Initialization of component
-		** 
-		** @return void
-		*/
+		/// <summary>
+		/// Initializes the component.
+		/// </summary>
 		public override void Initialize()
 		{
 			SizeFlagsVertical = Control.SizeFlags.ExpandFill;
@@ -64,6 +65,9 @@ namespace AssetSnap.Front.Components.Groups
 			_FinalizeFields();
 		}
 		
+		/// <summary>
+		/// Initializes the fields of the container.
+		/// </summary>
 		private void _InitializeFields()
 		{
 			Trait<Containerable>()
@@ -75,6 +79,9 @@ namespace AssetSnap.Front.Components.Groups
 				.Instantiate();
 		}
 		
+		/// <summary>
+        /// Finalizes the fields of the container.
+        /// </summary>
 		private void _FinalizeFields()
 		{
 			Godot.Container sidebar = Trait<Containerable>()
@@ -91,11 +98,10 @@ namespace AssetSnap.Front.Components.Groups
 				);
 		}
 		
-		/*
-		** Fetches the left inner container
-		**
-		** @return VBoxContainer
-		*/
+		/// <summary>
+        /// Fetches the left inner container.
+        /// </summary>
+        /// <returns>The left inner container.</returns>
 		public Godot.Container GetLeftInnerContainer() 
 		{
 			return Trait<Containerable>()
@@ -103,11 +109,10 @@ namespace AssetSnap.Front.Components.Groups
 				.GetInnerContainer(0);
 		}
 		
-		/*
-		** Fetches the right inner container
-		**
-		** @return VBoxContainer
-		*/
+		/// <summary>
+        /// Fetches the right inner container.
+        /// </summary>
+        /// <returns>The right inner container.</returns>
 		public Godot.Container GetRightInnerContainer() 
 		{
 			return Trait<Containerable>()
@@ -116,3 +121,5 @@ namespace AssetSnap.Front.Components.Groups
 		}
 	}
 }
+
+#endif

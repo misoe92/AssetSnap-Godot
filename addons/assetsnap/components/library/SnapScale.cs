@@ -20,26 +20,59 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using Godot;
+using AssetSnap.Component;
+using AssetSnap.Front.Nodes;
+using AssetSnap.Explorer;
+
 namespace AssetSnap.Front.Components.Library
 {
-	using Godot;
-	using AssetSnap.Component;
-	using AssetSnap.Front.Nodes;
-	using AssetSnap.Explorer;
-
+	/// <summary>
+	/// Component for snapping scale values.
+	/// </summary>
 	[Tool]
 	public partial class SnapScale : LibraryComponent
 	{ 
+		/// <summary>
+		/// The height at which snapping occurs.
+		/// </summary>
 		private float SnapHeight;
 		
+		/// <summary>
+		/// The scale factor along the X-axis.
+		/// </summary>
 		public float ScaleX;
+		
+		/// <summary>
+		/// The scale factor along the Y-axis.
+		/// </summary>
 		public float ScaleY;
+		
+		/// <summary>
+		/// The scale factor along the Z-axis.
+		/// </summary>
 		public float ScaleZ;
+		
+		/// <summary>
+		/// A flag indicating whether scaling is active.
+		/// </summary>
 		public bool value;
 		
+		/// <summary>
+		/// The callable object for handling state changes.
+		/// </summary>
 		public Callable? StateChangeCallable;
+		
+		/// <summary>
+		/// The current input event.
+		/// </summary>
 		public InputEvent CurrentEvent;
 
+		/// <summary>
+        /// Default constructor for SnapScale.
+        /// </summary>
 		public SnapScale()
 		{
 			Name = "LibrarySnapScale";
@@ -49,11 +82,10 @@ namespace AssetSnap.Front.Components.Library
 			//_include = false; 
 		}
 		
-		/*
-		** Initialization of component
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Initialization of the component.
+		/// </summary>
+		/// <returns>void</returns>
 		public override void Initialize() 
 		{
 			base.Initialize();
@@ -83,12 +115,11 @@ namespace AssetSnap.Front.Components.Library
 			}
 		} 
 		
-		/*
-		** Updates scale values on
-		** input changes
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Updates scale values on input changes.
+		/// </summary>
+		/// <param name="which">The type of scale change.</param>
+		/// <returns>void</returns>
 		private void _OnScaleListStateChange( string which )
 		{
 			if( null == ExplorerUtils.Get().ContextMenu ) 
@@ -117,12 +148,11 @@ namespace AssetSnap.Front.Components.Library
 			}
 		}
 		
-		/*
-		** Checks if scale is currently active
-		** and whether or not to apply it
-		**
-		** @return void 
-		*/
+		/// <summary>
+		/// Checks if scale is currently active and whether or not to apply it.
+		/// </summary>
+		/// <param name="@event">The input event.</param>
+		/// <returns>void</returns>
 		public override void _Input(InputEvent @event)
 		{
 			if(
@@ -166,11 +196,11 @@ namespace AssetSnap.Front.Components.Library
 			base._Input(@event);
 		}
 				
-		/*
-		** Scales on all angles
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Scales on all angles.
+		/// </summary>
+		/// <param name="Handle">The node to scale.</param>
+		/// <returns>void</returns>
 		public void DoScaleAll( Node3D Handle )
 		{
 			Vector3 _Scale = ExplorerUtils.Get().ContextMenu.GetScaleValues();
@@ -203,11 +233,11 @@ namespace AssetSnap.Front.Components.Library
 			}
 		}
 				
-		/*
-		** Scales on x angle
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Scales on x angle.
+		/// </summary>
+		/// <param name="Handle">The node to scale.</param>
+		/// <returns>void</returns>
 		public void DoScaleX( Node3D Handle )
 		{
 			Vector3 _Scale = ExplorerUtils.Get().ContextMenu.GetScaleValues();
@@ -231,11 +261,11 @@ namespace AssetSnap.Front.Components.Library
 			}
 		}
 		
-		/*
-		** Scales on y angle
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Scales on y angle.
+		/// </summary>
+		/// <param name="Handle">The node to scale.</param>
+		/// <returns>void</returns>
 		public void DoScaleY( Node3D Handle )
 		{
 			Vector3 _Scale = ExplorerUtils.Get().ContextMenu.GetScaleValues();
@@ -259,11 +289,11 @@ namespace AssetSnap.Front.Components.Library
 			}
 		}
 		
-		/*
-		** Scales on z angle
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Scales on z angle.
+		/// </summary>
+		/// <param name="Handle">The node to scale.</param>
+		/// <returns>void</returns>
 		public void DoScaleZ( Node3D Handle )
 		{
 			Vector3 _Scale = ExplorerUtils.Get().ContextMenu.GetScaleValues();
@@ -287,11 +317,15 @@ namespace AssetSnap.Front.Components.Library
 			}
 		}
 		
-		/*
-		** Applies the scale changes
-		**
-		** @return Vector3
-		*/
+		/// <summary>
+		/// Applies the scale changes.
+		/// </summary>
+		/// <param name="angle">The angle to apply the scale.</param>
+		/// <param name="Scale">The current scale.</param>
+		/// <param name="CurrentAngleScale">The current angle scale.</param>
+		/// <param name="_default">The default value.</param>
+		/// <param name="reverse">Whether to reverse the scale change.</param>
+		/// <returns>The updated scale.</returns>
 		public Vector3 Apply( string angle, Vector3 Scale, float CurrentAngleScale, float _default, bool reverse = false )
 		{
 			bool specific = false;
@@ -352,11 +386,10 @@ namespace AssetSnap.Front.Components.Library
 			return Scale;
 		}
 		
-		/*
-		** Checks if mouse wheel up is active
-		**
-		** @return bool
-		*/
+		/// <summary>
+		/// Checks if mouse wheel up is active.
+		/// </summary>
+		/// <returns>True if the mouse wheel is scrolling up, otherwise false.</returns>
 		public bool IsWheelUp()
 		{
 			if( CurrentEvent is InputEventMouseButton MouseButtonEvent ) 
@@ -367,11 +400,10 @@ namespace AssetSnap.Front.Components.Library
 			return false;
 		}
 		
-		/*
-		** Checks if mouse wheel down is active
-		**
-		** @return bool
-		*/
+		/// <summary>
+		/// Checks if mouse wheel down is active.
+		/// </summary>
+		/// <returns>True if the mouse wheel is scrolling down, otherwise false.</returns>
 		public bool IsWheelDown()
 		{
 			if( CurrentEvent is InputEventMouseButton MouseButtonEvent ) 
@@ -382,11 +414,11 @@ namespace AssetSnap.Front.Components.Library
 			return false;
 		} 
 		
-		/*
-		** Checks if scale on all angles should occur
-		**
-		** @return bool
-		*/
+		/// <summary>
+		/// Checks if scale on all angles should occur.
+		/// </summary>
+		/// <param name="angle">The current angle.</param>
+		/// <returns>True if scale on all angles should occur, otherwise false.</returns>
 		public bool ShouldScaleAll( int angle ) 
 		{
 			if( value == true && CurrentEvent is InputEventMouseButton MouseButtonEvent ) 
@@ -400,11 +432,11 @@ namespace AssetSnap.Front.Components.Library
 			return false;
 		}
 		
-		/*
-		** Checks if scale on x angle should occur
-		**
-		** @return bool
-		*/
+		/// <summary>
+		/// Checks if scale on x angle should occur.
+		/// </summary>
+		/// <param name="angle">The current angle.</param>
+		/// <returns>True if scale on x angle should occur, otherwise false.</returns>
 		public bool ShouldScaleX( int angle ) 
 		{
 			if( value == true && CurrentEvent is InputEventMouseButton MouseButtonEvent ) 
@@ -418,11 +450,11 @@ namespace AssetSnap.Front.Components.Library
 			return false;
 		}
 		
-		/*
-		** Checks if scale on y angle should occur
-		**
-		** @return bool
-		*/
+		/// <summary>
+		/// Checks if scale on y angle should occur.
+		/// </summary>
+		/// <param name="angle">The current angle.</param>
+		/// <returns>True if scale on y angle should occur, otherwise false.</returns>
 		public bool ShouldScaleY( int angle ) 
 		{
 			if( value == true && CurrentEvent is InputEventMouseButton MouseButtonEvent ) 
@@ -436,11 +468,11 @@ namespace AssetSnap.Front.Components.Library
 			return false;
 		}
 		
-		/*
-		** Checks if scale on z angle should occur
-		**
-		** @return bool
-		*/
+		/// <summary>
+		/// Checks if scale on z angle should occur.
+		/// </summary>
+		/// <param name="angle">The current angle.</param>
+		/// <returns>True if scale on z angle should occur, otherwise false.</returns>
 		public bool ShouldScaleZ( int angle ) 
 		{
 			if( value == true && CurrentEvent is InputEventMouseButton MouseButtonEvent ) 
@@ -454,14 +486,15 @@ namespace AssetSnap.Front.Components.Library
 			return false;
 		}
 			
-		/*
-		** Fetches current snap scale
-		**
-		** @return float 
-		*/
+		/// <summary>
+		/// Fetches the current snap scale.
+		/// </summary>
+		/// <returns>The current snap height.</returns>
 		public float GetSnapHeight() 
 		{
 			return SnapHeight;
 		}
 	}
 }
+
+#endif

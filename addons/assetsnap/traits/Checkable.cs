@@ -24,35 +24,37 @@
 using System.Collections.Generic;
 using AssetSnap.Trait;
 using Godot;
+
 namespace AssetSnap.Component
 {
+	/// <summary>
+	/// A checkable component that extends ContainerTrait, providing functionality for creating checkboxes.
+	/// </summary>
 	[Tool]
 	public partial class Checkable : ContainerTrait
 	{
 		/*
-		** Private
-		*/
+        ** Private fields
+        */
 		private List<Callable?> _Actions = new();
 		private Callable? _Action;
-		
 		private string Text = "";
 		private string TooltipText = "";
 		private bool ButtonPressed = false;
 		
-		/*
-		** Public methods
-		*/
+		/// <summary>
+        /// Constructor for the Checkable class.
+        /// </summary>
 		public Checkable()
 		{
 			Name = "Checkable";
 			TypeString = GetType().ToString();
 		}
 		
-		/*
-		** Instantiate an instance of the trait
-		**
-		** @return Checkable
-		*/
+		/// <summary>
+        /// Instantiate an instance of the trait.
+        /// </summary>
+        /// <returns>Returns the instantiated Checkable instance.</returns>
 		public override Checkable Instantiate()
 		{
 			base._Instantiate();
@@ -106,13 +108,12 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		/*
-		** Selects an placed checkbox in the
-		** nodes array by index
-		**
-		** @param int index
-		** @return Checkable
-		*/
+		/// <summary>
+        /// Selects a placed checkbox in the nodes array by index.
+        /// </summary>
+        /// <param name="index">The index of the checkbox to select.</param>
+        /// <param name="debug">Optional parameter to enable debugging.</param>
+        /// <returns>Returns the updated Checkable instance.</returns>
 		public override Checkable Select(int index, bool debug = false)
 		{
 			base._Select(index, debug);
@@ -126,13 +127,11 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		/*
-		** Selects an placed checkbox in the
-		** nodes array by name
-		**
-		** @param string name
-		** @return Checkable
-		*/
+		/// <summary>
+        /// Selects a placed checkbox in the nodes array by name.
+        /// </summary>
+        /// <param name="name">The name of the checkbox to select.</param>
+        /// <returns>Returns the updated Checkable instance.</returns>
 		public override Checkable SelectByName( string name ) 
 		{
 			foreach( Button button in Nodes ) 
@@ -147,13 +146,10 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		/*
-		** Adds the currently chosen button
-		** to a specified container
-		**
-		** @param Node Container
-		** @return void
-		*/
+		/// <summary>
+        /// Adds the currently chosen button to a specified container.
+        /// </summary>
+        /// <param name="Container">The container to which the chosen button will be added.</param>
 		public void AddToContainer( Node Container )
 		{
 			if( false == Dependencies.ContainsKey(TraitName + "_MarginContainer") ) 
@@ -167,16 +163,11 @@ namespace AssetSnap.Component
 			_AddToContainer(Container, Dependencies[TraitName + "_MarginContainer"].As<MarginContainer>());
 		}
 		
-		/*
-		** Setter Methods
-		*/
-		
-		/*
-		** Sets the name of the current checkbox
-		**
-		** @param string text
-		** @return Checkable
-		*/
+		/// <summary>
+        /// Sets the name of the current checkbox.
+        /// </summary>
+        /// <param name="text">The name to set.</param>
+        /// <returns>Returns the updated Checkable instance.</returns>
 		public Checkable SetName( string text ) 
 		{
 			base._SetName(text);
@@ -184,12 +175,11 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		/*
-		** Sets the text of the current checkbox
-		**
-		** @param string text
-		** @return Checkable
-		*/
+		/// <summary>
+        /// Sets the text of the current checkbox.
+        /// </summary>
+        /// <param name="text">The text to set.</param>
+        /// <returns>Returns the updated Checkable instance.</returns>
 		public Checkable SetText( string text ) 
 		{
 			Text = text;
@@ -197,12 +187,11 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		/*
-		** Sets the tooltip text of the current checkbox
-		**
-		** @param string text
-		** @return Checkable
-		*/
+		/// <summary>
+        /// Sets the tooltip text of the current checkbox.
+        /// </summary>
+        /// <param name="text">The tooltip text to set.</param>
+        /// <returns>Returns the updated Checkable instance.</returns>
 		public Checkable SetTooltipText( string text ) 
 		{
 			TooltipText = text;
@@ -210,12 +199,11 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		/*
-		** Sets the value of the current checkbox
-		**
-		** @param bool value
-		** @return Checkable
-		*/
+		/// <summary>
+        /// Sets the value of the current checkbox.
+        /// </summary>
+        /// <param name="value">The value to set.</param>
+        /// <returns>Returns the updated Checkable instance.</returns>
 		public Checkable SetValue( bool value )
 		{
 			if(
@@ -233,13 +221,11 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		/*
-		** Sets the visibility state of the
-		** currently chosen checkbox
-		**
-		** @param bool state
-		** @return Checkable
-		*/
+		/// <summary>
+        /// Sets the visibility state of the currently chosen checkbox.
+        /// </summary>
+        /// <param name="state">The visibility state to set.</param>
+        /// <returns>Returns the updated Checkable instance.</returns>
 		public override Checkable SetVisible( bool state ) 
 		{
 			base.SetVisible(state);
@@ -247,13 +233,11 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		/*
-		** Sets the horizontal size flag, which controls the x
-		** axis, and how it should act.
-		**
-		** @param Control.SizeFlags flag
-		** @return Checkable
-		*/
+		/// <summary>
+        /// Sets the horizontal size flag, which controls the x axis.
+        /// </summary>
+        /// <param name="flag">The size flag to set.</param>
+        /// <returns>Returns the updated Checkable instance.</returns>
 		public override Checkable SetHorizontalSizeFlags(Control.SizeFlags flag)
 		{
 			base.SetHorizontalSizeFlags(flag); 
@@ -261,13 +245,11 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		/*
-		** Sets the vertical size flag, which controls the y
-		** axis, and how it should act.
-		**
-		** @param Control.SizeFlags flag
-		** @return Checkable
-		*/
+		/// <summary>
+        /// Sets the vertical size flag, which controls the y axis.
+        /// </summary>
+        /// <param name="flag">The size flag to set.</param>
+        /// <returns>Returns the updated Checkable instance.</returns>
 		public override Checkable SetVerticalSizeFlags(Control.SizeFlags flag)
 		{
 			base.SetVerticalSizeFlags(flag); 
@@ -275,40 +257,35 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		/*
-		** Sets the callable for the
-		** currently chosen checkbox
-		**
-		** @param Callable action
-		** @return Checkable
-		*/
+		/// <summary>
+        /// Sets the callable for the currently chosen checkbox.
+        /// </summary>
+        /// <param name="action">The callable action to set.</param>
+        /// <returns>Returns the updated Checkable instance.</returns>
 		public Checkable SetAction( Callable action ) 
 		{
 			_Action = action;			
 			return this;
 		}
 		
-		/*
-		** Sets margin values for 
-		** the currently chosen checkbox
-		**
-		** @param int value
-		** @param string side
-		** @return Checkable
-		*/
+		/// <summary>
+        /// Sets margin values for the currently chosen checkbox.
+        /// </summary>
+        /// <param name="value">The margin value.</param>
+        /// <param name="side">The side for which to set the margin.</param>
+        /// <returns>Returns the updated Checkable instance.</returns>
 		public override Checkable SetMargin( int value, string side = "" ) 
 		{
 			base.SetMargin(value, side);
 			return this;
 		}
 		
-		/*
-		** Sets the dimensions for the checkbox
-		**
-		** @param int width
-		** @param int height
-		** @return Checkable
-		*/
+		/// <summary>
+        /// Sets the dimensions for the checkbox.
+        /// </summary>
+        /// <param name="width">The width to set.</param>
+        /// <param name="height">The height to set.</param>
+        /// <returns>Returns the updated Checkable instance.</returns>
 		public override Checkable SetDimensions( int width, int height )
 		{
 			base.SetDimensions(width, height);
@@ -316,16 +293,10 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		/*
-		** Getter Methods
-		*/
-		
-		/*
-		** Fetches the value of
-		** the current checkbox
-		**
-		** @return bool
-		*/
+		/// <summary>
+        /// Fetches the value of the current checkbox.
+        /// </summary>
+        /// <returns>Returns the value of the current checkbox.</returns>
 		public bool GetValue()
 		{
 			if( false != Dependencies.ContainsKey(TraitName + "_WorkingNode") && Dependencies[TraitName + "_WorkingNode"].As<GodotObject>() is CheckBox WorkingInput) 
@@ -337,34 +308,21 @@ namespace AssetSnap.Component
 			return false;
 		}
 		
-		/*
-		** Booleans
-		*/
-		
-		/*
-		** Checks if any nodes exists
-		**
-		** @return bool
-		*/
+		/// <summary>
+        /// Checks if any nodes exist.
+        /// </summary>
+        /// <returns>Returns true if nodes exist; otherwise, false.</returns>
 		public bool HasNodes()
 		{
 			return null != Nodes && Nodes.Count != 0;
 		}
 		
-		/*
-		** Private
-		*/
-		
-		/*
-		** Resets the trait to
-		** a cleared state
-		**
-		** @return void
-		*/
+		/// <summary>
+        /// Resets the trait to a cleared state.
+        /// </summary>
 		protected override void Reset()
 		{
 			_Action = null;
-
 			base.Reset();
 		}
 	}

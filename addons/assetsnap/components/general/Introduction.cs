@@ -20,22 +20,25 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using AssetSnap.Component;
+using Godot;
+
 namespace AssetSnap.Front.Components
 {
-	using AssetSnap.Component;
-	using Godot;
-
+	/// <summary>
+    /// Component responsible for displaying an introduction to the application.
+    /// </summary>
 	[Tool]
 	public partial class Introduction : TraitableComponent
 	{
 		private readonly string TitleText = "AssetSnap";
 		private readonly string DescriptionText = "Add folders to start, when an folder has been added a tab with the folder name will appear, Then go to the folder tab and browse your assets and place them. \n\nIf you wish to remove a library all you will have to do is click the red button on the right. In the same column as the library you wish to remove.";
 	
-		/*
-		** Constructor of the class
-		** 
-		** @return void
-		*/ 
+		/// <summary>
+        /// Constructor of the Introduction class.
+        /// </summary> 
 		public Introduction() : base()
 		{
 			Name = "Introduction";
@@ -48,11 +51,9 @@ namespace AssetSnap.Front.Components
 			//_include = false; 
 		}
 		
-		/*
-		** Initialization of component
-		** 
-		** @return void
-		*/
+		/// <summary>
+        /// Initializes the component.
+        /// </summary>
 		public override void Initialize()
 		{
 			base.Initialize();
@@ -86,3 +87,5 @@ namespace AssetSnap.Front.Components
 		}
 	}
 }
+
+#endif

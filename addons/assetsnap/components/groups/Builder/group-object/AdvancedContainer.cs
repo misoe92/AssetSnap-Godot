@@ -20,13 +20,18 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using System.Collections.Generic;
+using AssetSnap.Component;
+using Godot;
+using AssetSnap.Front.Components.Groups.Builder.GroupObject.AdvancedContainers;
+
 namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 {
-	using System.Collections.Generic;
-	using AssetSnap.Component;
-	using Godot;
-	using AssetSnap.Front.Components.Groups.Builder.GroupObject.AdvancedContainers;
-
+	/// <summary>
+	/// Represents an advanced container for group objects in the builder.
+	/// </summary>
 	[Tool]
 	public partial class AdvancedContainer : GroupObjectComponent
 	{
@@ -36,6 +41,9 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 		private SnapLayer _GroupBuilderEditorGroupObjectAdvancedContainerSnapLayer;
 		private LevelOfDetails _GroupBuilderEditorGroupObjectAdvancedContainerLevelOfDetails;
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="AdvancedContainer"/> class.
+		/// </summary>
 		public AdvancedContainer()
 		{
 			Name = "GroupsBuilderGroupObjectAdvancedContainer";
@@ -49,6 +57,10 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 			};
 		}
 
+		/// <summary>
+		/// Checks if the advanced container is visible.
+		/// </summary>
+		/// <returns>True if the advanced container is visible; otherwise, false.</returns>
 		public bool IsVisible()
 		{
 			return Trait<Containerable>()
@@ -56,6 +68,9 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 				.IsVisible();
 		}
 
+		/// <summary>
+		/// Toggles the visibility of the advanced container.
+		/// </summary>
 		public void ToggleVisibility()
 		{
 			Trait<Containerable>()
@@ -63,6 +78,9 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 				.ToggleVisible();
 		}
 
+		/// <summary>
+		/// Initializes the fields of the advanced container.
+		/// </summary>
 		protected override void _InitializeFields()
 		{
 			Trait<Containerable>()
@@ -76,7 +94,7 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 				.SetVisible(false)
 				.Instantiate();
 
-			Container BoxContainer = Trait<Containerable>().Select(0).GetInnerContainer();
+			Godot.Container BoxContainer = Trait<Containerable>().Select(0).GetInnerContainer();
 
 			_InitializeSnapLayerControl(BoxContainer);
 			_InitializeLevelOfDetailsControl(BoxContainer);
@@ -85,6 +103,9 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 			_InitializeConcaveCollisionControl(BoxContainer);
 		}
 
+		/// <summary>
+		/// Finalizes the fields of the advanced container.
+		/// </summary>
 		protected override void _FinalizeFields()
 		{
 			Trait<Containerable>()
@@ -94,7 +115,11 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 				);
 		}
 
-		private void _InitializeLevelOfDetailsControl(Container innerContainer)
+		/// <summary>
+		/// Initializes the level of details control.
+		/// </summary>
+		/// <param name="innerContainer">The inner container where the control will be added.</param>
+		private void _InitializeLevelOfDetailsControl(Godot.Container innerContainer)
 		{
 			List<string> Components = new()
 			{
@@ -113,7 +138,11 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 			}
 		}
 		
-		private void _InitializeSnapLayerControl(Container innerContainer)
+		/// <summary>
+		/// Initializes the snap layer control.
+		/// </summary>
+		/// <param name="innerContainer">The inner container where the control will be added.</param>
+		private void _InitializeSnapLayerControl(Godot.Container innerContainer)
 		{
 			List<string> Components = new()
 			{
@@ -131,7 +160,11 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 			}
 		}
 
-		private void _InitializeSphereCollisionControl(Container innerContainer)
+		/// <summary>
+		/// Initializes the sphere collision control.
+		/// </summary>
+		/// <param name="innerContainer">The inner container where the control will be added.</param>
+		private void _InitializeSphereCollisionControl(Godot.Container innerContainer)
 		{
 			List<string> Components = new()
 			{
@@ -149,7 +182,11 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 			}
 		}
 
-		private void _InitializeConvexCollisionControl(Container innerContainer)
+		/// <summary>
+		/// Initializes the convex collision control.
+		/// </summary>
+		/// <param name="innerContainer">The inner container where the control will be added.</param>
+		private void _InitializeConvexCollisionControl(Godot.Container innerContainer)
 		{
 			List<string> Components = new()
 			{
@@ -167,7 +204,11 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 			}
 		}
 
-		private void _InitializeConcaveCollisionControl(Container innerContainer)
+		/// <summary>
+        /// Initializes the concave collision control.
+        /// </summary>
+        /// <param name="innerContainer">The inner container where the control will be added.</param>
+		private void _InitializeConcaveCollisionControl(Godot.Container innerContainer)
 		{
 			List<string> Components = new()
 			{
@@ -186,3 +227,5 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 		}
 	}
 }
+
+#endif

@@ -20,13 +20,17 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using System.Collections.Generic;
+using AssetSnap.Explorer;
+using AssetSnap.Front.Components.Library;
+using AssetSnap.Front.Nodes;
+using Godot;
+
 namespace AssetSnap.Library
 {
-	using System.Collections.Generic;
-	using AssetSnap.Explorer;
-	using AssetSnap.Front.Components.Library;
-	using Godot;
-	
+	/// <summary>
+	/// Represents an instance of a library within the AssetSnap application.
+	/// </summary>
 	[Tool]
 	public partial class Instance : VBoxContainer
 	{
@@ -83,6 +87,9 @@ namespace AssetSnap.Library
 			"Library.Listing",
 		};
 		
+		/// <summary>
+		/// The folder path of the library instance.
+		/// </summary>
 		public string Folder 
 		{
 			get => _Folder;
@@ -112,7 +119,7 @@ namespace AssetSnap.Library
 		/** Components **/
 		public Body _LibraryBody;
 		public Topbar _LibraryTopbar;
-		public Settings _LibrarySettings;
+		public Front.Components.Library.Settings _LibrarySettings;
 		public Listing _LibraryListing;
 
 		public TabContainer Dock;
@@ -132,6 +139,10 @@ namespace AssetSnap.Library
 			// }
 		}
 
+		/// <summary>
+		/// Clears all components of the library instance.
+		/// </summary>
+		/// <param name="debug">Whether to output debug information.</param>
 		public void Clear(bool debug = false)
 		{
 			_GlobalExplorer.Components.Remove(_LibraryTopbar);
@@ -145,12 +156,9 @@ namespace AssetSnap.Library
 			_LibraryBody.Clear(debug);
 		}
 		
-		/*
-		** Initializes the library
-		** Setting up it's nodes and UI and more
-		** 
-		** @return void
-		*/
+		/// <summary>
+		/// Initializes the library instance.
+		/// </summary>
 		public void Initialize()
 		{
 			Component.Base Components = ExplorerUtils.Get().Components;
@@ -174,7 +182,6 @@ namespace AssetSnap.Library
 				
 				// To ensure we reset it's position
 				Dock.RemoveChild(this);
-				// GD.Print("Removed tab entry");
 				// Dock.AddChild(this);
 			}
 			else 
@@ -212,45 +219,39 @@ namespace AssetSnap.Library
 			Plugin.Singleton.EmitSignal(Plugin.SignalName.OnLibraryPopulized);
 		}
 
-		/*
-		** Fetches the current panels
-		**
-		** @return Godot.Collections.Array<AsLibraryPanelContainer>
-		*/
+		/// <summary>
+		/// Fetches the current panels.
+		/// </summary>
+		/// <returns>The array of panel containers.</returns>
 		public Godot.Collections.Array<AsLibraryPanelContainer> GetPanels()
 		{
 			return Panels;
 		}
 		
-		/*
-		** Sets the current panels
-		**
-		** @param Godot.Collections.Array<AsLibraryPanelContainer> _Panels
-		** @return void
-		*/
+		/// <summary>
+		/// Sets the current panels.
+		/// </summary>
+		/// <param name="_Panels">The array of panel containers to set.</param>
 		public void SetPanels( Godot.Collections.Array<AsLibraryPanelContainer> _Panels )
 		{
 			Panels = _Panels;
 		}
 		
-		/*
-		** Adds a panel container to the panels
-		**
-		** @param AsLibraryPanelContainer _PanelContainer
-		** @return void
-		*/
+		/// <summary>
+		/// Adds a panel container to the list of panels.
+		/// </summary>
+		/// <param name="_PanelContainer">The panel container to add.</param>
+		/// <returns>void</returns>
 		public void AddPanel(AsLibraryPanelContainer _PanelContainer)
 		{
 			Panels.Add(_PanelContainer);
 		} 
 		
-		/*
-		** Clears all panel states except for the one matching
-		** the one given in params
-		**
-		** @param AsLibraryPanelContainer panel
-		** @return void
-		*/
+		/// <summary>
+		/// Clears the active state of all panels except for the one specified.
+		/// </summary>
+		/// <param name="panel">The panel container to keep active.</param>
+		/// <returns>void</returns>
 		public void ClearActivePanelState( AsLibraryPanelContainer panel )
 		{
 			foreach( AsLibraryPanelContainer _panel in Panels ) 
@@ -262,11 +263,10 @@ namespace AssetSnap.Library
 			}
 		}
 		
-		/*
-		** Clears all panel states
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Clears the active state of all panels.
+		/// </summary>
+		/// <returns>void</returns>
 		public void ClearAllPanelState()
 		{
 			for( int i = 0; i < Panels.Count; i++) 
@@ -276,6 +276,10 @@ namespace AssetSnap.Library
 			}	
 		}
 		
+		/// <summary>
+		/// Removes all panel states and frees the panel containers.
+		/// </summary>
+		/// <returns>void</returns>
 		public void RemoveAllPanelState()
 		{
 			foreach( AsLibraryPanelContainer _panel in Panels ) 
@@ -294,11 +298,13 @@ namespace AssetSnap.Library
 			Panels = new();
 		}
 		 
-		/*
-		** Setups the library body if the component exists
-		** 
-		** @return void
-		*/
+		/// <summary>
+		/// Setups the library body if the component exists.
+		/// </summary>
+		/// <remarks>
+		/// This method initializes the library body component if it exists, sets up its properties, and adds it to the panel container.
+		/// </remarks>
+		/// <returns>void</returns>
 		private void _SetupLibraryBody()
 		{
 			Component.Base Components = _GlobalExplorer.Components;
@@ -315,11 +321,13 @@ namespace AssetSnap.Library
 			}
 		}
 		
-		/*
-		** Setups the library title if the component exists
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Setups the library title if the component exists.
+		/// </summary>
+		/// <remarks>
+		/// This method initializes the library title component if it exists, sets up its properties, and adds it to the library body's right inner container.
+		/// </remarks>
+		/// <returns>void</returns>
 		private void _SetupLibraryTopbar()
 		{
 			Component.Base Components = _GlobalExplorer.Components;
@@ -336,17 +344,19 @@ namespace AssetSnap.Library
 			}
 		}
 		
-		/*
-		** Setups the library settings if the component exists
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Setups the library settings if the component exists.
+		/// </summary>
+		/// <remarks>
+		/// This method initializes the library settings component if it exists, sets up its properties, and adds it to the library body's left inner container.
+		/// </remarks>
+		/// <returns>void</returns>
 		private void _SetupLibrarySettings()
 		{
 			Component.Base Components = _GlobalExplorer.Components;
 			if (Components.HasAll( SettingsComponents.ToArray() )) 
 			{
-				_LibrarySettings = Components.Single<Settings>(true);
+				_LibrarySettings = Components.Single<Front.Components.Library.Settings>(true);
 				
 				if( HasLibrarySettings() ) 
 				{
@@ -357,11 +367,13 @@ namespace AssetSnap.Library
 			}
 		}
 		
-		/*
-		** Setups the library listing if the component exists
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Setups the library listing if the component exists.
+		/// </summary>
+		/// <remarks>
+		/// This method initializes the library listing component if it exists, sets up its properties, and adds it to the library body's right inner container.
+		/// </remarks>
+		/// <returns>void</returns>
 		private void _SetupLibraryListing()
 		{
 			Component.Base Components = _GlobalExplorer.Components;
@@ -379,58 +391,62 @@ namespace AssetSnap.Library
 			}
 		}
 		
+		/// <summary>
+		/// Gets the name of the library.
+		/// </summary>
+		/// <remarks>
+		/// This method retrieves the name of the library from its folder path.
+		/// </remarks>
+		/// <returns>The name of the library.</returns>
 		public string GetName()
 		{
 			var split = Folder.Split('/');
 			return split[ split.Length - 1];
 		}
 		
-		/*
-		** Checks if the library title exists
-		**
-		** @return bool
-		*/
+		/// <summary>
+		/// Checks if the library title exists.
+		/// </summary>
+		/// <returns>True if the library title exists, false otherwise.</returns>
 		private bool HasLibraryTopbar()
 		{
 			return null != _LibraryTopbar;
 		}
 						
-		/*
-		** Checks if the library listing exists
-		**
-		** @return bool
-		*/
+		/// <summary>
+		/// Checks if the library listing exists.
+		/// </summary>
+		/// <returns>True if the library listing exists, false otherwise.</returns>
 		private bool HasLibraryListing()
 		{
 			return null != _LibraryListing;
 		}
 						
-		/*
-		** Checks if the library settings exists
-		**
-		** @return bool
-		*/
+		/// <summary>
+		/// Checks if the library settings exists.
+		/// </summary>
+		/// <returns>True if the library settings exists, false otherwise.</returns>
 		private bool HasLibrarySettings()
 		{
 			return null != _LibrarySettings;
 		}
 						
-		/*
-		** Checks if the library body exists
-		**
-		** @return bool
-		*/
+		/// <summary>
+		/// Checks if the library body exists.
+		/// </summary>
+		/// <returns>True if the library body exists, false otherwise.</returns>
 		private bool HasLibraryBody()
 		{
 			return null != _LibraryBody;
 		}
 		
-		/*
-		** Returns the last entry name for the folder
-		** So it can be used as a name it also removes _
-		**
-		** @return string
-		*/
+		/// <summary>
+		/// Returns the last entry name for the folder.
+		/// </summary>
+		/// <remarks>
+		/// This method extracts the last entry name from the folder path and formats it for use as a name, removing underscores.
+		/// </remarks>
+		/// <returns>The formatted file name.</returns>
 		private string AsFileName() 
 		{
 			var OnlyFileName = Folder;
@@ -446,6 +462,10 @@ namespace AssetSnap.Library
 			return OnlyFileName; 
 		} 
 		
+		/// <summary>
+		/// Handles the library change event.
+		/// </summary>
+		/// <param name="name">The name of the library that changed.</param>
 		private void _OnLibraryChanged( string name )
 		{
 			if( name == GetName() && null != _LibrarySettings ) 
@@ -456,12 +476,18 @@ namespace AssetSnap.Library
 			}
 		}
 		
+		/// <summary>
+		/// Resets the instance by clearing panel states and library settings.
+		/// </summary>
 		public void Reset()
 		{
 			ClearAllPanelState();
 			_LibrarySettings.ClearAll();
 		}
 
+		/// <summary>
+        /// Called when the node is about to be removed from the scene tree.
+        /// </summary>
 		public override void _ExitTree()
 		{
 			if( null != _PanelContainer && IsInstanceValid(_PanelContainer) ) 

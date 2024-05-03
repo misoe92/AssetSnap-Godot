@@ -20,19 +20,22 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
 using AssetSnap.Explorer;
 using AssetSnap.Settings;
 using Godot;
 
 namespace AssetSnap.Core 
 {
+	/// <summary>
+	/// Handles initialization and setup of the plugin upon entering the tree.
+	/// </summary>
 	public class CoreEnter : Core 
 	{ 
-		/*
-		** Initializes our plugin
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Initializes our plugin.
+		/// </summary>
 		public void InitializeCore()
 		{	 
 			/** Initialize custom node types **/  
@@ -46,7 +49,6 @@ namespace AssetSnap.Core
 			new ASNode.Types.AsMeshInstanceType().Initialize();
 			new ASNode.Types.AsMultiMeshInstanceType().Initialize();
 			new ASNode.Types.AsOptimizedMultiMeshGroupType().Initialize();
-			new ASNode.Types.AsMultiMeshType().Initialize();
 
 			new Library.Base();
 			new ContextMenu.Base();
@@ -76,6 +78,9 @@ namespace AssetSnap.Core
 			_GlobalExplorer.Settings.MaybeEmitFoldersLoaded();
 		} 
 		
+		/// <summary>
+		/// Handles the loading of containers upon the plugin's initialization.
+		/// </summary>
 		private void _OnLoadContainers() 
 		{
 			if( _GlobalExplorer.Settings.Initialized ) 
@@ -119,9 +124,14 @@ namespace AssetSnap.Core
 			}
 		}
 		
+		/// <summary>
+		/// Handles cleanup when the plugin exits the tree.
+		/// </summary>
 		public void dispose()
 		{
 			_GlobalExplorer._Plugin.FoldersLoaded -= () => { _OnLoadContainers(); };
 		}
 	}
 }
+
+#endif

@@ -20,22 +20,25 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using AssetSnap.Component;
+using Godot;
+
 namespace AssetSnap.Front.Components.Library.Sidebar
 {
-	using AssetSnap.Component;
-	using Godot;
-
+	/// <summary>
+	/// Component for optimized placement functionality.
+	/// </summary>
 	[Tool]
 	public partial class OptimizedPlacement : CheckableComponent
 	{
 		private readonly string _Title = "Optimized placement";
 		private readonly string _CheckboxTooltip = "Will use multi mesh for placing the elements, will be good when a large amount of objects is needed to be spawned";
 
-		/*
-		** Constructor of the component
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Constructor of the component.
+		/// </summary>
 		public OptimizedPlacement()
 		{
 			Name = "LSOptimizedPlacement";
@@ -48,11 +51,9 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			// _include = false;
 		}
 
-		/*
-		** Initializes the component
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Initializes the component.
+		/// </summary>
 		public override void Initialize()
 		{
 			base.Initialize();
@@ -77,6 +78,10 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			Plugin.GetInstance().StatesChanged += (Godot.Collections.Array data) => { MaybeUpdateValue(data); };
 		}
 
+		/// <summary>
+        /// Checks if an update of value is necessary and updates it if needed.
+        /// </summary>
+        /// <param name="data">The data to be checked for updates.</param>
 		public void MaybeUpdateValue(Godot.Collections.Array data)
 		{
 			if (data[0].As<string>() == "PlacingType")
@@ -92,46 +97,36 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			}
 		}
 
-		/*
-		** Updates collisions and spawn settings
-		** of the model
-		**
-		** @return void
-		*/
+		/// <summary>
+        /// Updates collisions and spawn settings of the model.
+        /// </summary>
 		private void _OnCheckboxPressed()
 		{
 			_GlobalExplorer.States.PlacingType = GlobalStates.PlacingTypeEnum.Optimized;
 			UpdateSpawnSettings("PlacingType", "Optimized");
 		}
 
-		/*
-		** Checks if the component state
-		** is active
-		** 
-		** @return bool
-		*/
+		/// <summary>
+        /// Checks if the component state is active.
+        /// </summary>
+        /// <returns>True if active, otherwise false.</returns>
 		public bool IsActive()
 		{
 			return _GlobalExplorer.States.PlacingType == GlobalStates.PlacingTypeEnum.Optimized;
 		}
 
-		/*
-		** Checks if the component state
-		** is simple
-		** 
-		** @return bool
-		*/
+		/// <summary>
+        /// Checks if the component state is simple.
+        /// </summary>
+        /// <returns>True if simple, otherwise false.</returns>
 		public bool IsSimple()
 		{
 			return _GlobalExplorer.States.PlacingType == GlobalStates.PlacingTypeEnum.Simple;
 		}
 
-		/*
-		** Syncronizes it's value to a global
-		** central state controller
-		**
-		** @return void
-		*/
+		/// <summary>
+        /// Synchronizes its value to a global central state controller.
+        /// </summary>
 		public override void Sync()
 		{
 			if (
@@ -144,3 +139,5 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		}
 	}
 }
+
+#endif

@@ -20,14 +20,22 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using AssetSnap.Component;
+using Godot;
+
 namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 {
-	using AssetSnap.Component;
-	using Godot;
-
+	/// <summary>
+	/// Component representing the option to simplify convex shapes in a group.
+	/// </summary>
 	[Tool]
 	public partial class ConvexSimplify : GroupOptionCheckableComponent
 	{
+		/// <summary>
+		/// Constructor for ConvexSimplify class.
+		/// </summary>
 		public ConvexSimplify()
 		{
 			Name = "GroupsBuilderGroupOptionsConvexSimplify";
@@ -38,6 +46,9 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 			};
 		}
 		
+		/// <summary>
+		/// Initializes the fields of the ConvexSimplify component.
+		/// </summary>
 		protected override void _InitializeFields()
 		{
 			Trait<Checkable>()
@@ -49,6 +60,9 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 				.Instantiate();
 		}
 		
+		/// <summary>
+        /// Event handler for when the check state changes.
+        /// </summary>
 		private void _OnCheck()
 		{
 			_GlobalExplorer.GroupBuilder._Editor.Group.ConvexSimplify = !_GlobalExplorer.GroupBuilder._Editor.Group.ConvexSimplify;
@@ -69,3 +83,5 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 		}
 	}
 }
+
+#endif

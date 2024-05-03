@@ -21,25 +21,33 @@
 // SOFTWARE.
 
 #if TOOLS
+
+using AssetSnap.Explorer;
+using AssetSnap.States;
+using Godot;
+	
 namespace AssetSnap.Snap
 {
-	using AssetSnap.Explorer;
-	using AssetSnap.States;
-	using Godot;
+	/// <summary>
+	/// Defines a class for managing snap boundaries.
+	/// </summary>
 	public class Boundary
 	{
-		private GlobalExplorer _GlobalExplorer;
-
 		public GlobalStates.SnapAngleEnums Angle;
-
+		
+		private readonly Shader _BoundaryGrid = GD.Load<Shader>("res://addons/assetsnap/shaders/snap-grid.gdshader");
+		private GlobalExplorer _GlobalExplorer;
 		private StaticBody3D _BoundaryBody;
 		private MeshInstance3D _BoundaryMeshInstance;
 		private PlaneMesh _BoundaryBoxMesh;
 		private CollisionShape3D _BoundaryCollision;
 		private BoxShape3D _BoundaryCollisionBox;
-		private readonly Shader _BoundaryGrid = GD.Load<Shader>("res://addons/assetsnap/shaders/snap-grid.gdshader");
 		private ShaderMaterial _BoundaryMaterial;
 
+		/// <summary>
+		/// Constructs a new instance of the <see cref="Boundary"/> class with the specified angle.
+		/// </summary>
+		/// <param name="angle">The snap angle.</param>
 		public Boundary(GlobalStates.SnapAngleEnums angle)
 		{
 			_GlobalExplorer = GlobalExplorer.GetInstance();
@@ -73,17 +81,19 @@ namespace AssetSnap.Snap
 			}
 		}
 
+		/// <summary>
+		/// Spawns the boundary in the specified container node.
+		/// </summary>
+		/// <param name="toContainer">The container node.</param>
 		public void Spawn(Node ToContainer)
 		{
 			ToContainer.AddChild(_BoundaryBody);
 		}
 
-		/*
-		** Updates the opacity of the boundary
-		** 
-		** @param float value
-		** @return void
-		*/
+		/// <summary>
+		/// Updates the opacity of the boundary.
+		/// </summary>
+		/// <param name="value">The opacity value.</param>
 		public void UpdateOpacity(float value)
 		{
 			if (_BoundaryMaterial != null)
@@ -92,12 +102,10 @@ namespace AssetSnap.Snap
 			}
 		}
 
-		/*
-		** Updates the opacity of the boundary
-		** 
-		** @param float value
-		** @return void
-		*/
+		/// <summary>
+		/// Updates the flatness of the boundary.
+		/// </summary>
+		/// <param name="value">The flatness value.</param>
 		public void UpdateFlat(float value)
 		{
 			if (_BoundaryMaterial != null)
@@ -106,12 +114,9 @@ namespace AssetSnap.Snap
 			}
 		}
 
-		/*
-		** Updates the transform of the boundary
-		** per rules set in the active library
-		** 
-		** @return void
-		*/
+		/// <summary>
+		/// Updates the transform of the boundary per rules set in the active library.
+		/// </summary>
 		public void UpdateTransform()
 		{
 			Transform3D transform = _BoundaryBody.Transform;
@@ -145,13 +150,10 @@ namespace AssetSnap.Snap
 			_BoundaryBody.Transform = transform;
 		}
 
-		/*
-		** Adds the collision box
-		** to the scene
-		** 
-		** @param StaticBody3D to
-		** @return void
-		*/
+		/// <summary>
+		/// Adds the collision box to the scene.
+		/// </summary>
+		/// <param name="to">The static body to attach the collision box to.</param>
 		private void AddCollisionBox(StaticBody3D to)
 		{
 			switch (Angle)
@@ -175,13 +177,10 @@ namespace AssetSnap.Snap
 			to.AddChild(_BoundaryCollision);
 		}
 
-		/*
-		** Adds the boundary box
-		** to the scene
-		** 
-		** @param StaticBody3D to
-		** @return void
-		*/
+		/// <summary>
+		/// Adds the boundary box to the scene.
+		/// </summary>
+		/// <param name="to">The static body to attach the boundary box to.</param>
 		private void AddBoundaryBox(StaticBody3D to)
 		{
 			switch (Angle)
@@ -217,6 +216,10 @@ namespace AssetSnap.Snap
 			to.AddChild(_BoundaryMeshInstance);
 		}
 
+		/// <summary>
+		/// Gets the boundary material.
+		/// </summary>
+		/// <returns>The boundary material.</returns>
 		private ShaderMaterial GetBoundaryMaterial()
 		{
 			_BoundaryMaterial.Shader = _BoundaryGrid;
@@ -236,21 +239,36 @@ namespace AssetSnap.Snap
 			return _BoundaryMaterial;
 		}
 
+		/// <summary>
+		/// Gets the boundary opacity.
+		/// </summary>
+		/// <returns>The boundary opacity.</returns>
 		private float GetBoundaryOpacity()
 		{
 			return _GlobalExplorer.Settings.GetKey("boundary_box_opacity").As<float>();
 		}
 
+		/// <summary>
+		/// Gets the boundary flatness.
+		/// </summary>
+		/// <returns>The boundary flatness.</returns>
 		private bool GetBoundaryFlat()
 		{
 			return _GlobalExplorer.Settings.GetKey("boundary_box_flat").As<bool>();
 		}
 
+		/// <summary>
+		/// Determines whether the boundary box should be shown.
+		/// </summary>
+		/// <returns>True if the boundary box should be shown, otherwise false.</returns>
 		private bool ShouldShowBoundaryBox()
 		{
 			return _GlobalExplorer.Settings.GetKey("show_snap_boundary_box").As<bool>();
 		}
 
+		/// <summary>
+		/// Cleans up the boundary instance when exiting the scene tree.
+		/// </summary>
 		public void ExitTree()
 		{
 			if (EditorPlugin.IsInstanceValid(_BoundaryCollision))

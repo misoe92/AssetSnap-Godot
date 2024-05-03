@@ -20,11 +20,16 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using AssetSnap.Component;
+using Godot;
+
 namespace AssetSnap.Front.Components.Library.Sidebar
 {
-	using AssetSnap.Component;
-	using Godot;
-
+	/// <summary>
+	/// Partial class for managing the editing component in the library sidebar.
+	/// </summary>
 	public partial class Editing : LibraryComponent
 	{
 		private readonly string _Title = "Currently Editing";
@@ -36,22 +41,18 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		private	Label _Label;
 		private	Label _LabelEditing;
 			 
-		/*
-		** Component constructor
-		** 
-		** @return void
-		*/	 
+		/// <summary>
+		/// Constructor for the Editing component.
+		/// </summary>	 
 		public Editing()
 		{
 			Name = "LSEditing";
 			//_include = false;
 		}
 		
-		/*
-		** Initializes the component
-		** 
-		** @return void
-		*/
+		/// <summary>
+		/// Initializes the component.
+		/// </summary>
 		public override void Initialize()
 		{
 			base.Initialize();
@@ -96,12 +97,21 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			AddChild(_MarginContainer);
 		}
 		
+		/// <summary>
+		/// Retrieves the name of the model being edited.
+		/// </summary>
+		/// <returns>The name of the model being edited.</returns>
 		private string GetModelName()
 		{
 			string _Name = _GlobalExplorer.GetHandle().Name;
 			return PrepareModelName( _Name );
 		}
 		
+		/// <summary>
+		/// Prepares the model name for display.
+		/// </summary>
+		/// <param name="name">The original model name.</param>
+		/// <returns>The prepared model name.</returns>
 		private string PrepareModelName( string name ) 
 		{
 			string _Name = name;
@@ -114,15 +124,24 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			return _Name;
 		}
 		
+		/// <summary>
+		/// Sets the text of the editing label.
+		/// </summary>
+		/// <param name="text">The text to set.</param>
 		public void SetText( string text ) 
 		{
 			_LabelEditing.Text = PrepareModelName(text);
 			_GlobalExplorer.States.EditingTitle = PrepareModelName(text);
 		}
 
+		/// <summary>
+        /// Synchronizes the editing title with the global explorer.
+        /// </summary>
 		public override void Sync() 
 		{
 			_GlobalExplorer.States.EditingTitle = PrepareModelName(_LabelEditing.Text);
 		}
 	}
 }
+
+#endif

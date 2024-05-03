@@ -21,34 +21,58 @@
 // SOFTWARE.
 
 #if TOOLS
+
+using System;
+using System.Reflection;
+using Godot;
+
 namespace AssetSnap.States
 {
-	using System;
-	using System.Reflection;
-	using Godot;
-
+	/// <summary>
+	/// Defines states for loading various components.
+	/// </summary>
 	[Tool]
 	public partial class LoadStates
 	{
+		/// <summary>
+		/// Enumeration representing the loaded state.
+		/// </summary>
 		public enum LoadedState 
 		{
 			Unloaded,
 			Loaded,
 		};
 		
+		/// <summary>
+		/// Gets or sets the loaded state for settings.
+		/// </summary>
 		[ExportCategory("Load States")]
 		[Export]
 		public LoadedState IsSettingsLoaded = LoadedState.Unloaded;
 		
+		/// <summary>
+		/// Gets or sets the loaded state for settings container.
+		/// </summary>
 		[Export]
 		public LoadedState IsSettingsContainerLoaded = LoadedState.Unloaded;
 		
+		/// <summary>
+		/// Gets or sets the loaded state for the group builder.
+		/// </summary>
 		[Export]
 		public LoadedState IsGroupBuilderLoaded = LoadedState.Unloaded;
-	
+
+		/// <summary>
+		/// Gets or sets the loaded state for the group builder container.
+		/// </summary>
 		[Export]
 		public LoadedState IsGroupBuilderContainerLoaded = LoadedState.Unloaded;
 		
+		/// <summary>
+		/// Sets the load state for a specified key.
+		/// </summary>
+		/// <param name="key">The key of the state to set.</param>
+		/// <param name="value">The value to set the state to.</param>
 		public void SetLoadState( string key, LoadedState value )
 		{
 			// Get the type of the class
@@ -62,6 +86,11 @@ namespace AssetSnap.States
 			StateChanged( key, (int)value );
 		}
 		
+		/// <summary>
+        /// Emits a signal when the state changes.
+        /// </summary>
+        /// <param name="key">The key of the state that changed.</param>
+        /// <param name="value">The new value of the state.</param>
 		protected void StateChanged( string key, Variant value )
 		{
 			if( null != Plugin.Singleton ) 

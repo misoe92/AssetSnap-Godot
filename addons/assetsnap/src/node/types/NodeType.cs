@@ -20,27 +20,41 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using System.Collections.Generic;
+using Godot;
+	
 namespace AssetSnap.ASNode.Types
 {
-	using System.Collections.Generic;
-	using Godot;
-	
+	/// <summary>
+	/// Represents a base class for custom node types.
+	/// </summary>
 	[Tool]
 	public class NodeType
 	{
+		/// <summary>
+		/// The name of the custom node type.
+		/// </summary>
 		public string Name;
 
+		/// <summary>
+		/// The parent class that the custom node type inherits from.
+		/// </summary>
 		public string Inherits;
 
+		/// <summary>
+		/// The file path of the script associated with the custom node type.
+		/// </summary>
 		public string ScriptPath;
 
+		/// <summary>
+        /// The file path of the icon associated with the custom node type.
+        /// </summary>
 		public string IconPath;
 		
-		/*
-		** Adds the custom type to the editor
-		**
-		** @return void 
-		*/
+		/// <summary>
+        /// Initializes the custom node type by adding it to the editor.
+        /// </summary>
+        /// <returns>void</returns>
 		public void Initialize()
 		{
 			Plugin _Plugin = GlobalExplorer.GetInstance()._Plugin; 
@@ -54,11 +68,11 @@ namespace AssetSnap.ASNode.Types
 			_Plugin.NodeTypes = _List.ToArray();
 		}
 			
-		/*
-		** Disposes of the custom type from the editor
-		**
-		** @return void 
-		*/
+		/// <summary>
+        /// Disposes of the custom node type by removing it from the editor.
+        /// </summary>
+        /// <param name="plugin">The plugin instance to remove the custom type from.</param>
+        /// <returns>void</returns>
 		public void Dispose(Plugin plugin)
 		{
 			plugin.RemoveCustomType(Name);

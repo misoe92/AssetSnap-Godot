@@ -20,12 +20,15 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using AssetSnap.Explorer;
+using AssetSnap.States;
+using Godot;
+
 namespace AssetSnap.Front.Nodes
 {
-	using AssetSnap.Explorer;
-	using AssetSnap.States;
-	using Godot;
-
+	/// <summary>
+	/// Represents a context menu control used for handling actions related to groups.
+	/// </summary>
 	[Tool]
 	public partial class AsGroupContextMenu : Control
 	{
@@ -35,6 +38,11 @@ namespace AssetSnap.Front.Nodes
 		public Button AddToCurrentGroup;
 		private string FocusedMesh = "";
 
+		/// <summary>
+		/// Displays the context menu at the specified coordinates with the provided mesh path.
+		/// </summary>
+		/// <param name="Coordinates">The coordinates to display the menu.</param>
+		/// <param name="MeshPath">The path of the mesh.</param>
 		public void ShowMenu(Vector2 Coordinates, string MeshPath)
 		{
 			if (EditorPlugin.IsInstanceValid(MenuPanelContainer) && EditorPlugin.IsInstanceValid(StatesUtils.Get().Group))
@@ -46,6 +54,10 @@ namespace AssetSnap.Front.Nodes
 			}
 		}
 
+		/// <summary>
+		/// Hides the context menu if it is visible and its position is outside the specified coordinates.
+		/// </summary>
+		/// <param name="Coordinates">The coordinates.</param>
 		public void MaybeHideMenu(Vector2 Coordinates)
 		{
 			if (EditorPlugin.IsInstanceValid(MenuPanelContainer) && true == MenuPanelContainer.Visible)
@@ -65,6 +77,9 @@ namespace AssetSnap.Front.Nodes
 			}
 		}
 
+		/// <summary>
+		/// Hides the context menu.
+		/// </summary>
 		public void HideMenu()
 		{
 			MenuPanelContainer.Visible = false;
@@ -72,11 +87,18 @@ namespace AssetSnap.Front.Nodes
 			FocusedMesh = "";
 		}
 
+		/// <summary>
+		/// Checks if the context menu is visible.
+		/// </summary>
+		/// <returns><c>true</c> if the context menu is visible; otherwise, <c>false</c>.</returns>
 		public bool IsVisible()
 		{
 			return MenuPanelContainer.Visible;
 		}
 
+		/// <summary>
+		/// Initializes the context menu.
+		/// </summary>
 		public void Initialize()
 		{
 			if( false == Plugin.Singleton.HasInternalContainer() ) 
@@ -126,11 +148,19 @@ namespace AssetSnap.Front.Nodes
 				.AddChild(MenuPanelContainer);
 		}
 
+		/// <summary>
+		/// Checks if the context menu is hidden.
+		/// </summary>
+		/// <returns><c>true</c> if the context menu is hidden; otherwise, <c>false</c>.</returns>
 		public bool IsHidden()
 		{
 			return MenuPanelContainer.Visible == false;
 		}
 
+		/// <summary>
+		/// Sets up the "Add to current group" button in the context menu.
+		/// </summary>
+		/// <param name="MenuBoxContainer">The container for the menu box.</param>
 		private void _SetupAddToCurrentGroupButton(VBoxContainer MenuBoxContainer)
 		{
 			AddToCurrentGroup = new()
@@ -146,6 +176,9 @@ namespace AssetSnap.Front.Nodes
 			MenuBoxContainer.AddChild(AddToCurrentGroup);
 		}
 
+		/// <summary>
+        /// Event handler for the "Add to current group" button click event.
+        /// </summary>
 		private void _OnAddToCurrentGroup()
 		{
 			ExplorerUtils.Get().GroupBuilder._Editor.AddMeshToGroup(FocusedMesh);

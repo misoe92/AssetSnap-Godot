@@ -21,18 +21,31 @@
 // SOFTWARE.
 
 #if TOOLS
+
+using AssetSnap.Front.Modifiers;
+
 namespace AssetSnap.Modifier
 {
-	using AssetSnap.Front.Modifiers;
-	
+	/// <summary>
+	/// Base class for modifiers.
+	/// </summary>
 	public partial class Base
 	{
-		/** Modifiers **/
+		/// <summary>
+		/// The array modifier instance.
+		/// </summary>
 		public AsArrayModifier ArrayModifier = new();
+		
+		/// <summary>
+		/// The scatter modifier instance.
+		/// </summary>
 		public AsScatterModifier ScatterModifier = new();
 		
 		private static Base _Instance;
-	
+		
+		/// <summary>
+		/// Gets the singleton instance of the Base class.
+		/// </summary>
 		public static Base Singleton 
 		{
 			get
@@ -46,6 +59,9 @@ namespace AssetSnap.Modifier
 			}
 		}
 		
+		/// <summary>
+        /// Called when the Base instance is exiting.
+        /// </summary>
 		public void _Exit()
 		{
 			ArrayModifier = null;

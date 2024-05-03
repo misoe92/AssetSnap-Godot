@@ -20,16 +20,24 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using AssetSnap.Component;
+using Godot;
+
 namespace AssetSnap.Front.Components.Groups.Builder
 {
-	using AssetSnap.Component;
-	using Godot;
-
+	/// <summary>
+	/// Represents a component for closing the editor in the group builder.
+	/// </summary>
 	[Tool]
 	public partial class EditorClose : LibraryComponent
 	{
 		private static readonly string Text = "Close"; 
-	
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="EditorClose"/> class.
+		/// </summary>
 		public EditorClose()
 		{
 			Name = "GroupBuilderEditorClose";
@@ -44,7 +52,9 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			// _include = false;
 		}
 
-		
+		/// <summary>
+		/// Initializes the component.
+		/// </summary>
 		public override void Initialize()
 		{
 			if( Initiated ) 
@@ -59,19 +69,28 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			_InitializeFields();
 			_FinalizeFields();
 		}
-	
+
+		/// <summary>
+		/// Shows the component.
+		/// </summary
 		public void DoShow()
 		{
 			Trait<Buttonable>()
 				.SetVisible(true);
 		}
-			
+		
+		/// <summary>
+		/// Hides the component.
+		/// </summary>
 		public void DoHide()
 		{
 			Trait<Buttonable>()
 				.SetVisible(false);
 		}
 		
+		/// <summary>
+		/// Event handler for closing the group.
+		/// </summary>
 		private void _OnCloseGroup()
 		{
 			string GroupPath = _GlobalExplorer.GroupBuilder._Editor.GroupPath;
@@ -85,6 +104,9 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			listing.Update();
 		}
 		
+		/// <summary>
+		/// Initializes the fields of the component.
+		/// </summary>
 		private void _InitializeFields()
 		{
 			Trait<Buttonable>()
@@ -98,6 +120,9 @@ namespace AssetSnap.Front.Components.Groups.Builder
 				.Instantiate();
 		}
 		
+		/// <summary>
+        /// Finalizes the fields of the component.
+        /// </summary>
 		private void _FinalizeFields()
 		{
 			Trait<Buttonable>()
@@ -108,3 +133,5 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		}
 	}
 }
+
+#endif

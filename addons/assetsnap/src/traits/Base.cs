@@ -25,19 +25,29 @@ namespace AssetSnap.Trait
 	using Godot;
 	
 	[Tool]
+	
 	public partial class Base : Node
 	{
-		/*
-		** Public
-		*/
+		/// <summary>
+		/// Public properties
+		/// </summary>
 		public int Iteration = 0;
 		public string TraitName = "";
 		[Export]
 		public bool Build = false;
-		
-		/*
-		** protected
-		*/
+		[Export]
+		public string TypeString;
+		[Export]
+		public string OwnerName;
+		[Export]
+		public Godot.Collections.Array<GodotObject> Nodes;
+		public int TotalCount = 0;
+		public bool disposed = false;
+		public Godot.Collections.Dictionary<string, Variant> Dependencies = new();
+	
+		/// <summary>
+		/// Protected properties
+		/// </summary>
 		protected Godot.Collections.Dictionary<string, int> Margin = new()
 		{
 			{"left", 0},
@@ -45,7 +55,6 @@ namespace AssetSnap.Trait
 			{"top", 0},
 			{"bottom", 0},
 		};
-
 		protected Godot.Collections.Dictionary<string, int> Padding = new()
 		{
 			{"left", 0},
@@ -53,25 +62,16 @@ namespace AssetSnap.Trait
 			{"top", 0},
 			{"bottom", 0},
 		};
-			
-		[Export]
-		public string TypeString;
-		[Export]
-		public string OwnerName;
-
 		protected Control.SizeFlags SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
 		protected Control.SizeFlags SizeFlagsVertical = Control.SizeFlags.ShrinkBegin;
-		[Export]
-		public Godot.Collections.Array<GodotObject> Nodes;
 		protected Vector2 CustomMinimumSize = Vector2.Zero;
 		protected Vector2 Size = Vector2.Zero;
-		public int TotalCount = 0;
 		protected bool _select = true;
-		public bool disposed = false;
 		protected bool Visible = true;
-	
-		public Godot.Collections.Dictionary<string, Variant> Dependencies = new();
 
+		/// <summary>
+		/// Constructor for the Base class.
+		/// </summary>
 		public Base()
 		{
 			Name = "TraitBase";
@@ -88,13 +88,11 @@ namespace AssetSnap.Trait
 			};
 		}
 
-		/*
-		** Checks if trait name is set
-		** and sets the type string
-		**
-		** @param string typeString
-		** @return void
-		*/
+		/// <summary>
+		/// Checks if trait name is set and sets the type string.
+		/// </summary>
+		/// <param name="typeString">The type string to set.</param>
+		/// <returns>Void.</returns>
 		public void _Instantiate()
 		{
 			if( Name == "" ) 
@@ -111,14 +109,13 @@ namespace AssetSnap.Trait
 			Dependencies = new();
 		}
 		
-		/*
-		** Adds the trait to a given container
-		**
-		** @param Node Container
-		** @param Node Node
-		** @param int? index
-		** @return void
-		*/
+		/// <summary>
+		/// Adds the trait to a given container.
+		/// </summary>
+		/// <param name="Container">The container node.</param>
+		/// <param name="Node">The node to add.</param>
+		/// <param name="index">The optional index.</param>
+		/// <returns>Void.</returns>
 		protected void _AddToContainer( Node Container, Node Node, int? index = null )
 		{
 			if( null == Node ) 
@@ -152,19 +149,24 @@ namespace AssetSnap.Trait
 			}
 		}
 		
+		/// <summary>
+		/// Selects an existing instance of the trait.
+		/// </summary>
+		/// <param name="index">The index of the instance.</param>
+		/// <param name="debug">Optional parameter to enable debugging.</param>
+		/// <returns>Void.</returns>
 		public virtual Trait.Base Select( int index, bool debug = false ) 
 		{
 			_Select(index, debug);
 			return this;
 		}
 
-		/*
-		** Selects an existing instance of
-		** the trait
-		**
-		** @param int index
-		** @return void
-		*/
+		/// <summary>
+		/// Selects an existing instance of the trait.
+		/// </summary>
+		/// <param name="index">The index of the instance.</param>
+		/// <param name="debug">Optional parameter to enable debugging.</param>
+		/// <returns>Void.</returns>
 		public virtual void _Select( int index, bool debug = false ) 
 		{
 			Dependencies = new();
@@ -261,13 +263,11 @@ namespace AssetSnap.Trait
 			return;
 		}
 		
-		/*
-		** Selects an existing instance of
-		** the trait based on name
-		**
-		** @param string name
-		** @return void
-		*/
+		/// <summary>
+		/// Selects an existing instance of the trait based on name.
+		/// </summary>
+		/// <param name="name">The name of the instance.</param>
+		/// <returns>Void.</returns>
 		public virtual void _SelectByName( string name ) 
 		{
 			foreach( Label label in Nodes ) 
@@ -280,17 +280,12 @@ namespace AssetSnap.Trait
 			}
 		}
 		
-		/*
-		** Setter methods
-		*/
-		
-		/*
-		** Sets margin of the trait
-		**
-		** @param int value
-		** @param string side
-		** @return void
-		*/
+		/// <summary>
+		/// Sets margin of the trait.
+		/// </summary>
+		/// <param name="value">The value to set.</param>
+		/// <param name="side">The side to set.</param>
+		/// <returns>Void.</returns>
 		public virtual void _SetMargin( int value, string side ) 
 		{
 			if( side == "" ) 
@@ -307,13 +302,12 @@ namespace AssetSnap.Trait
 			}
 		}
 		
-		/*
-		** Sets padding of the trait
-		**
-		** @param int value
-		** @param string side
-		** @return void
-		*/
+		/// <summary>
+		/// Sets padding of the trait.
+		/// </summary>
+		/// <param name="value">The value to set.</param>
+		/// <param name="side">The side to set.</param>
+		/// <returns>Void.</returns>
 		public virtual void _SetPadding( int value, string side ) 
 		{
 			if( side == "" ) 
@@ -329,35 +323,32 @@ namespace AssetSnap.Trait
 			}
 		}
 		
-		/*
-		** Sets visible state of the trait
-		**
-		** @param bool visible
-		** @return void
-		*/
+		/// <summary>
+		/// Sets visible state of the trait.
+		/// </summary>
+		/// <param name="visible">The visibility state to set.</param>
+		/// <returns>Void.</returns>
 		public virtual void _SetVisible( bool visible ) 
 		{
 			Visible = visible;
 		}
 		
-		/*
-		** Sets the name of the trait
-		**
-		** @param string text
-		** @return void
-		*/
+		/// <summary>
+		/// Sets the name of the trait.
+		/// </summary>
+		/// <param name="text">The name to set.</param>
+		/// <returns>Void.</returns>
 		public virtual void _SetName( string text ) 
 		{
 			TraitName = text;
 		}
 		
-		/*
-		** Sets the size of the container
-		**
-		** @param int width
-		** @param int height
-		** @return Containerable
-		*/
+		/// <summary>
+		/// Sets the size of the container.
+		/// </summary>
+		/// <param name="width">The width to set.</param>
+		/// <param name="height">The height to set.</param>
+		/// <returns>The updated container.</returns>
 		public virtual Base SetDimensions( int width, int height )
 		{
 			CustomMinimumSize = new Vector2( width, height);
@@ -366,13 +357,12 @@ namespace AssetSnap.Trait
 			return this;
 		}
 		
-		/*
-		** Sets the minimum size of the container
-		**
-		** @param int width
-		** @param int height
-		** @return Containerable
-		*/
+		/// <summary>
+		/// Sets the minimum size of the container.
+		/// </summary>
+		/// <param name="width">The width to set.</param>
+		/// <param name="height">The height to set.</param>
+		/// <returns>The updated container.</returns>
 		public virtual Base SetMinimumDimension( int width, int height )
 		{
 			CustomMinimumSize = new Vector2( width, height);
@@ -380,42 +370,33 @@ namespace AssetSnap.Trait
 			return this;
 		}
 		
-		/*
-		** Sets the horizontal size flag, which controls the x
-		** axis, and how it should act.
-		**
-		** @param Control.SizeFlags flag
-		** @return Containerable
-		*/
+		/// <summary>
+		/// Sets the horizontal size flag, which controls the x axis, and how it should act.
+		/// </summary>
+		/// <param name="flag">The size flag to set.</param>
+		/// <returns>The updated container.</returns>
 		public virtual Base SetHorizontalSizeFlags(Control.SizeFlags flag)
 		{
 			SizeFlagsHorizontal = flag;
 			return this;
 		}
 		
-		/*
-		** Sets the horizontal size flag, which controls the y
-		** axis, and how it should act.
-		**
-		** @param Control.SizeFlags flag
-		** @return Containerable
-		*/
+		/// <summary>
+		/// Sets the vertical size flag, which controls the y axis, and how it should act.
+		/// </summary>
+		/// <param name="flag">The size flag to set.</param>
+		/// <returns>The updated container.</returns>
 		public virtual Base SetVerticalSizeFlags(Control.SizeFlags flag)
 		{
 			SizeFlagsVertical = flag;
 			return this;
 		}
 	
-		
-		/*
-		** Getter Methods
-		*/
-		
-		/*
-		** Gets node and type casts it
-		**
-		** return T
-		*/
+		/// <summary>
+		/// Gets node and type casts it.
+		/// </summary>
+		/// <typeparam name="T">The type to cast to.</typeparam>
+		/// <returns>The node casted to the specified type.</returns>
 		public T GetNode<T>()
 		{
 			if( Dependencies.ContainsKey(TraitName + "_WorkingNode") ) 
@@ -432,11 +413,11 @@ namespace AssetSnap.Trait
 			return default(T);
 		}
 		
-		/*
-		** Gets node and returns it as Node
-		**
-		** return Node
-		*/
+		/// <summary>
+		/// Gets node and returns it as Node.
+		/// </summary>
+		/// <param name="debug">Optional parameter to enable debugging.</param>
+		/// <returns>The node.</returns>
 		public virtual Node GetNode( bool debug = false )
 		{
 			if( null != Dependencies && Dependencies.ContainsKey(TraitName + "_WorkingNode") ) 
@@ -464,16 +445,12 @@ namespace AssetSnap.Trait
 
 			return null;
 		}
-		
-		/*
-		** Boolean
-		*/
-		
-		/*
-		** Checks if the trait select was a succes
-		**
-		** @return bool
-		*/
+	
+		/// <summary>
+		/// Checks if the trait select was a success.
+		/// </summary>
+		/// <param name="debug">Optional parameter to enable debugging.</param>
+		/// <returns>True if the trait select was successful, otherwise false.</returns>
 		public virtual bool IsValid( bool debug = false )
 		{
 			if( debug ) 
@@ -579,48 +556,49 @@ namespace AssetSnap.Trait
 			return true;
 		}
 		
-		/*
-		** Checks if the trait has been disposed
-		**
-		** @return bool
-		*/
+		/// <summary>
+		/// Checks if the trait has been disposed.
+		/// </summary>
+		/// <returns>True if the trait has been disposed, otherwise false.</returns>
 		public bool IsDisposed()
 		{
 			return false;
 		}
 		
-		/*
-		** Checks if the nodes array
-		** contains an specified index
-		**
-		** @return bool
-		*/
+		/// <summary>
+		/// Checks if the nodes array contains a specified index.
+		/// </summary>
+		/// <param name="index">The index to check.</param>
+		/// <returns>True if the nodes array contains the specified index, otherwise false.</returns>
 		public bool ContainsIndex( int index ) 
 		{
 			return Plugin.Singleton.traitGlobal.CountOwner( OwnerName ) >= index;
 		}
 		
-		/*
-		** Checks if the nodes array
-		** is empty or null
-		**
-		** @return bool
-		*/
+		/// <summary>
+		/// Checks if the nodes array is empty or null.
+		/// </summary>
+		/// <returns>True if the nodes array is empty or null, otherwise false.</returns>
 		private bool HasNodeEntries()
 		{
 			return Plugin.Singleton.traitGlobal.Count() != 0 && Plugin.Singleton.traitGlobal.CountOwner( OwnerName ) != 0;
 		}
 		
-		/*
-		** Checks if a type string is present
-		**
-		** @return bool
-		*/
+		/// <summary>
+		/// Checks if a type string is present.
+		/// </summary>
+		/// <returns>True if a type string is present, otherwise false.</returns>
 		private bool HasTypeString()
 		{
 			return null != TypeString && "" != TypeString;
 		}
 		
+		/// <summary>
+		/// Clears the trait's instances.
+		/// </summary>
+		/// <param name="index">The index of the instance to clear.</param>
+		/// <param name="debug">Optional parameter to enable debugging.</param>
+		/// <returns>Void.</returns>
 		public virtual void Clear(int index = -1, bool debug = false)
 		{
 			if( null == TypeString || null == OwnerName || null == Plugin.Singleton || null == Plugin.Singleton.traitGlobal ) 
@@ -704,6 +682,10 @@ namespace AssetSnap.Trait
 			}
 		}
 		
+		/// <summary>
+		/// Gets the count of trait instances.
+		/// </summary>
+		/// <returns>The count of trait instances.</returns>
 		public virtual int Count()
 		{
 			if( null == TypeString || null == OwnerName || null == Plugin.Singleton || null == Plugin.Singleton.traitGlobal ) 
@@ -720,12 +702,20 @@ namespace AssetSnap.Trait
 
 			return instances.Count;
 		}
-			
+		
+		/// <summary>
+		/// Called before serialization.
+		/// </summary>
+		/// <returns>Void.</returns>
 		public void OnBeforeSerialize()
 		{
 			Build = true;
 		}
 		
+		/// <summary>
+		/// Called after deserialization.
+		/// </summary>
+		/// <returns>Void.</returns>
 		public void OnAfterDeserialize()
 		{
 			Build = false;
