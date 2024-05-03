@@ -20,27 +20,30 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using AssetSnap.Component;
+using AssetSnap.Explorer;
+using AssetSnap.Front.Components.Library.Sidebar;
+
+using AssetSnap.Front.Nodes;
+using AssetSnap.Settings;
+using AssetSnap.States;
+using AssetSnap.Static;
+using Godot;
+
 namespace AssetSnap.Core
 {
-	using AssetSnap.Component;
-	using AssetSnap.Explorer;
-	using AssetSnap.Front.Components.Library;
-	using AssetSnap.Front.Components.Library.Sidebar;
-
-	using AssetSnap.Front.Nodes;
-	using AssetSnap.Settings;
-	using AssetSnap.States;
-	using AssetSnap.Static;
-	using Godot;
-
+	/// <summary>
+	/// Handles the processing logic for various operations in the plugin.
+	/// </summary>
 	public class CoreProcess : Core
 	{
-		/*
-		** Handle of plugin process ticks
-		**
-		** @param double delta
-		** @return void
-		*/
+		/// <summary>
+		/// Handle of plugin process ticks
+		/// </summary>
+		/// <param name="delta">The time elapsed since the last frame, in seconds.</param>
+		/// <returns>void</returns>
 		public void Tick(double delta)
 		{
 			if (null == ExplorerUtils.Get() || null == SettingsUtils.Get() || false == EditorPlugin.IsInstanceValid(Plugin.Singleton) )
@@ -161,6 +164,10 @@ namespace AssetSnap.Core
 			ExplorerUtils.Get().Snap.Tick(delta);
 		}
 
+		/// <summary>
+		/// Determines whether the context menu should be hidden.
+		/// </summary>
+		/// <returns>True if the context menu should be hidden, otherwise false.</returns>
 		private bool ShouldHideContextMenu()
 		{
 			if (null == ExplorerUtils.Get() || true == ExplorerUtils.Get().ContextMenu.IsHidden())
@@ -198,6 +205,10 @@ namespace AssetSnap.Core
 			return false;
 		}
 
+		/// <summary>
+        /// Determines whether the context menu should be shown.
+        /// </summary>
+        /// <returns>True if the context menu should be shown, otherwise false.</returns>
 		private bool ShouldShowContextMenu()
 		{
 			if (null == ExplorerUtils.Get() || false == ExplorerUtils.Get().ContextMenu.IsHidden())
@@ -240,11 +251,10 @@ namespace AssetSnap.Core
 			return true;
 		}
 
-		/*
-		** Model specific process operations
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Model specific process operations
+		/// </summary>
+		/// <returns>void</returns>
 		private void ProcessModelHandle()
 		{
 			// Checks if current mouse is event is motion
@@ -296,6 +306,10 @@ namespace AssetSnap.Core
 			}
 		}
 
+		/// <summary>
+		/// Handles group specific process operations
+		/// </summary>
+		/// <returns>void</returns>
 		private void ProcessGroupHandle()
 		{
 			// Checks if current mouse is event is motion
@@ -346,14 +360,13 @@ namespace AssetSnap.Core
 			}
 		}
 
-		/*
-		** Checks if object snapping should occur, and if so
-		** it then applies the snapping to the Vector3 value
-		** and returns it
-		**
-		** @param Vector3 Origin
-		** @return Vector3
-		*/
+		/// <summary>
+		/// Checks if object snapping should occur, and if so,
+		/// it then applies the snapping to the Vector3 value
+		/// and returns it.
+		/// </summary>
+		/// <param name="Origin">The original Vector3 value.</param>
+		/// <returns>The modified Vector3 value after snapping.</returns>
 		private Vector3 HandleObjectSnap(Vector3 Origin)
 		{
 			if (HasLibrary())
@@ -399,14 +412,13 @@ namespace AssetSnap.Core
 			return Origin;
 		}
 
-		/*
-		** Takes an Vector3 value and applies a fixed value on a certain
-		** axis depending on how the glue options are set
-		**
-		** @param Vector3 Origin
-		** @param BaseComponent Object
-		** @return Vector3
-		*/
+		/// <summary>
+		/// Takes a Vector3 value and applies a fixed value on a certain
+		/// axis depending on how the glue options are set.
+		/// </summary>
+		/// <param name="Origin">The original Vector3 value.</param>
+		/// <param name="Object">The object to apply glue to.</param>
+		/// <returns>The modified Vector3 value after applying glue.</returns>
 		private Vector3 ApplyGlue(Vector3 Origin, BaseComponent Object)
 		{
 			if (Object is SnapToHeight _objectHeight)
@@ -428,12 +440,11 @@ namespace AssetSnap.Core
 			return Origin;
 		}
 
-		/*
-		** Configures and runs our raycast, so it's
-		** reading can be used afterwards
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Configures and runs our raycast, so its
+		/// reading can be used afterwards.
+		/// </summary>
+		/// <returns>void</returns>
 		private void ConfigureRayCast()
 		{
 			if (null != ExplorerUtils.Get().Raycast)
@@ -449,73 +460,74 @@ namespace AssetSnap.Core
 			}
 		}
 
-		/*
-		** Fetches the instance of our
-		** current handle
-		**
-		** @return Node
-		*/
+		/// <summary>
+		/// Fetches the instance of our current handle.
+		/// </summary>
+		/// <returns>The current handle Node.</returns>
 		private Node GetHandle()
 		{
 			return ExplorerUtils.Get().GetHandle();
 		}
 
-		/*
-		** Checks if an handle is currently set
-		**
-		** @return bool
-		*/
+		/// <summary>
+		/// Checks if a handle is currently set.
+		/// </summary>
+		/// <returns>True if a handle is set, otherwise false.</returns>
 		private bool HasHandle()
 		{
 			return ExplorerUtils.Get().GetHandle() != null;
 		}
 
-		/*
-		** Checks if decal is available
-		**
-		** @return bool
-		*/
+		/// <summary>
+		/// Checks if decal is available.
+		/// </summary>
+		/// <returns>True if a decal is available, otherwise false.</returns>
 		private bool HasDecal()
 		{
 			return null != ExplorerUtils.Get().Decal;
 		}
 
-		/*
-		** Checks if current handle is that of
-		** a model
-		*/
+		/// <summary>
+		/// Checks if the current handle is that of a model.
+		/// </summary>
+		/// <returns>True if the current handle is that of a model, otherwise false.</returns>
 		private bool HandleIsModel()
 		{
 			return EditorPlugin.IsInstanceValid(ExplorerUtils.Get().GetHandle()) && ExplorerUtils.Get().GetHandle() is MeshInstance3D && ExplorerUtils.Get().States.PlacingMode == GlobalStates.PlacingModeEnum.Model;
 		}
 
+		/// <summary>
+		/// Checks if the current handle is that of a Node3D.
+		/// </summary>
+		/// <returns>True if the current handle is that of a Node3D, otherwise false.</returns>
 		private bool HandleIsNode3D()
 		{
 			return EditorPlugin.IsInstanceValid(ExplorerUtils.Get().GetHandle()) && ExplorerUtils.Get().GetHandle() is AsNode3D node3d && false == node3d.IsPlaced();
 		}
 
+		/// <summary>
+		/// Checks if the current handle is that of a group.
+		/// </summary>
+		/// <returns>True if the current handle is that of a group, otherwise false.</returns>
 		private bool HandleIsGroup()
 		{
 			return EditorPlugin.IsInstanceValid(ExplorerUtils.Get().GetHandle()) && ExplorerUtils.Get().GetHandle() is AsGrouped3D && ExplorerUtils.Get().States.PlacingMode == GlobalStates.PlacingModeEnum.Group;
 		}
 
-		/*
-		** Checks if our raycast object have
-		** collided
-		**
-		** @return bool
-		*/
+		/// <summary>
+		/// Checks if our raycast object has collided.
+		/// </summary>
+		/// <returns>True if the raycast has collided, otherwise false.</returns>
 		private bool RaycastDidCollide()
 		{
 			return ExplorerUtils.Get().Raycast.HasCollision();
 		}
 
-		/*
-		** Checks if glue is being used or not
-		**
-		** @param BaseComponent Object
-		** @return bool
-		*/
+		/// <summary>
+		/// Checks if glue is being used or not.
+		/// </summary>
+		/// <param name="Object">The object to check for glue usage.</param>
+		/// <returns>True if glue is being used, otherwise false.</returns>
 		private bool UsesGlue(BaseComponent Object)
 		{
 			if (Object is SnapToHeight _objectHeight)
@@ -536,22 +548,20 @@ namespace AssetSnap.Core
 			return false;
 		}
 
-		/*
-		** Checks if object snapping is currently turned on.
-		**
-		** @return bool
-		*/
+		/// <summary>
+		/// Checks if object snapping is currently turned on.
+		/// </summary>
+		/// <returns>True if object snapping is turned on, otherwise false.</returns>
 		private bool ShouldSnap()
 		{
 			return ExplorerUtils.Get().States.SnapToObject == GlobalStates.LibraryStateEnum.Enabled;
 		}
 
-		/*
-		** Checks if our active library has an active
-		** library settings component bound to it
-		**
-		** @return bool
-		*/
+		/// <summary>
+		/// Checks if our active library has active
+		/// library settings component bound to it.
+		/// </summary>
+		/// <returns>True if library settings are available, otherwise false.</returns>
 		private bool HasLibrarySettings()
 		{
 			if (false == HasLibrary())
@@ -562,32 +572,28 @@ namespace AssetSnap.Core
 			return StatesUtils.Get().CurrentLibrary._LibrarySettings != null;
 		}
 
-		/*
-		** Checks if we have an active library
-		**
-		** @return bool
-		*/
+		/// <summary>
+		/// Checks if we have an active library.
+		/// </summary>
+		/// <returns>True if an active library is available, otherwise false.</returns>
 		private bool HasLibrary()
 		{
 			return null != StatesUtils.Get().CurrentLibrary;
 		}
 
-		/*
-		** Checks if we have a valid ray projection reading
-		**
-		** @return bool
-		*/
+		/// <summary>
+		/// Checks if we have a valid ray projection reading.
+		/// </summary>
+		/// <returns>True if ray projections are valid, otherwise false.</returns>
 		private bool HasRayProjections()
 		{
 			return ExplorerUtils.Get().ProjectRayOrigin != Vector3.Zero && ExplorerUtils.Get().ProjectRayNormal != Vector3.Zero;
 		}
 
-		/*
-		** Checks if the current mouse event
-		** is an Motion mouse event
-		**
-		** @return bool
-		*/
+		/// <summary>
+		/// Checks if the current mouse event is a motion mouse event.
+		/// </summary>
+		/// <returns>True if the mouse event is a motion event, otherwise false.</returns>
 		private bool MouseEventIsMove()
 		{
 			EventMouse MouseEvent = ExplorerUtils.Get()._CurrentMouseInput;
@@ -595,3 +601,5 @@ namespace AssetSnap.Core
 		}
 	}
 }
+
+#endif

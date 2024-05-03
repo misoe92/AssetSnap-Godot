@@ -20,24 +20,26 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using AssetSnap.Explorer;
+using AssetSnap.Front.Nodes;
+using AssetSnap.Instance.Input;
+using AssetSnap.States;
+using Godot;
+
 namespace AssetSnap.Core
 {
-	using AssetSnap.Explorer;
-	using AssetSnap.Front.Nodes;
-	using AssetSnap.Instance.Input;
-	using AssetSnap.Library;
-	using AssetSnap.States;
-	using Godot;
-
+	/// <summary>
+	/// Handles communication with the scene tree and performs actions depending on the current node in focus.
+	/// </summary>
 	public class CoreHandles : Core
 	{
-		/*
-		** Handles communication with the scene tree,
-		** Performs actions depending on the current node in focus
-		**
-		** @param GodotObject _object
-		** @return bool
-		*/
+		/// <summary>
+		/// Handles communication with the scene tree and performs actions depending on the current node in focus.
+		/// </summary>
+		/// <param name="_object">The object in focus.</param>
+		/// <returns>True if handling was successful, otherwise false.</returns>
 		public bool Handle(GodotObject _object)
 		{
 			if (
@@ -79,7 +81,7 @@ namespace AssetSnap.Core
 				if (null != ExplorerUtils.Get().Library && null != ExplorerUtils.Get().Library.Libraries)
 				{
 					// Goes through all libraries and resets it's data
-					foreach (Instance _Library in ExplorerUtils.Get().Library.Libraries)
+					foreach (Library.Instance _Library in ExplorerUtils.Get().Library.Libraries)
 					{
 						if (EditorPlugin.IsInstanceValid(_Library) && null != _Library._LibrarySettings)
 						{
@@ -96,12 +98,10 @@ namespace AssetSnap.Core
 			return true;
 		}
 
-		/*
-		** Handles the interaction with the model node
-		**
-		** @param AsNode3D Node
-		** @return void
-		*/
+		/// <summary>
+		/// Handles the interaction with the model node.
+		/// </summary>
+		/// <param name="_Node">The 3D node.</param>
 		private void _HandleNode(AsNode3D _Node)
 		{
 			StatesUtils.Get().PlacingMode = GlobalStates.PlacingModeEnum.Model;
@@ -156,12 +156,10 @@ namespace AssetSnap.Core
 			}
 		}
 
-		/*
-		** Handles the interaction with the model node
-		**
-		** @param AssetSnap.Front.Nodes.AsMeshInstance3D Node
-		** @return void
-		*/
+		/// <summary>
+		/// Handles the interaction with the model node.
+		/// </summary>
+		/// <param name="_Node">The mesh instance node.</param>
 		private void _HandleModel(AssetSnap.Front.Nodes.AsMeshInstance3D _Node)
 		{
 			StatesUtils.Get().PlacingMode = GlobalStates.PlacingModeEnum.Model;
@@ -220,12 +218,10 @@ namespace AssetSnap.Core
 			}
 		}
 
-		/*
-		** Handles the interaction with the model node
-		**
-		** @param AssetSnap.Front.Nodes.AsMeshInstance3D Node
-		** @return void
-		*/
+		/// <summary>
+		/// Handles the interaction with the grouped node.
+		/// </summary>
+		/// <param name="_Node">The grouped 3D node.</param>
 		private void _HandleGroup(AsGrouped3D _Node)
 		{
 			StatesUtils.Get().PlacingMode = GlobalStates.PlacingModeEnum.Group;
@@ -254,13 +250,10 @@ namespace AssetSnap.Core
 			}
 		}
 
-		/*
-		** Updates the library settings of the current node being
-		** worked on.
-		**
-		** @param AssetSnap.Front.Nodes.AsMeshInstance3D _Node
-		** @return void
-		*/
+		/// <summary>
+		/// Updates the library settings of the current node being worked on.
+		/// </summary>
+		/// <param name="_Node">The node whose library settings need to be updated.</param>
 		private void HandleNodeLibrarySettings(Node _Node)
 		{
 			if (_Node is AsNode3D node3d)
@@ -286,47 +279,49 @@ namespace AssetSnap.Core
 			}
 		}
 
-		/*
-		** Checks if the given object is an model
-		**
-		** @param GodotObject _object
-		** @return bool
-		*/
+		/// <summary>
+		/// Checks if the given object is a model.
+		/// </summary>
+		/// <param name="_object">The object to check.</param>
+		/// <returns>True if the object is a model, otherwise false.</returns>
 		private bool _ShouldHandleModel(GodotObject _object)
 		{
 			return EditorPlugin.IsInstanceValid(_object) && (_object is AsMeshInstance3D || _object is AsNode3D);
 		}
 
-		/*
-		** Checks if the given object is an model
-		**
-		** @param GodotObject _object
-		** @return bool
-		*/
+		/// <summary>
+		/// Checks if the given object is a grouped node.
+		/// </summary>
+		/// <param name="_object">The object to check.</param>
+		/// <returns>True if the object is a grouped node, otherwise false.</returns>
 		private bool _ShouldHandleGroup(GodotObject _object)
 		{
 			return EditorPlugin.IsInstanceValid(_object) && _object is AsGrouped3D;
 		}
 
-		/*
-		** Converts the given object to an model type
-		**
-		** @param GodotObject _object
-		** @return AssetSnap.Front.Nodes.AsMeshInstance3D
-		*/
+		/// <summary>
+		/// Converts the given object to a model type.
+		/// </summary>
+		/// <param name="_object">The object to convert.</param>
+		/// <returns>The converted model instance.</returns>
 		private AssetSnap.Front.Nodes.AsMeshInstance3D _ObjectToModel(GodotObject _object)
 		{
 			return _object as AssetSnap.Front.Nodes.AsMeshInstance3D;
 		}
 
+		/// <summary>
+        /// Converts the given object to a grouped node.
+        /// </summary>
+        /// <param name="_object">The object to convert.</param>
+        /// <returns>The converted grouped instance.</returns>
 		private AsGrouped3D _ObjectToGrouped(GodotObject _object)
 		{
 			return _object as AsGrouped3D;
 		}
 
-		/*
-		** Resets the current handle
-		*/
+		/// <summary>
+        /// Resets the current handle.
+        /// </summary>
 		public void ResetHandle()
 		{
 			StatesUtils.Get().EditingTitle = null;
@@ -336,3 +331,5 @@ namespace AssetSnap.Core
 		}
 	}
 }
+
+#endif

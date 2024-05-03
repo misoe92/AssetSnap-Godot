@@ -20,18 +20,27 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using AssetSnap.Explorer;
+using AssetSnap.Front.Nodes;
+using Godot;
+
 namespace AssetSnap.Core
 {
-    using AssetSnap.Explorer;
-    using AssetSnap.Front.Nodes;
-	using Godot;
+	/// <summary>
+    /// Handles input events for the core functionality.
+    /// </summary>
 	public class CoreInput : Core
 	{
 		private EventMouse _MouseEvent = EventMouse.EventNone;
 
-		/*
-		** Handle GUI input events
-		*/
+		/// <summary>
+        /// Handles GUI input events.
+        /// </summary>
+        /// <param name="Camera">The 3D camera.</param>
+        /// <param name="event">The input event.</param>
+        /// <returns>An integer representing the action to take after handling the input.</returns>
 		public int Handle(Camera3D Camera, InputEvent @event)
 		{
 			if (null == ExplorerUtils.Get())
@@ -79,14 +88,12 @@ namespace AssetSnap.Core
 			}
 		}
 
-		/*
-		** Projects origin and normals from the camera, given the event
-		** position.
-		**
-		** @param Camera3D Camera
-		** @param InputEvent @event
-		** @return void
-		*/
+		/// <summary>
+        /// Projects origin and normals from the camera, given the event position.
+        /// </summary>
+        /// <param name="Camera">The 3D camera.</param>
+        /// <param name="event">The input event.</param>
+        /// <returns>void</returns>
 		private void MaybeProjectFromCamera(Camera3D Camera, InputEvent @event)
 		{
 			if (@event is InputEventMouseMotion _MotionEvent)
@@ -100,11 +107,10 @@ namespace AssetSnap.Core
 			}
 		}
 
-		/*
-		** Checks if dragging is currently enabled
-		**
-		** @return bool
-		*/
+		/// <summary>
+        /// Checks if dragging is currently enabled.
+        /// </summary>
+        /// <returns>True if dragging is enabled, otherwise false.</returns>
 		public bool ShouldDrag()
 		{
 			bool value = ExplorerUtils.Get().Settings.GetKey("allow_drag_add").As<bool>();
@@ -117,47 +123,44 @@ namespace AssetSnap.Core
 			return false;
 		}
 
-		/*
-		** Checks if scroll is disallowed
-		**
-		** @return bool
-		*/
+		/// <summary>
+        /// Checks if scroll is disallowed.
+        /// </summary>
+        /// <returns>The current scroll state.</returns>
 		public GlobalExplorer.ScrollState ScrollAllowed()
 		{
 			return ExplorerUtils.Get().AllowScroll;
 		}
 
-		/*
-		** Checks if we have a handle, and if its valid
-		**
-		** @return bool
-		*/
+		/// <summary>
+        /// Checks if we have a handle, and if it's valid.
+        /// </summary>
+        /// <returns>True if a handle exists and is valid, otherwise false.</returns>
 		public bool HasHandle()
 		{
 			Node NodeHandle = ExplorerUtils.Get().GetHandle();
 			return null != NodeHandle;
 		}
 
-		/*
-		** Sets the mouse event that are currently 
-		** being used
-		**
-		** @param EventMouse value
-		** @return void
-		*/
+		/// <summary>
+        /// Sets the mouse event that is currently being used.
+        /// </summary>
+        /// <param name="value">The mouse event value.</param>
+        /// <returns>void</returns>
 		public void SetMouseEvent(EventMouse value)
 		{
 			_MouseEvent = value;
 		}
 
-		/*
-		** Fetches the current mouse event
-		**
-		** @return EventMouse
-		*/
+		/// <summary>
+        /// Fetches the current mouse event.
+        /// </summary>
+        /// <returns>The current mouse event.</returns>
 		public EventMouse GetMouseEvent()
 		{
 			return _MouseEvent;
 		}
 	}
 }
+
+#endif

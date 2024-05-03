@@ -20,29 +20,35 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using AssetSnap.Explorer;
+using AssetSnap.Front.Nodes;
+using AssetSnap.States;
+using AssetSnap.Static;
+using Godot;
+
 namespace AssetSnap.Instance.Input
 {
-	using AssetSnap.Explorer;
-	using AssetSnap.Front.Nodes;
-	using AssetSnap.States;
-	using AssetSnap.Static;
-	using Godot;
-
+	/// <summary>
+    /// Base class for input drivers.
+    /// </summary>
 	public class BaseInputDriver
 	{
-		/*
-		** Holds a reference to the current instance
-		*/
+		/// <summary>
+        /// Holds a reference to the current instance.
+        /// </summary>
 		private static BaseInputDriver _Instance;
 
-		/*
-		** Checks if Is Multi is currently enabled
-		*/
+		/// <summary>
+        /// Gets or sets a value indicating whether Multi mode is currently enabled.
+        /// </summary>
 		public bool IsMulti = false;
 
-		/*
-		** Fetches an instance of the input driver
-		*/
+		/// <summary>
+        /// Fetches an instance of the input driver.
+        /// </summary>
+        /// <returns>The input driver instance.</returns>
 		public static BaseInputDriver GetInstance()
 		{
 			if (null == _Instance)
@@ -53,13 +59,12 @@ namespace AssetSnap.Instance.Input
 			return _Instance;
 		}
 
-		/*
-		** Handles base input events
-		** 
-		** @param Camera3D Camera
-		** @param InputEvent Event
-		** @return int
-		*/
+		/// <summary>
+        /// Handles base input events.
+        /// </summary>
+        /// <param name="Camera">The 3D camera.</param>
+        /// <param name="Event">The input event.</param>
+        /// <returns>An integer representing the handling result.</returns>
 		public virtual int _Input(Camera3D Camera, InputEvent Event)
 		{
 			if (false == ShouldListen())
@@ -78,21 +83,19 @@ namespace AssetSnap.Instance.Input
 			return (int)EditorPlugin.AfterGuiInput.Pass;
 		}
 
-		/*
-		** Forces focus to a model
-		**
-		** @return void
-		*/
+		/// <summary>
+        /// Forces focus to a model.
+        /// </summary>
+        /// <param name="_model">The model to focus on.</param>
 		public void FocusAsset(Node3D _model)
 		{
 			GlobalExplorer.GetInstance()._ForceFocus = _model;
 		}
 
-		/*
-		** Listens to for reset events
-		**
-		** @return void
-		*/
+		/// <summary>
+        /// Listens to for reset events.
+        /// </summary>
+        /// <param name="Event">The input event.</param>
 		private void _ListenForReset(InputEvent Event)
 		{
 			if (Event is InputEventKey _KeyEvent)
@@ -115,11 +118,11 @@ namespace AssetSnap.Instance.Input
 			}
 		}
 
-		/*
-		** Listens to mouse button events
-		**
-		** @return void
-		*/
+		/// <summary>
+        /// Listens to mouse button events.
+        /// </summary>
+        /// <param name="Event">The input event.</param>
+        /// <returns>An integer representing the handling result.</returns>
 		private int _ListenForMouseButtons(InputEvent Event)
 		{
 			if (Event is InputEventMouseButton _MouseButtonEvent)
@@ -238,9 +241,10 @@ namespace AssetSnap.Instance.Input
 			return (int)EditorPlugin.AfterGuiInput.Pass;
 		}
 
-		/*
-		** Checks if input should be listened to.
-		*/
+		/// <summary>
+        /// Checks if input should be listened to.
+        /// </summary>
+        /// <returns><c>true</c> if input should be listened to; otherwise, <c>false</c>.</returns>
 		private bool ShouldListen()
 		{
 			return
@@ -248,15 +252,16 @@ namespace AssetSnap.Instance.Input
 				StatesUtils.Get().PlacingMode == GlobalStates.PlacingModeEnum.Group;
 		}
 
-		/*
-		** Checks if current keycode is escape
-		**
-		** @param InputEventKey _KeyEvent
-		** @return bool
-		*/
+		/// <summary>
+        /// Checks if the current keycode is escape.
+        /// </summary>
+        /// <param name="_KeyEvent">The key event to check.</param>
+        /// <returns><c>true</c> if the keycode is escape; otherwise, <c>false</c>.</returns>
 		private bool IsKeyReset(InputEventKey _KeyEvent)
 		{
 			return _KeyEvent.Keycode == Key.Escape;
 		}
 	}
 }
+
+#endif

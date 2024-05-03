@@ -20,15 +20,19 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using System.Collections.Generic;
+using AssetSnap.Nodes;
+using AssetSnap.States;
+using AssetSnap.Static;
+using Godot;
+
 namespace AssetSnap.Instance.Input
 {
-	using System.Collections.Generic;
-	using AssetSnap.Front.Nodes;
-	using AssetSnap.Nodes;
-	using AssetSnap.States;
-	using AssetSnap.Static;
-	using Godot;
-
+	/// <summary>
+	/// Handles input events for drag-and-drop functionality.
+	/// </summary>
 	public class DragAddInputDriver : BaseInputDriver
 	{
 		/** Private **/
@@ -43,10 +47,17 @@ namespace AssetSnap.Instance.Input
 		private int NumPoints = 0;
 		private Godot.Collections.Array<Node3D> _Buffer;
 
+		/// <summary>
+		/// Offset for the size of the dragged objects.
+		/// </summary>
 		public float SizeOffset = 0;
 
 		private static DragAddInputDriver _Instance;
 
+		/// <summary>
+		/// Gets the singleton instance of the DragAddInputDriver class.
+		/// </summary>
+		/// <returns>The instance of DragAddInputDriver.</returns>
 		public new static DragAddInputDriver GetInstance()
 		{
 			if (null == _Instance)
@@ -57,22 +68,20 @@ namespace AssetSnap.Instance.Input
 			return _Instance;
 		}
 
-		/*
-		** Construction of the class
-		*/
+		/// <summary>
+		/// Constructs a new instance of DragAddInputDriver.
+		/// </summary>
 		public DragAddInputDriver() : base()
 		{
 			_Buffer = new();
 		}
 
-		/*
-		** Handles input events regarding the drag
-		** add functionality
-		** 
-		** @param Camera3D Camera
-		** @param InputEvent Event
-		** @return int
-		*/
+		/// <summary>
+		/// Handles input events regarding the drag-and-drop functionality.
+		/// </summary>
+		/// <param name="Camera">The Camera3D used for rendering.</param>
+		/// <param name="Event">The input event.</param>
+		/// <returns>An integer indicating the input event handling result.</returns>
 		public override int _Input(Camera3D Camera, InputEvent Event)
 		{
 			GlobalExplorer explorer = GlobalExplorer.GetInstance();
@@ -90,7 +99,7 @@ namespace AssetSnap.Instance.Input
 				if (
 					_MouseButtonInitialEvent.ButtonIndex == MouseButton.Left &&
 					false == _MouseButtonInitialEvent.Pressed &&
-					Input.IsKeyPressed(Key.Ctrl) &&
+					Godot.Input.IsKeyPressed(Key.Ctrl) &&
 					explorer.HasPositionDrawn()
 				)
 				{
@@ -195,7 +204,7 @@ namespace AssetSnap.Instance.Input
 
 			if (
 				Dragging &&
-				Input.IsKeyPressed(Key.Ctrl) &&
+				Godot.Input.IsKeyPressed(Key.Ctrl) &&
 				Event is InputEventMouseButton inputEventMouseButton &&
 				(
 					inputEventMouseButton.ButtonIndex == MouseButton.WheelUp ||
@@ -232,11 +241,10 @@ namespace AssetSnap.Instance.Input
 			return (int)EditorPlugin.AfterGuiInput.Stop;
 		}
 
-		/*
-		** Calculates the current object size
-		** 
-		** @return Vector3
-		*/
+		/// <summary>
+		/// Calculates the size of the current object being dragged.
+		/// </summary>
+		/// <returns>The size of the object as a Vector3.</returns>
 		public Vector3 CalculateObjectSize()
 		{
 			Node3D handle = GlobalExplorer.GetInstance().GetHandle();
@@ -251,16 +259,20 @@ namespace AssetSnap.Instance.Input
 			return aabb.Size;
 		}
 
+		/// <summary>
+        /// Checks if the drag-and-drop functionality is currently active.
+        /// </summary>
+        /// <returns>True if dragging, false otherwise.</returns>
 		public bool IsDragging()
 		{
 			return Dragging;
 		}
 
-		/*
-		** Spawns the calculated amount of models
-		** 
-		** @return void
-		*/
+		/// <summary>
+		/// Spawns the calculated amount of models.
+		/// </summary>
+		/// <param name="paths">An array of Vector3 representing the calculated path.</param>
+		/// <returns>void</returns>
 		private void SpawnCalculatedAmount(Vector3[] paths)
 		{
 			Node3D Handle = GlobalExplorer.GetInstance().GetHandle();
@@ -281,11 +293,10 @@ namespace AssetSnap.Instance.Input
 			}
 		}
 
-		/*
-		** Spawns the already created buffer of models
-		** 
-		** @return void
-		*/
+		/// <summary>
+		/// Spawns the already created buffer of models.
+		/// </summary>
+		/// <returns>void</returns>
 		private void SpawnBuffer()
 		{
 			int ite = 0;
@@ -297,11 +308,10 @@ namespace AssetSnap.Instance.Input
 			}
 		}
 
-		/*
-		** Resets the buffer of models
-		** 
-		** @return void
-		*/
+		/// <summary>
+		/// Resets the buffer of models.
+		/// </summary>
+		/// <returns>void</returns>
 		private void ResetBuffer()
 		{
 			foreach (Node3D Instance in _Buffer)
@@ -317,23 +327,20 @@ namespace AssetSnap.Instance.Input
 			_Buffer = new();
 		}
 
-		/*
-		** Resets the generated path, that
-		** was to be used to place models on
-		** 
-		** @return void
-		*/
+		/// <summary>
+		/// Resets the generated path to be used to place models on.
+		/// </summary>
+		/// <returns>void</returns>
 		private void ResetDragPath()
 		{
 			DragFrom = Vector3.Zero;
 			DragTo = Vector3.Zero;
 		}
 
-		/*
-		** Calculates a path of vector3's the models can spawn on
-		** 
-		** @return Vector3[]
-		*/
+		/// <summary>
+		/// Calculates a path of vector3's the models can spawn on.
+		/// </summary>
+		/// <returns>An array of Vector3 representing the calculated path.</returns>
 		private Vector3[] CalculateDragPath()
 		{
 			List<Vector3> VectorList = new();
@@ -353,12 +360,10 @@ namespace AssetSnap.Instance.Input
 			return VectorList.ToArray();
 		}
 
-		/*
-		** Defines which side the current drag
-		** action is facing
-		** 
-		** @return int
-		*/
+		/// <summary>
+		/// Defines which side the current drag action is facing.
+		/// </summary>
+		/// <returns>An integer representing the direction of the drag action.</returns>
 		private int Facing()
 		{
 			if (DragFrom.X < DragTo.X || DragFrom.X > DragTo.X)
@@ -380,12 +385,10 @@ namespace AssetSnap.Instance.Input
 			return 0;
 		}
 
-		/*
-		** Calculates amount of models that can be
-		** spawned in the available space
-		** 
-		** @return int
-		*/
+		/// <summary>
+		/// Calculates the amount of models that can be spawned in the available space.
+		/// </summary>
+		/// <returns>An integer representing the number of models that can be spawned.</returns>
 		private int CalculateSpawnAmount()
 		{
 			float Size = 0.0f;
@@ -410,3 +413,5 @@ namespace AssetSnap.Instance.Input
 		}
 	}
 }
+
+#endif
