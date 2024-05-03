@@ -20,17 +20,26 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using Godot;
-
 namespace AssetSnap.Explorer
 {
+	/// <summary>
+	/// Utility class for accessing the global explorer instance.
+	/// </summary>
 	public static class ExplorerUtils
 	{
+		/// <summary>
+		/// Retrieves the global explorer instance.
+		/// </summary>
+		/// <returns>The global explorer instance.</returns>
 		public static GlobalExplorer Get()
 		{
 			return GlobalExplorer.Singleton;
 		}
 		
+		/// <summary>
+        /// Checks if the global explorer instance is valid.
+        /// </summary>
+        /// <returns>True if the global explorer instance is valid, false otherwise.</returns>
 		public static bool IsValid()
 		{
 			return Get() != null;

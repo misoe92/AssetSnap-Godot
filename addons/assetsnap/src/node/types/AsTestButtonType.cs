@@ -21,24 +21,24 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using Godot;
+
 namespace AssetSnap.ASNode.Types
 {
-	using Godot;
-	
+	/// <summary>
+	/// Represents a custom node type for test buttons.
+	/// </summary>
 	[Tool]
 	public class AsTestButtonType : NodeType
 	{
-		/*
-		** Construction of the custom node type.
-		*/
+		/// <summary>
+        /// Constructs a new instance of the custom node type for test buttons.
+        /// </summary>
 		public AsTestButtonType()
 		{
 			Name = "AsTestButton";
-
 			Inherits = "Button";
-
 			ScriptPath = "res://addons/assetsnap/nodes/interface/TestButton.cs"; 
-
 			IconPath = "res://addons/assetsnap/assets/icons/StaticBody3D.svg";
 		}
 	}

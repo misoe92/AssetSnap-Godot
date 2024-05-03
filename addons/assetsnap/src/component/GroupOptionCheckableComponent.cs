@@ -21,16 +21,26 @@
 // SOFTWARE.
 
 #if TOOLS
+
 using AssetSnap.Front.Components.Groups.Builder;
 using Godot;
 
 namespace AssetSnap.Component
 {
+	/// <summary>
+	/// Component for managing group options with checkable behavior.
+	/// </summary>
 	[Tool]
 	public partial class GroupOptionCheckableComponent : GroupOptionComponent
 	{
+		/// <summary>
+		/// The parent editor group options.
+		/// </summary>
 		public EditorGroupOptions Parent;
 		
+		/// <summary>
+		/// Initializes the component.
+		/// </summary>
 		public override void Initialize()
 		{
 			base.Initialize();
@@ -41,6 +51,9 @@ namespace AssetSnap.Component
 			_FinalizeFields();
 		}
 		
+		/// <summary>
+		/// Shows the input for checkable behavior.
+		/// </summary>
 		public void InputShow()
 		{
 			Trait<Checkable>()
@@ -48,6 +61,9 @@ namespace AssetSnap.Component
 				.SetVisible(true);
 		}
 		
+		/// <summary>
+		/// Hides the input for checkable behavior.
+		/// </summary>
 		public void InputHide()
 		{
 			Trait<Checkable>()
@@ -55,6 +71,10 @@ namespace AssetSnap.Component
 				.SetVisible(false);
 		}
 		
+		/// <summary>
+		/// Sets the value of the checkable option.
+		/// </summary>
+		/// <param name="value">The value to set.</param>
 		public void SetValue( bool value )
 		{
 			Trait<Checkable>()
@@ -65,6 +85,10 @@ namespace AssetSnap.Component
 			EmitSignal(SignalName.GroupOptionChanged, Name, value);
 		}
 		
+		/// <summary>
+		/// Gets the value of the checkable option.
+		/// </summary>
+		/// <returns>The value of the checkable option.</returns>
 		public bool GetValue()
 		{
 			return Trait<Checkable>()
@@ -73,6 +97,10 @@ namespace AssetSnap.Component
 				.ButtonPressed;
 		}
 		
+		/// <summary>
+		/// Gets the value of the checkable option as a Variant.
+		/// </summary>
+		/// <returns>The value of the checkable option as a Variant.</returns>
 		public override Variant GetValueVariant()
 		{
 			return Trait<Checkable>()
@@ -81,6 +109,10 @@ namespace AssetSnap.Component
 				.ButtonPressed;
 		}
 		
+		/// <summary>
+		/// Checks if the input for checkable behavior is hidden.
+		/// </summary>
+		/// <returns><c>true</c> if the input is hidden; otherwise, <c>false</c>.</returns>
 		public bool IsHidden()
 		{
 			return Trait<Checkable>()
@@ -88,8 +120,14 @@ namespace AssetSnap.Component
 				.IsVisible() == false;
 		}
 		
+		/// <summary>
+		/// Initializes the fields for the component.
+		/// </summary>
 		protected virtual void _InitializeFields(){}
-			
+		
+		/// <summary>
+        /// Finalizes the fields for the component.
+        /// </summary>
 		protected virtual void _FinalizeFields()
 		{
 			Trait<Checkable>()
@@ -100,4 +138,5 @@ namespace AssetSnap.Component
 		}
 	}
 }
+
 #endif

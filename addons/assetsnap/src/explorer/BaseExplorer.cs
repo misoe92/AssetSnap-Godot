@@ -21,12 +21,16 @@
 // SOFTWARE.
 
 #if TOOLS
+
+using AssetSnap.Abstracts;
+using AssetSnap.Front.Nodes;
+using Godot;
+
 namespace AssetSnap
 {
-	using AssetSnap.Abstracts;
-	using AssetSnap.Front.Nodes;
-	using Godot;
-
+	/// <summary>
+    /// Partial class representing a base explorer, inheriting from AbstractExplorerBase.
+    /// </summary>
 	[Tool]
 	public partial class BaseExplorer : AbstractExplorerBase
 	{
@@ -36,9 +40,9 @@ namespace AssetSnap
 		
 		protected GlobalStates _States = null;
 		
-		/*
-		** Counter that keeps check on our total delta time 
-		*/
+		/// <summary>
+		/// Gets or sets the delta time.
+		/// </summary>
 		public float DeltaTime
 		{
 			get => _DeltaTime;
@@ -48,9 +52,9 @@ namespace AssetSnap
 			}
 		}
 				
-		/*
-		** The active library
-		*/
+		/// <summary>
+		/// Gets or sets the array of select lists.
+		/// </summary>
 		public Godot.Collections.Array<AsSelectList> SelectLists 
 		{
 			get => _SelectLists;
@@ -60,9 +64,9 @@ namespace AssetSnap
 			}
 		}
 				
-		/*
-		** Contains the current mouse input type
-		*/
+		/// <summary>
+		/// Gets or sets the current mouse input type.
+		/// </summary>
 		public EventMouse CurrentMouseInput
 		{
 			get => _CurrentMouseInput;
@@ -72,9 +76,9 @@ namespace AssetSnap
 			}	
 		}
 		
-		/*
-		** Allow scroll
-		*/
+		/// <summary>
+		/// Gets or sets the scroll state.
+		/// </summary>
 		public ScrollState AllowScroll
 		{
 			get => _AllowScroll;

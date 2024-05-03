@@ -21,16 +21,26 @@
 // SOFTWARE.
 
 #if TOOLS
+
 using AssetSnap.Front.Components.Groups.Builder;
 using Godot;
 
 namespace AssetSnap.Component
 {
+	/// <summary>
+	/// Component for managing group options with selectable functionality.
+	/// </summary>
 	[Tool]
 	public partial class GroupOptionSelectableComponent : GroupOptionComponent
 	{
+		/// <summary>
+		/// The parent editor group options.
+		/// </summary>
 		public EditorGroupOptions Parent;
 		
+		/// <summary>
+		/// Initializes the component.
+		/// </summary>
 		public override void Initialize()
 		{
 			base.Initialize();
@@ -41,6 +51,9 @@ namespace AssetSnap.Component
 			_FinalizeFields();
 		}
 		
+		/// <summary>
+		/// Shows the selectable input.
+		/// </summary>
 		public void InputShow()
 		{
 			Trait<Selectable>()
@@ -48,6 +61,9 @@ namespace AssetSnap.Component
 				.SetVisible(true);
 		}
 		
+		/// <summary>
+		/// Hides the selectable input.
+		/// </summary>
 		public void InputHide()
 		{
 			Trait<Selectable>()
@@ -55,6 +71,10 @@ namespace AssetSnap.Component
 				.SetVisible(false);
 		}
 		
+		/// <summary>
+		/// Gets the value of the currently selected option.
+		/// </summary>
+		/// <returns>The value of the currently selected option.</returns>
 		public string GetValue()
 		{
 			OptionButton select = Trait<Selectable>()
@@ -64,6 +84,10 @@ namespace AssetSnap.Component
 			return select.GetItemText( select.GetIndex() );
 		}
 		
+		/// <summary>
+		/// Checks if the selectable input is hidden.
+		/// </summary>
+		/// <returns>True if the selectable input is hidden, false otherwise.</returns>
 		public bool IsHidden()
 		{
 			return Trait<Selectable>()
@@ -71,8 +95,14 @@ namespace AssetSnap.Component
 				.IsVisible() == false;
 		}
 		
+		/// <summary>
+		/// Initializes additional fields of the component.
+		/// </summary>
 		protected virtual void _InitializeFields(){}
 		
+		/// <summary>
+        /// Finalizes the initialization of the fields.
+        /// </summary>
 		protected void _FinalizeFields()
 		{
 			Trait<Selectable>()
@@ -81,4 +111,5 @@ namespace AssetSnap.Component
 		}
 	}
 }
+
 #endif

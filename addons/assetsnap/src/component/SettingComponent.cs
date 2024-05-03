@@ -21,12 +21,19 @@
 // SOFTWARE.
 
 #if TOOLS
+
 namespace AssetSnap.Component
 {
+	/// <summary>
+	/// Base class for components related to settings.
+	/// </summary>
 	public partial class SettingsComponent : BaseComponent
 	{
 		protected Library.Instance _Library;
 		
+		/// <summary>
+		/// Gets or sets the library instance associated with the component.
+		/// </summary>
 		public Library.Instance Library 
 		{
 			get => _Library;
@@ -37,13 +44,11 @@ namespace AssetSnap.Component
 			}
 		}
 
-		/*
-		** Virtual method which are called each time
-		** a library change is happening.
-		**
-		** @return void 
-		*/
+		/// <summary>
+		/// Virtual method called each time a library change occurs.
+		/// </summary>
 		public virtual void _OnLibraryChange(){}
 	}
 }
+
 #endif

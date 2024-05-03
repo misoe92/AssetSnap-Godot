@@ -20,16 +20,19 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using Godot;
+
 namespace AssetSnap.ASNode.Types
 {
-	using Godot;
-	
+	/// <summary>
+	/// Represents a custom list select node type.
+	/// </summary>
 	[Tool]
 	public class AsListSelectType : NodeType
 	{
-		/*
-		** Construction of the custom node type.
-		*/
+		/// <summary>
+        /// Constructs a new instance of the custom list select node type.
+        /// </summary>
 		public AsListSelectType()
 		{
 			Name = "AsSelectList";

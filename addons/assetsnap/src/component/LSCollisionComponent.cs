@@ -20,11 +20,16 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using AssetSnap.States;
+using Godot;
+	
 namespace AssetSnap.Component
 {
-	using AssetSnap.States;
-	using Godot;
-
+	/// <summary>
+	/// Base class for components related to Library Collision Snap.
+	/// </summary>
 	public partial class LSCollisionComponent : LibraryComponent
 	{
 		protected string Type = "";
@@ -38,17 +43,27 @@ namespace AssetSnap.Component
 			}
 		}
 		
+		/// <summary>
+		/// Initializes a new instance of the <see cref="LSCollisionComponent"/> class.
+		/// </summary>
 		public LSCollisionComponent()
 		{
 			Name = "LSCollisionComponent";
 			//_include = false;
 		}
 
+		/// <summary>
+		/// Initializes the component.
+		/// </summary>
 		public override void Initialize()
 		{
 			base.Initialize();
 		}
 
+		/// <summary>
+		/// Updates the value of the component based on the provided data.
+		/// </summary>
+		/// <param name="data">The data to update the component with.</param>
 		public virtual void MaybeUpdateValue(Godot.Collections.Array data)
 		{
 			if( ShouldUpdateState() ) 
@@ -57,6 +72,10 @@ namespace AssetSnap.Component
 			}
 		}
 		
+		/// <summary>
+		/// Determines whether the state of the component should be updated.
+		/// </summary>
+		/// <returns><c>true</c> if the state should be updated; otherwise, <c>false</c>.</returns>
 		public bool ShouldUpdateState()
 		{
 			return
@@ -64,6 +83,9 @@ namespace AssetSnap.Component
 				false == IsActive() && CheckboxPressed();
 		}
 		
+		/// <summary>
+		/// Updates the state of the component.
+		/// </summary>
 		public void UpdateState()
 		{
 			if(IsActive() && false == CheckboxPressed() ) 
@@ -76,6 +98,10 @@ namespace AssetSnap.Component
 			}
 		}
 		
+		/// <summary>
+		/// Sets the state of the component.
+		/// </summary>
+		/// <param name="state">The state to set.</param>
 		public void SetState( bool state ) 
 		{
 			if( false == IsValid() ) 
@@ -86,6 +112,10 @@ namespace AssetSnap.Component
 			Trait<Checkable>().Select(0).SetValue( state );
 		}
 		
+		/// <summary>
+		/// Gets the state of the component.
+		/// </summary>
+		/// <returns>The state of the component.</returns>
 		public bool GetState() 
 		{
 			if( false == IsValid() ) 
@@ -96,16 +126,19 @@ namespace AssetSnap.Component
 			return Trait<Checkable>().Select(0).GetValue();
 		}
 		
+		/// <summary>
+		/// Checks if the checkbox associated with the component is pressed.
+		/// </summary>
+		/// <returns><c>true</c> if the checkbox is pressed; otherwise, <c>false</c>.</returns>
 		protected bool CheckboxPressed()
 		{
 			return GetState();
 		}
 		
-		/*
-		** Fetches the component checkbox
-		** 
-		** @return CheckBox
-		*/
+		/// <summary>
+		/// Fetches the component checkbox.
+		/// </summary>
+		/// <returns>The checkbox associated with the component.</returns>
 		public CheckBox GetCheckbox()
 		{
 			if( false == IsValid() ) 
@@ -116,11 +149,19 @@ namespace AssetSnap.Component
 			return Trait<Checkable>().Select(0).GetNode() as CheckBox;
 		}
 		
+		/// <summary>
+		/// Determines whether the component is active.
+		/// </summary>
+		/// <returns><c>true</c> if the component is active; otherwise, <c>false</c>.</returns>
 		public virtual bool IsActive()
 		{
 			return false;
 		}
 		
+		/// <summary>
+		/// Checks if the component is valid.
+		/// </summary>
+		/// <returns><c>true</c> if the component is valid; otherwise, <c>false</c>.</returns>
 		public bool IsValid()
 		{
 			return
@@ -130,6 +171,9 @@ namespace AssetSnap.Component
 				false != HasTrait<Checkable>();
 		}		
 
+		/// <summary>
+        /// Called when the node is about to be removed from the scene tree.
+        /// </summary>
 		public override void _ExitTree()
 		{
 			Initiated = false;
@@ -137,3 +181,5 @@ namespace AssetSnap.Component
 		}
 	}
 }
+
+#endif

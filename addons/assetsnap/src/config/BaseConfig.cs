@@ -20,10 +20,13 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using Godot;
+
 namespace AssetSnap.Config
 {
-	using Godot;
-	
+	/// <summary>
+    /// Base class for configuration handling.
+    /// </summary>
 	[Tool]
 	public partial class BaseConfig
 	{
@@ -34,21 +37,22 @@ namespace AssetSnap.Config
 		protected bool LoadOk; 
 		protected ConfigFile _Config;
 		
-		/*
-		** Construction of our config
-		*/		
+		/// <summary>
+        /// Constructor for the BaseConfig class.
+        /// </summary>
+        /// <remarks>
+        /// Initializes the LoadOk field to false.
+        /// </remarks>	
 		public BaseConfig()
 		{
 			LoadOk = false;
 		}
 
-		/*
-		** Loads our config given a specified config file name
-		** It overwrites the current _Config field.
-		**
-		** @param string _ConfigName
-		** @return void
-		*/
+		/// <summary>
+        /// Loads the configuration from the specified file name.
+        /// </summary>
+        /// <param name="_ConfigName">The name of the configuration file.</param>
+        /// <returns>Void.</returns>
 		protected void LoadConfig( string _ConfigName)
 		{
 			_Config = new();
@@ -62,24 +66,22 @@ namespace AssetSnap.Config
 			}
 		}
 		
-		/*
-		** Fetches a single key value from the config
-		**
-		** @param string _key
-		** @return Variant
-		*/
+		/// <summary>
+        /// Retrieves a single key value from the configuration.
+        /// </summary>
+        /// <param name="_key">The key to retrieve the value for.</param>
+        /// <returns>The value associated with the specified key.</returns>
 		public virtual Variant GetKey( string _key )
 		{
 			return _Config.GetValue( DefaultConfigSection, _key );
 		}
 		
-		/*
-		** Sets a value in the config and saves it
-		**
-		** @param string _key
-		** @param Variant _value
-		** @return void
-		*/
+		/// <summary>
+        /// Sets a value in the configuration and saves it.
+        /// </summary>
+        /// <param name="_key">The key to set the value for.</param>
+        /// <param name="_value">The value to set.</param>
+        /// <returns>Void.</returns>
 		public virtual void SetKey( string _key, Variant _value )
 		{
 			_Config.SetValue(Name, _key, _value);

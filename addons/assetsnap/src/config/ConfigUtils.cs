@@ -22,8 +22,15 @@
 
 namespace AssetSnap.Config
 {
+	/// <summary>
+	/// Utility class for accessing configuration settings.
+	/// </summary>
 	public static class ConfigUtils
 	{
+		/// <summary>
+        /// Retrieves the number of folders configured.
+        /// </summary>
+        /// <returns>The number of folders configured.</returns>
 		public static int FolderCount()
 		{
 			return GlobalExplorer.GetInstance().Settings.FolderCount;

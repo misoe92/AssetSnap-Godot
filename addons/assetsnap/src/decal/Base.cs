@@ -21,13 +21,17 @@
 // SOFTWARE.
 
 #if TOOLS
+
+using AssetSnap.Explorer;
+using AssetSnap.Front.Nodes;
+using AssetSnap.States;
+using Godot;
+
 namespace AssetSnap.Decal
 {
-	using AssetSnap.Explorer;
-	using AssetSnap.Front.Nodes;
-	using AssetSnap.States;
-	using Godot;
-
+	/// <summary>
+	/// Partial class representing a base decal handler.
+	/// </summary>
 	public partial class Base
 	{
 		private AsDecal3D _Decal;
@@ -36,6 +40,9 @@ namespace AssetSnap.Decal
 		private AsGroup3D _Group;
 		private GlobalExplorer _GlobalExplorer;
 
+		/// <summary>
+		/// Gets or sets the decal.
+		/// </summary>
 		public AsDecal3D Decal
 		{
 			get => _Decal;
@@ -45,6 +52,9 @@ namespace AssetSnap.Decal
 			}
 		}
 
+		/// <summary>
+		/// Gets or sets the model mesh.
+		/// </summary>
 		public Mesh ModelMesh
 		{
 			get => _ModelMesh;
@@ -54,6 +64,9 @@ namespace AssetSnap.Decal
 			}
 		}
 
+		/// <summary>
+		/// Gets or sets the model mesh instance.
+		/// </summary>
 		public MeshInstance3D ModelMeshInstance
 		{
 			get => _ModelMeshInstance;
@@ -63,6 +76,9 @@ namespace AssetSnap.Decal
 			}
 		}
 
+		/// <summary>
+		/// Gets or sets the group.
+		/// </summary>
 		public AsGroup3D Group
 		{
 			get => _Group;
@@ -74,6 +90,9 @@ namespace AssetSnap.Decal
 
 		private static Base _Instance;
 
+		/// <summary>
+		/// Gets the singleton instance of Base.
+		/// </summary>
 		public static Base Singleton
 		{
 			get
@@ -87,11 +106,9 @@ namespace AssetSnap.Decal
 			}
 		}
 
-		/*
-		** Initializes the decal handler
-		**
-		** @return void 
-		*/
+		/// <summary>
+		/// Initializes the decal handler.
+		/// </summary>
 		public void Initialize()
 		{
 			ClearChildren();
@@ -108,28 +125,28 @@ namespace AssetSnap.Decal
 			Hide();
 		}
 		
-		/*
-		** Exits from the tree
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Exits from the tree.
+		/// </summary>
 		public void Exit()
 		{
 			Hide();
 		}
 
+		/// <summary>
+		/// Gets the position of the decal.
+		/// </summary>
+		/// <returns>The position of the decal.</returns>
 		public Vector3 GetPosition()
 		{
 			
 			return GetNode().Transform.Origin;
 		}
 
-		/*
-		** Updates the preview model shown in the decal
-		**
-		** @param bool State
-		** @return void
-		*/
+		/// <summary>
+		/// Updates the preview model shown in the decal.
+		/// </summary>
+		/// <param name="State">The state of the preview model.</param>
 		public void _UpdateDecalPreview(bool State)
 		{
 			if (false == EditorPlugin.IsInstanceValid(ExplorerUtils.Get().GetHandle()) || false == EditorPlugin.IsInstanceValid(GetNode()))
@@ -176,11 +193,9 @@ namespace AssetSnap.Decal
 			}
 		}
 
-		/*
-		** Shows the decal
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Shows the decal.
+		/// </summary>
 		public void Show()
 		{
 			/** Only show if we have an actual model to show **/
@@ -194,11 +209,9 @@ namespace AssetSnap.Decal
 			StatesUtils.Get().DecalVisible = GlobalStates.VisibilityStateEnum.Visible;
 		}
 
-		/*
-		** Hides the decal
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Hides the decal.
+		/// </summary>
 		public void Hide()
 		{
 			if (GetNode() == null || false == GetNode().Visible)
@@ -210,11 +223,10 @@ namespace AssetSnap.Decal
 			StatesUtils.Get().DecalVisible = GlobalStates.VisibilityStateEnum.Hidden;
 		}
 
-		/*
-		** Fetches the Decal's node
-		**
-		** @return Node3D
-		*/
+		/// <summary>
+		/// Fetches the Decal's node.
+		/// </summary>
+		/// <returns>The Decal's node.</returns>
 		public Node3D GetNode()
 		{
 			if( false == Plugin.Singleton.GetInternalContainer().HasNode("AsDecal") ) 
@@ -226,32 +238,28 @@ namespace AssetSnap.Decal
 			return Plugin.Singleton.GetInternalContainer().GetNode("AsDecal") as Node3D;
 		}
 
-		/*
-		** Fetches the Decal's mesh instance
-		**
-		** @return MeshInstance3D
-		*/
+		/// <summary>
+		/// Fetches the Decal's mesh instance.
+		/// </summary>
+		/// <returns>The Decal's mesh instance.</returns>
 		public MeshInstance3D GetMeshInstance()
 		{
 			return ModelMeshInstance;
 		}
 
-		/*
-		** Sets transform of the decal
-		**
-		** @param Transform3D GlobalTrans
-		** @return void
-		*/
+		/// <summary>
+		/// Sets the transform of the decal.
+		/// </summary>
+		/// <param name="GlobalTrans">The global transform to set.</param>
 		public void SetTransform(Transform3D GlobalTrans)
 		{
 			GetNode().GlobalTransform = GlobalTrans;
 		}
 
-		/*
-		** Checks if the decal is hidden
-		**
-		** @return bool
-		*/
+		/// <summary>
+		/// Checks if the decal is hidden.
+		/// </summary>
+		/// <returns>True if the decal is hidden, otherwise false.</returns>
 		public bool IsHidden()
 		{
 			if( false == EditorPlugin.IsInstanceValid(GetNode()))
@@ -262,14 +270,11 @@ namespace AssetSnap.Decal
 			return GetNode().Visible == false;
 		}
 
-		/*
-		** Clears the current children of the decal as
-		** long as it does not match the new child.
-		**
-		** @param AssetSnap.Front.Nodes.AsMeshInstance3D Model
-		** @param AssetSnap.Front.Nodes.AsMeshInstance3D model
-		** @return void
-		*/
+		/// <summary>
+		/// Clears the current children of the decal.
+		/// </summary>
+		/// <param name="Model">The model to clear.</param>
+		/// <param name="model">The new model.</param>
 		private void ClearCurrentChildren(Node Model, Node model)
 		{
 			if (EditorPlugin.IsInstanceValid(Model) && Model != model)
@@ -279,6 +284,9 @@ namespace AssetSnap.Decal
 			}
 		}
 
+		/// <summary>
+		/// Clears the current children of the decal as long as it does not match the new child.
+		/// </summary>
 		private void ClearChildren()
 		{
 			for (int i = 0; i < GlobalExplorer.GetInstance()._Plugin.GetChildCount(); i++)
@@ -291,16 +299,13 @@ namespace AssetSnap.Decal
 			}
 		}
 
-		/*
-		** Places the decal preview inside of the decal,
-		** so it's shown in the editor
-		**
-		** @param bool State
-		** @param bool ChildFound
-		** @param AssetSnap.Front.Nodes.AsMeshInstance3D Model
-		** @param AssetSnap.Front.Nodes.AsMeshInstance3D model
-		** @return void
-		*/
+		/// <summary>
+		/// Places the decal preview inside of the decal so it's shown in the editor.
+		/// </summary>
+		/// <param name="State">The state of the preview model.</param>
+		/// <param name="ChildFound">True if a child was found, false otherwise.</param>
+		/// <param name="Model">The model to place.</param>
+		/// <param name="model">The model node.</param>
 		private void PlaceDecalPreview(bool State, bool ChildFound, Node Model, Node model)
 		{
 			if (true == State && false == ChildFound)
@@ -320,21 +325,17 @@ namespace AssetSnap.Decal
 			}
 		}
 
-		/*
-		** Attaches the message bus to the class
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Attaches the message bus to the class.
+		/// </summary>
 		private void Attach_GlobalExplorer()
 		{
 			_GlobalExplorer = GlobalExplorer.GetInstance();
 		}
 
-		/*
-		** Initializes the decal node
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Initializes the decal node.
+		/// </summary>
 		private void InitializeNode()
 		{
 			AsDecal3D _Decal = new();
@@ -342,12 +343,9 @@ namespace AssetSnap.Decal
 			StatesUtils.Get().DecalSpawned = GlobalStates.SpawnStateEnum.Spawned;
 		}
 
-		/*
-		** Set an initial position for our
-		** decal node
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Sets an initial position for the decal node.
+		/// </summary>
 		private void SetInitialPosition()
 		{
 			Transform3D Trans = GetNode().Transform;
@@ -355,11 +353,10 @@ namespace AssetSnap.Decal
 			GetNode().Transform = Trans;
 		}
 
-		/*
-		** Checks if message bus is valid
-		**
-		** @return bool
-		*/
+		/// <summary>
+		/// Checks if the message bus is valid.
+		/// </summary>
+		/// <returns>True if the message bus is valid, otherwise false.</returns>
 		private bool Is_GlobalExplorerValid()
 		{
 			return null != _GlobalExplorer && null != _GlobalExplorer.Settings;

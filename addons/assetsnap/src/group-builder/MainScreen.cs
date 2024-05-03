@@ -20,11 +20,14 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using System.Threading.Tasks;
+using Godot;
+
 namespace AssetSnap.GroupBuilder
 {
-	using System.Threading.Tasks;
-	using Godot;
-
+	/// <summary>
+	/// Main screen class responsible for managing the group preview and user input.
+	/// </summary>
 	[Tool]
 	public partial class MainScreen : VBoxContainer
 	{
@@ -70,6 +73,9 @@ namespace AssetSnap.GroupBuilder
 			}
 		}
 
+		/// <summary>
+		/// Called when the node is added to the scene tree.
+		/// </summary>
 		public override void _EnterTree()
 		{
 			Name = "GroupMainScreen";
@@ -104,6 +110,10 @@ namespace AssetSnap.GroupBuilder
 			_InitializePreview();
 		}
 
+		/// <summary>
+		/// Process method called every frame.
+		/// </summary>
+		/// <param name="delta">The time in seconds since the last frame.</param>
 		public override void _Process(double delta)
 		{
 			if( false == IsInstanceValid(this) ) 
@@ -157,12 +167,18 @@ namespace AssetSnap.GroupBuilder
 			base._Process(delta);
 		}
 
+		/// <summary>
+		/// Updates the group preview.
+		/// </summary>
 		public void Update()
 		{
 			Remove3DPreview(Viewport);
 			Render3DPreview(Viewport);
 		}
 
+		/// <summary>
+		/// Initializes the toolbar UI elements.
+		/// </summary>
 		private void _InitializeToolbar()
 		{
 			ToolbarPanelContainer = new()
@@ -200,6 +216,11 @@ namespace AssetSnap.GroupBuilder
 			AddChild(ToolbarPanelContainer);
 		}
 
+		/// <summary>
+		/// Initializes the environment preview if needed.
+		/// </summary>
+		/// <param name="Viewport">The viewport to render the environment.</param>
+		/// <returns>True if the environment preview is initialized, false otherwise.</returns>
 		private async Task<bool> _MaybeInitializeEnvironment(SubViewport Viewport)
 		{
 			if (PreviewEnvironment)
@@ -275,6 +296,9 @@ namespace AssetSnap.GroupBuilder
 			return false;
 		}
 
+		/// <summary>
+		/// Initializes the 3D preview.
+		/// </summary>
 		private async void _InitializePreview()
 		{
 			// Create a Viewport to render the 3D preview
@@ -356,6 +380,10 @@ namespace AssetSnap.GroupBuilder
 			ViewportContainer.Connect(Control.SignalName.GuiInput, Callable.From((InputEvent Event) => { _OnMaybeListenToInput(Event); }));
 		}
 
+		/// <summary>
+		/// Handles user input events.
+		/// </summary>
+		/// <param name="@event">The input event.</param>
 		public override void _Input(InputEvent @event)
 		{
 			if (ListensForInput)
@@ -460,6 +488,10 @@ namespace AssetSnap.GroupBuilder
 			base._Input(@event);
 		}
 
+		/// <summary>
+		/// Physics process method called every physics frame.
+		/// </summary>
+		/// <param name="delta">The time in seconds since the last physics frame.</param>
 		public override void _PhysicsProcess(double delta)
 		{
 			// Check if we listens to input
@@ -498,6 +530,10 @@ namespace AssetSnap.GroupBuilder
 			base._PhysicsProcess(delta);
 		}
 
+		/// <summary>
+		/// Handles input events to start or stop listening for input.
+		/// </summary>
+		/// <param name="Event">The input event.</param>
 		private void _OnMaybeListenToInput(InputEvent Event)
 		{
 			if (Event is InputEventMouseButton eventMouseButton)
@@ -524,6 +560,10 @@ namespace AssetSnap.GroupBuilder
 			}
 		}
 
+		/// <summary>
+		/// Renders the 3D preview of the group.
+		/// </summary>
+		/// <param name="Viewport">The viewport to render the preview.</param>
 		private void Render3DPreview(SubViewport Viewport)
 		{
 			Front.Nodes.GroupResource Group = GlobalExplorer.GetInstance().GroupBuilder._Editor.Group;
@@ -569,6 +609,10 @@ namespace AssetSnap.GroupBuilder
 			}
 		}
 
+		/// <summary>
+		/// Removes the 3D preview from the viewport.
+		/// </summary>
+		/// <param name="Viewport">The viewport containing the preview.</param>
 		private void Remove3DPreview(SubViewport Viewport)
 		{
 			foreach (Node previewChild in Viewport.GetChildren())
@@ -581,6 +625,9 @@ namespace AssetSnap.GroupBuilder
 			}
 		}
 
+		/// <summary>
+		/// Updates the texture.
+		/// </summary>
 		private void UpdateTexture()
 		{
 			// // Capture the rendered texture from the Viewport
@@ -592,6 +639,10 @@ namespace AssetSnap.GroupBuilder
 			// textureRect.Texture = imageTexture;
 		}
 
+		/// <summary>
+		/// Checks if a group is selected.
+		/// </summary>
+		/// <returns>True if a group is selected, false otherwise.</returns>
 		public bool HasGroup()
 		{
 			GlobalExplorer explorer = GlobalExplorer.GetInstance();
@@ -603,6 +654,9 @@ namespace AssetSnap.GroupBuilder
 				IsInstanceValid(GlobalExplorer.GetInstance().GroupBuilder._Editor.Group);
 		}
 
+		/// <summary>
+        /// Called when the node is about to be removed from the scene tree.
+        /// </summary>
 		public override void _ExitTree()
 		{
 			// Clean up when the plugin is deactivated 

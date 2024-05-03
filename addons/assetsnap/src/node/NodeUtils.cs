@@ -24,8 +24,16 @@ using Godot;
 
 namespace AssetSnap.Nodes
 {
+	/// <summary>
+	/// Utility class for handling operations related to Godot nodes.
+	/// </summary>
 	public static class NodeUtils
 	{
+		/// <summary>
+        /// Calculates the axis-aligned bounding box (AABB) of a given node.
+        /// </summary>
+        /// <param name="node">The node for which to calculate the AABB.</param>
+        /// <returns>The calculated AABB of the node.</returns>
 		public static Aabb CalculateNodeAabb(Node node)
 		{
 			Aabb aabb = new Aabb();

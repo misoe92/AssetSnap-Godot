@@ -21,25 +21,34 @@
 // SOFTWARE.
 
 #if TOOLS
+
+using System;
+using System.Linq;
+using Godot;
+
 namespace AssetSnap.Component
 {
-	using System;
-	using System.Linq;
-	using Godot;
-
+	/// <summary>
+	/// Base class for components that can have traits attached to them.
+	/// </summary>
 	[Tool]
 	public partial class TraitableComponent : BaseComponent
 	{
 		[Export]
 		public Godot.Collections.Array<Trait.Base> boundTraits;
-
 		protected bool Initiated = false;
 
+		/// <summary>
+		/// Default constructor for TraitableComponent.
+		/// </summary>
 		public TraitableComponent()
 		{
 			boundTraits = new();
 		}
 
+		/// <summary>
+		/// Initializes the component and adds attached traits.
+		/// </summary>
 		public override void Initialize()
 		{
 			if( false == Initiated ) 
@@ -53,12 +62,21 @@ namespace AssetSnap.Component
 			base.Initialize();
 		}
 
+		/// <summary>
+		/// Clears the component, including its attached traits.
+		/// </summary>
+		/// <param name="debug">Optional parameter to enable debugging output.</param>
 		public override void Clear(bool debug = false)
 		{
 			ClearTrait( debug );
 			base.Clear(debug);
 		}
 		
+		/// <summary>
+		/// Adds a trait to the component.
+		/// </summary>
+		/// <param name="traitType">Type of the trait to add.</param>
+		/// <param name="container">Container node for the trait.</param>
 		public void AddTrait(Type traitType, Node container)
 		{
 			object instance = Activator.CreateInstance(traitType);
@@ -83,6 +101,12 @@ namespace AssetSnap.Component
 			}
 		}
 		
+		/// <summary>
+		/// Checks if the component has a specified type of trait.
+		/// </summary>
+		/// <typeparam name="T">Type of the trait to check.</typeparam>
+		/// <param name="debug">Optional parameter to enable debugging output.</param>
+		/// <returns>True if the component has the specified trait type; otherwise, false.</returns>
 		public bool HasTrait<T>( bool debug = false)
 		{
 			if( boundTraits.Count == 0 ) 
@@ -145,6 +169,12 @@ namespace AssetSnap.Component
 			return false;
 		}
 		
+		/// <summary>
+		/// Clears the trait with the specified type from the component.
+		/// </summary>
+		/// <typeparam name="T">Type of the trait to clear.</typeparam>
+		/// <param name="debug">Optional parameter to enable debugging output.</param>
+		/// <returns>True if the trait was successfully cleared; otherwise, false.</returns>
 		public bool ClearTrait<T>(bool debug = false) 
 		{
 			if( boundTraits.Count == 0 ) 
@@ -173,6 +203,11 @@ namespace AssetSnap.Component
 			return false;
 		}
 		
+		/// <summary>
+		/// Clears all traits from the component.
+		/// </summary>
+		/// <param name="debug">Optional parameter to enable debugging output.</param>
+		/// <returns>True if all traits were successfully cleared; otherwise, false.</returns>
 		public bool ClearTrait(bool debug = false) 
 		{
 			if( boundTraits.Count == 0 ) 
@@ -201,6 +236,11 @@ namespace AssetSnap.Component
 			return false;
 		}
 		
+		/// <summary>
+		/// Retrieves a trait of the specified type from the component.
+		/// </summary>
+		/// <typeparam name="T">Type of the trait to retrieve.</typeparam>
+		/// <returns>The trait instance if found; otherwise, null.</returns>
 		public T Trait<T>() where T : class
 		{
 			if( boundTraits.Count == 0 ) 
@@ -232,6 +272,11 @@ namespace AssetSnap.Component
 			return null;
 		}
 		
+		/// <summary>
+		/// Retrieves a trait of the specified type from the component.
+		/// </summary>
+		/// <param name="type">Type of the trait to retrieve.</param>
+		/// <returns>The trait instance if found; otherwise, null.</returns>
 		public Trait.Base Trait( Type type )
 		{
 			if( boundTraits.Count == 0 ) 
@@ -264,4 +309,5 @@ namespace AssetSnap.Component
 		}
 	}
 }
+
 #endif
