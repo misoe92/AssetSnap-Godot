@@ -26,32 +26,42 @@ using Godot;
 
 namespace AssetSnap.Component
 {
+	/// <summary>
+	/// A partial class representing a scrollable container, derived from ContainerTrait.
+	/// </summary>
 	[Tool]
 	public partial class ScrollContainerable : ContainerTrait
 	{
-		/*
-		** Public methods
-		*/
+		/// <summary>
+		/// The inner VBoxContainer of the scroll container.
+		/// </summary>
 		public VBoxContainer _ScrollInnerContainer;
+		
+		/// <summary>
+		/// The scroll container padding container.
+		/// </summary>
 		public MarginContainer _ScrollPaddingContainer;
 		
+		/// <summary>
+		/// Default constructor for ScrollContainerable.
+		/// </summary>
 		public ScrollContainerable()
 		{
 			Name = "ScrollContainerable";
 			TypeString = GetType().ToString();
 		}
 		
-		/*
-		** Instantiate an instance of the trait
-		**
-		** @return ScrollContainerable
-		*/	
+		/// <summary>
+		/// Instantiate an instance of the trait.
+		/// </summary>
+		/// <returns>Returns the instantiated ScrollContainerable.</returns>
 		public override ScrollContainerable Instantiate()
 		{
 			UsePaddingContainer = false;
 			base._Instantiate();
 			base.Instantiate();
 			
+			// Create ScrollContainer and its inner containers
 			ScrollContainer _WorkingNode = new()
 			{
 				Name="Scroll",
@@ -73,15 +83,18 @@ namespace AssetSnap.Component
 				SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
 			};
 			
+			// Apply padding to the ScrollPaddingContainer
 			foreach( (string side, int value ) in Padding ) 
 			{
 				_ScrollPaddingContainer.AddThemeConstantOverride("margin_" + side, value);
 			}
 
+			// Add inner containers to appropriate parent nodes
 			_ScrollPaddingContainer.AddChild(_ScrollInnerContainer);
 			_WorkingNode.AddChild(_ScrollPaddingContainer);
 			GetInnerContainer(0).AddChild(_WorkingNode);
-		
+
+			// Update dependencies and instances
 			Dependencies[TraitName + "_WorkingNode"] = _WorkingNode;
 			Dependencies[TraitName + "_ScrollPaddingContainer"] = _ScrollPaddingContainer;
 			Dependencies[TraitName + "_ScrollInnerContainer"] = _ScrollInnerContainer;
@@ -96,13 +109,12 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		/*
-		** Selects an placed scroll container
-		** in the nodes array by index
-		**
-		** @param int index
-		** @return ScrollContainerable
-		*/
+		/// <summary>
+        /// Selects a placed scroll container in the nodes array by index.
+        /// </summary>
+        /// <param name="index">The index of the scroll container.</param>
+        /// <param name="debug">Whether to print debug information.</param>
+        /// <returns>Returns the modified ScrollContainerable.</returns>
 		public override ScrollContainerable Select(int index, bool debug = false)
 		{
 			base._Select(index, debug);
@@ -116,13 +128,11 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		/*
-		** Selects an placed scroll container
-		** in the nodes array by name
-		**
-		** @param string name
-		** @return ScrollContainerable
-		*/
+		/// <summary>
+        /// Selects a placed scroll container in the nodes array by name.
+        /// </summary>
+        /// <param name="name">The name of the scroll container.</param>
+        /// <returns>Returns the modified ScrollContainerable.</returns>
 		public override ScrollContainerable SelectByName( string name ) 
 		{
 			foreach( Container container in Nodes ) 
@@ -137,13 +147,10 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		/*
-		** Adds the currently chosen scroll
-		** container to a specified container
-		**
-		** @param Node Container
-		** @return void
-		*/
+		/// <summary>
+        /// Adds the currently chosen scroll container to a specified container.
+        /// </summary>
+        /// <param name="Container">The container to which to add the scroll container.</param>
 		public void AddToContainer( Node Container ) 
 		{
 			if( false == Dependencies.ContainsKey(TraitName + "_MarginContainer") ) 
@@ -157,16 +164,11 @@ namespace AssetSnap.Component
 			base._AddToContainer(Container, Dependencies[TraitName + "_MarginContainer"].As<MarginContainer>());
 		}
 		
-		/*
-		** Setter Methods
-		*/
-		
-		/*
-		** Sets the name of the current scroll container
-		**
-		** @param string text
-		** @return ScrollContainerable
-		*/
+		/// <summary>
+        /// Sets the name of the current scroll container.
+        /// </summary>
+        /// <param name="text">The name to set.</param>
+        /// <returns>Returns the modified ScrollContainerable.</returns>
 		public ScrollContainerable SetName( string text ) 
 		{
 			base._SetName(text);
@@ -174,13 +176,11 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		/*
-		** Sets the visibility state of the
-		** currently chosen scroll container
-		**
-		** @param bool state
-		** @return ScrollContainerable
-		*/
+		/// <summary>
+        /// Sets the visibility state of the currently chosen scroll container.
+        /// </summary>
+        /// <param name="state">The visibility state to set.</param>
+        /// <returns>Returns the modified ScrollContainerable.</returns>
 		public override ScrollContainerable SetVisible( bool state ) 
 		{
 			base.SetVisible(state);
@@ -188,13 +188,12 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		/*
-		** Sets the dimensions of the
-		** currently chosen scroll container
-		**
-		** @param bool state
-		** @return ScrollContainerable
-		*/
+		/// <summary>
+        /// Sets the dimensions of the currently chosen scroll container.
+        /// </summary>
+        /// <param name="width">The width of the container.</param>
+        /// <param name="height">The height of the container.</param>
+        /// <returns>Returns the modified ScrollContainerable.</returns>
 		public override ScrollContainerable SetDimensions( int width, int height ) 
 		{
 			base.SetDimensions(width,height);
@@ -202,13 +201,12 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		/*
-		** Sets the minimum dimensions of the
-		** currently chosen scroll container
-		**
-		** @param bool state
-		** @return ScrollContainerable
-		*/
+		/// <summary>
+        /// Sets the minimum dimensions of the currently chosen scroll container.
+        /// </summary>
+        /// <param name="width">The minimum width of the container.</param>
+        /// <param name="height">The minimum height of the container.</param>
+        /// <returns>Returns the modified ScrollContainerable.</returns>
 		public override ScrollContainerable SetMinimumDimension( int width, int height ) 
 		{
 			base.SetMinimumDimension(width,height);
@@ -216,13 +214,11 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		/*
-		** Sets the horizontal size flag, which controls the x
-		** axis, and how it should act.
-		**
-		** @param Control.SizeFlags flag
-		** @return ScrollContainerable
-		*/
+		/// <summary>
+        /// Sets the horizontal size flag for the container.
+        /// </summary>
+        /// <param name="flag">The horizontal size flag to set.</param>
+        /// <returns>Returns the modified ScrollContainerable.</returns>
 		public override ScrollContainerable SetHorizontalSizeFlags(Control.SizeFlags flag)
 		{
 			base.SetHorizontalSizeFlags(flag);
@@ -230,13 +226,11 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		/*
-		** Sets the horizontal size flag, which controls the y
-		** axis, and how it should act.
-		**
-		** @param Control.SizeFlags flag
-		** @return ScrollContainerable
-		*/
+		/// <summary>
+        /// Sets the vertical size flag for the container.
+        /// </summary>
+        /// <param name="flag">The vertical size flag to set.</param>
+        /// <returns>Returns the modified ScrollContainerable.</returns>
 		public override ScrollContainerable SetVerticalSizeFlags(Control.SizeFlags flag)
 		{
 			base.SetVerticalSizeFlags(flag);
@@ -244,12 +238,11 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		/*
-		** Sets the orientation of the scroll container
-		**
-		** @param ContainerOrientation orientation
-		** @return ScrollContainerable
-		*/
+		/// <summary>
+        /// Sets the orientation of the scroll container.
+        /// </summary>
+        /// <param name="orientation">The orientation to set.</param>
+        /// <returns>Returns the modified ScrollContainerable.</returns>
 		public override ScrollContainerable SetOrientation(ContainerOrientation orientation) 
 		{
 			base.SetOrientation(orientation);
@@ -257,14 +250,12 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		/*
-		** Sets margin values for 
-		** the currently chosen scroll container
-		**
-		** @param int value
-		** @param string side
-		** @return ScrollContainerable
-		*/
+		/// <summary>
+        /// Sets margin values for the currently chosen scroll container.
+        /// </summary>
+        /// <param name="value">The margin value to set.</param>
+        /// <param name="side">The side for which to set the margin.</param>
+        /// <returns>Returns the modified ScrollContainerable.</returns>
 		public override ScrollContainerable SetMargin( int value, string side = "" ) 
 		{
 			base.SetMargin(value, side);
@@ -272,15 +263,10 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		/*
-		** Getter Methods
-		*/
-		
-		/*
-		** Returns the inner container
-		**
-		** @return Container
-		*/
+		/// <summary>
+        /// Returns the inner container of the scroll container.
+        /// </summary>
+        /// <returns>Returns the inner container.</returns>
 		public Container GetScrollContainer()
 		{
 			if( null != Dependencies && false != Dependencies.ContainsKey(TraitName + "_ScrollInnerContainer") ) 
@@ -304,20 +290,12 @@ namespace AssetSnap.Component
 			return null;
 		}
 		
-		/*
-		** Private Methods
-		*/
-		
-		/*
-		** Resets the trait to
-		** a cleared state
-		**
-		** @return void
-		*/
+		/// <summary>
+        /// Resets the trait to a cleared state.
+        /// </summary>
 		protected override void Reset()
 		{
 			Orientation = ContainerOrientation.Vertical;
-
 			base.Reset();
 		}
 	}
