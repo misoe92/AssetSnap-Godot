@@ -20,27 +20,29 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#if TOOLS
 using System;
-using AssetSnap.Front.Nodes;
-using AssetSnap.Library;
 using AssetSnap.Waypoint;
-using Godot;
 
 namespace AssetSnap.Static
 {
+	/// <summary>
+	/// Static class for handling waypoint-related operations.
+	/// </summary>
 	public static class WaypointsStatic
 	{
-		/*
-		** Checks if any waypoints exists
-		**
-		** @return bool
-		*/
+		/// <summary>
+		/// Checks if any waypoints exist.
+		/// </summary>
+		/// <returns>True if any waypoints exist, false otherwise.</returns>
 		public static bool HasAnyWaypoints()
 		{
 			return GlobalExplorer.GetInstance().Waypoints.HasAnyWaypoints();
 		}
 		
+		/// <summary>
+        /// Performs an action on each waypoint.
+        /// </summary>
+        /// <param name="action">The action to perform on each waypoint.</param>
 		public static void Each( Action<BaseWaypoint> action )
 		{
 			GlobalExplorer.GetInstance().Waypoints.WaypointList.Each(
@@ -53,4 +55,3 @@ namespace AssetSnap.Static
 		}
 	}
 }
-#endif

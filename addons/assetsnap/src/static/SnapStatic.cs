@@ -20,41 +20,42 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#if TOOLS
 using Godot;
 
 namespace AssetSnap.Static
 {
+	/// <summary>
+    /// Utility class for handling snapping functionality.
+    /// </summary>
 	public static class SnapStatic
 	{
-		/*
-		** Checks if snapping is possible with a set of cordinates
-		** and on a given layer.
-		**
-		** @return bool
-		*/
+		/// <summary>
+        /// Checks if snapping is possible with a set of coordinates and on a given layer.
+        /// </summary>
+        /// <param name="Coordinates">The coordinates to check for snapping.</param>
+        /// <param name="Layer">The layer to check for snapping.</param>
+        /// <returns>True if snapping is possible, false otherwise.</returns>
 		public static bool CanSnap( Vector3 Coordinates, int Layer ) 
 		{
 			return GlobalExplorer.GetInstance().Snappable.CanSnap(Coordinates, Layer);
 		}
 		
-		/*
-		** Snaps a set of cordinates on a giving layer
-		** to each other
-		**
-		** @return Vector3
-		*/
+		/// <summary>
+        /// Snaps a set of coordinates on a giving layer to each other.
+        /// </summary>
+        /// <param name="Coordinates">The coordinates to snap.</param>
+        /// <param name="aabb">The axis-aligned bounding box to snap to.</param>
+        /// <param name="Layer">The layer to snap to.</param>
+        /// <returns>The snapped coordinates.</returns>
 		public static Vector3 Snap( Vector3 Coordinates, Aabb aabb, int Layer ) 
 		{
 			return GlobalExplorer.GetInstance().Snappable.Snap(Coordinates, aabb, Layer);
 		}
 		
-		/*
-		** Checks if any snapping is enabled on the x
-		** axis
-		**
-		** @return bool
-		*/
+		/// <summary>
+        /// Checks if snapping is enabled on the x-axis.
+        /// </summary>
+        /// <returns>True if snapping is enabled on the x-axis, false otherwise.</returns>
 		public static bool IsSnapX()
 		{
 			if( null == GlobalExplorer.GetInstance() ) 
@@ -70,12 +71,10 @@ namespace AssetSnap.Static
 			return true;
 		}
 
-		/*
-		** Checks if any snapping is enabled on the z
-		** axis
-		**
-		** @return bool
-		*/
+		/// <summary>
+        /// Checks if snapping is enabled on the z-axis.
+        /// </summary>
+        /// <returns>True if snapping is enabled on the z-axis, false otherwise.</returns>
 		public static bool IsSnapZ()
 		{
 			if( null == GlobalExplorer.GetInstance() ) 
@@ -91,11 +90,10 @@ namespace AssetSnap.Static
 			return true;
 		}
 		
-		/*
-		** Fetches the snap offset on the x axis
-		**
-		** @return float
-		*/
+		/// <summary>
+        /// Fetches the snap offset on the x-axis.
+        /// </summary>
+        /// <returns>The snap offset on the x-axis.</returns>
 		public static float GetObjectSnapOffsetX()
 		{			
 			if( null == GlobalExplorer.GetInstance() ) 
@@ -106,11 +104,10 @@ namespace AssetSnap.Static
 			return GlobalExplorer.GetInstance().States.SnapToObjectOffsetXValue;
 		}
 			
-		/*
-		** Fetches the snap offset on the z axis
-		**
-		** @return float
-		*/
+		/// <summary>
+        /// Fetches the snap offset on the z-axis.
+        /// </summary>
+        /// <returns>The snap offset on the z-axis.</returns>
 		public static float GetObjectSnapOffsetZ()
 		{		
 			if( null == GlobalExplorer.GetInstance() ) 
@@ -121,12 +118,10 @@ namespace AssetSnap.Static
 			return GlobalExplorer.GetInstance().States.SnapToObjectOffsetZValue;
 		}
 		
-		/*
-		** Checks if object snap offset on the x axis
-		** is enabled
-		**
-		** @return bool
-		*/
+		/// <summary>
+        /// Checks if object snap offset on the x-axis is enabled.
+        /// </summary>
+        /// <returns>True if object snap offset on the x-axis is enabled, false otherwise.</returns>
 		public static bool HasObjectSnapOffsetX()
 		{			
 			if( null == GlobalExplorer.GetInstance() ) 
@@ -142,12 +137,10 @@ namespace AssetSnap.Static
 			return true;
 		}
 		
-		/*
-		** Checks if object snap offset on the z axis
-		** is enabled
-		**
-		** @return bool
-		*/
+		/// <summary>
+        /// Checks if object snap offset on the z-axis is enabled.
+        /// </summary>
+        /// <returns>True if object snap offset on the z-axis is enabled, false otherwise.</returns>
 		public static bool HasObjectSnapOffsetZ()
 		{	
 			if( null == GlobalExplorer.GetInstance() ) 
@@ -164,4 +157,3 @@ namespace AssetSnap.Static
 		}
 	}
 }
-#endif
