@@ -22,13 +22,25 @@
 
 namespace AssetSnap.States
 {
+	/// <summary>
+	/// Utility class for accessing and modifying global states.
+	/// </summary>
 	public static class StatesUtils
 	{
+		/// <summary>
+		/// Retrieves the global states instance.
+		/// </summary>
+		/// <returns>The global states instance.</returns>
 		public static GlobalStates Get()
 		{
 			return GlobalExplorer.GetInstance().States;
 		}
 		
+		/// <summary>
+        /// Sets the load state of a specified key.
+        /// </summary>
+        /// <param name="key">The key of the state to set.</param>
+        /// <param name="value">The value to set the state to.</param>
 		public static void SetLoad( string key, bool value ) 
 		{
 			string FullKey = "Is" + key + "Loaded";
