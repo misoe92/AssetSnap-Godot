@@ -24,12 +24,19 @@
 using Godot;
 namespace AssetSnap.Component
 {
+	/// <summary>
+	/// A partial class representing a panel container trait, derived from Base.
+	/// </summary>
 	[Tool]
 	public partial class Panelable : Trait.Base
 	{
 		/*
 		** Enums
 		*/
+		
+		/// <summary>
+		/// Enumeration of panel types.
+		/// </summary>
 		public enum PanelType
 		{
 			DefaultPanelContainer,
@@ -37,9 +44,7 @@ namespace AssetSnap.Component
 			LightPanelContainer
 		}
 
-		/*
-		** Private
-		*/
+		// Private variables
 		private new Godot.Collections.Dictionary<string, int> Margin = new()
 		{
 			{"left", 0},
@@ -58,24 +63,24 @@ namespace AssetSnap.Component
 		private MarginContainer _MarginContainer;
 		private MarginContainer _PaddingContainer;
 
-		/*
-		** Public methods
-		*/
+		/// <summary>
+		/// Default constructor for Panelable.
+		/// </summary>
 		public Panelable()
 		{
 			Name = "Panelable";
 			TypeString = GetType().ToString();
 		}
 
-		/*
-		** Instantiate an instance of the trait
-		**
-		** @return Panelable
-		*/
+		/// <summary>
+		/// Instantiate an instance of the trait.
+		/// </summary>
+		/// <returns>Returns the instantiated Panelable.</returns>
 		public Panelable Instantiate()
 		{
 			base._Instantiate();
 
+			// Create MarginContainer
 			_MarginContainer = new()
 			{
 				Name = "PanelMarginContainer",
@@ -84,11 +89,13 @@ namespace AssetSnap.Component
 				Visible = Visible,
 			};
 
+			// Apply margin to MarginContainer
 			foreach ((string side, int value) in Margin)
 			{
 				_MarginContainer.AddThemeConstantOverride("margin_" + side, value);
 			}
 
+			// Create PanelContainer
 			PanelContainer WorkingPanel = new()
 			{
 				Name = TraitName,
@@ -96,7 +103,8 @@ namespace AssetSnap.Component
 				SizeFlagsHorizontal = SizeFlagsHorizontal,
 				SizeFlagsVertical = SizeFlagsVertical,
 			};
-
+			
+			// Create PaddingContainer
 			_PaddingContainer = new()
 			{
 				Name = "PanelPaddingContainer",
@@ -104,14 +112,17 @@ namespace AssetSnap.Component
 				SizeFlagsVertical = SizeFlagsVertical,
 			};
 
+			// Apply padding to PaddingContainer
 			foreach ((string side, int value) in Padding)
 			{
 				_PaddingContainer.AddThemeConstantOverride("margin_" + side, value);
 			}
 
+			// Add children to appropriate parents
 			WorkingPanel.AddChild(_PaddingContainer);
 			_MarginContainer.AddChild(WorkingPanel);
 
+			// Update dependencies and instances
 			Dependencies[TraitName + "_WorkingNode"] = WorkingPanel;
 			Dependencies[TraitName + "_PanelPaddingContainer"] = _PaddingContainer;
 			Dependencies[TraitName + "_MarginContainer"] = _MarginContainer;
@@ -119,8 +130,7 @@ namespace AssetSnap.Component
 			Plugin.Singleton.traitGlobal.AddInstance(Iteration, WorkingPanel, OwnerName, TypeString, Dependencies);
 			Plugin.Singleton.traitGlobal.AddName(Iteration, TraitName, OwnerName, TypeString);
 
-			// GD.Print(Iteration);
-
+			// Reset and update iteration
 			Reset();
 			Iteration += 1;
 			Dependencies = new();
@@ -128,13 +138,11 @@ namespace AssetSnap.Component
 			return this;
 		}
 
-		/*
-		** Selects an placed panel container
-		** in the nodes array by index
-		**
-		** @param int index
-		** @return Panelable
-		*/
+		/// <summary>
+        /// Selects a placed panel container in the nodes array by index.
+        /// </summary>
+        /// <param name="index">The index of the panel container.</param>
+        /// <returns>Returns the modified Panelable.</returns>
 		public Panelable Select(int index)
 		{
 			base._Select(index);
@@ -148,13 +156,11 @@ namespace AssetSnap.Component
 			return this;
 		}
 
-		/*
-		** Selects an placed panel container
-		** in the nodes array by name
-		**
-		** @param string name
-		** @return Panelable
-		*/
+		/// <summary>
+        /// Selects a placed panel container in the nodes array by name.
+        /// </summary>
+        /// <param name="name">The name of the panel container.</param>
+        /// <returns>Returns the modified Panelable.</returns>
 		public Panelable SelectByName(string name)
 		{
 			foreach (Button button in Nodes)
@@ -169,13 +175,10 @@ namespace AssetSnap.Component
 			return this;
 		}
 
-		/*
-		** Adds the currently chosen panel
-		** container to a specified container
-		**
-		** @param Node Container
-		** @return void
-		*/
+		/// <summary>
+        /// Adds the currently chosen panel container to a specified container.
+        /// </summary>
+        /// <param name="Container">The container to which to add the panel container.</param>
 		public void AddToContainer(Node Container)
 		{
 			if (false == Dependencies.ContainsKey(TraitName + "_MarginContainer"))
@@ -189,16 +192,11 @@ namespace AssetSnap.Component
 			base._AddToContainer(Container, Dependencies[TraitName + "_MarginContainer"].As<MarginContainer>());
 		}
 
-		/*
-		** Setter Methods
-		*/
-
-		/*
-		** Sets the name of the current panel container
-		**
-		** @param string text
-		** @return Panelable
-		*/
+		/// <summary>
+        /// Sets the name of the current panel container.
+        /// </summary>
+        /// <param name="text">The name to set.</param>
+        /// <returns>Returns the modified Panelable.</returns>
 		public Panelable SetName(string text)
 		{
 			base._SetName(text);
@@ -206,27 +204,22 @@ namespace AssetSnap.Component
 			return this;
 		}
 
-		/*
-		** Sets the theme type of the panel continer,
-		** which lays out a set of specified rules
-		** from the theme that the panel container follows
-		**
-		** @param PanelType type
-		** @return Panelable
-		*/
+		/// <summary>
+        /// Sets the theme type of the panel container.
+        /// </summary>
+        /// <param name="type">The type of panel container to set.</param>
+        /// <returns>Returns the modified Panelable.</returns>
 		public Panelable SetType(PanelType type)
 		{
 			Type = type;
 			return this;
 		}
 
-		/*
-		** Sets the visible state
-		** of the current panel container
-		**
-		** @param bool state
-		** @return Panelable
-		*/
+		/// <summary>
+        /// Sets the visible state of the current panel container.
+        /// </summary>
+        /// <param name="state">The visibility state to set.</param>
+        /// <returns>Returns the modified Panelable.</returns>
 		public Panelable SetVisible(bool state)
 		{
 			base._SetVisible(state);
@@ -242,13 +235,11 @@ namespace AssetSnap.Component
 			return this;
 		}
 
-		/*
-		** Sets the horizontal size flag, which controls the x
-		** axis, and how it should act.
-		**
-		** @param Control.SizeFlags flag
-		** @return Panelable
-		*/
+		/// <summary>
+        /// Sets the horizontal size flag of the panel container.
+        /// </summary>
+        /// <param name="flag">The size flag to set.</param>
+        /// <returns>Returns the modified Panelable.</returns>
 		public override Panelable SetHorizontalSizeFlags(Control.SizeFlags flag)
 		{
 			base.SetHorizontalSizeFlags(flag);
@@ -256,13 +247,11 @@ namespace AssetSnap.Component
 			return this;
 		}
 
-		/*
-		** Sets the horizontal size flag, which controls the y
-		** axis, and how it should act.
-		**
-		** @param Control.SizeFlags flag
-		** @return Panelable
-		*/
+		/// <summary>
+        /// Sets the vertical size flag of the panel container.
+        /// </summary>
+        /// <param name="flag">The size flag to set.</param>
+        /// <returns>Returns the modified Panelable.</returns>
 		public override Panelable SetVerticalSizeFlags(Control.SizeFlags flag)
 		{
 			base.SetVerticalSizeFlags(flag);
@@ -270,14 +259,12 @@ namespace AssetSnap.Component
 			return this;
 		}
 
-		/*
-		** Sets margin values for the 
-		** currently chosen panel container
-		**
-		** @param int value
-		** @param string side
-		** @return Panelable
-		*/
+		/// <summary>
+        /// Sets margin values for the currently chosen panel container.
+        /// </summary>
+        /// <param name="value">The margin value to set.</param>
+        /// <param name="side">The side for which to set the margin.</param>
+        /// <returns>Returns the modified Panelable.</returns>
 		public Panelable SetMargin(int value, string side = "")
 		{
 			if (side == "")
@@ -295,14 +282,12 @@ namespace AssetSnap.Component
 			return this;
 		}
 
-		/*
-		** Sets padding values for the 
-		** currently chosen panel container
-		**
-		** @param int value
-		** @param string side
-		** @return Panelable
-		*/
+		/// <summary>
+		/// Sets padding values for the currently chosen panel container.
+		/// </summary>
+		/// <param name="value">The padding value to set.</param>
+		/// <param name="side">The side for which to set the padding.</param>
+		/// <returns>Returns the modified Panelable.</returns>
 		public Panelable SetPadding(int value, string side)
 		{
 			base._SetPadding(value, side);
@@ -310,10 +295,10 @@ namespace AssetSnap.Component
 			return this;
 		}
 
-		/*
-		** Getter Methods
-		*/
-
+		/// <summary>
+        /// Returns the inner container of the panel container.
+        /// </summary>
+        /// <returns>Returns the inner container.</returns>
 		public MarginContainer GetContainer()
 		{
 			if (false == Dependencies.ContainsKey(TraitName + "_PanelPaddingContainer"))
@@ -324,16 +309,9 @@ namespace AssetSnap.Component
 			return Dependencies[TraitName + "_PanelPaddingContainer"].As<MarginContainer>();
 		}
 
-		/*
-		** Private
-		*/
-
-		/*
-		** Resets the trait to
-		** a cleared state
-		**
-		** @return void
-		*/
+		/// <summary>
+        /// Resets the trait to a cleared state.
+        /// </summary>
 		private void Reset()
 		{
 			_MarginContainer = null;
