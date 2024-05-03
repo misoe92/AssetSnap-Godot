@@ -29,6 +29,9 @@ namespace AssetSnap.Waypoint
 	using AssetSnap.Static;
 	using Godot;
 
+	/// <summary>
+	/// Provides functionality for managing waypoints in the scene.
+	/// </summary>
 	public partial class Base
 	{
 		private Node _ParentContainer;
@@ -36,6 +39,10 @@ namespace AssetSnap.Waypoint
 		public float SnapDistance = 1.0f;
 		public Node3D WorkingNode;
 		private static Base _Instance;
+		
+		/// <summary>
+		/// Gets the singleton instance of the waypoint system.
+		/// </summary>
 		public static Base Singleton
 		{
 			get
@@ -49,21 +56,21 @@ namespace AssetSnap.Waypoint
 			}
 		}
 
+		/// <summary>
+		/// Initializes the waypoint system.
+		/// </summary>
 		public void Initialize()
 		{
 			WaypointList = new();
 		}
 
-		/*
-		** Spawns a model and also creates the collisions for said model
-		** if defined in settings
-		**
-		** @param Node3D ModelInstance
-		** @param Vector3 Origin
-		** @param Vector3 Rotation
-		** @param Vector3 Scale
-		** @return Node3D
-		*/
+		/// <summary>
+		/// Spawns a model and creates the collisions for said model if defined in settings.
+		/// </summary>
+		/// <param name="ModelInstance">The model instance to spawn.</param>
+		/// <param name="Origin">The origin position of the model.</param>
+		/// <param name="Rotation">The rotation of the model.</param>
+		/// <param name="Scale">The scale of the model.</param>
 		public void Spawn(Node3D ModelInstance, Vector3 Origin, Vector3 Rotation, Vector3 Scale)
 		{
 			Node3D _model = null;
@@ -132,22 +139,44 @@ namespace AssetSnap.Waypoint
 			}
 		}
 
+		/// <summary>
+		/// Checks if the current placing mode is set to Simple.
+		/// </summary>
+		/// <returns>True if the placing mode is Simple, otherwise false.</returns>
 		private bool IsSimpleMode()
 		{
 			return StatesUtils.Get().PlacingType == GlobalStates.PlacingTypeEnum.Simple;
 		}
 
+		/// <summary>
+		/// Checks if the current placing mode is set to Optimized.
+		/// </summary>
+		/// <returns>True if the placing mode is Optimized, otherwise false.</returns>
 		private bool IsOptimizedMode()
 		{
 			return StatesUtils.Get().PlacingType == GlobalStates.PlacingTypeEnum.Optimized;
 		}
 
+		/// <summary>
+		/// Spawns a model using the simple placement method.
+		/// </summary>
+		/// <param name="model">The model to spawn.</param>
+		/// <param name="Origin">The origin position of the model.</param>
+		/// <param name="Rotation">The rotation of the model.</param>
+		/// <param name="Scale">The scale of the model.</param>
 		private void SimpleSpawn(Node3D model, Vector3 Origin, Vector3 Rotation, Vector3 Scale)
 		{
 			_SpawnNode(model);
 			_ConfigureNode(model, Origin, Rotation, Scale);
 		}
 
+		/// <summary>
+		/// Spawns a model using the optimized placement method.
+		/// </summary>
+		/// <param name="model">The model to spawn.</param>
+		/// <param name="Origin">The origin position of the model.</param>
+		/// <param name="Rotation">The rotation of the model.</param>
+		/// <param name="Scale">The scale of the model.</param>
 		private void OptimizedSpawn(Node3D model, Vector3 Origin, Vector3 Rotation, Vector3 Scale)
 		{
 			if (model is AsMeshInstance3D meshInstance3D)
@@ -195,6 +224,14 @@ namespace AssetSnap.Waypoint
 			}
 		}
 
+		/// <summary>
+		/// Handles the optimized spawning of a single mesh instance.
+		/// </summary>
+		/// <param name="meshInstance3D">The mesh instance to spawn.</param>
+		/// <param name="Origin">The origin position of the mesh instance.</param>
+		/// <param name="Rotation">The rotation of the mesh instance.</param>
+		/// <param name="Scale">The scale of the mesh instance.</param>
+		/// <returns>The instance ID of the spawned mesh instance.</returns>
 		private int _OptimizedSpawn(AsMeshInstance3D meshInstance3D, Vector3 Origin, Vector3 Rotation, Vector3 Scale)
 		{
 			Node3D AsChunks = null;
@@ -333,14 +370,11 @@ namespace AssetSnap.Waypoint
 			return 0;
 		}
 
-		/*
-		** Removes a waypoint given it's ModelInstance
-		** and it's origin x,y,z point
-		**
-		** @param MeshInstance3D ModelInstance
-		** @param Vector3 Origin
-		** @return void
-		*/
+		/// <summary>
+		/// Removes a waypoint given its ModelInstance and its origin point.
+		/// </summary>
+		/// <param name="ModelInstance">The model instance to remove.</param>
+		/// <param name="Origin">The origin position of the waypoint.</param>
 		public void Remove(Node ModelInstance, Vector3 Origin)
 		{
 			if (null == WaypointList)
@@ -354,15 +388,13 @@ namespace AssetSnap.Waypoint
 			}
 		}
 
-		/*
-		** Registers a new waypoint
-		**
-		** @param Node3D node
-		** @param Vector3 Origin
-		** @param Vector3 Rot
-		** @param Vector3 Scale
-		** @return void
-		*/
+		/// <summary>
+		/// Registers a new waypoint.
+		/// </summary>
+		/// <param name="node">The node to register.</param>
+		/// <param name="Origin">The origin position of the node.</param>
+		/// <param name="Rot">The rotation of the node.</param>
+		/// <param name="Scale">The scale of the node.</param>
 		public void Register(Node3D node, Vector3 Origin, Vector3 Rot, Vector3 Scale)
 		{
 			if (null == WaypointList)
@@ -373,12 +405,11 @@ namespace AssetSnap.Waypoint
 			WaypointList.Add(node, Origin, Rot, Scale);
 		}
 
-		/*
-		** Checks if a node is already registered
-		**
-		** @param Node3D node
-		** @return bool
-		*/
+		/// <summary>
+		/// Checks if a node is already registered as a waypoint.
+		/// </summary>
+		/// <param name="node">The node to check.</param>
+		/// <returns>True if the node is registered, otherwise false.</returns>
 		public bool Has(Node3D node)
 		{
 			if (null == WaypointList)
@@ -388,14 +419,12 @@ namespace AssetSnap.Waypoint
 
 			return WaypointList.Has(node);
 		}
-		/*
-		** Updates the scale value on a waypoint
-		** positioned on a given origin x,y,z point
-		**
-		** @param Vector3 Origin
-		** @param Vector3 Scale
-		** @return void
-		*/
+		
+		/// <summary>
+		/// Updates the scale value on a waypoint positioned on a given origin point.
+		/// </summary>
+		/// <param name="Origin">The origin position of the waypoint.</param>
+		/// <param name="Scale">The new scale value.</param>
 		public void UpdateScaleOnPoint(Vector3 Origin, Vector3 Scale)
 		{
 			if (null == WaypointList)
@@ -406,23 +435,19 @@ namespace AssetSnap.Waypoint
 			WaypointList.Update("Scale", Scale, Origin);
 		}
 
-		/*
-		** Fetches the node that is currently
-		** being worked on
-		**
-		** @return Node3D
-		*/
+		/// <summary>
+		/// Retrieves the node that is currently being worked on.
+		/// </summary>
+		/// <returns>The working node.</returns>
 		public Node3D GetWorkingNode()
 		{
 			return WorkingNode;
 		}
 
-		/*
-		** Spawns the node
-		**
-		** @param Node3D _model
-		** @return void
-		*/
+		/// <summary>
+		/// Spawns the specified Node3D and sets its owner and parent container if necessary.
+		/// </summary>
+		/// <param name="_model">The Node3D to spawn.</param>
 		private void _SpawnNode(Node3D _model)
 		{
 			if (_model.GetParent() != null)
@@ -494,21 +519,22 @@ namespace AssetSnap.Waypoint
 			_model.NotifyPropertyListChanged();
 		}
 
+		/// <summary>
+		/// Sets the parent container for spawning nodes.
+		/// </summary>
+		/// <param name="Container">The parent container node.</param>
 		public void SetParentContainer(Node Container)
 		{
 			_ParentContainer = Container;
 		}
 
-		/*
-		** Configures the node and it's
-		** Transform, scale etc.
-		**
-		** @param Node3D _model
-		** @param Vector3 Origin
-		** @param Vector3 Rotation
-		** @param Vector3 Scale
-		** @return void
-		*/
+		/// <summary>
+		/// Configures the node's transform, scale, etc.
+		/// </summary>
+		/// <param name="_model">The node to configure.</param>
+		/// <param name="Origin">The origin position of the node.</param>
+		/// <param name="Rotation">The rotation of the node.</param>
+		/// <param name="Scale">The scale of the node.</param>
 		private void _ConfigureNode(Node3D _model, Vector3 Origin, Vector3 Rotation, Vector3 Scale)
 		{
 			Transform3D _Trans = _model.Transform;
@@ -615,11 +641,10 @@ namespace AssetSnap.Waypoint
 			}
 		}
 
-		/*
-		** Checks if any waypoints is available
-		**
-		** @return bool
-		*/
+		/// <summary>
+		/// Checks if any waypoints are available.
+		/// </summary>
+		/// <returns>True if there are any waypoints, otherwise false.</returns>
 		public bool HasAnyWaypoints()
 		{
 			return false == WaypointList.IsEmpty();
