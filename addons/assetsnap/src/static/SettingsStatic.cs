@@ -20,95 +20,87 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#if TOOLS
-using AssetSnap.Library;
-
 namespace AssetSnap.Static
 {
+	/// <summary>
+	/// Utility class for handling settings.
+	/// </summary>
 	public static class SettingsStatic
 	{
-		/*
-		** Checks if new children should be pushed to the current scene
-		**
-		** @return bool
-		*/
+		/// <summary>
+		/// Checks if new children should be pushed to the current scene.
+		/// </summary>
+		/// <returns>True if new children should be pushed to the current scene; otherwise, false.</returns>
 		public static bool ShouldPushToScene()
 		{
 			bool PushToScene = GlobalExplorer.GetInstance().Settings.GetKey("push_to_scene").As<bool>();
 			return PushToScene;
 		}
 
-		/*
-		** Checks if collisions should be added
-		**
-		** @return bool
-		*/
+		/// <summary>
+		/// Checks if collisions should be added.
+		/// </summary>
+		/// <returns>True if collisions should be added; otherwise, false.</returns>
 		public static bool ShouldAddCollision()
 		{
 			bool AddCollisions = GlobalExplorer.GetInstance().Settings.GetKey("add_collisions").As<bool>();
 			return AddCollisions;
 		}
 
-		/*
-		** Checks if Multi drop is allowed
-		**
-		** @returns bool
-		*/
+		/// <summary>
+		/// Checks if Multi drop is allowed.
+		/// </summary>
+		/// <returns>True if Multi drop is allowed; otherwise, false.</returns>
 		public static bool CanMultiDrop()
 		{
 			GlobalExplorer _GlobalExplorer = GlobalExplorer.GetInstance();
 			return _GlobalExplorer.Settings.GetKey("allow_multi_drop").As<bool>();
 		}
 
-		/*
-		** Checks if Multi drop is allowed
-		**
-		** @returns bool
-		*/
+		/// <summary>
+		/// Checks if model transparency is active.
+		/// </summary>
+		/// <returns>True if model transparency is active; otherwise, false.</returns>
 		public static bool ModelTransparencyActive()
 		{
 			GlobalExplorer _GlobalExplorer = GlobalExplorer.GetInstance();
 			return _GlobalExplorer.Settings.GetKey("enable_model_spawn_in").As<bool>();
 		}
 
-		/*
-		** Checks if Multi drop is allowed
-		**
-		** @returns bool
-		*/
+		/// <summary>
+		/// Gets the transparency level.
+		/// </summary>
+		/// <returns>The transparency level as a float value.</returns>
 		public static float TransparencyLevel()
 		{
 			GlobalExplorer _GlobalExplorer = GlobalExplorer.GetInstance();
 			return _GlobalExplorer.Settings.GetKey("initial_model_spawn_in_level").As<float>();
 		}
 
-		/*
-		** Checks if Multi drop is allowed
-		**
-		** @returns bool
-		*/
+		/// <summary>
+		/// Gets the transparency fade duration.
+		/// </summary>
+		/// <returns>The transparency fade duration as a float value.</returns>
 		public static float TransparencyFadeDuration()
 		{
 			GlobalExplorer _GlobalExplorer = GlobalExplorer.GetInstance();
 			return _GlobalExplorer.Settings.GetKey("model_spawn_in_duration").As<float>();
 		}
 
-		/*
-		** Checks if Multi drop is allowed
-		**
-		** @returns bool
-		*/
+		/// <summary>
+		/// Gets the preview image size.
+		/// </summary>
+		/// <returns>The preview image size as an integer value.</returns>
 		public static int PreviewImageSize()
 		{
 			GlobalExplorer _GlobalExplorer = GlobalExplorer.GetInstance();
 			return _GlobalExplorer.Settings.GetKey("model_preview_size").As<int>();
 		}
 
-		/*
-		** Checks if a asset should be focused after placement
-		**
-		** @return bool
-		*/
+		/// <summary>
+		/// Checks if an asset should be focused after placement.
+		/// </summary>
+		/// <returns>True if an asset should be focused after placement; otherwise, false.</returns>
 		public static bool ShouldFocusAsset()
 		{
 			bool value = GlobalExplorer.GetInstance().Settings.GetKey("focus_placed_asset").As<bool>();
@@ -121,6 +113,10 @@ namespace AssetSnap.Static
 			return false;
 		}
 		
+		/// <summary>
+        /// Checks if AS overlay should be used.
+        /// </summary>
+        /// <returns>True if AS overlay should be used; otherwise, false.</returns>
 		public static bool ShouldUseASOverlay()
 		{
 			bool value = GlobalExplorer.GetInstance().Settings.GetKey("use_as_overlay").As<bool>();
@@ -134,4 +130,3 @@ namespace AssetSnap.Static
 		}
 	}
 }
-#endif
