@@ -20,24 +20,37 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using AssetSnap.Component;
+using Godot;
+
 namespace AssetSnap.Front.Components.Groups.Builder
 {
-	using AssetSnap.Component;
-	using Godot;
-
+	/// <summary>
+	/// A component for editing the title of a group in the builder interface.
+	/// </summary>
 	[Tool]
 	public partial class EditorTitleInput : LibraryComponent
 	{
+		/// <summary>
+		/// Initializes a new instance of the <see cref="EditorTitleInput"/> class.
+		/// </summary>
 		public EditorTitleInput()
 		{
 			Name = "GroupBuilderEditorTitleInput";
-
 			SizeFlagsVertical = SizeFlags.ShrinkCenter;
 			//_include = false;
 		}
 
+		/// <summary>
+		/// The input field for editing the title.
+		/// </summary>
 		public LineEdit _InputField;
 
+		/// <summary>
+		/// Initializes the component.
+		/// </summary>
 		public override void Initialize()
 		{
 			base.Initialize();
@@ -55,6 +68,9 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			AddChild(_InputField);
 		}
 
+		/// <summary>
+		/// Updates the input field with the name of the current group.
+		/// </summary>
 		public void Update()
 		{
 			if (null == _GlobalExplorer.GroupBuilder._Editor.Group || false == IsInstanceValid(_GlobalExplorer.GroupBuilder._Editor.Group))
@@ -66,6 +82,10 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			_InputField.Text = _GlobalExplorer.GroupBuilder._Editor.Group.Name;
 		}
 
+		/// <summary>
+        /// Handles the event when the input field text changes.
+        /// </summary>
+        /// <param name="text">The new text entered in the input field.</param>
 		private void _OnMaybeUpdateGroupName(string text)
 		{
 			if (null == _GlobalExplorer.GroupBuilder._Editor.Group)
@@ -82,3 +102,5 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		}
 	}
 }
+
+#endif

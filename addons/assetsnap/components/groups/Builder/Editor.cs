@@ -19,17 +19,26 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+
+#if TOOLS
+
+using System.Collections.Generic;
+using AssetSnap.Component;
+using AssetSnap.Front.Nodes;
+using AssetSnap.States;
+using Godot;
+
 namespace AssetSnap.Front.Components.Groups.Builder
 {
-	using System.Collections.Generic;
-	using AssetSnap.Component;
-	using AssetSnap.Front.Nodes;
-	using AssetSnap.States;
-	using Godot;
-
+	/// <summary>
+	/// Editor class for managing group building functionality.
+	/// </summary>
 	[Tool]
 	public partial class Editor : LibraryComponent
 	{
+		/// <summary>
+		/// Constructor for the Editor class.
+		/// </summary>
 		public Editor()
 		{
 			// _include = false;
@@ -38,6 +47,9 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
 		}
 
+		/// <summary>
+		/// Gets or sets the group resource.
+		/// </summary>
 		public GroupResource Group
 		{
 			get => _Group;
@@ -56,6 +68,9 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			}
 		}
 
+		/// <summary>
+		/// Gets or sets the path of the group.
+		/// </summary>
 		public string GroupPath
 		{
 			get => _GroupPath;
@@ -87,6 +102,9 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		private GroupResource _Group;
 		private string _GroupPath = "";
 
+		/// <summary>
+		/// Initializes the editor.
+		/// </summary>
 		public override void Initialize()
 		{
 			base.Initialize();
@@ -97,6 +115,9 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			_SetupGroupOptions();
 		}
 
+		/// <summary>
+		/// Updates the editor.
+		/// </summary>
 		public void Update()
 		{
 			Topbar.Update();
@@ -120,12 +141,19 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			GroupOptions._UpdateGroupOptions();
 		}
 
+		/// <summary>
+		/// Opens the group options.
+		/// </summary>
 		public void OpenGroupOptions()
 		{
 			GroupOptions.DoShow();
 			Listing.DoHide();
 		}
 
+		/// <summary>
+		/// Adds a mesh to the group.
+		/// </summary>
+		/// <param name="MeshPath">The path of the mesh to add.</param>
 		public void AddMeshToGroup(string MeshPath)
 		{
 			if (null == Group)
@@ -143,6 +171,13 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			Update();
 		}
 
+		/// <summary>
+		/// Updates the properties of a mesh in the group.
+		/// </summary>
+		/// <param name="index">The index of the mesh.</param>
+		/// <param name="Origin">The origin of the mesh.</param>
+		/// <param name="Rotation">The rotation of the mesh.</param>
+		/// <param name="Scale">The scale of the mesh.</param>
 		public void UpdateMeshInGroup(int index, Vector3 Origin, Vector3 Rotation, Vector3 Scale)
 		{
 			bool NameChanged = false;
@@ -172,6 +207,10 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			GlobalExplorer.GetInstance().GroupMainScreen.Update();
 		}
 
+		/// <summary>
+		/// Duplicates a mesh in the group.
+		/// </summary>
+		/// <param name="index">The index of the mesh to duplicate.</param>
 		public void DuplicateMeshInGroup(int index)
 		{
 			if (null == Group)
@@ -193,6 +232,11 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			Update();
 		}
 
+		/// <summary>
+		/// Removes a mesh from the group.
+		/// </summary>
+		/// <param name="index">The index of the mesh to remove.</param>
+		/// <param name="path">The path of the mesh to remove.</param>
 		public void RemoveMeshInGroup(int index, string path)
 		{
 			Godot.Collections.Dictionary<int, Vector3> OldOrigins = Group._Origins;
@@ -224,6 +268,9 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			Update();
 		}
 
+		/// <summary>
+		/// Updates the group properties.
+		/// </summary>
 		public void UpdateGroup()
 		{
 			bool NameChanged = false;
@@ -264,6 +311,12 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			}
 		}
 
+		/// <summary>
+		/// Sets an option for a group.
+		/// </summary>
+		/// <param name="index">The index of the option.</param>
+		/// <param name="key">The key of the option.</param>
+		/// <param name="value">The value of the option.</param>
 		public void SetOption(int index, string key, Variant value)
 		{
 			if (Group._Options.Count > index && Group._Options[index].ContainsKey(key))
@@ -281,11 +334,9 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			}
 		}
 
-		/*
-		** Set's up the list title
-		** 
-		** @return void
-		*/
+		/// <summary>
+		/// Sets up the topbar component.
+		/// </summary>
 		private void _SetupTopbar()
 		{
 			List<string> Components = new()
@@ -301,6 +352,9 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			}
 		}
 
+		/// <summary>
+		/// Sets up the group items list component.
+		/// </summary>
 		private void _SetupGroupItemsList()
 		{
 			List<string> Components = new()
@@ -316,6 +370,9 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			}
 		}
 
+		/// <summary>
+        /// Sets up the group options component.
+        /// </summary>
 		private void _SetupGroupOptions()
 		{
 			List<string> Components = new()
@@ -332,3 +389,5 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		}
 	}
 }
+
+#endif

@@ -20,26 +20,32 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using System.Collections.Generic;
+using System.IO;
+using AssetSnap.Component;
+using AssetSnap.Explorer;
+using AssetSnap.Front.Nodes;
+using AssetSnap.Helpers;
+using Godot;
+
 namespace AssetSnap.Front.Components.Groups.Builder
 {
-	using System.Collections.Generic;
-	using System.IO;
-	using AssetSnap.Component;
-	using AssetSnap.Explorer;
-	using AssetSnap.Front.Nodes;
-	using AssetSnap.Helpers;
-	using Godot;
-
+	/// <summary>
+	/// Partial class representing a sidebar component for building groups within a library.
+	/// </summary>
 	[Tool]
 	public partial class Sidebar : LibraryComponent
 	{
 		private readonly string TitleText = "Current Groups";
 		private readonly string ButtonText = "Create new Group";
-
 		private VBoxContainer GroupContainer;
-
 		private Godot.Collections.Dictionary<string, ListingEntry> _Instances;
 
+		/// <summary>
+		/// Constructor for the Sidebar class.
+		/// </summary>
 		public Sidebar()
 		{
 			Name = "GroupBuilderSidebar";
@@ -56,7 +62,10 @@ namespace AssetSnap.Front.Components.Groups.Builder
 
 			//_include = false;
 		}
-
+		
+		/// <summary>
+		/// Initializes the sidebar component.
+		/// </summary>
 		public override void Initialize()
 		{
 			base.Initialize();
@@ -66,6 +75,9 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			_SetupExistingGroupList();
 		}
 
+		/// <summary>
+		/// Shows the sidebar.
+		/// </summary>
 		public void DoShow()
 		{
 			List<string> OuterComponents = new()
@@ -82,6 +94,9 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			}
 		}
 
+		/// <summary>
+		/// Hides the sidebar.
+		/// </summary>
 		public void DoHide()
 		{
 			List<string> OuterComponents = new()
@@ -98,6 +113,9 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			}
 		}
 
+		/// <summary>
+		/// Updates the sidebar based on the current state.
+		/// </summary>
 		public void Update()
 		{
 			string path = ExplorerUtils.Get()
@@ -116,6 +134,10 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			}
 		}
 
+		/// <summary>
+		/// Focuses on a group given its file path.
+		/// </summary>
+		/// <param name="FilePath">The file path of the group to focus on.</param>
 		public void FocusGroup(string FilePath)
 		{
 			foreach ((string fp, ListingEntry _Instance) in _Instances)
@@ -131,6 +153,10 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			}
 		}
 
+		/// <summary>
+		/// Unfocuses a group given its file path.
+		/// </summary>
+		/// <param name="FilePath">The file path of the group to unfocus.</param>
 		public void UnFocusGroup(string FilePath)
 		{
 			foreach ((string fp, ListingEntry _Instance) in _Instances)
@@ -142,6 +168,10 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			}
 		}
 
+		/// <summary>
+		/// Selects a group given its file path.
+		/// </summary>
+		/// <param name="FilePath">The file path of the group to select.</param>
 		public void SelectGroup(string FilePath)
 		{
 			foreach ((string fp, ListingEntry _Instance) in _Instances)
@@ -153,6 +183,10 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			}
 		}
 
+		/// <summary>
+		/// Deselects a group given its file path.
+		/// </summary>
+		/// <param name="FilePath">The file path of the group to deselect.</param>
 		public void DeselectGroup(string FilePath)
 		{
 			foreach ((string fp, ListingEntry _Instance) in _Instances)
@@ -164,6 +198,9 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			}
 		}
 
+		/// <summary>
+		/// Sets up the top bar of the sidebar.
+		/// </summary>
 		private void _SetupTopbar()
 		{
 			Trait<Containerable>()
@@ -203,6 +240,9 @@ namespace AssetSnap.Front.Components.Groups.Builder
 				);
 		}
 
+		/// <summary>
+		/// Sets up the existing group list within the sidebar.
+		/// </summary>
 		private void _SetupExistingGroupList()
 		{
 			_Instances = new();
@@ -244,6 +284,9 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			}
 		}
 
+		/// <summary>
+		/// Refreshes the existing groups within the sidebar.
+		/// </summary>
 		public void RefreshExistingGroups()
 		{
 			Trait<Labelable>()
@@ -261,6 +304,10 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			_SetupExistingGroupList();
 		}
 
+		/// <summary>
+		/// Sets up the title of the group list.
+		/// </summary>
+		/// <param name="container">The container to add the title to.</param>
 		private void _SetupListTitle(Container container)
 		{
 			Trait<Labelable>()
@@ -277,6 +324,10 @@ namespace AssetSnap.Front.Components.Groups.Builder
 				);
 		}
 
+		/// <summary>
+		/// Sets up the button for creating a new group.
+		/// </summary>
+		/// <param name="container">The container to add the button to.</param>
 		private void _SetupNewGroupButton(Container container)
 		{
 			Trait<Containerable>()
@@ -304,6 +355,10 @@ namespace AssetSnap.Front.Components.Groups.Builder
 				);
 		}
 
+		/// <summary>
+		/// Gets the current group paths.
+		/// </summary>
+		/// <returns>An array of file paths for the current groups.</returns>
 		private string[] _GetCurrentGroupPaths()
 		{
 			// Directory path of the 'res://groups' folder
@@ -315,6 +370,11 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			return filePaths;
 		}
 
+		/// <summary>
+		/// Gets file paths in a directory.
+		/// </summary>
+		/// <param name="directoryPath">The path of the directory.</param>
+		/// <returns>An array of file paths in the directory.</returns>
 		private string[] _GetFilePathsInDirectory(string directoryPath)
 		{
 			// Initialize an empty list to store file paths
@@ -341,6 +401,9 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			return filePaths.ToArray();
 		}
 
+		/// <summary>
+		/// Sets up a new group.
+		/// </summary>
 		private void _SetupNewGroup()
 		{
 			string Name = "Group-" + UniqueHelper.GenerateId();
@@ -365,6 +428,10 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			RefreshExistingGroups();
 		}
 
+		/// <summary>
+		/// Removes a group given its file path.
+		/// </summary>
+		/// <param name="filepath">The file path of the group to remove.</param>
 		public void RemoveGroup(string filepath)
 		{
 			string absolutePath = ProjectSettings.GlobalizePath(filepath);
@@ -382,11 +449,18 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			}
 		}
 
+		/// <summary>
+        /// Clears the sidebar.
+        /// </summary>
+        /// <param name="debug">Whether to output debug information.</param>
 		public override void Clear(bool debug = false)
 		{
 			base.Clear(debug);
 		}
 
+		/// <summary>
+		/// Exits the tree and performs cleanup.
+		/// </summary>
 		public override void _ExitTree()
 		{
 			_Instances = null;
@@ -394,3 +468,5 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		}
 	}
 }
+
+#endif

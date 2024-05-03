@@ -20,26 +20,50 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using System.Collections.Generic;
+using AssetSnap.Component;
+using AssetSnap.Front.Components.Groups.Builder.GroupObject;
+using AssetSnap.Helpers;
+using Godot;
+
 namespace AssetSnap.Front.Components.Groups.Builder
 {
-	using System.Collections.Generic;
-	using AssetSnap.Component;
-	using AssetSnap.Front.Components.Groups.Builder.GroupObject;
-	using AssetSnap.Helpers;
-	using Godot;
-
+	/// <summary>
+	/// Represents an editor group object used in the GroupBuilder.
+	/// </summary>
 	[Tool]
 	public partial class EditorGroupObject : LibraryComponent
 	{
+		/// <summary>
+		/// Index of the group object.
+		/// </summary>
 		public int Index = 0;
+		
+		/// <summary>
+		/// Path of the group object.
+		/// </summary>
 		public string Path = "";
 
+		/// <summary>
+		/// Origin of the group object.
+		/// </summary>
 		public Vector3 Origin { get; set; }
 
+		/// <summary>
+		/// Rotation of the group object.
+		/// </summary>
 		public Vector3 ObjectRotation { get; set; }
 
+		/// <summary>
+		/// Scale of the group object.
+		/// </summary>
 		public Vector3 ObjectScale { get; set; }
 
+		/// <summary>
+		/// Options of the group object.
+		/// </summary>
 		public Godot.Collections.Dictionary<string, Variant> Options { get; set; }
 
 		/** Components **/
@@ -51,6 +75,9 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		public Scale _GroupBuilderEditorGroupObjectScale;
 		public Rotation _GroupBuilderEditorGroupObjectRotation;
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="EditorGroupObject"/> class.
+		/// </summary>
 		public EditorGroupObject()
 		{
 			Name = "GroupBuilderEditorGroupObject";
@@ -66,6 +93,9 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			//_include = false;
 		}
 
+		/// <summary>
+		/// Initializes the editor group object.
+		/// </summary>
 		public override void Initialize()
 		{
 			base.Initialize();
@@ -97,6 +127,11 @@ namespace AssetSnap.Front.Components.Groups.Builder
 
 		}
 
+		/// <summary>
+		/// Formats the path to the filename.
+		/// </summary>
+		/// <param name="path">The path to format.</param>
+		/// <returns>The formatted filename.</returns>
 		public string FormatPathToFilename(string path)
 		{
 			string filename = StringHelper.FilePathToFileName(path);
@@ -104,6 +139,11 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			return filename;
 		}
 
+		/// <summary>
+		/// Formats the path to the title.
+		/// </summary>
+		/// <param name="path">The path to format.</param>
+		/// <returns>The formatted title.</returns>
 		public string FormatPathToTitle(string path)
 		{
 			string filename = StringHelper.FilePathToFileName(path);
@@ -112,6 +152,10 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			return title;
 		}
 
+		/// <summary>
+		/// Initializes the origin container.
+		/// </summary>
+		/// <param name="RowInnerContainer">The inner container.</param>
 		private void _InitializeOriginContainer(Container RowInnerContainer)
 		{
 			List<string> Components = new()
@@ -130,6 +174,10 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			}
 		}
 
+		/// <summary>
+		/// Initializes the rotation container.
+		/// </summary>
+		/// <param name="RowInnerContainer">The inner container.</param>
 		private void _InitializeRotationContainer(Container RowInnerContainer)
 		{
 			List<string> Components = new()
@@ -148,6 +196,10 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			}
 		}
 
+		/// <summary>
+		/// Initializes the scale container.
+		/// </summary>
+		/// <param name="RowInnerContainer">The inner container.</param>
 		private void _InitializeScaleContainer(Container RowInnerContainer)
 		{
 			List<string> Components = new()
@@ -166,6 +218,10 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			}
 		}
 
+		/// <summary>
+		/// Initializes the actions container.
+		/// </summary>
+		/// <param name="RowInnerContainer">The inner container.</param>
 		private void _InitializeActionsContainer(Container RowInnerContainer)
 		{
 			List<string> Components = new()
@@ -183,6 +239,10 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			}
 		}
 
+		/// <summary>
+		/// Initializes the advanced container.
+		/// </summary>
+		/// <param name="RowInnerContainer">The inner container.</param>
 		private void _InitializeAdvancedContainer(Container RowInnerContainer)
 		{
 			List<string> Components = new()
@@ -199,12 +259,12 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			}
 		}
 
-		/*
-		** Initializes model preview image and
-		** it's container
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Initializes the preview container.
+		/// </summary>
+		/// <param name="FileName">Name of the file to preview.</param>
+		/// <param name="FolderPath">Path of the folder containing the file.</param>
+		/// <param name="BoxContainer">The container to add the preview to.</param>
 		private void _InitializePreviewContainer(string FileName, string FolderPath, Container BoxContainer)
 		{
 			Trait<Thumbnaileable>()
@@ -226,6 +286,10 @@ namespace AssetSnap.Front.Components.Groups.Builder
 				);
 		}
 
+		/// <summary>
+		/// Initializes the advanced container control.
+		/// </summary>
+		/// <param name="container">The container to add the control to.</param>
 		private void _InitializeAdvancedContainerControl(Container container)
 		{
 			List<string> Components = new()
@@ -244,6 +308,9 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			}
 		}
 
+		/// <summary>
+		/// Initializes the fields of the editor group object.
+		/// </summary>
 		private void _InitializeFields()
 		{
 			Trait<Panelable>()
@@ -272,6 +339,9 @@ namespace AssetSnap.Front.Components.Groups.Builder
 				.Instantiate();
 		}
 
+		/// <summary>
+        /// Finalizes the fields of the editor group object.
+        /// </summary>
 		private void _FinalizeFields()
 		{
 			Trait<Labelable>()
@@ -297,3 +367,5 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		}
 	}
 }
+
+#endif
