@@ -33,8 +33,8 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 428.0
 offset_top = 123.0
-offset_right = -917.0
-offset_bottom = -857.0
+offset_right = -1186.0
+offset_bottom = -821.0
 grow_horizontal = 2
 grow_vertical = 2
 size_flags_horizontal = 0
@@ -58,6 +58,7 @@ metadata/_edit_use_anchors_ = true
 layout_mode = 2
 theme_override_constants/separation = 0
 script = ExtResource("3_oumkg")
+Label = "Modifiers"
 SelectButton = NodePath("ButtonContainer/Button")
 Items = [NodePath("ArrayContainer"), NodePath("ScatterContainer")]
 
@@ -132,6 +133,7 @@ metadata/_edit_use_anchors_ = true
 layout_mode = 2
 theme_override_constants/separation = 0
 script = ExtResource("3_oumkg")
+Label = "Quick Actions"
 SelectButton = NodePath("ButtonContainer/Button")
 Items = [NodePath("None"), NodePath("Rotate"), NodePath("Scale")]
 
@@ -153,7 +155,7 @@ theme_override_styles/hover = SubResource("StyleBoxFlat_xpdw5")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_rurda")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_j7sy8")
 theme_override_styles/focus = SubResource("StyleBoxFlat_65ox5")
-text = "Quick Action"
+text = "Quick Actions"
 flat = true
 
 [node name="SeparatorContainer" type="MarginContainer" parent="HBoxContainer/QuickAction/SelectList"]
