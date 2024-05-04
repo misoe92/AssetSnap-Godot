@@ -28,19 +28,18 @@ using Godot;
 
 namespace AssetSnap.Settings
 {
-
 	public partial class BaseContainer : PanelContainer
 	{
+		public bool Initialized = false;
+		
 		private ScrollContainer _ScrollContainer;
 		private MarginContainer _MarginContainer;
 		private VBoxContainer _VBoxContainer;
 		private HBoxContainer _HBoxContainer;
-		private VBoxContainer SubContainerOne;
-		private VBoxContainer SubContainerTwo;
-		private VBoxContainer SubContainerThree;
-		private VBoxContainer SubContainerFour;
-
-		public bool Initialized = false;
+		private VBoxContainer _SubContainerOne;
+		private VBoxContainer _SubContainerTwo;
+		private VBoxContainer _SubContainerThree;
+		private VBoxContainer _SubContainerFour;
 
 		/// <summary>
 		/// Constructor for the BaseContainer class.
@@ -97,36 +96,36 @@ namespace AssetSnap.Settings
 				SizeFlagsHorizontal = Control.SizeFlags.ExpandFill
 			};
 
-			SubContainerOne = new()
+			_SubContainerOne = new()
 			{
 				SizeFlagsVertical = Control.SizeFlags.ShrinkBegin,
 				SizeFlagsHorizontal = Control.SizeFlags.ExpandFill
 			};
 
-			SubContainerTwo = new()
+			_SubContainerTwo = new()
 			{
 				SizeFlagsVertical = Control.SizeFlags.ShrinkBegin,
 				SizeFlagsHorizontal = Control.SizeFlags.ExpandFill
 			};
 
-			SubContainerThree = new()
+			_SubContainerThree = new()
 			{
 				SizeFlagsVertical = Control.SizeFlags.ShrinkBegin,
 				SizeFlagsHorizontal = Control.SizeFlags.ExpandFill
 			};
 
-			SubContainerFour = new()
+			_SubContainerFour = new()
 			{
 				SizeFlagsVertical = Control.SizeFlags.ShrinkBegin,
 				SizeFlagsHorizontal = Control.SizeFlags.ExpandFill
 			};
 
-			RenderTypes();
+			_RenderTypes();
 
-			_HBoxContainer.AddChild(SubContainerOne);
-			_HBoxContainer.AddChild(SubContainerTwo);
-			_HBoxContainer.AddChild(SubContainerThree);
-			_HBoxContainer.AddChild(SubContainerFour);
+			_HBoxContainer.AddChild(_SubContainerOne);
+			_HBoxContainer.AddChild(_SubContainerTwo);
+			_HBoxContainer.AddChild(_SubContainerThree);
+			_HBoxContainer.AddChild(_SubContainerFour);
 			_VBoxContainer.AddChild(_HBoxContainer);
 			_MarginContainer.AddChild(_VBoxContainer);
 			_ScrollContainer.AddChild(_MarginContainer);
@@ -160,22 +159,22 @@ namespace AssetSnap.Settings
 		/// </summary>
 		/// <param name="Iteration">The iteration number.</param>
 		/// <returns>The settings container.</returns>
-		private VBoxContainer GetSettingsContainer(int Iteration)
+		private VBoxContainer _GetSettingsContainer(int Iteration)
 		{
-			VBoxContainer EntryContainer = SubContainerOne;
+			VBoxContainer EntryContainer = _SubContainerOne;
 			if (Iteration == 1)
 			{
-				EntryContainer = SubContainerTwo;
+				EntryContainer = _SubContainerTwo;
 			}
 
 			if (Iteration == 2)
 			{
-				EntryContainer = SubContainerThree;
+				EntryContainer = _SubContainerThree;
 			}
 
 			if (Iteration == 3)
 			{
-				EntryContainer = SubContainerFour;
+				EntryContainer = _SubContainerFour;
 			}
 
 			return EntryContainer;
@@ -184,7 +183,7 @@ namespace AssetSnap.Settings
 		/// <summary>
 		/// Renders various settings.
 		/// </summary>
-		private void RenderTypes()
+		private void _RenderTypes()
 		{
 			var Iteration = 0;
 			SettingsConfig _Config = GlobalExplorer.GetInstance().Settings;
@@ -195,7 +194,7 @@ namespace AssetSnap.Settings
 				if (HasInputTypeMethod(k))
 				{
 					string InputType = GetInputTypeByMethod(k);
-					VBoxContainer EntryContainer = GetSettingsContainer(Iteration);
+					VBoxContainer EntryContainer = _GetSettingsContainer(Iteration);
 
 					if (value is Godot.Variant VariantValue)
 					{
@@ -210,11 +209,11 @@ namespace AssetSnap.Settings
 							{
 								FinalValue = true;
 							}
-							RenderBoolType(key, FinalValue, InputType, EntryContainer);
+							_RenderBoolType(key, FinalValue, InputType, EntryContainer);
 						}
 						else
 						{
-							RenderIntegerType(key, FloatValue, InputType, EntryContainer);
+							_RenderIntegerType(key, FloatValue, InputType, EntryContainer);
 						}
 					}
 					else
@@ -239,7 +238,7 @@ namespace AssetSnap.Settings
 		/// <param name="Type">The type of the setting.</param>
 		/// <param name="_Container">The container to render the setting in.</param>
 		/// <returns>void</returns>
-		public void RenderStringType(string key, string value, string Type, VBoxContainer _Container)
+		private void _RenderStringType(string key, string value, string Type, VBoxContainer _Container)
 		{
 			switch (Type)
 			{
@@ -257,7 +256,7 @@ namespace AssetSnap.Settings
 		/// <param name="Type">The type of the setting.</param>
 		/// <param name="_Container">The container to render the setting in.</param>
 		/// <returns>void</returns>
-		public void RenderIntegerType(string key, float value, string Type, VBoxContainer _Container)
+		private void _RenderIntegerType(string key, float value, string Type, VBoxContainer _Container)
 		{
 			switch (Type)
 			{
@@ -288,7 +287,7 @@ namespace AssetSnap.Settings
 		/// <param name="Type">The type of the setting.</param>
 		/// <param name="_Container">The container to render the setting in.</param>
 		/// <returns>void</returns>
-		public void RenderBoolType(string key, bool value, string Type, VBoxContainer _Container)
+		private void _RenderBoolType(string key, bool value, string Type, VBoxContainer _Container)
 		{
 			switch (Type)
 			{
@@ -316,7 +315,7 @@ namespace AssetSnap.Settings
 		/// </summary>
 		/// <param name="key">The key to convert.</param>
 		/// <returns>The converted label.</returns>
-		public string KeyToLabel(string key)
+		private string _KeyToLabel(string key)
 		{
 			return key.Capitalize().Split('_').Join(" ");
 		}

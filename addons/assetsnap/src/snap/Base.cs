@@ -50,10 +50,10 @@ namespace AssetSnap.Snap
 		public List<Boundary> boundaries = new List<Boundary>();
 
 		private static Base _Instance;
-		private float CurrentOpacity;
-		private float CurrentX = 0;
-		private float CurrentY = 0;
-		private float CurrentZ = 0;
+		private float _CurrentOpacity;
+		private float _CurrentX = 0;
+		private float _CurrentY = 0;
+		private float _CurrentZ = 0;
 
 		/// <summary>
 		/// Initializes the snap boundaries.
@@ -65,10 +65,10 @@ namespace AssetSnap.Snap
 				return;
 			}
 
-			CurrentOpacity = ExplorerUtils.Get().Settings.GetKey("boundary_box_opacity").As<float>();
-			CurrentX = StatesUtils.Get().SnapToXValue;
-			CurrentY = StatesUtils.Get().SnapToHeightValue;
-			CurrentZ = StatesUtils.Get().SnapToZValue;
+			_CurrentOpacity = ExplorerUtils.Get().Settings.GetKey("boundary_box_opacity").As<float>();
+			_CurrentX = StatesUtils.Get().SnapToXValue;
+			_CurrentY = StatesUtils.Get().SnapToHeightValue;
+			_CurrentZ = StatesUtils.Get().SnapToZValue;
 
 			// BoundaryOpacity = SettingsUtils.Get().GetKey("boundary_box_opacity").As<float>();
 
@@ -94,7 +94,7 @@ namespace AssetSnap.Snap
 		public void SetBoxOpacity(float value)
 		{
 			// BoundaryOpacity = value;
-			UpdateOpacity(value);
+			_UpdateOpacity(value);
 		}
 
 		/// <summary>
@@ -108,51 +108,51 @@ namespace AssetSnap.Snap
 				return;
 			}
 
-			if (IsBoundaryShown())
+			if (_IsBoundaryShown())
 			{
-				UpdateTransform();
+				_UpdateTransform();
 			}
 
-			if (ShouldHideBoundary())
+			if (_ShouldHideBoundary())
 			{
-				RemoveBoundaries();
+				_RemoveBoundaries();
 			}
-			else if (ShouldShowBoundary())
+			else if (_ShouldShowBoundary())
 			{
-				if (ShouldSnapToHeight() && false == IsAngleActive(GlobalStates.SnapAngleEnums.Y))
+				if (_ShouldSnapToHeight() && false == _IsAngleActive(GlobalStates.SnapAngleEnums.Y))
 				{
-					SpawnBoundary(GlobalStates.SnapAngleEnums.Y);
+					_SpawnBoundary(GlobalStates.SnapAngleEnums.Y);
 					StatesUtils.Get().BoundaryActiveAngles.Add(GlobalStates.SnapAngleEnums.Y);
 				}
-				else if (false == ShouldSnapToHeight() && IsAngleActive(GlobalStates.SnapAngleEnums.Y))
+				else if (false == _ShouldSnapToHeight() && _IsAngleActive(GlobalStates.SnapAngleEnums.Y))
 				{
-					RemoveBoundary(GlobalStates.SnapAngleEnums.Y);
+					_RemoveBoundary(GlobalStates.SnapAngleEnums.Y);
 					StatesUtils.Get().BoundaryActiveAngles.Remove(GlobalStates.SnapAngleEnums.Y);
 				}
 
-				if (ShouldSnapToX() && false == IsAngleActive(GlobalStates.SnapAngleEnums.X))
+				if (_ShouldSnapToX() && false == _IsAngleActive(GlobalStates.SnapAngleEnums.X))
 				{
-					SpawnBoundary(GlobalStates.SnapAngleEnums.X);
+					_SpawnBoundary(GlobalStates.SnapAngleEnums.X);
 					StatesUtils.Get().BoundaryActiveAngles.Add(GlobalStates.SnapAngleEnums.X);
 				}
-				else if (false == ShouldSnapToX() && IsAngleActive(GlobalStates.SnapAngleEnums.X))
+				else if (false == _ShouldSnapToX() && _IsAngleActive(GlobalStates.SnapAngleEnums.X))
 				{
-					RemoveBoundary(GlobalStates.SnapAngleEnums.X);
+					_RemoveBoundary(GlobalStates.SnapAngleEnums.X);
 					StatesUtils.Get().BoundaryActiveAngles.Remove(GlobalStates.SnapAngleEnums.X);
 				}
 
-				if (ShouldSnapToZ() && false == IsAngleActive(GlobalStates.SnapAngleEnums.Z))
+				if (_ShouldSnapToZ() && false == _IsAngleActive(GlobalStates.SnapAngleEnums.Z))
 				{
-					SpawnBoundary(GlobalStates.SnapAngleEnums.Z);
+					_SpawnBoundary(GlobalStates.SnapAngleEnums.Z);
 					StatesUtils.Get().BoundaryActiveAngles.Add(GlobalStates.SnapAngleEnums.Z);
 				}
-				else if (false == ShouldSnapToZ() && IsAngleActive(GlobalStates.SnapAngleEnums.Z))
+				else if (false == _ShouldSnapToZ() && _IsAngleActive(GlobalStates.SnapAngleEnums.Z))
 				{
-					RemoveBoundary(GlobalStates.SnapAngleEnums.Z);
+					_RemoveBoundary(GlobalStates.SnapAngleEnums.Z);
 					StatesUtils.Get().BoundaryActiveAngles.Remove(GlobalStates.SnapAngleEnums.Z);
 				}
 
-				if (HasActiveAngle())
+				if (_HasActiveAngle())
 				{
 					StatesUtils.Get().BoundarySpawned = GlobalStates.SpawnStateEnum.Spawned;
 				}
@@ -167,7 +167,7 @@ namespace AssetSnap.Snap
 		/// Spawns a boundary at the specified angle.
 		/// </summary>
 		/// <param name="angle">The angle at which to spawn the boundary.</param>
-		private void SpawnBoundary(GlobalStates.SnapAngleEnums angle)
+		private void _SpawnBoundary(GlobalStates.SnapAngleEnums angle)
 		{
 			Boundary boundary = new Boundary(angle);
 			boundary.Spawn(ExplorerUtils.Get()._Plugin);
@@ -179,7 +179,7 @@ namespace AssetSnap.Snap
 		/// Removes the boundary at the specified angle.
 		/// </summary>
 		/// <param name="angle">The angle of the boundary to remove.</param>
-		private void RemoveBoundary(GlobalStates.SnapAngleEnums angle)
+		private void _RemoveBoundary(GlobalStates.SnapAngleEnums angle)
 		{
 			Boundary removed = null;
 
@@ -201,7 +201,7 @@ namespace AssetSnap.Snap
 		/// <summary>
 		/// Removes all snap boundaries.
 		/// </summary>
-		private void RemoveBoundaries()
+		private void _RemoveBoundaries()
 		{
 			foreach (Boundary boundary in boundaries)
 			{
@@ -217,19 +217,19 @@ namespace AssetSnap.Snap
 		/// Checks whether the opacity of the snap boundaries should be updated.
 		/// </summary>
 		/// <returns><c>true</c> if the opacity should be updated; otherwise, <c>false</c>.</returns>
-		private bool ShouldUpdateOpacity()
+		private bool _ShouldUpdateOpacity()
 		{
 			float BoundaryOpacity = SettingsUtils.Get().GetKey("boundary_box_opacity").As<float>();
 
 			return
-				BoundaryOpacity != CurrentOpacity;
+				BoundaryOpacity != _CurrentOpacity;
 		}
 
 		/// <summary>
 		/// Updates the opacity of the snap boundaries.
 		/// </summary>
 		/// <param name="value">The new opacity value.</param>
-		private void UpdateOpacity(float value)
+		private void _UpdateOpacity(float value)
 		{
 			if (boundaries.Count == 0)
 			{
@@ -241,10 +241,10 @@ namespace AssetSnap.Snap
 				boundary.UpdateOpacity(value);
 			}
 
-			CurrentOpacity = value;
+			_CurrentOpacity = value;
 		}
 
-		private void UpdateTransform()
+		private void _UpdateTransform()
 		{
 			if (boundaries.Count == 0)
 			{
@@ -256,24 +256,24 @@ namespace AssetSnap.Snap
 				boundary.UpdateTransform();
 			}
 
-			CurrentX = StatesUtils.Get().SnapToXValue;
-			CurrentY = StatesUtils.Get().SnapToHeightValue;
-			CurrentZ = StatesUtils.Get().SnapToZValue;
+			_CurrentX = StatesUtils.Get().SnapToXValue;
+			_CurrentY = StatesUtils.Get().SnapToHeightValue;
+			_CurrentZ = StatesUtils.Get().SnapToZValue;
 		}
 
-		private bool ShouldUpdateTransform()
+		private bool _ShouldUpdateTransform()
 		{
 			return
-				StatesUtils.Get().SnapToXValue != CurrentX ||
-				StatesUtils.Get().SnapToHeightValue != CurrentY ||
-				StatesUtils.Get().SnapToZValue != CurrentZ;
+				StatesUtils.Get().SnapToXValue != _CurrentX ||
+				StatesUtils.Get().SnapToHeightValue != _CurrentY ||
+				StatesUtils.Get().SnapToZValue != _CurrentZ;
 		}
 
 		/// <summary>
 		/// Checks whether the snap boundaries are currently visible.
 		/// </summary>
 		/// <returns><c>true</c> if the boundaries are visible; otherwise, <c>false</c>.</returns>
-		private bool IsBoundaryShown()
+		private bool _IsBoundaryShown()
 		{
 			return
 				StatesUtils.Get().BoundarySpawned == GlobalStates.SpawnStateEnum.Spawned;
@@ -283,7 +283,7 @@ namespace AssetSnap.Snap
 		/// Checks whether there is any active snap angle.
 		/// </summary>
 		/// <returns><c>true</c> if there is an active snap angle; otherwise, <c>false</c>.</returns>
-		private bool HasActiveAngle()
+		private bool _HasActiveAngle()
 		{
 			return
 				StatesUtils.Get().BoundaryActiveAngles.Count != 0;
@@ -294,7 +294,7 @@ namespace AssetSnap.Snap
 		/// </summary>
 		/// <param name="angle">The snap angle to check.</param>
 		/// <returns><c>true</c> if the specified snap angle is active; otherwise, <c>false</c>.</returns>
-		private bool IsAngleActive(GlobalStates.SnapAngleEnums angle)
+		private bool _IsAngleActive(GlobalStates.SnapAngleEnums angle)
 		{
 			return
 				true == StatesUtils.Get().BoundaryActiveAngles.Contains(angle);
@@ -304,7 +304,7 @@ namespace AssetSnap.Snap
 		/// Checks whether snapping to height is enabled.
 		/// </summary>
 		/// <returns><c>true</c> if snapping to height is enabled; otherwise, <c>false</c>.</returns>
-		private bool ShouldSnapToHeight()
+		private bool _ShouldSnapToHeight()
 		{
 			return
 				StatesUtils.Get().SnapToHeight == GlobalStates.LibraryStateEnum.Enabled &&
@@ -315,7 +315,7 @@ namespace AssetSnap.Snap
 		/// Checks whether snapping to the X-axis is enabled.
 		/// </summary>
 		/// <returns><c>true</c> if snapping to the X-axis is enabled; otherwise, <c>false</c>.</returns>
-		private bool ShouldSnapToX()
+		private bool _ShouldSnapToX()
 		{
 			return
 				StatesUtils.Get().SnapToX == GlobalStates.LibraryStateEnum.Enabled &&
@@ -326,7 +326,7 @@ namespace AssetSnap.Snap
 		/// Checks whether snapping to the Z-axis is enabled.
 		/// </summary>
 		/// <returns><c>true</c> if snapping to the Z-axis is enabled; otherwise, <c>false</c>.</returns>
-		private bool ShouldSnapToZ()
+		private bool _ShouldSnapToZ()
 		{
 			return
 				StatesUtils.Get().SnapToZ == GlobalStates.LibraryStateEnum.Enabled &&
@@ -337,7 +337,7 @@ namespace AssetSnap.Snap
 		/// Checks whether the snap boundaries should be shown.
 		/// </summary>
 		/// <returns><c>true</c> if the boundaries should be shown; otherwise, <c>false</c>.</returns>
-		private bool ShouldShowBoundary()
+		private bool _ShouldShowBoundary()
 		{
 			return
 				(
@@ -353,7 +353,7 @@ namespace AssetSnap.Snap
 		/// Checks whether the snap boundaries should be hidden.
 		/// </summary>
 		/// <returns><c>true</c> if the boundaries should be hidden; otherwise, <c>false</c>.</returns>
-		private bool ShouldHideBoundary()
+		private bool _ShouldHideBoundary()
 		{
 			return
 				(
