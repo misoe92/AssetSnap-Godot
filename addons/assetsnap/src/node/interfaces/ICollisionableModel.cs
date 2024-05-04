@@ -41,17 +41,17 @@ namespace AssetSnap.Nodes
 		/// </summary>
 		/// <param name="body">The static body for collision.</param>
 		public void ApplyCollision(AsStaticBody3D body);
+			
+		/// <summary>
+		/// Gets the collision body of the model.
+		/// </summary>
+		/// <returns>The collision body as <see cref="AsStaticBody3D"/>.</returns>
+		public AsStaticBody3D GetCollisionBody();
 		
 		/// <summary>
 		/// Checks if the model has collisions.
 		/// </summary>
 		/// <returns>True if the model has collisions, false otherwise.</returns>
 		public bool HasCollisions();
-		
-		/// <summary>
-        /// Gets the collision body of the model.
-        /// </summary>
-        /// <returns>The collision body as <see cref="AsStaticBody3D"/>.</returns>
-		public AsStaticBody3D GetCollisionBody();
 	}
 }
