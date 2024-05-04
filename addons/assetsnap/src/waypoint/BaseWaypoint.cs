@@ -22,11 +22,11 @@
 
 #if TOOLS
 
+using AssetSnap.Front.Nodes;
+using Godot;
+
 namespace AssetSnap.Waypoint
 {
-	using AssetSnap.Front.Nodes;
-	using Godot;
-
 	public partial class BaseWaypoint
 	{
 		private Vector3 Origin;
@@ -38,12 +38,12 @@ namespace AssetSnap.Waypoint
 		private bool IsGroup = false;
 		
 		/// <summary>
-        /// Constructor for a waypoint associated with a model.
-        /// </summary>
-        /// <param name="_Origin">The origin position of the waypoint.</param>
-        /// <param name="_Rotation">The rotation of the waypoint.</param>
-        /// <param name="_Scale">The scale of the waypoint.</param>
-        /// <param name="_Model">The associated 3D model node.</param>
+		/// Constructor for a waypoint associated with a model.
+		/// </summary>
+		/// <param name="_Origin">The origin position of the waypoint.</param>
+		/// <param name="_Rotation">The rotation of the waypoint.</param>
+		/// <param name="_Scale">The scale of the waypoint.</param>
+		/// <param name="_Model">The associated 3D model node.</param>
 		public BaseWaypoint( Vector3 _Origin, Vector3 _Rotation, Vector3 _Scale, Node3D _Model ) 
 		{
 			Origin = _Origin;
@@ -64,10 +64,10 @@ namespace AssetSnap.Waypoint
 		}
 		
 		/// <summary>
-        /// Constructor for a waypoint associated with a group.
-        /// </summary>
-        /// <param name="_Origin">The origin position of the waypoint.</param>
-        /// <param name="_Group">The associated 3D group node.</param>
+		/// Constructor for a waypoint associated with a group.
+		/// </summary>
+		/// <param name="_Origin">The origin position of the waypoint.</param>
+		/// <param name="_Group">The associated 3D group node.</param>
 		public BaseWaypoint( Vector3 _Origin, AsGroup3D _Group ) 
 		{
 			Origin = _Origin;
@@ -76,18 +76,18 @@ namespace AssetSnap.Waypoint
 		}
 		
 		/// <summary>
-        /// Sets the scale of the waypoint model.
-        /// </summary>
-        /// <param name="scale">The new scale to set.</param>
+		/// Sets the scale of the waypoint model.
+		/// </summary>
+		/// <param name="scale">The new scale to set.</param>
 		public void SetScale( Vector3 scale ) 
 		{
 			Scale = scale;
 		}
 			
 		/// <summary>
-        /// Retrieves the axis-aligned bounding box (AABB) of the associated model.
-        /// </summary>
-        /// <returns>The AABB of the model.</returns>
+		/// Retrieves the axis-aligned bounding box (AABB) of the associated model.
+		/// </summary>
+		/// <returns>The AABB of the model.</returns>
 		public Aabb GetAabb()
 		{
 			if( EditorPlugin.IsInstanceValid( Model ) && Model is AsGrouped3D ) 
@@ -112,27 +112,27 @@ namespace AssetSnap.Waypoint
 		}
 		
 		/// <summary>
-        /// Retrieves the associated model node.
-        /// </summary>
-        /// <returns>The associated model node.</returns>
+		/// Retrieves the associated model node.
+		/// </summary>
+		/// <returns>The associated model node.</returns>
 		public Node3D GetModel()
 		{
 			return Model;
 		}
 		
 		/// <summary>
-        /// Retrieves the origin position of the model.
-        /// </summary>
-        /// <returns>The origin position of the model.</returns>
+		/// Retrieves the origin position of the model.
+		/// </summary>
+		/// <returns>The origin position of the model.</returns>
 		public Vector3 GetOrigin()
 		{
 			return Origin;
 		}
 		
 		/// <summary>
-        /// Retrieves the scale of the model.
-        /// </summary>
-        /// <returns>The scale of the model.</returns>
+		/// Retrieves the scale of the model.
+		/// </summary>
+		/// <returns>The scale of the model.</returns>
 		public Vector3 GetScale()
 		{
 			return Scale;
