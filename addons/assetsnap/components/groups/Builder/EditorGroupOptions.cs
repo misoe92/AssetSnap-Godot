@@ -72,7 +72,7 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		{
 			Name = "GroupBuilderEditorGroupOptions";
 
-			UsingTraits = new()
+			_UsingTraits = new()
 			{
 				{ typeof(Labelable).ToString() },
 				{ typeof(Buttonable).ToString() },
@@ -85,50 +85,17 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		}
 
 		/// <summary>
-		/// Removes the specified option instance.
-		/// </summary>
-		/// <param name="_object">The object to remove.</param>
-		/// <param name="debug">Whether to enable debug mode.</param>
-		private void RemoveOptionInstance(GroupOptionComponent _object, bool debug = false)
-		{
-			if (
-				EditorPlugin.IsInstanceValid(_object) &&
-				_object.GetParent() == this
-			)
-			{
-				_object.Clear(debug);
-				RemoveChild(_object);
-			}
-		}
-
-		/// <summary>
-		/// Clears the specified option instance.
-		/// </summary>
-		/// <param name="_object">The object to clear.</param>
-		/// <param name="debug">Whether to enable debug mode.</param>
-		private void ClearOptionInstance(GroupOptionComponent _object, bool debug = false)
-		{
-			if (
-				EditorPlugin.IsInstanceValid(_object) &&
-				_object.GetParent() == this
-			)
-			{
-				_object.Free();
-			}
-		}
-
-		/// <summary>
 		/// Initializes the editor group options.
 		/// </summary>
 		public override void Initialize()
 		{
-			if (Initiated)
+			if (_Initiated)
 			{
 				return;
 			}
 
 			base.Initialize();
-			Initiated = true;
+			_Initiated = true;
 			Visible = false;
 
 			SizeFlagsHorizontal = SizeFlags.ExpandFill;
@@ -232,6 +199,197 @@ namespace AssetSnap.Front.Components.Groups.Builder
 				.SetMargin(0, "top")
 				.SetDimensions(500, 0)
 				.Instantiate();
+		}
+		
+		/// <summary>
+		/// Shows the control.
+		/// </summary>
+		public void DoShow()
+		{
+			Visible = true;
+		}
+
+		/// <summary>
+		/// Hides the control.
+		/// </summary>
+		public void DoHide()
+		{
+			Visible = false;
+		}
+
+		/// <summary>
+		/// Updates the specified group option.
+		/// </summary>
+		/// <param name="Name">The name of the option.</param>
+		/// <param name="value">The value of the option.</param>
+		public void _UpdateGroupOption(string Name, Variant value)
+		{
+			if (true == _GroupBuilderEditorGroupOptionSnapToObject.GetValue())
+			{
+				_GroupBuilderEditorGroupOptionSnapToObjectOffsetX.InputShow();
+				_GroupBuilderEditorGroupOptionSnapToObjectOffsetZ.InputShow();
+			}
+			else
+			{
+				_GroupBuilderEditorGroupOptionSnapToObjectOffsetX.InputHide();
+				_GroupBuilderEditorGroupOptionSnapToObjectOffsetZ.InputHide();
+			}
+
+			if (true == _GroupBuilderEditorGroupOptionSnapToHeight.GetValue())
+			{
+				_GroupBuilderEditorGroupOptionSnapToHeightValue.InputShow();
+			}
+			else
+			{
+				_GroupBuilderEditorGroupOptionSnapToHeightValue.InputHide();
+			}
+
+			if (true == _GroupBuilderEditorGroupOptionSnapToX.GetValue())
+			{
+				_GroupBuilderEditorGroupOptionSnapToXValue.InputShow();
+			}
+			else
+			{
+				_GroupBuilderEditorGroupOptionSnapToXValue.InputHide();
+			}
+
+			if (true == _GroupBuilderEditorGroupOptionSnapToZ.GetValue())
+			{
+				_GroupBuilderEditorGroupOptionSnapToZValue.InputShow();
+			}
+			else
+			{
+				_GroupBuilderEditorGroupOptionSnapToZValue.InputHide();
+			}
+
+			if (true == _GroupBuilderEditorGroupOptionConvexCollision.GetValue())
+			{
+				_GroupBuilderEditorGroupOptionConvexClean.InputShow();
+				_GroupBuilderEditorGroupOptionConvexSimplify.InputShow();
+			}
+			else
+			{
+				_GroupBuilderEditorGroupOptionConvexClean.InputHide();
+				_GroupBuilderEditorGroupOptionConvexSimplify.InputHide();
+			}
+		}
+
+		/// <summary>
+		/// Updates all group options.
+		/// </summary>
+		public void _UpdateGroupOptions()
+		{
+			if (null == StatesUtils.Get().Group)
+			{
+				return;
+			}
+
+			if (false == _Initiated)
+			{
+				GD.PushWarning("Group options object is not initialized");
+				return;
+			}
+
+			_GroupBuilderEditorGroupOptionSnapToObject.SetValue(_GlobalExplorer.GroupBuilder._Editor.Group.SnapToObject);
+			_GroupBuilderEditorGroupOptionSnapLayer.SetValue(_GlobalExplorer.GroupBuilder._Editor.Group.SnapLayer);
+			_GroupBuilderEditorGroupOptionSnapToObjectOffsetX.SetValue(_GlobalExplorer.GroupBuilder._Editor.Group.SnapToObjectOffsetXValue);
+			_GroupBuilderEditorGroupOptionSnapToObjectOffsetZ.SetValue(_GlobalExplorer.GroupBuilder._Editor.Group.SnapToObjectOffsetZValue);
+			_GroupBuilderEditorGroupOptionSnapToHeight.SetValue(_GlobalExplorer.GroupBuilder._Editor.Group.SnapToHeight);
+			_GroupBuilderEditorGroupOptionSnapToHeightValue.SetValue(_GlobalExplorer.GroupBuilder._Editor.Group.SnapToHeightValue);
+			_GroupBuilderEditorGroupOptionSnapToX.SetValue(_GlobalExplorer.GroupBuilder._Editor.Group.SnapToX);
+			_GroupBuilderEditorGroupOptionSnapToXValue.SetValue(_GlobalExplorer.GroupBuilder._Editor.Group.SnapToXValue);
+			_GroupBuilderEditorGroupOptionSnapToZ.SetValue(_GlobalExplorer.GroupBuilder._Editor.Group.SnapToZ);
+			_GroupBuilderEditorGroupOptionSnapToZValue.SetValue(_GlobalExplorer.GroupBuilder._Editor.Group.SnapToZValue);
+			_GroupBuilderEditorGroupOptionSphereCollision.SetValue(_GlobalExplorer.GroupBuilder._Editor.Group.SphereCollision);
+			_GroupBuilderEditorGroupOptionConcaveCollision.SetValue(_GlobalExplorer.GroupBuilder._Editor.Group.ConcaveCollision);
+			_GroupBuilderEditorGroupOptionConvexCollision.SetValue(_GlobalExplorer.GroupBuilder._Editor.Group.ConvexCollision);
+			_GroupBuilderEditorGroupOptionConvexClean.SetValue(_GlobalExplorer.GroupBuilder._Editor.Group.ConvexClean);
+			_GroupBuilderEditorGroupOptionConvexSimplify.SetValue(_GlobalExplorer.GroupBuilder._Editor.Group.ConvexSimplify);
+			_GroupBuilderEditorGroupOptionPlacementSimple.SetValue(StatesUtils.Get().PlacingType == GlobalStates.PlacingTypeEnum.Simple);
+			_GroupBuilderEditorGroupOptionPlacementOptimized.SetValue(StatesUtils.Get().PlacingType == GlobalStates.PlacingTypeEnum.Optimized);
+			_GroupBuilderEditorGroupOptionDragOffset.SetValue(DragAddInputDriver.GetInstance().SizeOffset);
+
+			if (true == _GroupBuilderEditorGroupOptionSnapToObject.GetValue())
+			{
+				_GroupBuilderEditorGroupOptionSnapToObjectOffsetX.InputShow();
+				_GroupBuilderEditorGroupOptionSnapToObjectOffsetZ.InputShow();
+			}
+			else
+			{
+				_GroupBuilderEditorGroupOptionSnapToObjectOffsetX.InputHide();
+				_GroupBuilderEditorGroupOptionSnapToObjectOffsetZ.InputHide();
+			}
+
+			if (true == _GroupBuilderEditorGroupOptionSnapToHeight.GetValue())
+			{
+				_GroupBuilderEditorGroupOptionSnapToHeightValue.InputShow();
+			}
+			else
+			{
+				_GroupBuilderEditorGroupOptionSnapToHeightValue.InputHide();
+			}
+
+			if (true == _GroupBuilderEditorGroupOptionSnapToX.GetValue())
+			{
+				_GroupBuilderEditorGroupOptionSnapToXValue.InputShow();
+			}
+			else
+			{
+				_GroupBuilderEditorGroupOptionSnapToXValue.InputHide();
+			}
+
+			if (true == _GroupBuilderEditorGroupOptionSnapToZ.GetValue())
+			{
+				_GroupBuilderEditorGroupOptionSnapToZValue.InputShow();
+			}
+			else
+			{
+				_GroupBuilderEditorGroupOptionSnapToZValue.InputHide();
+			}
+
+			if (true == _GroupBuilderEditorGroupOptionConvexCollision.GetValue())
+			{
+				_GroupBuilderEditorGroupOptionConvexClean.InputShow();
+				_GroupBuilderEditorGroupOptionConvexSimplify.InputShow();
+			}
+			else
+			{
+				_GroupBuilderEditorGroupOptionConvexClean.InputHide();
+				_GroupBuilderEditorGroupOptionConvexSimplify.InputHide();
+			}
+		}
+
+		/// <summary>
+		/// Removes the specified option instance.
+		/// </summary>
+		/// <param name="_object">The object to remove.</param>
+		/// <param name="debug">Whether to enable debug mode.</param>
+		private void _RemoveOptionInstance(GroupOptionComponent _object, bool debug = false)
+		{
+			if (
+				EditorPlugin.IsInstanceValid(_object) &&
+				_object.GetParent() == this
+			)
+			{
+				_object.Clear(debug);
+				RemoveChild(_object);
+			}
+		}
+
+		/// <summary>
+		/// Clears the specified option instance.
+		/// </summary>
+		/// <param name="_object">The object to clear.</param>
+		/// <param name="debug">Whether to enable debug mode.</param>
+		private void _ClearOptionInstance(GroupOptionComponent _object, bool debug = false)
+		{
+			if (
+				EditorPlugin.IsInstanceValid(_object) &&
+				_object.GetParent() == this
+			)
+			{
+				_object.Free();
+			}
 		}
 
 		/// <summary>
@@ -682,164 +840,6 @@ namespace AssetSnap.Front.Components.Groups.Builder
 				.AddToContainer(
 					this
 				);
-		}
-
-		/// <summary>
-		/// Shows the control.
-		/// </summary>
-		public void DoShow()
-		{
-			Visible = true;
-		}
-
-		/// <summary>
-		/// Hides the control.
-		/// </summary>
-		public void DoHide()
-		{
-			Visible = false;
-		}
-
-		/// <summary>
-		/// Updates the specified group option.
-		/// </summary>
-		/// <param name="Name">The name of the option.</param>
-		/// <param name="value">The value of the option.</param>
-		public void _UpdateGroupOption(string Name, Variant value)
-		{
-			if (true == _GroupBuilderEditorGroupOptionSnapToObject.GetValue())
-			{
-				_GroupBuilderEditorGroupOptionSnapToObjectOffsetX.InputShow();
-				_GroupBuilderEditorGroupOptionSnapToObjectOffsetZ.InputShow();
-			}
-			else
-			{
-				_GroupBuilderEditorGroupOptionSnapToObjectOffsetX.InputHide();
-				_GroupBuilderEditorGroupOptionSnapToObjectOffsetZ.InputHide();
-			}
-
-			if (true == _GroupBuilderEditorGroupOptionSnapToHeight.GetValue())
-			{
-				_GroupBuilderEditorGroupOptionSnapToHeightValue.InputShow();
-			}
-			else
-			{
-				_GroupBuilderEditorGroupOptionSnapToHeightValue.InputHide();
-			}
-
-			if (true == _GroupBuilderEditorGroupOptionSnapToX.GetValue())
-			{
-				_GroupBuilderEditorGroupOptionSnapToXValue.InputShow();
-			}
-			else
-			{
-				_GroupBuilderEditorGroupOptionSnapToXValue.InputHide();
-			}
-
-			if (true == _GroupBuilderEditorGroupOptionSnapToZ.GetValue())
-			{
-				_GroupBuilderEditorGroupOptionSnapToZValue.InputShow();
-			}
-			else
-			{
-				_GroupBuilderEditorGroupOptionSnapToZValue.InputHide();
-			}
-
-			if (true == _GroupBuilderEditorGroupOptionConvexCollision.GetValue())
-			{
-				_GroupBuilderEditorGroupOptionConvexClean.InputShow();
-				_GroupBuilderEditorGroupOptionConvexSimplify.InputShow();
-			}
-			else
-			{
-				_GroupBuilderEditorGroupOptionConvexClean.InputHide();
-				_GroupBuilderEditorGroupOptionConvexSimplify.InputHide();
-			}
-		}
-
-		/// <summary>
-		/// Updates all group options.
-		/// </summary>
-		public void _UpdateGroupOptions()
-		{
-			if (null == StatesUtils.Get().Group)
-			{
-				return;
-			}
-
-			if (false == Initiated)
-			{
-				GD.PushWarning("Group options object is not initialized");
-				return;
-			}
-
-			_GroupBuilderEditorGroupOptionSnapToObject.SetValue(_GlobalExplorer.GroupBuilder._Editor.Group.SnapToObject);
-			_GroupBuilderEditorGroupOptionSnapLayer.SetValue(_GlobalExplorer.GroupBuilder._Editor.Group.SnapLayer);
-			_GroupBuilderEditorGroupOptionSnapToObjectOffsetX.SetValue(_GlobalExplorer.GroupBuilder._Editor.Group.SnapToObjectOffsetXValue);
-			_GroupBuilderEditorGroupOptionSnapToObjectOffsetZ.SetValue(_GlobalExplorer.GroupBuilder._Editor.Group.SnapToObjectOffsetZValue);
-			_GroupBuilderEditorGroupOptionSnapToHeight.SetValue(_GlobalExplorer.GroupBuilder._Editor.Group.SnapToHeight);
-			_GroupBuilderEditorGroupOptionSnapToHeightValue.SetValue(_GlobalExplorer.GroupBuilder._Editor.Group.SnapToHeightValue);
-			_GroupBuilderEditorGroupOptionSnapToX.SetValue(_GlobalExplorer.GroupBuilder._Editor.Group.SnapToX);
-			_GroupBuilderEditorGroupOptionSnapToXValue.SetValue(_GlobalExplorer.GroupBuilder._Editor.Group.SnapToXValue);
-			_GroupBuilderEditorGroupOptionSnapToZ.SetValue(_GlobalExplorer.GroupBuilder._Editor.Group.SnapToZ);
-			_GroupBuilderEditorGroupOptionSnapToZValue.SetValue(_GlobalExplorer.GroupBuilder._Editor.Group.SnapToZValue);
-			_GroupBuilderEditorGroupOptionSphereCollision.SetValue(_GlobalExplorer.GroupBuilder._Editor.Group.SphereCollision);
-			_GroupBuilderEditorGroupOptionConcaveCollision.SetValue(_GlobalExplorer.GroupBuilder._Editor.Group.ConcaveCollision);
-			_GroupBuilderEditorGroupOptionConvexCollision.SetValue(_GlobalExplorer.GroupBuilder._Editor.Group.ConvexCollision);
-			_GroupBuilderEditorGroupOptionConvexClean.SetValue(_GlobalExplorer.GroupBuilder._Editor.Group.ConvexClean);
-			_GroupBuilderEditorGroupOptionConvexSimplify.SetValue(_GlobalExplorer.GroupBuilder._Editor.Group.ConvexSimplify);
-			_GroupBuilderEditorGroupOptionPlacementSimple.SetValue(_GlobalExplorer.States.PlacingType == GlobalStates.PlacingTypeEnum.Simple);
-			_GroupBuilderEditorGroupOptionPlacementOptimized.SetValue(_GlobalExplorer.States.PlacingType == GlobalStates.PlacingTypeEnum.Optimized);
-			_GroupBuilderEditorGroupOptionDragOffset.SetValue(DragAddInputDriver.GetInstance().SizeOffset);
-
-			if (true == _GroupBuilderEditorGroupOptionSnapToObject.GetValue())
-			{
-				_GroupBuilderEditorGroupOptionSnapToObjectOffsetX.InputShow();
-				_GroupBuilderEditorGroupOptionSnapToObjectOffsetZ.InputShow();
-			}
-			else
-			{
-				_GroupBuilderEditorGroupOptionSnapToObjectOffsetX.InputHide();
-				_GroupBuilderEditorGroupOptionSnapToObjectOffsetZ.InputHide();
-			}
-
-			if (true == _GroupBuilderEditorGroupOptionSnapToHeight.GetValue())
-			{
-				_GroupBuilderEditorGroupOptionSnapToHeightValue.InputShow();
-			}
-			else
-			{
-				_GroupBuilderEditorGroupOptionSnapToHeightValue.InputHide();
-			}
-
-			if (true == _GroupBuilderEditorGroupOptionSnapToX.GetValue())
-			{
-				_GroupBuilderEditorGroupOptionSnapToXValue.InputShow();
-			}
-			else
-			{
-				_GroupBuilderEditorGroupOptionSnapToXValue.InputHide();
-			}
-
-			if (true == _GroupBuilderEditorGroupOptionSnapToZ.GetValue())
-			{
-				_GroupBuilderEditorGroupOptionSnapToZValue.InputShow();
-			}
-			else
-			{
-				_GroupBuilderEditorGroupOptionSnapToZValue.InputHide();
-			}
-
-			if (true == _GroupBuilderEditorGroupOptionConvexCollision.GetValue())
-			{
-				_GroupBuilderEditorGroupOptionConvexClean.InputShow();
-				_GroupBuilderEditorGroupOptionConvexSimplify.InputShow();
-			}
-			else
-			{
-				_GroupBuilderEditorGroupOptionConvexClean.InputHide();
-				_GroupBuilderEditorGroupOptionConvexSimplify.InputHide();
-			}
 		}
 
 		/// <summary>

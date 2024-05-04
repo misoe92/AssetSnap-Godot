@@ -43,7 +43,7 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 		{
 			Name = "GroupsBuilderGroupOptionsLevelOfDetailsState";
 			
-			UsingTraits = new()
+			_UsingTraits = new()
 			{
 				{ typeof(Checkable).ToString() },
 			};

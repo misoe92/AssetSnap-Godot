@@ -32,12 +32,12 @@ namespace AssetSnap.Component
 	/// </summary>	
 	public partial class LSSnapComponent : LibraryComponent
 	{
-		protected GlobalStates.SnapAngleEnums Angle;
-		protected Callable _SpinBoxCallable;
-		
 		public float _value = 0.0f;
 		public bool state = false;
 		public bool UsingGlue = false;
+		
+		protected GlobalStates.SnapAngleEnums Angle;
+		protected Callable _SpinBoxCallable;
 		
 		/// <summary>
 		/// Initializes a new instance of the <see cref="LSSnapComponent"/> class.
@@ -54,32 +54,32 @@ namespace AssetSnap.Component
 		/// <param name="data">Array of data.</param>
 		public virtual void MaybeUpdateValue(Godot.Collections.Array data)
 		{
-			if( IsSnapTo() && false == IsSnapToChecked() ) 
+			if( _IsSnapTo() && false == _IsSnapToChecked() ) 
 			{
 				Trait<Checkable>().Select(0).SetValue(true);
 			}
-			else if( false == IsSnapTo() && true == IsSnapToChecked() )
+			else if( false == _IsSnapTo() && true == _IsSnapToChecked() )
 			{
 				Trait<Checkable>().Select(0).SetValue(false);	
 			}
 			
-			if( IsSnapToGlue() && false == IsSnapToGlueChecked() ) 
+			if( IsSnapToGlue() && false == _IsSnapToGlueChecked() ) 
 			{
 				Trait<Checkable>().Select(1).SetValue(true);
 			}
-			else if( false == IsSnapToGlue() && true == IsSnapToGlueChecked() )
+			else if( false == IsSnapToGlue() && true == _IsSnapToGlueChecked() )
 			{
 				Trait<Checkable>().Select(1).SetValue(false);	
 			}
 			
-			if (IsSnapTo() && false == IsGlueCheckboxShown() ) 
+			if (_IsSnapTo() && false == _IsGlueCheckboxShown() ) 
 			{
 				Trait<Checkable>().Select(1).SetValue(true);
 				Trait<Checkable>().Select(0).SetMargin( 2, "bottom" );
 				Trait<Checkable>().Select(1).SetVisible(true);
 				Trait<Spinboxable>().Select(0).SetVisible(true);
 			}
-			else if( false == IsSnapTo() && true == IsGlueCheckboxShown() ) 
+			else if( false == _IsSnapTo() && true == _IsGlueCheckboxShown() ) 
 			{
 				Trait<Checkable>().Select(0).SetMargin( 10, "bottom" );
 				Trait<Checkable>().Select(1).SetVisible(false);
@@ -100,6 +100,16 @@ namespace AssetSnap.Component
 				Trait<Checkable>().Select(1).SetValue(state);
 			}
 		}
+		
+		/// <summary>
+		/// Resets the component to its default state.
+		/// </summary>
+		public void Reset()
+		{
+			state = false;
+			UsingGlue = false;
+			_value = 0.0f;
+		}
 			
 		/// <summary>
 		/// Applies glue to the boundary's Y axis.
@@ -111,28 +121,20 @@ namespace AssetSnap.Component
 			Origin.Y = _GlobalExplorer.States.SnapToHeightValue;
 			return Origin;
 		}
-				  
+		
 		/// <summary>
-		/// Checks if Snap to height is enabled.
+		/// Checks if the component is valid.
 		/// </summary>
-		/// <returns><c>true</c> if Snap to height is enabled; otherwise, <c>false</c>.</returns>
-		public bool IsSnapTo()
+		/// <returns><c>true</c> if the component is valid; otherwise, <c>false</c>.</returns>	
+		public bool IsValid()
 		{
-			switch( Angle ) 
-			{
-				case GlobalStates.SnapAngleEnums.X:
-					return _GlobalExplorer.States.SnapToX == GlobalStates.LibraryStateEnum.Enabled;
-					
-				case GlobalStates.SnapAngleEnums.Y:
-					return _GlobalExplorer.States.SnapToHeight == GlobalStates.LibraryStateEnum.Enabled;
-					
-				case GlobalStates.SnapAngleEnums.Z:
-					return _GlobalExplorer.States.SnapToZ == GlobalStates.LibraryStateEnum.Enabled;
-			}
-
-			return false;
+			return
+				null != StatesUtils.Get() &&
+				false != _Initiated &&
+				null != Trait<Checkable>() &&
+				false != HasTrait<Checkable>();
 		}
-
+		
 		/// <summary>
 		/// Checks if Snap to height glue is enabled.
 		/// </summary>
@@ -155,10 +157,31 @@ namespace AssetSnap.Component
 		}
 		
 		/// <summary>
+		/// Checks if Snap to height is enabled.
+		/// </summary>
+		/// <returns><c>true</c> if Snap to height is enabled; otherwise, <c>false</c>.</returns>
+		protected bool _IsSnapTo()
+		{
+			switch( Angle ) 
+			{
+				case GlobalStates.SnapAngleEnums.X:
+					return _GlobalExplorer.States.SnapToX == GlobalStates.LibraryStateEnum.Enabled;
+					
+				case GlobalStates.SnapAngleEnums.Y:
+					return _GlobalExplorer.States.SnapToHeight == GlobalStates.LibraryStateEnum.Enabled;
+					
+				case GlobalStates.SnapAngleEnums.Z:
+					return _GlobalExplorer.States.SnapToZ == GlobalStates.LibraryStateEnum.Enabled;
+			}
+
+			return false;
+		}
+		
+		/// <summary>
 		/// Checks if Snap to x is checked.
 		/// </summary>
 		/// <returns><c>true</c> if Snap to x is checked; otherwise, <c>false</c>.</returns>
-		protected bool IsSnapToChecked()
+		protected bool _IsSnapToChecked()
 		{
 			if( IsValid() ) 
 			{
@@ -172,7 +195,7 @@ namespace AssetSnap.Component
 		/// Checks if Snap to x glue is checked.
 		/// </summary>
 		/// <returns><c>true</c> if Snap to x glue is checked; otherwise, <c>false</c>.</returns>
-		protected bool IsSnapToGlueChecked()
+		protected bool _IsSnapToGlueChecked()
 		{
 			if( IsValid() ) 
 			{
@@ -186,7 +209,7 @@ namespace AssetSnap.Component
 		/// Checks if glue checkbox is shown.
 		/// </summary>
 		/// <returns><c>true</c> if glue checkbox is shown; otherwise, <c>false</c>.</returns>
-		protected bool IsGlueCheckboxShown()
+		protected bool _IsGlueCheckboxShown()
 		{
 			if( IsValid() ) 
 			{
@@ -194,29 +217,6 @@ namespace AssetSnap.Component
 			}
 			
 			return false;
-		}
-		
-		/// <summary>
-        /// Checks if the component is valid.
-        /// </summary>
-        /// <returns><c>true</c> if the component is valid; otherwise, <c>false</c>.</returns>	
-		public bool IsValid()
-		{
-			return
-				null != StatesUtils.Get() &&
-				false != Initiated &&
-				null != Trait<Checkable>() &&
-				false != HasTrait<Checkable>();
-		}
-		
-		/// <summary>
-        /// Resets the component to its default state.
-        /// </summary>
-		public void Reset()
-		{
-			state = false;
-			UsingGlue = false;
-			_value = 0.0f;
 		}
 	}
 }

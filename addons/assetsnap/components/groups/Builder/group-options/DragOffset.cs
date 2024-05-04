@@ -24,6 +24,7 @@
 
 using AssetSnap.Component;
 using AssetSnap.Instance.Input;
+using AssetSnap.States;
 using Godot;
 
 namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
@@ -41,7 +42,7 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 		{
 			Name = "GroupsBuilderGroupOptionsDragOffset";
 			
-			UsingTraits = new()
+			_UsingTraits = new()
 			{
 				{ typeof(Spinboxable).ToString() },
 			};
@@ -79,9 +80,9 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 				dragAddInputDriver.SizeOffset = value;
 			}
 			
-			if( _GlobalExplorer.States.DragSizeOffset != value )
+			if( StatesUtils.Get().DragSizeOffset != value )
 			{
-				_GlobalExplorer.States.DragSizeOffset = value;
+				StatesUtils.Get().DragSizeOffset = value;
 			}
 			
 			Parent._UpdateGroupOptions();

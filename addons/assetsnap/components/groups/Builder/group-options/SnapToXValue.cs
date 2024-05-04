@@ -42,7 +42,7 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 		{
 			Name = "GroupsBuilderGroupOptionsSnapToXValue";
 
-			UsingTraits = new()
+			_UsingTraits = new()
 			{
 				{ typeof(Spinboxable).ToString() },
 			};

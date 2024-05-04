@@ -41,7 +41,7 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 		{
 			Name = "GroupsBuilderGroupOptionsVisibilityEndMargin";
 			
-			UsingTraits = new()
+			_UsingTraits = new()
 			{
 				{ typeof(Spinboxable).ToString() },
 			};

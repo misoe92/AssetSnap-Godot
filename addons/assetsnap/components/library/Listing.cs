@@ -35,12 +35,9 @@ namespace AssetSnap.Front.Components.Library
 	[Tool]
 	public partial class Listing : LibraryComponent
 	{
-		private string _Folder;
-		private Godot.Collections.Array<HBoxContainer> Containers = new();
-
 		/// <summary>
-        /// Gets or sets the folder path for the listing.
-        /// </summary>
+		/// Gets or sets the folder path for the listing.
+		/// </summary>
 		public string Folder
 		{
 			get => _Folder;
@@ -49,15 +46,18 @@ namespace AssetSnap.Front.Components.Library
 				_Folder = value;
 			}
 		}
+		
+		private string _Folder;
+		private Godot.Collections.Array<HBoxContainer> _Containers = new();
 
 		/// <summary>
-        /// Constructor for the Listing class.
-        /// </summary>
+		/// Constructor for the Listing class.
+		/// </summary>
 		public Listing()
 		{
 			Name = "LibraryListing";
 
-			UsingTraits = new()
+			_UsingTraits = new()
 			{
 				{ typeof(Containerable).ToString() },
 				{ typeof(ScrollContainerable).ToString() },
@@ -67,14 +67,14 @@ namespace AssetSnap.Front.Components.Library
 		}
 
 		/// <summary>
-        /// Initializes the component.
-        /// </summary>
+		/// Initializes the component.
+		/// </summary>
 		public override void Initialize()
 		{
 			base.Initialize();
 
-			Containers = new();
-			Initiated = true;
+			_Containers = new();
+			_Initiated = true;
 
 			SizeFlagsHorizontal = SizeFlags.ExpandFill;
 			SizeFlagsVertical = SizeFlags.ExpandFill;
@@ -107,7 +107,7 @@ namespace AssetSnap.Front.Components.Library
 				.Instantiate();
 
 			// Get the bottom dock
-			IterateFiles(
+			_IterateFiles(
 				_Folder,
 				Trait<Containerable>()
 					.Select(1)
@@ -138,9 +138,9 @@ namespace AssetSnap.Front.Components.Library
 		}
 
 		/// <summary>
-        /// Updates the list.
-        /// </summary>
-		public  void Update()
+		/// Updates the list.
+		/// </summary>
+		public void Update()
 		{
 			// _Library.RemoveAllPanelState();
 			foreach (HBoxContainer child in Trait<Containerable>().Select(1).GetInnerContainer().GetChildren())
@@ -153,15 +153,15 @@ namespace AssetSnap.Front.Components.Library
 				}
 			}
 
-			 IterateFiles(Folder, Trait<Containerable>().Select(1).GetInnerContainer());
+			 _IterateFiles(Folder, Trait<Containerable>().Select(1).GetInnerContainer());
 		}
 
 		/// <summary>
-        /// Iterates through the files inside the current folder and adds them as entries to the list.
-        /// </summary>
-        /// <param name="folderPath">The path of the folder to iterate through.</param>
-        /// <param name="BoxContainer">The container to add the entries to.</param>
-		private void IterateFiles(string folderPath, Container BoxContainer)
+		/// Iterates through the files inside the current folder and adds them as entries to the list.
+		/// </summary>
+		/// <param name="folderPath">The path of the folder to iterate through.</param>
+		/// <param name="BoxContainer">The container to add the entries to.</param>
+		private void _IterateFiles(string folderPath, Container BoxContainer)
 		{
 			List<string> Components = new()
 			{
@@ -197,10 +197,10 @@ namespace AssetSnap.Front.Components.Library
 					string extension = System.IO.Path.GetExtension(fileName).ToLower();
 					string file_name = System.IO.Path.GetFileName(fileName);
 
-					if (IsInstanceValid(Library._LibraryTopbar) && IsInstanceValid(Library._LibraryTopbar._LibrarySearch))
+					if (IsInstanceValid(Library._LibraryTopbar) && IsInstanceValid(Library._LibraryTopbar.LibrarySearch))
 					{
-						bool IsSearching = Library._LibraryTopbar._LibrarySearch.IsSearching();
-						bool SearchValid = Library._LibraryTopbar._LibrarySearch.SearchValid(file_name);
+						bool IsSearching = Library._LibraryTopbar.LibrarySearch.IsSearching();
+						bool SearchValid = Library._LibraryTopbar.LibrarySearch.SearchValid(file_name);
 
 						if (IsSearching && false == SearchValid)
 						{
@@ -209,7 +209,7 @@ namespace AssetSnap.Front.Components.Library
 					}
 
 					// Check if the file has a supported extension 
-					if (IsValidExtension(extension))
+					if (_IsValidExtension(extension))
 					{
 						ListEntry SingleEntry = GlobalExplorer.GetInstance().Components.Single<ListEntry>(true);
 						SingleEntry.Name = "LibraryEntry-" + file_name + "-" + total_iteration;
@@ -239,20 +239,10 @@ namespace AssetSnap.Front.Components.Library
 		}
 
 		/// <summary>
-        /// Checks if an extension is valid to be used as a model.
-        /// </summary>
-        /// <param name="Extension">The file extension to check.</param>
-        /// <returns>True if the extension is valid, otherwise false.</returns>
-		private bool IsValidExtension(string Extension)
-		{
-			return Extension == ".obj" || Extension == ".fbx" || Extension == ".glb" || Extension == ".gltf";
-		}
-
-		/// <summary>
-        /// Sets up the list container.
-        /// </summary>
-        /// <param name="BoxContainer">The container to set up the list within.</param>
-        /// <returns>The initialized HBoxContainer.</returns>
+		/// Sets up the list container.
+		/// </summary>
+		/// <param name="BoxContainer">The container to set up the list within.</param>
+		/// <returns>The initialized HBoxContainer.</returns>
 		private HBoxContainer _SetupListContainer(Container BoxContainer)
 		{
 			HBoxContainer _Con = new()
@@ -262,9 +252,19 @@ namespace AssetSnap.Front.Components.Library
 			};
 
 			BoxContainer.AddChild(_Con);
-			Containers.Add(_Con);
+			_Containers.Add(_Con);
 
 			return _Con;
+		}
+		
+		/// <summary>
+		/// Checks if an extension is valid to be used as a model.
+		/// </summary>
+		/// <param name="Extension">The file extension to check.</param>
+		/// <returns>True if the extension is valid, otherwise false.</returns>
+		private bool _IsValidExtension(string Extension)
+		{
+			return Extension == ".obj" || Extension == ".fbx" || Extension == ".glb" || Extension == ".gltf";
 		}
 	}
 }

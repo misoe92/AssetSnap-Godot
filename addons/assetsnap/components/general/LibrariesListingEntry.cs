@@ -36,7 +36,7 @@ namespace AssetSnap.Front.Components
 		/// <summary>
 		/// The title of the entry.
 		/// </summary>
-		public string title;
+		public string Title;
 		
 		/// <summary>
 		/// Constructor of the LibrariesListingEntry class.
@@ -45,7 +45,7 @@ namespace AssetSnap.Front.Components
 		{
 			Name = "LibrariesListingEntry";
 			
-			UsingTraits = new()
+			_UsingTraits = new()
 			{
 				{ typeof(Labelable).ToString() },
 				{ typeof(Buttonable).ToString() },
@@ -63,7 +63,7 @@ namespace AssetSnap.Front.Components
 		{
 			base.Initialize();
 		
-			Initiated = true;
+			_Initiated = true;
 			
 			Trait<Panelable>()
 				.SetType(Panelable.PanelType.RoundedPanelContainer)
@@ -94,7 +94,7 @@ namespace AssetSnap.Front.Components
 			Trait<Labelable>()
 				.SetName("EntryTitle")
 				.SetType(Labelable.TitleType.HeaderSmall)
-				.SetText(title)
+				.SetText(Title)
 				.SetHorizontalSizeFlags(Control.SizeFlags.ExpandFill)
 				.SetVerticalSizeFlags(Control.SizeFlags.ExpandFill)
 				.Instantiate();
@@ -234,7 +234,7 @@ namespace AssetSnap.Front.Components
 		/// </summary>
 		private void _OnConfirm()
 		{
-			Plugin.Singleton.EmitSignal(Plugin.SignalName.OnRemoveFolder, title);
+			Plugin.Singleton.EmitSignal(Plugin.SignalName.OnRemoveFolder, Title);
 		}
 		
 		/// <summary>
@@ -251,14 +251,6 @@ namespace AssetSnap.Front.Components
 			Containerable choiceContainer = Trait<Containerable>()
 				.Select(2);
 			choiceContainer.Hide();
-		}
-
-		/// <summary>
-        /// Overrides the _ExitTree method.
-        /// </summary>
-		public override void _ExitTree()
-		{
-			base._ExitTree();
 		}
 	}
 }

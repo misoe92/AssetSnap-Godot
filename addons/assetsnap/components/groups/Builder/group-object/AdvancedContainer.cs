@@ -48,24 +48,13 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 		{
 			Name = "GroupsBuilderGroupObjectAdvancedContainer";
 
-			UsingTraits = new()
+			_UsingTraits = new()
 			{
 				{ typeof(Buttonable).ToString() },
 				{ typeof(Spinboxable).ToString() },
 				{ typeof(Labelable).ToString() },
 				{ typeof(Containerable).ToString() },
 			};
-		}
-
-		/// <summary>
-		/// Checks if the advanced container is visible.
-		/// </summary>
-		/// <returns>True if the advanced container is visible; otherwise, false.</returns>
-		public bool IsVisible()
-		{
-			return Trait<Containerable>()
-				.Select(0)
-				.IsVisible();
 		}
 
 		/// <summary>
@@ -76,6 +65,17 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 			Trait<Containerable>()
 				.Select(0)
 				.ToggleVisible();
+		}
+		
+		/// <summary>
+		/// Checks if the advanced container is visible.
+		/// </summary>
+		/// <returns>True if the advanced container is visible; otherwise, false.</returns>
+		public bool IsVisible()
+		{
+			return Trait<Containerable>()
+				.Select(0)
+				.IsVisible();
 		}
 
 		/// <summary>
@@ -205,9 +205,9 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 		}
 
 		/// <summary>
-        /// Initializes the concave collision control.
-        /// </summary>
-        /// <param name="innerContainer">The inner container where the control will be added.</param>
+		/// Initializes the concave collision control.
+		/// </summary>
+		/// <param name="innerContainer">The inner container where the control will be added.</param>
 		private void _InitializeConcaveCollisionControl(Godot.Container innerContainer)
 		{
 			List<string> Components = new()

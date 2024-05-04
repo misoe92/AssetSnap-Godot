@@ -37,7 +37,7 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		/// <summary>
 		/// Gets or sets the state of the level of details settings.
 		/// </summary>
-		public bool state 
+		public bool State 
 		{
 			get => GetState();
 			set 
@@ -62,7 +62,7 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		{
 			Name = "LSLevelOfDetails";
 			
-			UsingTraits = new()
+			_UsingTraits = new()
 			{
 				{ typeof(Labelable).ToString() },
 				{ typeof(Checkable).ToString() },
@@ -97,7 +97,7 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 
 			Callable _callable = Callable.From(() => { _OnCheckboxPressed(); });
 			
-			Initiated = true;
+			_Initiated = true;
 			
 			Trait<Labelable>()
 				.SetName("LevelOfDetailsText")
@@ -161,6 +161,41 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		}
 		
 		/// <summary>
+		/// Resets the component to its default state.
+		/// </summary>	
+		public void Reset()
+		{
+			StatesUtils.Get().LevelOfDetailsState = GlobalStates.LibraryStateEnum.Disabled;
+			StatesUtils.Get().LevelOfDetails = 0.0f;
+			State = false;
+		}
+		
+		/// <summary>
+		/// Synchronizes the component's value to a global central state controller.
+		/// </summary>
+		public override void Sync() 
+		{
+			if( StatesUtils.Get().LevelOfDetailsState == GlobalStates.LibraryStateEnum.Enabled ) 
+			{
+				StatesUtils.Get().LevelOfDetails = (float)Trait<Spinboxable>().Select(0).GetValue();
+			}
+		}
+		
+		/// <summary>
+		/// Checks if the component is in a valid state.
+		/// </summary>
+		/// <returns>True if the component is valid, otherwise false.</returns>
+		public bool IsValid()
+		{
+			return
+				null != _GlobalExplorer &&
+				null != StatesUtils.Get() &&
+				false != _Initiated &&
+				null != Trait<Checkable>() &&
+				false != HasTrait<Checkable>();
+		}
+		
+		/// <summary>
 		/// Handles the checkbox press event.
 		/// </summary>
 		private void _OnCheckboxPressed()
@@ -185,47 +220,12 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		}
 		
 		/// <summary>
-        /// Checks if the level of details checkbox is checked.
-        /// </summary>
-        /// <returns>True if the checkbox is checked, otherwise false.</returns>
+		/// Checks if the level of details checkbox is checked.
+		/// </summary>
+		/// <returns>True if the checkbox is checked, otherwise false.</returns>
 		private bool IsCheckboxChecked()
 		{
-			return state == true;
-		}
-		
-		/// <summary>
-		/// Resets the component to its default state.
-		/// </summary>	
-		public void Reset()
-		{
-			StatesUtils.Get().LevelOfDetailsState = GlobalStates.LibraryStateEnum.Disabled;
-			StatesUtils.Get().LevelOfDetails = 0.0f;
-			state = false;
-		}
-		
-		/// <summary>
-		/// Checks if the component is in a valid state.
-		/// </summary>
-		/// <returns>True if the component is valid, otherwise false.</returns>
-		public bool IsValid()
-		{
-			return
-				null != _GlobalExplorer &&
-				null != _GlobalExplorer.States &&
-				false != Initiated &&
-				null != Trait<Checkable>() &&
-				false != HasTrait<Checkable>();
-		}
-		
-		/// <summary>
-		/// Synchronizes the component's value to a global central state controller.
-		/// </summary>
-		public override void Sync() 
-		{
-			if( StatesUtils.Get().LevelOfDetailsState == GlobalStates.LibraryStateEnum.Enabled ) 
-			{
-				StatesUtils.Get().LevelOfDetails = (float)Trait<Spinboxable>().Select(0).GetValue();
-			}
+			return State == true;
 		}
 	}
 }

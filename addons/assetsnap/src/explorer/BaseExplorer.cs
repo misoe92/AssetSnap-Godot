@@ -29,17 +29,11 @@ using Godot;
 namespace AssetSnap
 {
 	/// <summary>
-    /// Partial class representing a base explorer, inheriting from AbstractExplorerBase.
-    /// </summary>
+	/// Partial class representing a base explorer, inheriting from AbstractExplorerBase.
+	/// </summary>
 	[Tool]
 	public partial class BaseExplorer : AbstractExplorerBase
 	{
-		public GlobalStates States {
-			get => GlobalStates.Singleton;
-		}
-		
-		protected GlobalStates _States = null;
-		
 		/// <summary>
 		/// Gets or sets the delta time.
 		/// </summary>
@@ -51,7 +45,11 @@ namespace AssetSnap
 				_DeltaTime = value;	
 			}
 		}
-				
+		
+		public GlobalStates States {
+			get => GlobalStates.Singleton;
+		}
+		
 		/// <summary>
 		/// Gets or sets the array of select lists.
 		/// </summary>
@@ -63,7 +61,7 @@ namespace AssetSnap
 				_SelectLists = value;
 			}
 		}
-				
+		
 		/// <summary>
 		/// Gets or sets the current mouse input type.
 		/// </summary>
@@ -87,6 +85,8 @@ namespace AssetSnap
 				_AllowScroll = value;
 			}	
 		}
+		
+		protected GlobalStates _States = null;
 	}
 }
 #endif

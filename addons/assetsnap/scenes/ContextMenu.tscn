@@ -31,10 +31,10 @@ layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 444.0
-offset_top = 157.0
-offset_right = -901.0
-offset_bottom = -833.0
+offset_left = 428.0
+offset_top = 123.0
+offset_right = -917.0
+offset_bottom = -857.0
 grow_horizontal = 2
 grow_vertical = 2
 size_flags_horizontal = 0
@@ -54,22 +54,21 @@ size_flags_vertical = 0
 mouse_default_cursor_shape = 2
 metadata/_edit_use_anchors_ = true
 
-[node name="ModifiersList" type="VBoxContainer" parent="HBoxContainer/Modifiers" node_paths=PackedStringArray("_Button", "_Items")]
+[node name="SelectList" type="VBoxContainer" parent="HBoxContainer/Modifiers" node_paths=PackedStringArray("SelectButton", "Items")]
 layout_mode = 2
 theme_override_constants/separation = 0
 script = ExtResource("3_oumkg")
-_Label = "Modifiers"
-_Button = NodePath("ButtonContainer/Button")
-_Items = [NodePath("ArrayContainer"), NodePath("ScatterContainer")]
+SelectButton = NodePath("ButtonContainer/Button")
+Items = [NodePath("ArrayContainer"), NodePath("ScatterContainer")]
 
-[node name="ButtonContainer" type="MarginContainer" parent="HBoxContainer/Modifiers/ModifiersList"]
+[node name="ButtonContainer" type="MarginContainer" parent="HBoxContainer/Modifiers/SelectList"]
 layout_mode = 2
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_top = 2
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 2
 
-[node name="Button" type="Button" parent="HBoxContainer/Modifiers/ModifiersList/ButtonContainer"]
+[node name="Button" type="Button" parent="HBoxContainer/Modifiers/SelectList/ButtonContainer"]
 custom_minimum_size = Vector2(80, 0)
 layout_mode = 2
 tooltip_text = "View actions available"
@@ -83,41 +82,41 @@ theme_override_styles/focus = SubResource("StyleBoxFlat_65ox5")
 text = "Modifiers"
 flat = true
 
-[node name="SeparatorContainer" type="MarginContainer" parent="HBoxContainer/Modifiers/ModifiersList"]
+[node name="SeparatorContainer" type="MarginContainer" parent="HBoxContainer/Modifiers/SelectList"]
 visible = false
 layout_mode = 2
 theme_override_constants/margin_bottom = 2
 
-[node name="HSeparator" type="HSeparator" parent="HBoxContainer/Modifiers/ModifiersList/SeparatorContainer"]
+[node name="HSeparator" type="HSeparator" parent="HBoxContainer/Modifiers/SelectList/SeparatorContainer"]
 layout_mode = 2
 theme_override_constants/separation = 0
 
-[node name="ArrayContainer" type="MarginContainer" parent="HBoxContainer/Modifiers/ModifiersList"]
+[node name="ArrayContainer" type="MarginContainer" parent="HBoxContainer/Modifiers/SelectList"]
 visible = false
 layout_mode = 2
 tooltip_text = "Apply array modifier to node"
 theme_override_constants/margin_bottom = 2
 script = ExtResource("4_b1pe5")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/Modifiers/ModifiersList/ArrayContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/Modifiers/SelectList/ArrayContainer"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="HBoxContainer/Modifiers/ModifiersList/ArrayContainer/VBoxContainer"]
+[node name="Label" type="Label" parent="HBoxContainer/Modifiers/SelectList/ArrayContainer/VBoxContainer"]
 layout_mode = 2
 text = "Array"
 horizontal_alignment = 1
 
-[node name="ScatterContainer" type="MarginContainer" parent="HBoxContainer/Modifiers/ModifiersList"]
+[node name="ScatterContainer" type="MarginContainer" parent="HBoxContainer/Modifiers/SelectList"]
 visible = false
 layout_mode = 2
 tooltip_text = "Apply scatter modifier to node"
 theme_override_constants/margin_bottom = 2
 script = ExtResource("5_xptkx")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/Modifiers/ModifiersList/ScatterContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/Modifiers/SelectList/ScatterContainer"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="HBoxContainer/Modifiers/ModifiersList/ScatterContainer/VBoxContainer"]
+[node name="Label" type="Label" parent="HBoxContainer/Modifiers/SelectList/ScatterContainer/VBoxContainer"]
 layout_mode = 2
 text = "Scatter"
 horizontal_alignment = 1
@@ -129,22 +128,21 @@ size_flags_vertical = 0
 mouse_default_cursor_shape = 2
 metadata/_edit_use_anchors_ = true
 
-[node name="ModifiersList" type="VBoxContainer" parent="HBoxContainer/QuickAction" node_paths=PackedStringArray("_Button", "_Items")]
+[node name="SelectList" type="VBoxContainer" parent="HBoxContainer/QuickAction" node_paths=PackedStringArray("SelectButton", "Items")]
 layout_mode = 2
 theme_override_constants/separation = 0
 script = ExtResource("3_oumkg")
-_Label = "Quick Action"
-_Button = NodePath("ButtonContainer/Button")
-_Items = [NodePath("None"), NodePath("Rotate"), NodePath("Scale")]
+SelectButton = NodePath("ButtonContainer/Button")
+Items = [NodePath("None"), NodePath("Rotate"), NodePath("Scale")]
 
-[node name="ButtonContainer" type="MarginContainer" parent="HBoxContainer/QuickAction/ModifiersList"]
+[node name="ButtonContainer" type="MarginContainer" parent="HBoxContainer/QuickAction/SelectList"]
 layout_mode = 2
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_top = 2
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 2
 
-[node name="Button" type="Button" parent="HBoxContainer/QuickAction/ModifiersList/ButtonContainer"]
+[node name="Button" type="Button" parent="HBoxContainer/QuickAction/SelectList/ButtonContainer"]
 custom_minimum_size = Vector2(80, 0)
 layout_mode = 2
 tooltip_text = "View actions available"
@@ -158,61 +156,61 @@ theme_override_styles/focus = SubResource("StyleBoxFlat_65ox5")
 text = "Quick Action"
 flat = true
 
-[node name="SeparatorContainer" type="MarginContainer" parent="HBoxContainer/QuickAction/ModifiersList"]
+[node name="SeparatorContainer" type="MarginContainer" parent="HBoxContainer/QuickAction/SelectList"]
 visible = false
 layout_mode = 2
 theme_override_constants/margin_bottom = 2
 
-[node name="HSeparator" type="HSeparator" parent="HBoxContainer/QuickAction/ModifiersList/SeparatorContainer"]
+[node name="HSeparator" type="HSeparator" parent="HBoxContainer/QuickAction/SelectList/SeparatorContainer"]
 layout_mode = 2
 theme_override_constants/separation = 0
 
-[node name="None" type="MarginContainer" parent="HBoxContainer/QuickAction/ModifiersList"]
+[node name="None" type="MarginContainer" parent="HBoxContainer/QuickAction/SelectList"]
 visible = false
 layout_mode = 2
 tooltip_text = "Clears quick action (Shift + Alt + Q)"
 theme_override_constants/margin_bottom = 2
 script = ExtResource("4_5frov")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/QuickAction/ModifiersList/None"]
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/QuickAction/SelectList/None"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="HBoxContainer/QuickAction/ModifiersList/None/VBoxContainer"]
+[node name="Label" type="Label" parent="HBoxContainer/QuickAction/SelectList/None/VBoxContainer"]
 layout_mode = 2
 text = "None"
 horizontal_alignment = 1
 
-[node name="Rotate" type="MarginContainer" parent="HBoxContainer/QuickAction/ModifiersList"]
+[node name="Rotate" type="MarginContainer" parent="HBoxContainer/QuickAction/SelectList"]
 visible = false
 layout_mode = 2
 tooltip_text = "Enables quick rotation (Shift + Alt + R)"
 theme_override_constants/margin_bottom = 2
 script = ExtResource("4_5frov")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/QuickAction/ModifiersList/Rotate"]
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/QuickAction/SelectList/Rotate"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="HBoxContainer/QuickAction/ModifiersList/Rotate/VBoxContainer"]
+[node name="Label" type="Label" parent="HBoxContainer/QuickAction/SelectList/Rotate/VBoxContainer"]
 layout_mode = 2
 text = "Rotate"
 horizontal_alignment = 1
 
-[node name="Scale" type="MarginContainer" parent="HBoxContainer/QuickAction/ModifiersList"]
+[node name="Scale" type="MarginContainer" parent="HBoxContainer/QuickAction/SelectList"]
 visible = false
 layout_mode = 2
 tooltip_text = "Enables quick scaling (Shift + Alt + S)"
 theme_override_constants/margin_bottom = 2
 script = ExtResource("4_5frov")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/QuickAction/ModifiersList/Scale"]
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/QuickAction/SelectList/Scale"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="HBoxContainer/QuickAction/ModifiersList/Scale/VBoxContainer"]
+[node name="Label" type="Label" parent="HBoxContainer/QuickAction/SelectList/Scale/VBoxContainer"]
 layout_mode = 2
 text = "Scale"
 horizontal_alignment = 1
 
-[node name="Angle" type="PanelContainer" parent="HBoxContainer" node_paths=PackedStringArray("_Control")]
+[node name="Angle" type="PanelContainer" parent="HBoxContainer" node_paths=PackedStringArray("ConditionalControl")]
 visible = false
 layout_mode = 2
 size_flags_horizontal = 0
@@ -220,26 +218,25 @@ size_flags_vertical = 0
 tooltip_text = "View modifiers available"
 mouse_default_cursor_shape = 2
 script = ExtResource("4_av7ja")
-_Control = NodePath("../QuickAction/ModifiersList")
+ConditionalControl = NodePath("SelectList")
 values = PackedStringArray("Rotate", "Scale")
 metadata/_edit_use_anchors_ = true
 
-[node name="ModifiersList" type="VBoxContainer" parent="HBoxContainer/Angle" node_paths=PackedStringArray("_Button", "_Items")]
+[node name="SelectList" type="VBoxContainer" parent="HBoxContainer/Angle" node_paths=PackedStringArray("SelectButton", "Items")]
 layout_mode = 2
 theme_override_constants/separation = 0
 script = ExtResource("3_oumkg")
-_Label = "All Angles"
-_Button = NodePath("ButtonContainer/Button")
-_Items = [NodePath("All"), NodePath("X"), NodePath("Y"), NodePath("Z")]
+SelectButton = NodePath("ButtonContainer/Button")
+Items = [NodePath("All"), NodePath("X"), NodePath("Y"), NodePath("Z")]
 
-[node name="ButtonContainer" type="MarginContainer" parent="HBoxContainer/Angle/ModifiersList"]
+[node name="ButtonContainer" type="MarginContainer" parent="HBoxContainer/Angle/SelectList"]
 layout_mode = 2
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_top = 2
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 2
 
-[node name="Button" type="Button" parent="HBoxContainer/Angle/ModifiersList/ButtonContainer"]
+[node name="Button" type="Button" parent="HBoxContainer/Angle/SelectList/ButtonContainer"]
 custom_minimum_size = Vector2(80, 0)
 layout_mode = 2
 mouse_default_cursor_shape = 2
@@ -252,85 +249,85 @@ theme_override_styles/focus = SubResource("StyleBoxFlat_65ox5")
 text = "All Angles"
 flat = true
 
-[node name="SeparatorContainer" type="MarginContainer" parent="HBoxContainer/Angle/ModifiersList"]
+[node name="SeparatorContainer" type="MarginContainer" parent="HBoxContainer/Angle/SelectList"]
 layout_mode = 2
 theme_override_constants/margin_bottom = 2
 
-[node name="HSeparator" type="HSeparator" parent="HBoxContainer/Angle/ModifiersList/SeparatorContainer"]
+[node name="HSeparator" type="HSeparator" parent="HBoxContainer/Angle/SelectList/SeparatorContainer"]
 layout_mode = 2
 theme_override_constants/separation = 0
 
-[node name="All" type="MarginContainer" parent="HBoxContainer/Angle/ModifiersList"]
+[node name="All" type="MarginContainer" parent="HBoxContainer/Angle/SelectList"]
 visible = false
 layout_mode = 2
 theme_override_constants/margin_bottom = 2
 script = ExtResource("4_5frov")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/Angle/ModifiersList/All"]
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/Angle/SelectList/All"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="HBoxContainer/Angle/ModifiersList/All/VBoxContainer"]
+[node name="Label" type="Label" parent="HBoxContainer/Angle/SelectList/All/VBoxContainer"]
 layout_mode = 2
 text = "All"
 horizontal_alignment = 1
 
-[node name="X" type="MarginContainer" parent="HBoxContainer/Angle/ModifiersList"]
+[node name="X" type="MarginContainer" parent="HBoxContainer/Angle/SelectList"]
 visible = false
 layout_mode = 2
 theme_override_constants/margin_bottom = 2
 script = ExtResource("4_5frov")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/Angle/ModifiersList/X"]
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/Angle/SelectList/X"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="HBoxContainer/Angle/ModifiersList/X/VBoxContainer"]
+[node name="Label" type="Label" parent="HBoxContainer/Angle/SelectList/X/VBoxContainer"]
 layout_mode = 2
 text = "X"
 horizontal_alignment = 1
 
-[node name="Y" type="MarginContainer" parent="HBoxContainer/Angle/ModifiersList"]
+[node name="Y" type="MarginContainer" parent="HBoxContainer/Angle/SelectList"]
 visible = false
 layout_mode = 2
 theme_override_constants/margin_bottom = 2
 script = ExtResource("4_5frov")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/Angle/ModifiersList/Y"]
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/Angle/SelectList/Y"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="HBoxContainer/Angle/ModifiersList/Y/VBoxContainer"]
+[node name="Label" type="Label" parent="HBoxContainer/Angle/SelectList/Y/VBoxContainer"]
 layout_mode = 2
 text = "Y"
 horizontal_alignment = 1
 
-[node name="Z" type="MarginContainer" parent="HBoxContainer/Angle/ModifiersList"]
+[node name="Z" type="MarginContainer" parent="HBoxContainer/Angle/SelectList"]
 visible = false
 layout_mode = 2
 theme_override_constants/margin_bottom = 2
 script = ExtResource("4_5frov")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/Angle/ModifiersList/Z"]
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/Angle/SelectList/Z"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="HBoxContainer/Angle/ModifiersList/Z/VBoxContainer"]
+[node name="Label" type="Label" parent="HBoxContainer/Angle/SelectList/Z/VBoxContainer"]
 layout_mode = 2
 text = "Z"
 horizontal_alignment = 1
 
-[node name="RotateValues" type="HBoxContainer" parent="HBoxContainer" node_paths=PackedStringArray("_Control")]
+[node name="RotateValues" type="HBoxContainer" parent="HBoxContainer" node_paths=PackedStringArray("ConditionalControl")]
 visible = false
 layout_mode = 2
 script = ExtResource("4_av7ja")
-_Control = NodePath("../QuickAction/ModifiersList")
+ConditionalControl = NodePath("../QuickAction/SelectList")
 values = PackedStringArray("Rotate")
 
-[node name="RotateAngleX" type="PanelContainer" parent="HBoxContainer/RotateValues" node_paths=PackedStringArray("_Control")]
+[node name="RotateAngleX" type="PanelContainer" parent="HBoxContainer/RotateValues" node_paths=PackedStringArray("ConditionalControl")]
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 0
 tooltip_text = "View modifiers available"
 mouse_default_cursor_shape = 2
 script = ExtResource("4_av7ja")
-_Control = NodePath("../../Angle/ModifiersList")
+ConditionalControl = NodePath("../../Angle/SelectList")
 values = PackedStringArray("All", "X")
 metadata/_edit_use_anchors_ = true
 
@@ -342,14 +339,14 @@ max_value = 360.0
 step = 5.0
 prefix = "X: "
 
-[node name="RotateAngleY" type="PanelContainer" parent="HBoxContainer/RotateValues" node_paths=PackedStringArray("_Control")]
+[node name="RotateAngleY" type="PanelContainer" parent="HBoxContainer/RotateValues" node_paths=PackedStringArray("ConditionalControl")]
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 0
 tooltip_text = "View modifiers available"
 mouse_default_cursor_shape = 2
 script = ExtResource("4_av7ja")
-_Control = NodePath("../../Angle/ModifiersList")
+ConditionalControl = NodePath("../../Angle/SelectList")
 values = PackedStringArray("All", "Y")
 metadata/_edit_use_anchors_ = true
 
@@ -359,14 +356,14 @@ max_value = 360.0
 step = 5.0
 prefix = "Y: "
 
-[node name="RotateAngleZ" type="PanelContainer" parent="HBoxContainer/RotateValues" node_paths=PackedStringArray("_Control")]
+[node name="RotateAngleZ" type="PanelContainer" parent="HBoxContainer/RotateValues" node_paths=PackedStringArray("ConditionalControl")]
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 0
 tooltip_text = "View modifiers available"
 mouse_default_cursor_shape = 2
 script = ExtResource("4_av7ja")
-_Control = NodePath("../../Angle/ModifiersList")
+ConditionalControl = NodePath("../../Angle/SelectList")
 values = PackedStringArray("All", "Z")
 metadata/_edit_use_anchors_ = true
 
@@ -376,21 +373,21 @@ max_value = 360.0
 step = 5.0
 prefix = "Z: "
 
-[node name="ScaleValues" type="HBoxContainer" parent="HBoxContainer" node_paths=PackedStringArray("_Control")]
+[node name="ScaleValues" type="HBoxContainer" parent="HBoxContainer" node_paths=PackedStringArray("ConditionalControl")]
 visible = false
 layout_mode = 2
 script = ExtResource("4_av7ja")
-_Control = NodePath("../QuickAction/ModifiersList")
+ConditionalControl = NodePath("../QuickAction/SelectList")
 values = PackedStringArray("Scale")
 
-[node name="ScaleAngleX" type="PanelContainer" parent="HBoxContainer/ScaleValues" node_paths=PackedStringArray("_Control")]
+[node name="ScaleAngleX" type="PanelContainer" parent="HBoxContainer/ScaleValues" node_paths=PackedStringArray("ConditionalControl")]
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 0
 tooltip_text = "View modifiers available"
 mouse_default_cursor_shape = 2
 script = ExtResource("4_av7ja")
-_Control = NodePath("../../Angle/ModifiersList")
+ConditionalControl = NodePath("../../Angle/SelectList")
 values = PackedStringArray("All", "X")
 metadata/_edit_use_anchors_ = true
 
@@ -402,14 +399,14 @@ max_value = 360.0
 step = 0.1
 prefix = "X: "
 
-[node name="ScaleAngleY" type="PanelContainer" parent="HBoxContainer/ScaleValues" node_paths=PackedStringArray("_Control")]
+[node name="ScaleAngleY" type="PanelContainer" parent="HBoxContainer/ScaleValues" node_paths=PackedStringArray("ConditionalControl")]
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 0
 tooltip_text = "View modifiers available"
 mouse_default_cursor_shape = 2
 script = ExtResource("4_av7ja")
-_Control = NodePath("../../Angle/ModifiersList")
+ConditionalControl = NodePath("../../Angle/SelectList")
 values = PackedStringArray("All", "Y")
 metadata/_edit_use_anchors_ = true
 
@@ -419,14 +416,14 @@ max_value = 360.0
 step = 0.1
 prefix = "Y: "
 
-[node name="ScaleAngleZ" type="PanelContainer" parent="HBoxContainer/ScaleValues" node_paths=PackedStringArray("_Control")]
+[node name="ScaleAngleZ" type="PanelContainer" parent="HBoxContainer/ScaleValues" node_paths=PackedStringArray("ConditionalControl")]
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 0
 tooltip_text = "View modifiers available"
 mouse_default_cursor_shape = 2
 script = ExtResource("4_av7ja")
-_Control = NodePath("../../Angle/ModifiersList")
+ConditionalControl = NodePath("../../Angle/SelectList")
 values = PackedStringArray("All", "Z")
 metadata/_edit_use_anchors_ = true
 
@@ -436,7 +433,7 @@ max_value = 360.0
 step = 0.1
 prefix = "Z: "
 
-[connection signal="StateChanged" from="HBoxContainer/QuickAction/ModifiersList" to="." method="_OnQuickActionChange"]
+[connection signal="StateChanged" from="HBoxContainer/QuickAction/SelectList" to="." method="_OnQuickActionChange"]
 [connection signal="value_changed" from="HBoxContainer/RotateValues/RotateAngleX/SpinBox" to="." method="_OnRotateXChanged"]
 [connection signal="value_changed" from="HBoxContainer/RotateValues/RotateAngleY/SpinBox" to="." method="_OnRotateYChanged"]
 [connection signal="value_changed" from="HBoxContainer/RotateValues/RotateAngleZ/SpinBox" to="." method="_OnRotateZChanged"]

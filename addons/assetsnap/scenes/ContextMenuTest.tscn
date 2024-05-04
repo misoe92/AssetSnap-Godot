@@ -1,9 +1,29 @@
-[gd_scene load_steps=3 format=3 uid="uid://bxehi2qsa633l"]
+[gd_scene load_steps=13 format=3 uid="uid://bxehi2qsa633l"]
 
 [ext_resource type="Theme" uid="uid://c528pe12u8j3m" path="res://addons/assetsnap/assets/themes/contextmenu.tres" id="1_gesve"]
 [ext_resource type="Script" path="res://addons/assetsnap/nodes/interface/AsContextMenu.cs" id="2_pj4bm"]
+[ext_resource type="Script" path="res://addons/assetsnap/nodes/interface/AsSelectList.cs" id="3_0r6pa"]
+[ext_resource type="Script" path="res://addons/assetsnap/nodes/interface/HoverableMarginContainer/ArrayMarginContainer.cs" id="4_sf26a"]
+[ext_resource type="Script" path="res://addons/assetsnap/nodes/interface/HoverableMarginContainer/ScatterMarginContainer.cs" id="5_c3f7b"]
+[ext_resource type="Script" path="res://addons/assetsnap/nodes/interface/HoverableMarginContainer.cs" id="6_3vok2"]
+[ext_resource type="Script" path="res://addons/assetsnap/nodes/interface/AsConditional.cs" id="7_3eslx"]
 
-[node name="ContextMenuBase" type="Control"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5ha3a"]
+content_margin_top = 3.0
+content_margin_bottom = 3.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_n514h"]
+bg_color = Color(0.6, 0.6, 0.6, 0)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tgch2"]
+bg_color = Color(0.6, 0.6, 0.6, 0)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_k14vp"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3ipek"]
+bg_color = Color(0.6, 0.6, 0.6, 0)
+
+[node name="AsContextMenu" type="Control"]
 z_as_relative = false
 layout_mode = 3
 anchor_left = 0.216146
@@ -19,3 +39,393 @@ size_flags_vertical = 0
 theme = ExtResource("1_gesve")
 script = ExtResource("2_pj4bm")
 metadata/_edit_use_anchors_ = true
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+offset_right = 204.0
+offset_bottom = 90.0
+
+[node name="Modifiers" type="PanelContainer" parent="HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+mouse_default_cursor_shape = 2
+metadata/_edit_use_anchors_ = true
+
+[node name="ModifiersList" type="VBoxContainer" parent="HBoxContainer/Modifiers" node_paths=PackedStringArray("SelectButton", "Items")]
+layout_mode = 2
+theme_override_constants/separation = 0
+script = ExtResource("3_0r6pa")
+SelectButton = NodePath("")
+Items = [NodePath("ArrayContainer"), NodePath("ScatterContainer")]
+
+[node name="ButtonContainer" type="MarginContainer" parent="HBoxContainer/Modifiers/SelectList"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 2
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 2
+
+[node name="Button" type="Button" parent="HBoxContainer/Modifiers/SelectList/ButtonContainer"]
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
+tooltip_text = "View actions available"
+mouse_default_cursor_shape = 2
+theme_override_font_sizes/font_size = 12
+theme_override_styles/normal = SubResource("StyleBoxFlat_5ha3a")
+theme_override_styles/hover = SubResource("StyleBoxFlat_n514h")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_tgch2")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_k14vp")
+theme_override_styles/focus = SubResource("StyleBoxFlat_3ipek")
+text = "Modifiers"
+flat = true
+
+[node name="SeparatorContainer" type="MarginContainer" parent="HBoxContainer/Modifiers/SelectList"]
+visible = false
+layout_mode = 2
+theme_override_constants/margin_bottom = 2
+
+[node name="HSeparator" type="HSeparator" parent="HBoxContainer/Modifiers/SelectList/SeparatorContainer"]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="ArrayContainer" type="MarginContainer" parent="HBoxContainer/Modifiers/SelectList"]
+visible = false
+layout_mode = 2
+tooltip_text = "Apply array modifier to node"
+theme_override_constants/margin_bottom = 2
+script = ExtResource("4_sf26a")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/Modifiers/SelectList/ArrayContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="HBoxContainer/Modifiers/SelectList/ArrayContainer/VBoxContainer"]
+layout_mode = 2
+text = "Array"
+horizontal_alignment = 1
+
+[node name="ScatterContainer" type="MarginContainer" parent="HBoxContainer/Modifiers/SelectList"]
+visible = false
+layout_mode = 2
+tooltip_text = "Apply scatter modifier to node"
+theme_override_constants/margin_bottom = 2
+script = ExtResource("5_c3f7b")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/Modifiers/SelectList/ScatterContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="HBoxContainer/Modifiers/SelectList/ScatterContainer/VBoxContainer"]
+layout_mode = 2
+text = "Scatter"
+horizontal_alignment = 1
+
+[node name="QuickAction" type="PanelContainer" parent="HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+mouse_default_cursor_shape = 2
+metadata/_edit_use_anchors_ = true
+
+[node name="SelectList" type="VBoxContainer" parent="HBoxContainer/QuickAction" node_paths=PackedStringArray("SelectButton", "Items")]
+layout_mode = 2
+theme_override_constants/separation = 0
+script = ExtResource("3_0r6pa")
+SelectButton = NodePath("")
+Items = [NodePath("None"), NodePath("Rotate"), NodePath("Scale")]
+
+[node name="ButtonContainer" type="MarginContainer" parent="HBoxContainer/QuickAction/SelectList"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 2
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 2
+
+[node name="Button" type="Button" parent="HBoxContainer/QuickAction/SelectList/ButtonContainer"]
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
+tooltip_text = "View actions available"
+mouse_default_cursor_shape = 2
+theme_override_font_sizes/font_size = 12
+theme_override_styles/normal = SubResource("StyleBoxFlat_5ha3a")
+theme_override_styles/hover = SubResource("StyleBoxFlat_n514h")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_tgch2")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_k14vp")
+theme_override_styles/focus = SubResource("StyleBoxFlat_3ipek")
+text = "Quick Action"
+flat = true
+
+[node name="SeparatorContainer" type="MarginContainer" parent="HBoxContainer/QuickAction/SelectList"]
+visible = false
+layout_mode = 2
+theme_override_constants/margin_bottom = 2
+
+[node name="HSeparator" type="HSeparator" parent="HBoxContainer/QuickAction/SelectList/SeparatorContainer"]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="None" type="MarginContainer" parent="HBoxContainer/QuickAction/SelectList"]
+visible = false
+layout_mode = 2
+tooltip_text = "Clears quick action (Shift + Alt + Q)"
+theme_override_constants/margin_bottom = 2
+script = ExtResource("6_3vok2")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/QuickAction/SelectList/None"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="HBoxContainer/QuickAction/SelectList/None/VBoxContainer"]
+layout_mode = 2
+text = "None"
+horizontal_alignment = 1
+
+[node name="Rotate" type="MarginContainer" parent="HBoxContainer/QuickAction/SelectList"]
+visible = false
+layout_mode = 2
+tooltip_text = "Enables quick rotation (Shift + Alt + R)"
+theme_override_constants/margin_bottom = 2
+script = ExtResource("6_3vok2")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/QuickAction/SelectList/Rotate"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="HBoxContainer/QuickAction/SelectList/Rotate/VBoxContainer"]
+layout_mode = 2
+text = "Rotate"
+horizontal_alignment = 1
+
+[node name="Scale" type="MarginContainer" parent="HBoxContainer/QuickAction/SelectList"]
+visible = false
+layout_mode = 2
+tooltip_text = "Enables quick scaling (Shift + Alt + S)"
+theme_override_constants/margin_bottom = 2
+script = ExtResource("6_3vok2")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/QuickAction/SelectList/Scale"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="HBoxContainer/QuickAction/SelectList/Scale/VBoxContainer"]
+layout_mode = 2
+text = "Scale"
+horizontal_alignment = 1
+
+[node name="Angle" type="PanelContainer" parent="HBoxContainer" node_paths=PackedStringArray("ConditionalControl")]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+tooltip_text = "View modifiers available"
+mouse_default_cursor_shape = 2
+script = ExtResource("7_3eslx")
+ConditionalControl = NodePath("")
+values = PackedStringArray("Rotate", "Scale")
+metadata/_edit_use_anchors_ = true
+
+[node name="SelectList" type="VBoxContainer" parent="HBoxContainer/Angle" node_paths=PackedStringArray("SelectButton", "Items")]
+layout_mode = 2
+theme_override_constants/separation = 0
+script = ExtResource("3_0r6pa")
+SelectButton = NodePath("")
+Items = [NodePath("All"), NodePath("X"), NodePath("Y"), NodePath("Z")]
+
+[node name="ButtonContainer" type="MarginContainer" parent="HBoxContainer/Angle/SelectList"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 2
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 2
+
+[node name="Button" type="Button" parent="HBoxContainer/Angle/SelectList/ButtonContainer"]
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_font_sizes/font_size = 12
+theme_override_styles/normal = SubResource("StyleBoxFlat_5ha3a")
+theme_override_styles/hover = SubResource("StyleBoxFlat_n514h")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_tgch2")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_k14vp")
+theme_override_styles/focus = SubResource("StyleBoxFlat_3ipek")
+text = "All Angles"
+flat = true
+
+[node name="SeparatorContainer" type="MarginContainer" parent="HBoxContainer/Angle/SelectList"]
+layout_mode = 2
+theme_override_constants/margin_bottom = 2
+
+[node name="HSeparator" type="HSeparator" parent="HBoxContainer/Angle/SelectList/SeparatorContainer"]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="All" type="MarginContainer" parent="HBoxContainer/Angle/SelectList"]
+visible = false
+layout_mode = 2
+theme_override_constants/margin_bottom = 2
+script = ExtResource("6_3vok2")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/Angle/SelectList/All"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="HBoxContainer/Angle/SelectList/All/VBoxContainer"]
+layout_mode = 2
+text = "All"
+horizontal_alignment = 1
+
+[node name="X" type="MarginContainer" parent="HBoxContainer/Angle/SelectList"]
+visible = false
+layout_mode = 2
+theme_override_constants/margin_bottom = 2
+script = ExtResource("6_3vok2")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/Angle/SelectList/X"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="HBoxContainer/Angle/SelectList/X/VBoxContainer"]
+layout_mode = 2
+text = "X"
+horizontal_alignment = 1
+
+[node name="Y" type="MarginContainer" parent="HBoxContainer/Angle/SelectList"]
+visible = false
+layout_mode = 2
+theme_override_constants/margin_bottom = 2
+script = ExtResource("6_3vok2")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/Angle/SelectList/Y"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="HBoxContainer/Angle/SelectList/Y/VBoxContainer"]
+layout_mode = 2
+text = "Y"
+horizontal_alignment = 1
+
+[node name="Z" type="MarginContainer" parent="HBoxContainer/Angle/SelectList"]
+visible = false
+layout_mode = 2
+theme_override_constants/margin_bottom = 2
+script = ExtResource("6_3vok2")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/Angle/SelectList/Z"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="HBoxContainer/Angle/SelectList/Z/VBoxContainer"]
+layout_mode = 2
+text = "Z"
+horizontal_alignment = 1
+
+[node name="RotateValues" type="HBoxContainer" parent="HBoxContainer" node_paths=PackedStringArray("ConditionalControl")]
+visible = false
+layout_mode = 2
+script = ExtResource("7_3eslx")
+ConditionalControl = NodePath("")
+values = PackedStringArray("Rotate")
+
+[node name="RotateAngleX" type="PanelContainer" parent="HBoxContainer/RotateValues" node_paths=PackedStringArray("ConditionalControl")]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+tooltip_text = "View modifiers available"
+mouse_default_cursor_shape = 2
+script = ExtResource("7_3eslx")
+ConditionalControl = NodePath("")
+values = PackedStringArray("All", "X")
+metadata/_edit_use_anchors_ = true
+
+[node name="SpinBox" type="SpinBox" parent="HBoxContainer/RotateValues/RotateAngleX"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+max_value = 360.0
+step = 5.0
+prefix = "X: "
+
+[node name="RotateAngleY" type="PanelContainer" parent="HBoxContainer/RotateValues" node_paths=PackedStringArray("ConditionalControl")]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+tooltip_text = "View modifiers available"
+mouse_default_cursor_shape = 2
+script = ExtResource("7_3eslx")
+ConditionalControl = NodePath("")
+values = PackedStringArray("All", "Y")
+metadata/_edit_use_anchors_ = true
+
+[node name="SpinBox" type="SpinBox" parent="HBoxContainer/RotateValues/RotateAngleY"]
+layout_mode = 2
+max_value = 360.0
+step = 5.0
+prefix = "Y: "
+
+[node name="RotateAngleZ" type="PanelContainer" parent="HBoxContainer/RotateValues" node_paths=PackedStringArray("ConditionalControl")]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+tooltip_text = "View modifiers available"
+mouse_default_cursor_shape = 2
+script = ExtResource("7_3eslx")
+ConditionalControl = NodePath("")
+values = PackedStringArray("All", "Z")
+metadata/_edit_use_anchors_ = true
+
+[node name="SpinBox" type="SpinBox" parent="HBoxContainer/RotateValues/RotateAngleZ"]
+layout_mode = 2
+max_value = 360.0
+step = 5.0
+prefix = "Z: "
+
+[node name="ScaleValues" type="HBoxContainer" parent="HBoxContainer" node_paths=PackedStringArray("ConditionalControl")]
+visible = false
+layout_mode = 2
+script = ExtResource("7_3eslx")
+ConditionalControl = NodePath("")
+values = PackedStringArray("Scale")
+
+[node name="ScaleAngleX" type="PanelContainer" parent="HBoxContainer/ScaleValues" node_paths=PackedStringArray("ConditionalControl")]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+tooltip_text = "View modifiers available"
+mouse_default_cursor_shape = 2
+script = ExtResource("7_3eslx")
+ConditionalControl = NodePath("")
+values = PackedStringArray("All", "X")
+metadata/_edit_use_anchors_ = true
+
+[node name="SpinBox" type="SpinBox" parent="HBoxContainer/ScaleValues/ScaleAngleX"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+max_value = 360.0
+step = 0.1
+prefix = "X: "
+
+[node name="ScaleAngleY" type="PanelContainer" parent="HBoxContainer/ScaleValues" node_paths=PackedStringArray("ConditionalControl")]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+tooltip_text = "View modifiers available"
+mouse_default_cursor_shape = 2
+script = ExtResource("7_3eslx")
+ConditionalControl = NodePath("")
+values = PackedStringArray("All", "Y")
+metadata/_edit_use_anchors_ = true
+
+[node name="SpinBox" type="SpinBox" parent="HBoxContainer/ScaleValues/ScaleAngleY"]
+layout_mode = 2
+max_value = 360.0
+step = 0.1
+prefix = "Y: "
+
+[node name="ScaleAngleZ" type="PanelContainer" parent="HBoxContainer/ScaleValues" node_paths=PackedStringArray("ConditionalControl")]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+tooltip_text = "View modifiers available"
+mouse_default_cursor_shape = 2
+script = ExtResource("7_3eslx")
+ConditionalControl = NodePath("")
+values = PackedStringArray("All", "Z")
+metadata/_edit_use_anchors_ = true
+
+[node name="SpinBox" type="SpinBox" parent="HBoxContainer/ScaleValues/ScaleAngleZ"]
+layout_mode = 2
+max_value = 360.0
+step = 0.1
+prefix = "Z: "

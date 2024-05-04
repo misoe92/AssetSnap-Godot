@@ -31,18 +31,9 @@ namespace AssetSnap.Static
 	public static class WaypointsStatic
 	{
 		/// <summary>
-		/// Checks if any waypoints exist.
+		/// Performs an action on each waypoint.
 		/// </summary>
-		/// <returns>True if any waypoints exist, false otherwise.</returns>
-		public static bool HasAnyWaypoints()
-		{
-			return GlobalExplorer.GetInstance().Waypoints.HasAnyWaypoints();
-		}
-		
-		/// <summary>
-        /// Performs an action on each waypoint.
-        /// </summary>
-        /// <param name="action">The action to perform on each waypoint.</param>
+		/// <param name="action">The action to perform on each waypoint.</param>
 		public static void Each( Action<BaseWaypoint> action )
 		{
 			GlobalExplorer.GetInstance().Waypoints.WaypointList.Each(
@@ -52,6 +43,15 @@ namespace AssetSnap.Static
 					callable.Invoke(Point);
 				}
 			);
+		}
+		
+		/// <summary>
+		/// Checks if any waypoints exist.
+		/// </summary>
+		/// <returns>True if any waypoints exist, false otherwise.</returns>
+		public static bool HasAnyWaypoints()
+		{
+			return GlobalExplorer.GetInstance().Waypoints.HasAnyWaypoints();
 		}
 	}
 }

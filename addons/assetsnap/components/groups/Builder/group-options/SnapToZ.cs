@@ -23,6 +23,7 @@
 #if TOOLS
 
 using AssetSnap.Component;
+using AssetSnap.States;
 using Godot;
 
 namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
@@ -40,7 +41,7 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 		{
 			Name = "GroupsBuilderGroupOptionsSnapToZ";
 		
-			UsingTraits = new()
+			_UsingTraits = new()
 			{
 				{ typeof(Checkable).ToString() },
 			};
@@ -66,13 +67,13 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 		{
 			_GlobalExplorer.GroupBuilder._Editor.Group.SnapToZ = !_GlobalExplorer.GroupBuilder._Editor.Group.SnapToZ;
 				
-			if( true == _GlobalExplorer.GroupBuilder._Editor.Group.SnapToZ && _GlobalExplorer.States.PlacingMode == GlobalStates.PlacingModeEnum.Group )
+			if( true == _GlobalExplorer.GroupBuilder._Editor.Group.SnapToZ && StatesUtils.Get().PlacingMode == GlobalStates.PlacingModeEnum.Group )
 			{
-				_GlobalExplorer.States.SnapToZ = GlobalStates.LibraryStateEnum.Enabled;
+				StatesUtils.Get().SnapToZ = GlobalStates.LibraryStateEnum.Enabled;
 			}
-			else if( _GlobalExplorer.States.PlacingMode == GlobalStates.PlacingModeEnum.Group )
+			else if( StatesUtils.Get().PlacingMode == GlobalStates.PlacingModeEnum.Group )
 			{
-				_GlobalExplorer.States.SnapToZ = GlobalStates.LibraryStateEnum.Disabled;
+				StatesUtils.Get().SnapToZ = GlobalStates.LibraryStateEnum.Disabled;
 			}
 																								
 			Parent._UpdateGroupOptions();

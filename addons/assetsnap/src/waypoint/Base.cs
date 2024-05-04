@@ -21,25 +21,20 @@
 // SOFTWARE.
 
 #if TOOLS
+
+using System;
+using AssetSnap.Front.Nodes;
+using AssetSnap.States;
+using AssetSnap.Static;
+using Godot;
+
 namespace AssetSnap.Waypoint
 {
-	using System;
-	using AssetSnap.Front.Nodes;
-	using AssetSnap.States;
-	using AssetSnap.Static;
-	using Godot;
-
 	/// <summary>
 	/// Provides functionality for managing waypoints in the scene.
 	/// </summary>
 	public partial class Base
 	{
-		private Node _ParentContainer;
-		public WaypointList WaypointList;
-		public float SnapDistance = 1.0f;
-		public Node3D WorkingNode;
-		private static Base _Instance;
-		
 		/// <summary>
 		/// Gets the singleton instance of the waypoint system.
 		/// </summary>
@@ -55,6 +50,13 @@ namespace AssetSnap.Waypoint
 				return _Instance;
 			}
 		}
+		
+		public float SnapDistance = 1.0f;
+		public Node3D WorkingNode;
+		public WaypointList WaypointList;
+		
+		private static Base _Instance;
+		private Node _ParentContainer;
 
 		/// <summary>
 		/// Initializes the waypoint system.
@@ -139,23 +141,7 @@ namespace AssetSnap.Waypoint
 			}
 		}
 
-		/// <summary>
-		/// Checks if the current placing mode is set to Simple.
-		/// </summary>
-		/// <returns>True if the placing mode is Simple, otherwise false.</returns>
-		private bool IsSimpleMode()
-		{
-			return StatesUtils.Get().PlacingType == GlobalStates.PlacingTypeEnum.Simple;
-		}
-
-		/// <summary>
-		/// Checks if the current placing mode is set to Optimized.
-		/// </summary>
-		/// <returns>True if the placing mode is Optimized, otherwise false.</returns>
-		private bool IsOptimizedMode()
-		{
-			return StatesUtils.Get().PlacingType == GlobalStates.PlacingTypeEnum.Optimized;
-		}
+		
 
 		/// <summary>
 		/// Spawns a model using the simple placement method.
@@ -224,6 +210,65 @@ namespace AssetSnap.Waypoint
 			}
 		}
 
+		/// <summary>
+		/// Removes a waypoint given its ModelInstance and its origin point.
+		/// </summary>
+		/// <param name="ModelInstance">The model instance to remove.</param>
+		/// <param name="Origin">The origin position of the waypoint.</param>
+		public void Remove(Node ModelInstance, Vector3 Origin)
+		{
+			if (null == WaypointList)
+			{
+				return;
+			}
+
+			if (EditorPlugin.IsInstanceValid(ModelInstance))
+			{
+				WaypointList.Remove(ModelInstance, Origin);
+			}
+		}
+
+		/// <summary>
+		/// Registers a new waypoint.
+		/// </summary>
+		/// <param name="node">The node to register.</param>
+		/// <param name="Origin">The origin position of the node.</param>
+		/// <param name="Rot">The rotation of the node.</param>
+		/// <param name="Scale">The scale of the node.</param>
+		public void Register(Node3D node, Vector3 Origin, Vector3 Rot, Vector3 Scale)
+		{
+			if (null == WaypointList)
+			{
+				return;
+			}
+
+			WaypointList.Add(node, Origin, Rot, Scale);
+		}
+		
+		/// <summary>
+		/// Updates the scale value on a waypoint positioned on a given origin point.
+		/// </summary>
+		/// <param name="Origin">The origin position of the waypoint.</param>
+		/// <param name="Scale">The new scale value.</param>
+		public void UpdateScaleOnPoint(Vector3 Origin, Vector3 Scale)
+		{
+			if (null == WaypointList)
+			{
+				return;
+			}
+
+			WaypointList.Update("Scale", Scale, Origin);
+		}
+		
+		/// <summary>
+		/// Sets the parent container for spawning nodes.
+		/// </summary>
+		/// <param name="Container">The parent container node.</param>
+		public void SetParentContainer(Node Container)
+		{
+			_ParentContainer = Container;
+		}
+		
 		/// <summary>
 		/// Handles the optimized spawning of a single mesh instance.
 		/// </summary>
@@ -369,40 +414,14 @@ namespace AssetSnap.Waypoint
 
 			return 0;
 		}
-
+		
 		/// <summary>
-		/// Removes a waypoint given its ModelInstance and its origin point.
+		/// Retrieves the node that is currently being worked on.
 		/// </summary>
-		/// <param name="ModelInstance">The model instance to remove.</param>
-		/// <param name="Origin">The origin position of the waypoint.</param>
-		public void Remove(Node ModelInstance, Vector3 Origin)
+		/// <returns>The working node.</returns>
+		public Node3D GetWorkingNode()
 		{
-			if (null == WaypointList)
-			{
-				return;
-			}
-
-			if (EditorPlugin.IsInstanceValid(ModelInstance))
-			{
-				WaypointList.Remove(ModelInstance, Origin);
-			}
-		}
-
-		/// <summary>
-		/// Registers a new waypoint.
-		/// </summary>
-		/// <param name="node">The node to register.</param>
-		/// <param name="Origin">The origin position of the node.</param>
-		/// <param name="Rot">The rotation of the node.</param>
-		/// <param name="Scale">The scale of the node.</param>
-		public void Register(Node3D node, Vector3 Origin, Vector3 Rot, Vector3 Scale)
-		{
-			if (null == WaypointList)
-			{
-				return;
-			}
-
-			WaypointList.Add(node, Origin, Rot, Scale);
+			return WorkingNode;
 		}
 
 		/// <summary>
@@ -421,27 +440,12 @@ namespace AssetSnap.Waypoint
 		}
 		
 		/// <summary>
-		/// Updates the scale value on a waypoint positioned on a given origin point.
+		/// Checks if any waypoints are available.
 		/// </summary>
-		/// <param name="Origin">The origin position of the waypoint.</param>
-		/// <param name="Scale">The new scale value.</param>
-		public void UpdateScaleOnPoint(Vector3 Origin, Vector3 Scale)
+		/// <returns>True if there are any waypoints, otherwise false.</returns>
+		public bool HasAnyWaypoints()
 		{
-			if (null == WaypointList)
-			{
-				return;
-			}
-
-			WaypointList.Update("Scale", Scale, Origin);
-		}
-
-		/// <summary>
-		/// Retrieves the node that is currently being worked on.
-		/// </summary>
-		/// <returns>The working node.</returns>
-		public Node3D GetWorkingNode()
-		{
-			return WorkingNode;
+			return false == WaypointList.IsEmpty();
 		}
 
 		/// <summary>
@@ -517,15 +521,6 @@ namespace AssetSnap.Waypoint
 			}
 
 			_model.NotifyPropertyListChanged();
-		}
-
-		/// <summary>
-		/// Sets the parent container for spawning nodes.
-		/// </summary>
-		/// <param name="Container">The parent container node.</param>
-		public void SetParentContainer(Node Container)
-		{
-			_ParentContainer = Container;
 		}
 
 		/// <summary>
@@ -640,15 +635,25 @@ namespace AssetSnap.Waypoint
 				}
 			}
 		}
+		
+		/// <summary>
+		/// Checks if the current placing mode is set to Simple.
+		/// </summary>
+		/// <returns>True if the placing mode is Simple, otherwise false.</returns>
+		private bool IsSimpleMode()
+		{
+			return StatesUtils.Get().PlacingType == GlobalStates.PlacingTypeEnum.Simple;
+		}
 
 		/// <summary>
-		/// Checks if any waypoints are available.
+		/// Checks if the current placing mode is set to Optimized.
 		/// </summary>
-		/// <returns>True if there are any waypoints, otherwise false.</returns>
-		public bool HasAnyWaypoints()
+		/// <returns>True if the placing mode is Optimized, otherwise false.</returns>
+		private bool IsOptimizedMode()
 		{
-			return false == WaypointList.IsEmpty();
+			return StatesUtils.Get().PlacingType == GlobalStates.PlacingTypeEnum.Optimized;
 		}
 	}
 }
+
 #endif

@@ -37,17 +37,17 @@ namespace AssetSnap.Front.Components.Library
 		/// <summary>
 		/// The title of the library list.
 		/// </summary>
-		public ListTitle _LibraryListTitle;
+		public ListTitle LibraryListTitle;
 		
 		/// <summary>
 		/// The search component of the library.
 		/// </summary>
-		public Search _LibrarySearch;
+		public Search LibrarySearch;
 		
 		/// <summary>
 		/// The total number of items in the library.
 		/// </summary>
-		public TotalItems _LibraryItems;
+		public TotalItems LibraryItems;
 		
 		/// <summary>
 		/// Constructor for Topbar class.
@@ -58,7 +58,7 @@ namespace AssetSnap.Front.Components.Library
 			SizeFlagsHorizontal = SizeFlags.ExpandFill;
 			SizeFlagsVertical = SizeFlags.ShrinkBegin;
 			
-			UsingTraits = new()
+			_UsingTraits = new()
 			{
 				{ typeof(Containerable).ToString() },
 			};
@@ -72,7 +72,7 @@ namespace AssetSnap.Front.Components.Library
 		public override void Initialize()
 		{
 			base.Initialize();
-			Initiated = true;
+			_Initiated = true;
 			
 			// Container 3 way
 			// TitleComponent (spot 1)
@@ -104,29 +104,29 @@ namespace AssetSnap.Front.Components.Library
 
 			if (GlobalExplorer.GetInstance().Components.HasAll( Components.ToArray() )) 
 			{
-				_LibraryListTitle = GlobalExplorer.GetInstance().Components.Single<ListTitle>(true);
-				_LibrarySearch = GlobalExplorer.GetInstance().Components.Single<Search>(true);
-				_LibraryItems = GlobalExplorer.GetInstance().Components.Single<TotalItems>(true);
+				LibraryListTitle = GlobalExplorer.GetInstance().Components.Single<ListTitle>(true);
+				LibrarySearch = GlobalExplorer.GetInstance().Components.Single<Search>(true);
+				LibraryItems = GlobalExplorer.GetInstance().Components.Single<TotalItems>(true);
 
-				if( _LibraryListTitle != null ) 
+				if( LibraryListTitle != null ) 
 				{
-					_LibraryListTitle.LibraryName = LibraryName;
-					_LibraryListTitle.Initialize();
-					ContainerOne.AddChild(_LibraryListTitle);
+					LibraryListTitle.LibraryName = LibraryName;
+					LibraryListTitle.Initialize();
+					ContainerOne.AddChild(LibraryListTitle);
 				}
 				
-				if( _LibrarySearch != null ) 
+				if( LibrarySearch != null ) 
 				{
-					_LibrarySearch.LibraryName = LibraryName;
-					_LibrarySearch.Initialize();
-					ContainerTwo.AddChild(_LibrarySearch);
+					LibrarySearch.LibraryName = LibraryName;
+					LibrarySearch.Initialize();
+					ContainerTwo.AddChild(LibrarySearch);
 				}
 				
-				if( _LibraryItems != null ) 
+				if( LibraryItems != null ) 
 				{
-					_LibraryItems.LibraryName = LibraryName;
-					_LibraryItems.Initialize();
-					ContainerThree.AddChild(_LibraryItems);
+					LibraryItems.LibraryName = LibraryName;
+					LibraryItems.Initialize();
+					ContainerThree.AddChild(LibraryItems);
 				}
 			}
 

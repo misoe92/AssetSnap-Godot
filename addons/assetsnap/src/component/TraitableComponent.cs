@@ -35,15 +35,16 @@ namespace AssetSnap.Component
 	public partial class TraitableComponent : BaseComponent
 	{
 		[Export]
-		public Godot.Collections.Array<Trait.Base> boundTraits;
-		protected bool Initiated = false;
+		public Godot.Collections.Array<Trait.Base> BoundTraits;
+		
+		protected bool _Initiated = false;
 
 		/// <summary>
 		/// Default constructor for TraitableComponent.
 		/// </summary>
 		public TraitableComponent()
 		{
-			boundTraits = new();
+			BoundTraits = new();
 		}
 
 		/// <summary>
@@ -51,9 +52,9 @@ namespace AssetSnap.Component
 		/// </summary>
 		public override void Initialize()
 		{
-			if( false == Initiated ) 
+			if( false == _Initiated ) 
 			{
-				foreach( string traitString in UsingTraits ) 
+				foreach( string traitString in _UsingTraits ) 
 				{
 					AddTrait(Type.GetType(traitString), this);
 				}
@@ -85,9 +86,9 @@ namespace AssetSnap.Component
 				trait.OwnerName = Name;
 				container.AddChild(trait);
 				// Check if the trait is already bound
-				if (!boundTraits.Contains(trait))
+				if (!BoundTraits.Contains(trait))
 				{
-					boundTraits.Add(trait);
+					BoundTraits.Add(trait);
 				}
 				else
 				{
@@ -109,7 +110,7 @@ namespace AssetSnap.Component
 		/// <returns>True if the component has the specified trait type; otherwise, false.</returns>
 		public bool HasTrait<T>( bool debug = false)
 		{
-			if( boundTraits.Count == 0 ) 
+			if( BoundTraits.Count == 0 ) 
 			{
 				if (debug)
 				{
@@ -119,7 +120,7 @@ namespace AssetSnap.Component
 				return false;
 			}
 
-			Trait.Base traitInstance = boundTraits.FirstOrDefault(
+			Trait.Base traitInstance = BoundTraits.FirstOrDefault(
 				(t) =>
 				{
 					if (
@@ -177,26 +178,26 @@ namespace AssetSnap.Component
 		/// <returns>True if the trait was successfully cleared; otherwise, false.</returns>
 		public bool ClearTrait<T>(bool debug = false) 
 		{
-			if( boundTraits.Count == 0 ) 
+			if( BoundTraits.Count == 0 ) 
 			{
 				GD.PushWarning("No traits was found");
 				return false;
 			}
 	
-			foreach( string traitString in UsingTraits ) 
+			foreach( string traitString in _UsingTraits ) 
 			{
 				if( debug ) 
 				{
-					GD.Print("Clearing trait: ", traitString, "::", Name, "->Count(", boundTraits.Count, ")");
+					GD.Print("Clearing trait: ", traitString, "::", Name, "->Count(", BoundTraits.Count, ")");
 				}
 			
 				Trait(Type.GetType(traitString)).Clear(-1, debug);
 				Trait(Type.GetType(traitString)).Iteration = 0;
-				boundTraits.Remove(Trait(Type.GetType(traitString)));
+				BoundTraits.Remove(Trait(Type.GetType(traitString)));
 				
 				if( debug ) 
 				{
-					GD.Print("Cleared: ", traitString, "->Count(", boundTraits.Count, ")" );
+					GD.Print("Cleared: ", traitString, "->Count(", BoundTraits.Count, ")" );
 				}
 			}
 			
@@ -210,26 +211,26 @@ namespace AssetSnap.Component
 		/// <returns>True if all traits were successfully cleared; otherwise, false.</returns>
 		public bool ClearTrait(bool debug = false) 
 		{
-			if( boundTraits.Count == 0 ) 
+			if( BoundTraits.Count == 0 ) 
 			{
 				GD.PushWarning("No traits was found");
 				return false;
 			}
 			
-			foreach( string traitString in UsingTraits ) 
+			foreach( string traitString in _UsingTraits ) 
 			{
 				if( debug ) 
 				{
-					GD.Print("Clearing trait: ", traitString, "::", Name, "->Count(", boundTraits.Count, ")");
+					GD.Print("Clearing trait: ", traitString, "::", Name, "->Count(", BoundTraits.Count, ")");
 				}
 				
 				Trait(Type.GetType(traitString)).Clear(-1, debug);
 				Trait(Type.GetType(traitString)).Iteration = 0;
-				boundTraits.Remove(Trait(Type.GetType(traitString)));
+				BoundTraits.Remove(Trait(Type.GetType(traitString)));
 				
 				if( debug ) 
 				{
-					GD.Print("Cleared: ", traitString, "->Count(", boundTraits.Count, ")" );
+					GD.Print("Cleared: ", traitString, "->Count(", BoundTraits.Count, ")" );
 				}
 			}
 			
@@ -243,12 +244,12 @@ namespace AssetSnap.Component
 		/// <returns>The trait instance if found; otherwise, null.</returns>
 		public T Trait<T>() where T : class
 		{
-			if( boundTraits.Count == 0 ) 
+			if( BoundTraits.Count == 0 ) 
 			{
 				return null;
 			}
 			
-			Trait.Base traitInstance = boundTraits.FirstOrDefault(
+			Trait.Base traitInstance = BoundTraits.FirstOrDefault(
 				(t) =>
 				{
 					if (
@@ -279,12 +280,12 @@ namespace AssetSnap.Component
 		/// <returns>The trait instance if found; otherwise, null.</returns>
 		public Trait.Base Trait( Type type )
 		{
-			if( boundTraits.Count == 0 ) 
+			if( BoundTraits.Count == 0 ) 
 			{
 				return null;
 			}
 			
-			Trait.Base traitInstance = boundTraits.FirstOrDefault(
+			Trait.Base traitInstance = BoundTraits.FirstOrDefault(
 				(t) =>
 				{
 					if (

@@ -46,7 +46,7 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 		{
 			Name = "GroupsBuilderGroupObjectRotation";
 
-			UsingTraits = new()
+			_UsingTraits = new()
 			{
 				{ typeof(Spinboxable).ToString() },
 				{ typeof(Labelable).ToString() },

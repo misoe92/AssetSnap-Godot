@@ -74,10 +74,10 @@ namespace AssetSnap.Snap
 				Name = "SnapToHeightBoundaryCollision"
 			};
 
-			AddCollisionBox(_BoundaryBody);
-			if (true == ShouldShowBoundaryBox())
+			_AddCollisionBox(_BoundaryBody);
+			if (true == _ShouldShowBoundaryBox())
 			{
-				AddBoundaryBox(_BoundaryBody);
+				_AddBoundaryBox(_BoundaryBody);
 			}
 		}
 
@@ -149,12 +149,34 @@ namespace AssetSnap.Snap
 
 			_BoundaryBody.Transform = transform;
 		}
+		
+		
+		/// <summary>
+		/// Cleans up the boundary instance when exiting the scene tree.
+		/// </summary>
+		public void ExitTree()
+		{
+			if (EditorPlugin.IsInstanceValid(_BoundaryCollision))
+			{
+				_BoundaryCollision.QueueFree();
+			}
+
+			if (EditorPlugin.IsInstanceValid(_BoundaryMeshInstance))
+			{
+				_BoundaryMeshInstance.QueueFree();
+			}
+
+			if (EditorPlugin.IsInstanceValid(_BoundaryBody))
+			{
+				_BoundaryBody.QueueFree();
+			}
+		}
 
 		/// <summary>
 		/// Adds the collision box to the scene.
 		/// </summary>
 		/// <param name="to">The static body to attach the collision box to.</param>
-		private void AddCollisionBox(StaticBody3D to)
+		private void _AddCollisionBox(StaticBody3D to)
 		{
 			switch (Angle)
 			{
@@ -181,7 +203,7 @@ namespace AssetSnap.Snap
 		/// Adds the boundary box to the scene.
 		/// </summary>
 		/// <param name="to">The static body to attach the boundary box to.</param>
-		private void AddBoundaryBox(StaticBody3D to)
+		private void _AddBoundaryBox(StaticBody3D to)
 		{
 			switch (Angle)
 			{
@@ -210,7 +232,7 @@ namespace AssetSnap.Snap
 
 					break;
 			}
-			_BoundaryBoxMesh.Material = GetBoundaryMaterial();
+			_BoundaryBoxMesh.Material = _GetBoundaryMaterial();
 			_BoundaryMeshInstance.Mesh = _BoundaryBoxMesh;
 
 			to.AddChild(_BoundaryMeshInstance);
@@ -220,7 +242,7 @@ namespace AssetSnap.Snap
 		/// Gets the boundary material.
 		/// </summary>
 		/// <returns>The boundary material.</returns>
-		private ShaderMaterial GetBoundaryMaterial()
+		private ShaderMaterial _GetBoundaryMaterial()
 		{
 			_BoundaryMaterial.Shader = _BoundaryGrid;
 
@@ -233,8 +255,8 @@ namespace AssetSnap.Snap
 			_BoundaryMaterial.SetShaderParameter("color_0", new Color(Colors.Black.R, Colors.Black.G, Colors.Black.B, 0.1f));
 			_BoundaryMaterial.SetShaderParameter("color_1", new Color(Colors.White));
 
-			_BoundaryMaterial.SetShaderParameter("opacity", GetBoundaryOpacity());
-			_BoundaryMaterial.SetShaderParameter("flatten", GetBoundaryFlat());
+			_BoundaryMaterial.SetShaderParameter("opacity", _GetBoundaryOpacity());
+			_BoundaryMaterial.SetShaderParameter("flatten", _GetBoundaryFlat());
 
 			return _BoundaryMaterial;
 		}
@@ -243,7 +265,7 @@ namespace AssetSnap.Snap
 		/// Gets the boundary opacity.
 		/// </summary>
 		/// <returns>The boundary opacity.</returns>
-		private float GetBoundaryOpacity()
+		private float _GetBoundaryOpacity()
 		{
 			return _GlobalExplorer.Settings.GetKey("boundary_box_opacity").As<float>();
 		}
@@ -252,7 +274,7 @@ namespace AssetSnap.Snap
 		/// Gets the boundary flatness.
 		/// </summary>
 		/// <returns>The boundary flatness.</returns>
-		private bool GetBoundaryFlat()
+		private bool _GetBoundaryFlat()
 		{
 			return _GlobalExplorer.Settings.GetKey("boundary_box_flat").As<bool>();
 		}
@@ -261,31 +283,11 @@ namespace AssetSnap.Snap
 		/// Determines whether the boundary box should be shown.
 		/// </summary>
 		/// <returns>True if the boundary box should be shown, otherwise false.</returns>
-		private bool ShouldShowBoundaryBox()
+		private bool _ShouldShowBoundaryBox()
 		{
 			return _GlobalExplorer.Settings.GetKey("show_snap_boundary_box").As<bool>();
 		}
 
-		/// <summary>
-		/// Cleans up the boundary instance when exiting the scene tree.
-		/// </summary>
-		public void ExitTree()
-		{
-			if (EditorPlugin.IsInstanceValid(_BoundaryCollision))
-			{
-				_BoundaryCollision.QueueFree();
-			}
-
-			if (EditorPlugin.IsInstanceValid(_BoundaryMeshInstance))
-			{
-				_BoundaryMeshInstance.QueueFree();
-			}
-
-			if (EditorPlugin.IsInstanceValid(_BoundaryBody))
-			{
-				_BoundaryBody.QueueFree();
-			}
-		}
 	}
 }
 #endif

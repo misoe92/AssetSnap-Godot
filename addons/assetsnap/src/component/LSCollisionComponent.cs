@@ -32,16 +32,16 @@ namespace AssetSnap.Component
 	/// </summary>
 	public partial class LSCollisionComponent : LibraryComponent
 	{
-		protected string Type = "";
-		private bool _state = false;
-		protected bool state 
+		protected string _Type = "";
+		protected bool State 
 		{
-			get => _state;
+			get => _State;
 			set 
 			{
-				_state = value;
+				_State = value;
 			}
 		}
+		private bool _State = false;
 		
 		/// <summary>
 		/// Initializes a new instance of the <see cref="LSCollisionComponent"/> class.
@@ -66,35 +66,9 @@ namespace AssetSnap.Component
 		/// <param name="data">The data to update the component with.</param>
 		public virtual void MaybeUpdateValue(Godot.Collections.Array data)
 		{
-			if( ShouldUpdateState() ) 
+			if( _ShouldUpdateState() ) 
 			{
-				UpdateState();
-			}
-		}
-		
-		/// <summary>
-		/// Determines whether the state of the component should be updated.
-		/// </summary>
-		/// <returns><c>true</c> if the state should be updated; otherwise, <c>false</c>.</returns>
-		public bool ShouldUpdateState()
-		{
-			return
-				IsActive() && false == CheckboxPressed() ||
-				false == IsActive() && CheckboxPressed();
-		}
-		
-		/// <summary>
-		/// Updates the state of the component.
-		/// </summary>
-		public void UpdateState()
-		{
-			if(IsActive() && false == CheckboxPressed() ) 
-			{
-				SetState(true);
-			}
-			else if( false == IsActive() && CheckboxPressed() ) 
-			{
-				SetState(false);
+				_UpdateState();
 			}
 		}
 		
@@ -127,15 +101,6 @@ namespace AssetSnap.Component
 		}
 		
 		/// <summary>
-		/// Checks if the checkbox associated with the component is pressed.
-		/// </summary>
-		/// <returns><c>true</c> if the checkbox is pressed; otherwise, <c>false</c>.</returns>
-		protected bool CheckboxPressed()
-		{
-			return GetState();
-		}
-		
-		/// <summary>
 		/// Fetches the component checkbox.
 		/// </summary>
 		/// <returns>The checkbox associated with the component.</returns>
@@ -150,15 +115,6 @@ namespace AssetSnap.Component
 		}
 		
 		/// <summary>
-		/// Determines whether the component is active.
-		/// </summary>
-		/// <returns><c>true</c> if the component is active; otherwise, <c>false</c>.</returns>
-		public virtual bool IsActive()
-		{
-			return false;
-		}
-		
-		/// <summary>
 		/// Checks if the component is valid.
 		/// </summary>
 		/// <returns><c>true</c> if the component is valid; otherwise, <c>false</c>.</returns>
@@ -166,18 +122,63 @@ namespace AssetSnap.Component
 		{
 			return
 				null != StatesUtils.Get() &&
-				false != Initiated &&
+				false != _Initiated &&
 				null != Trait<Checkable>() &&
 				false != HasTrait<Checkable>();
 		}		
 
 		/// <summary>
-        /// Called when the node is about to be removed from the scene tree.
-        /// </summary>
+		/// Called when the node is about to be removed from the scene tree.
+		/// </summary>
 		public override void _ExitTree()
 		{
-			Initiated = false;
+			_Initiated = false;
+			
 			base._ExitTree();
+		}
+		
+		/// <summary>
+		/// Determines whether the component is active.
+		/// </summary>
+		/// <returns><c>true</c> if the component is active; otherwise, <c>false</c>.</returns>
+		protected virtual bool _IsActive()
+		{
+			return false;
+		}
+		
+		/// <summary>
+		/// Checks if the checkbox associated with the component is pressed.
+		/// </summary>
+		/// <returns><c>true</c> if the checkbox is pressed; otherwise, <c>false</c>.</returns>
+		protected bool _CheckboxPressed()
+		{
+			return GetState();
+		}
+		
+		/// <summary>
+		/// Updates the state of the component.
+		/// </summary>
+		private void _UpdateState()
+		{
+			if(_IsActive() && false == _CheckboxPressed() ) 
+			{
+				SetState(true);
+			}
+			else if( false == _IsActive() && _CheckboxPressed() ) 
+			{
+				SetState(false);
+			}
+		}
+		
+		/// <summary>
+		/// Determines whether the state of the component should be updated.
+		/// </summary>
+		/// <returns><c>true</c> if the state should be updated; otherwise, <c>false</c>.</returns>
+		private bool _ShouldUpdateState()
+		{
+			return
+				_IsActive() && false == _CheckboxPressed() ||
+				false == _IsActive() && _CheckboxPressed();
 		}
 	}
 }

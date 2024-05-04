@@ -20,6 +20,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
 using AssetSnap.Explorer;
 using AssetSnap.Front.Components;
 using Godot;
@@ -34,7 +36,6 @@ namespace AssetSnap.Library
 	{
 		[Export]
 		public Godot.Collections.Array<GodotObject> _Libraries = new();
-		private static Base _Instance;
 		
 		/// <summary>
 		/// Gets the singleton instance of the Base class.
@@ -51,7 +52,7 @@ namespace AssetSnap.Library
 				return _Instance;
 			}
 		}
-
+		
 		/// <summary>
 		/// Gets the array of libraries.
 		/// </summary>
@@ -59,6 +60,8 @@ namespace AssetSnap.Library
 		{
 			get => _Libraries;
 		}
+		
+		private static Base _Instance;
 
 		/// <summary>
 		/// Constructor for the Base class.
@@ -129,7 +132,7 @@ namespace AssetSnap.Library
 		/// <param name="index">The index.</param>
 		public void New(TabContainer Dock, string _Folder, int index)
 		{
-			if (false == IsGlobalExplorerValid())
+			if (false == _IsGlobalExplorerValid())
 			{
 				return;
 			}
@@ -144,65 +147,10 @@ namespace AssetSnap.Library
 			_Libraries.Add(_Base);
 
 			_Base.Name = _Base.FileName.Capitalize();
-			_Base._Name = _Base.FileName.Capitalize();
 
 			_Base.Initialize();
 		}
-
-		/// <summary>
-		/// Checks if there is already a library with the specified folder path.
-		/// </summary>
-		/// <param name="Folder">The folder path to check.</param>
-		/// <returns>True if a library with the specified folder path exists; otherwise, false.</returns>
-		private bool AlreadyHaveFolder(string Folder)
-		{
-			foreach (Library.Instance instance in _Libraries)
-			{
-				if (Folder == instance._Folder)
-				{
-					return true;
-				}
-			}
-
-			return false;
-		}
-
-		/// <summary>
-		/// Cleans up an old library with the specified folder path.
-		/// </summary>
-		/// <param name="Folder">The folder path of the library to clean up.</param>
-		/// <returns>True if an old library was cleaned up; otherwise, false.</returns>
-		private bool CleanOldLibrary(string Folder)
-		{
-			foreach (Library.Instance instance in _Libraries)
-			{
-				if (Folder == instance._Folder)
-				{
-					instance.Clear();
-
-					instance.GetParent().RemoveChild(instance);
-					instance.QueueFree();
-
-					return true;
-				}
-			}
-
-			return false;
-		}
-
-		/// <summary>
-		/// Rebinds the settings container to the bottom dock.
-		/// </summary>
-		private void RebindSettingsContainer()
-		{
-			ExplorerUtils.Get().Settings.InitializeContainer();
-			if (EditorPlugin.IsInstanceValid(ExplorerUtils.Get().Settings.Container))
-			{
-				ExplorerUtils.Get().Settings.Container.Name = "Settings";
-				ExplorerUtils.Get().BottomDock.Add(ExplorerUtils.Get().Settings.Container);
-			}
-		}
-
+		
 		/// <summary>
 		/// Removes the specified library from the collection.
 		/// </summary>
@@ -230,10 +178,64 @@ namespace AssetSnap.Library
 		}
 
 		/// <summary>
+		/// Checks if there is already a library with the specified folder path.
+		/// </summary>
+		/// <param name="Folder">The folder path to check.</param>
+		/// <returns>True if a library with the specified folder path exists; otherwise, false.</returns>
+		private bool _AlreadyHaveFolder(string Folder)
+		{
+			foreach (Library.Instance instance in _Libraries)
+			{
+				if (Folder == instance.Folder)
+				{
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		/// <summary>
+		/// Cleans up an old library with the specified folder path.
+		/// </summary>
+		/// <param name="Folder">The folder path of the library to clean up.</param>
+		/// <returns>True if an old library was cleaned up; otherwise, false.</returns>
+		private bool _CleanOldLibrary(string Folder)
+		{
+			foreach (Library.Instance instance in _Libraries)
+			{
+				if (Folder == instance.Folder)
+				{
+					instance.Clear();
+
+					instance.GetParent().RemoveChild(instance);
+					instance.QueueFree();
+
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		/// <summary>
+		/// Rebinds the settings container to the bottom dock.
+		/// </summary>
+		private void _RebindSettingsContainer()
+		{
+			ExplorerUtils.Get().Settings.InitializeContainer();
+			if (EditorPlugin.IsInstanceValid(ExplorerUtils.Get().Settings.Container))
+			{
+				ExplorerUtils.Get().Settings.Container.Name = "Settings";
+				ExplorerUtils.Get().BottomDock.Add(ExplorerUtils.Get().Settings.Container);
+			}
+		}
+
+		/// <summary>
 		/// Gets the library listing component.
 		/// </summary>
 		/// <returns>The library listing component.</returns>
-		private LibrariesListing GetLibraryListing()
+		private LibrariesListing _GetLibraryListing()
 		{
 			LibrariesListing _LibrariesListing = ExplorerUtils.Get().Components.Single<LibrariesListing>();
 			return _LibrariesListing;
@@ -243,7 +245,7 @@ namespace AssetSnap.Library
 		/// Checks if there are any folders found.
 		/// </summary>
 		/// <returns>True if folders are found; otherwise, false.</returns>
-		private bool HasFolders()
+		private bool _HasFolders()
 		{
 			return ExplorerUtils.Get().Settings.FolderCount != 0;
 		}
@@ -252,7 +254,7 @@ namespace AssetSnap.Library
 		/// Checks if the library listing exists.
 		/// </summary>
 		/// <returns>True if the library listing exists; otherwise, false.</returns>
-		private bool HasLibraryListing()
+		private bool _HasLibraryListing()
 		{
 			LibrariesListing _LibrariesListing = ExplorerUtils.Get().Components.Single<LibrariesListing>();
 			return null != _LibrariesListing;
@@ -262,9 +264,11 @@ namespace AssetSnap.Library
 		/// Checks if the global class GlobalExplorer reference is available.
 		/// </summary>
 		/// <returns>True if GlobalExplorer is valid; otherwise, false.</returns>
-		private bool IsGlobalExplorerValid()
+		private bool _IsGlobalExplorerValid()
 		{
 			return ExplorerUtils.IsValid();
 		}
 	}
 }
+
+#endif

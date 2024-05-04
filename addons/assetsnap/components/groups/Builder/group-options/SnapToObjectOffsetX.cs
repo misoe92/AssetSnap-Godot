@@ -23,6 +23,7 @@
 #if TOOLS
 
 using AssetSnap.Component;
+using AssetSnap.States;
 using Godot;
 	
 namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
@@ -40,7 +41,7 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 		{
 			Name = "GroupsBuilderGroupOptionsSnapToObjectOffsetX";
 
-			UsingTraits = new()
+			_UsingTraits = new()
 			{
 				{ typeof(Spinboxable).ToString() },
 			};
@@ -76,9 +77,9 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 		{
 			_GlobalExplorer.GroupBuilder._Editor.Group.SnapToObjectOffsetXValue = value;
 
-			if (_GlobalExplorer.States.PlacingMode == GlobalStates.PlacingModeEnum.Group)
+			if (StatesUtils.Get().PlacingMode == GlobalStates.PlacingModeEnum.Group)
 			{
-				_GlobalExplorer.States.SnapToObjectOffsetXValue = value;
+				StatesUtils.Get().SnapToObjectOffsetXValue = value;
 			}
 
 			Parent._UpdateGroupOptions();

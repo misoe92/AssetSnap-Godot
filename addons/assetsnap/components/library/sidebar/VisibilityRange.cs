@@ -40,7 +40,7 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		/// <remarks>
 		/// This property represents whether the visibility range component is enabled or disabled.
 		/// </remarks>
-		public bool state 
+		public bool State 
 		{
 			get => GetState();
 			set 
@@ -65,7 +65,7 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		{
 			Name = "LSVisibilityRange";
 			
-			UsingTraits = new()
+			_UsingTraits = new()
 			{
 				{ typeof(Labelable).ToString() },
 				{ typeof(Checkable).ToString() },
@@ -99,7 +99,7 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		{
 			base.Initialize();
 
-			Initiated = true;
+			_Initiated = true;
 			
 			Trait<Labelable>()
 				.SetName("VisibilityRangeText")
@@ -228,6 +228,41 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		}
 		
 		/// <summary>
+		/// Resets the visibility range component.
+		/// </summary>
+		public void Reset()
+		{
+			// StatesUtils.Get().VisibilityRangeState = GlobalStates.LibraryStateEnum.Disabled;
+			// StatesUtils.Get().VisibilityRange = 0.0f;
+			State = false;
+		}
+		
+		/// <summary>
+		/// Checks whether the visibility range component is valid.
+		/// </summary>
+		/// <returns>A boolean value indicating whether the component is valid.</returns>
+		public bool IsValid()
+		{
+			return
+				null != _GlobalExplorer &&
+				null != StatesUtils.Get() &&
+				false != _Initiated &&
+				null != Trait<Checkable>() &&
+				false != HasTrait<Checkable>();
+		}
+		
+		/// <summary>
+		/// Synchronizes the value of the visibility range component to a global central state controller.
+		/// </summary>
+		public override void Sync() 
+		{
+			// if( StatesUtils.Get().VisibilityRangeState == GlobalStates.LibraryStateEnum.Enabled ) 
+			// {
+			// 	StatesUtils.Get().VisibilityRange = (float)Trait<Spinboxable>().Select(0).GetValue();
+			// }
+		}
+		
+		/// <summary>
 		/// Handles the event when the visibility fade mode changes.
 		/// </summary>
 		/// <param name="index">The index of the selected item.</param>
@@ -265,9 +300,9 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		}
 		
 		/// <summary>
-        /// Handles the event when the visibility range end margin value changes.
-        /// </summary>
-        /// <param name="value">The new value of the visibility range end margin.</param>
+		/// Handles the event when the visibility range end margin value changes.
+		/// </summary>
+		/// <param name="value">The new value of the visibility range end margin.</param>
 		private void _OnVisibilityRangeEndMarginChanged( double value ) 
 		{
 			StatesUtils.Get().VisibilityRangeEndMargin = (float)value;
@@ -277,44 +312,9 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		/// Checks if the checkbox is checked.
 		/// </summary>
 		/// <returns>A boolean value indicating whether the checkbox is checked.</returns>
-		private bool IsCheckboxChecked()
+		private bool _IsCheckboxChecked()
 		{
-			return state == true;
-		}
-		
-		/// <summary>
-		/// Resets the visibility range component.
-		/// </summary>
-		public void Reset()
-		{
-			// StatesUtils.Get().VisibilityRangeState = GlobalStates.LibraryStateEnum.Disabled;
-			// StatesUtils.Get().VisibilityRange = 0.0f;
-			state = false;
-		}
-		
-		/// <summary>
-		/// Checks whether the visibility range component is valid.
-		/// </summary>
-		/// <returns>A boolean value indicating whether the component is valid.</returns>
-		public bool IsValid()
-		{
-			return
-				null != _GlobalExplorer &&
-				null != _GlobalExplorer.States &&
-				false != Initiated &&
-				null != Trait<Checkable>() &&
-				false != HasTrait<Checkable>();
-		}
-		
-		/// <summary>
-		/// Synchronizes the value of the visibility range component to a global central state controller.
-		/// </summary>
-		public override void Sync() 
-		{
-			// if( StatesUtils.Get().VisibilityRangeState == GlobalStates.LibraryStateEnum.Enabled ) 
-			// {
-			// 	StatesUtils.Get().VisibilityRange = (float)Trait<Spinboxable>().Select(0).GetValue();
-			// }
+			return State == true;
 		}
 	}
 }

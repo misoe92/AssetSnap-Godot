@@ -23,6 +23,7 @@
 #if TOOLS
 
 using AssetSnap.Component;
+using AssetSnap.States;
 using Godot;
 
 namespace AssetSnap.Front.Components.Library.Sidebar
@@ -48,7 +49,7 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			Name = "LSSnapToX";
 			Angle = GlobalStates.SnapAngleEnums.X;
 			
-			UsingTraits = new()
+			_UsingTraits = new()
 			{
 				{ typeof(Checkable).ToString() },
 				{ typeof(Spinboxable).ToString() },
@@ -64,7 +65,7 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		{
 			base.Initialize();
 
-			Initiated = true;
+			_Initiated = true;
 			
 			_InitializeCheckBox(this);
 			_InitializeGlue(this);
@@ -73,9 +74,9 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		}
 
 		/// <summary>
-        /// Updates the value of the component if necessary.
-        /// </summary>
-        /// <param name="data">Data to update.</param>
+		/// Updates the value of the component if necessary.
+		/// </summary>
+		/// <param name="data">Data to update.</param>
 		public override void MaybeUpdateValue(Godot.Collections.Array data)
 		{
 			if( data[0].As<string>() == "SnapToX" || data[0].As<string>() == "SnapToXValue" ) 
@@ -99,9 +100,24 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		}
 		
 		/// <summary>
-        /// Initializes the checkbox for snapping to the X axis.
+        /// Synchronizes the component's value with the global state controller.
         /// </summary>
-        /// <param name="BoxContainer">The VBoxContainer to add the checkbox to.</param>
+		public override void Sync() 
+		{
+			if( IsValid() )
+			{
+				return;
+			} 
+			
+			StatesUtils.Get().SnapToX = Trait<Checkable>().Select(0).GetValue() ? GlobalStates.LibraryStateEnum.Enabled : GlobalStates.LibraryStateEnum.Disabled;
+			StatesUtils.Get().SnapToXGlue = Trait<Checkable>().Select(1).GetValue() ? GlobalStates.LibraryStateEnum.Enabled : GlobalStates.LibraryStateEnum.Disabled;
+			StatesUtils.Get().SnapToXValue = (float)Trait<Spinboxable>().GetValue();
+		}
+		
+		/// <summary>
+		/// Initializes the checkbox for snapping to the X axis.
+		/// </summary>
+		/// <param name="BoxContainer">The VBoxContainer to add the checkbox to.</param>
 		private void _InitializeCheckBox( VBoxContainer BoxContainer ) 
 		{
 			Callable _callable = Callable.From(() => { _OnCheckboxPressed(); });
@@ -122,9 +138,9 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		}
 		
 		/// <summary>
-        /// Initializes the checkbox for snapping to the X axis glue.
-        /// </summary>
-        /// <param name="BoxContainer">The VBoxContainer to add the checkbox to.</param>
+		/// Initializes the checkbox for snapping to the X axis glue.
+		/// </summary>
+		/// <param name="BoxContainer">The VBoxContainer to add the checkbox to.</param>
 		private void _InitializeGlue( VBoxContainer BoxContainer ) 
 		{
 			Callable _callable = Callable.From(() => { _OnGlueCheckboxPressed(); });
@@ -146,9 +162,9 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		}
 		
 		/// <summary>
-        /// Initializes the spinbox for setting the value of the X axis.
-        /// </summary>
-        /// <param name="BoxContainer">The VBoxContainer to add the spinbox to.</param>
+		/// Initializes the spinbox for setting the value of the X axis.
+		/// </summary>
+		/// <param name="BoxContainer">The VBoxContainer to add the spinbox to.</param>
 		private void _InitializeSpinBox( VBoxContainer BoxContainer ) 
 		{
 			Callable _callable = Callable.From((double value) => { _OnSpinBoxValueChange((float)value); });
@@ -172,21 +188,21 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		}
 		
 		/// <summary>
-        /// Updates spawn settings and the internal value for snapping to the X axis.
-        /// </summary>
+		/// Updates spawn settings and the internal value for snapping to the X axis.
+		/// </summary>
 		private void _OnCheckboxPressed()
 		{
 			bool state = false;
-			if( false == IsSnapTo() ) 
+			if( false == _IsSnapTo() ) 
 			{
-				_GlobalExplorer.States.SnapToX = GlobalStates.LibraryStateEnum.Enabled;
-				_GlobalExplorer.States.SnapToXGlue = GlobalStates.LibraryStateEnum.Enabled;
+				StatesUtils.Get().SnapToX = GlobalStates.LibraryStateEnum.Enabled;
+				StatesUtils.Get().SnapToXGlue = GlobalStates.LibraryStateEnum.Enabled;
 				state = true;
 			}
 			else 
 			{
-				_GlobalExplorer.States.SnapToX = GlobalStates.LibraryStateEnum.Disabled;
-				_GlobalExplorer.States.SnapToXGlue = GlobalStates.LibraryStateEnum.Disabled;
+				StatesUtils.Get().SnapToX = GlobalStates.LibraryStateEnum.Disabled;
+				StatesUtils.Get().SnapToXGlue = GlobalStates.LibraryStateEnum.Disabled;
 			}
 
 			UpdateSpawnSettings("SnapToX", state);
@@ -194,50 +210,35 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		}
 		
 		/// <summary>
-        /// Updates spawn settings and the internal value for using glue.
-        /// </summary>
+		/// Updates spawn settings and the internal value for using glue.
+		/// </summary>
 		private void _OnGlueCheckboxPressed()
 		{
 			bool state = false;
 			
 			if( false == IsSnapToGlue() ) 
 			{
-				_GlobalExplorer.States.SnapToXGlue = GlobalStates.LibraryStateEnum.Enabled;
+				StatesUtils.Get().SnapToXGlue = GlobalStates.LibraryStateEnum.Enabled;
 				state = true;
 			}
 			else 
 			{
-				_GlobalExplorer.States.SnapToXGlue = GlobalStates.LibraryStateEnum.Disabled;
+				StatesUtils.Get().SnapToXGlue = GlobalStates.LibraryStateEnum.Disabled;
 			}
 		
 			UpdateSpawnSettings("SnapToXGlue", state);
 		}
 		
 		/// <summary>
-        /// Updates SpawnSettings on the model when the component value is changed.
-        /// </summary>
-        /// <param name="value">The new value for the X axis.</param>
+		/// Updates SpawnSettings on the model when the component value is changed.
+		/// </summary>
+		/// <param name="value">The new value for the X axis.</param>
 		private void _OnSpinBoxValueChange(float value)
 		{
 			_value = value;
-			_GlobalExplorer.States.SnapToXValue = value;
+			StatesUtils.Get().SnapToXValue = value;
 						
 			UpdateSpawnSettings("SnapXValue", value);
-		}
-		
-		/// <summary>
-        /// Synchronizes the component's value with the global state controller.
-        /// </summary>
-		public override void Sync() 
-		{
-			if( IsValid() )
-			{
-				return;
-			} 
-			
-			_GlobalExplorer.States.SnapToX = Trait<Checkable>().Select(0).GetValue() ? GlobalStates.LibraryStateEnum.Enabled : GlobalStates.LibraryStateEnum.Disabled;
-			_GlobalExplorer.States.SnapToXGlue = Trait<Checkable>().Select(1).GetValue() ? GlobalStates.LibraryStateEnum.Enabled : GlobalStates.LibraryStateEnum.Disabled;
-			_GlobalExplorer.States.SnapToXValue = (float)Trait<Spinboxable>().GetValue();
 		}
 	}
 }

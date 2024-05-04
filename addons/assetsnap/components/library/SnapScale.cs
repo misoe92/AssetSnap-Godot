@@ -36,11 +36,6 @@ namespace AssetSnap.Front.Components.Library
 	public partial class SnapScale : LibraryComponent
 	{ 
 		/// <summary>
-		/// The height at which snapping occurs.
-		/// </summary>
-		private float SnapHeight;
-		
-		/// <summary>
 		/// The scale factor along the X-axis.
 		/// </summary>
 		public float ScaleX;
@@ -58,7 +53,7 @@ namespace AssetSnap.Front.Components.Library
 		/// <summary>
 		/// A flag indicating whether scaling is active.
 		/// </summary>
-		public bool value;
+		public bool Value;
 		
 		/// <summary>
 		/// The callable object for handling state changes.
@@ -69,15 +64,21 @@ namespace AssetSnap.Front.Components.Library
 		/// The current input event.
 		/// </summary>
 		public InputEvent CurrentEvent;
+		
+		/// <summary>
+		/// The height at which snapping occurs.
+		/// </summary>
+		private float _SnapHeight;
+		
 
 		/// <summary>
-        /// Default constructor for SnapScale.
-        /// </summary>
+		/// Default constructor for SnapScale.
+		/// </summary>
 		public SnapScale()
 		{
 			Name = "LibrarySnapScale";
 			
-			UsingTraits = new(){};
+			_UsingTraits = new(){};
 			
 			//_include = false; 
 		}
@@ -105,8 +106,8 @@ namespace AssetSnap.Front.Components.Library
 			ScaleX = 0.0f;
 			ScaleY = 0.0f; 
 			ScaleZ = 0.0f;
-			SnapHeight = 0.1f; 
-			value = false;
+			_SnapHeight = 0.1f; 
+			Value = false;
 
 			StateChangeCallable = new(this, "_OnScaleListStateChange");
 			if( StateChangeCallable is Callable _callable) 
@@ -114,39 +115,6 @@ namespace AssetSnap.Front.Components.Library
 				ContextMenu.GetInstance().Connect(AsContextMenu.SignalName.QuickActionsChanged, _callable);
 			}
 		} 
-		
-		/// <summary>
-		/// Updates scale values on input changes.
-		/// </summary>
-		/// <param name="which">The type of scale change.</param>
-		/// <returns>void</returns>
-		private void _OnScaleListStateChange( string which )
-		{
-			if( null == ExplorerUtils.Get().ContextMenu ) 
-			{
-				return;
-			}
-			
-			if( which == "Scale" )  
-			{
-				value = true;
-				
-				Vector3 _Scale = ExplorerUtils.Get().ContextMenu.GetScaleValues();
-				
-				ScaleX = _Scale.X;
-				ScaleY = _Scale.Y;
-				ScaleZ = _Scale.Z;
-			}
-			else 
-			{
-				if( value == true ) 
-				{
-					// Means the value just changed 
-					
-				}
-				value = false;
-			}
-		}
 		
 		/// <summary>
 		/// Checks if scale is currently active and whether or not to apply it.
@@ -172,149 +140,39 @@ namespace AssetSnap.Front.Components.Library
 				return;
 			}
 
-			if( ShouldScaleAll(angle) ) 
+			if( _ShouldScaleAll(angle) ) 
 			{
-				DoScaleAll(Handle);
+				_DoScaleAll(Handle);
 				ExplorerUtils.Get().AllowScroll = Abstracts.AbstractExplorerBase.ScrollState.SCROLL_DISABLED;
 			}
-			else if( ShouldScaleX(angle) ) 
+			else if( _ShouldScaleX(angle) ) 
 			{
-				DoScaleX(Handle);
+				_DoScaleX(Handle);
 				ExplorerUtils.Get().AllowScroll = Abstracts.AbstractExplorerBase.ScrollState.SCROLL_DISABLED;
 			}
-			else if( ShouldScaleY(angle) ) 
+			else if( _ShouldScaleY(angle) ) 
 			{
-				DoScaleY(Handle);
+				_DoScaleY(Handle);
 				ExplorerUtils.Get().AllowScroll = Abstracts.AbstractExplorerBase.ScrollState.SCROLL_DISABLED;
 			}
-			else if( ShouldScaleZ(angle) ) 
+			else if( _ShouldScaleZ(angle) ) 
 			{
-				DoScaleZ(Handle);
+				_DoScaleZ(Handle);
 				ExplorerUtils.Get().AllowScroll = Abstracts.AbstractExplorerBase.ScrollState.SCROLL_DISABLED;
 			}
 
 			base._Input(@event);
 		}
 				
-		/// <summary>
-		/// Scales on all angles.
-		/// </summary>
-		/// <param name="Handle">The node to scale.</param>
-		/// <returns>void</returns>
-		public void DoScaleAll( Node3D Handle )
-		{
-			Vector3 _Scale = ExplorerUtils.Get().ContextMenu.GetScaleValues();
-			if( IsWheelUp() ) 
-			{
-				_Scale = Apply("X", _Scale, ScaleX, 0);
-				_Scale = Apply("Y", _Scale, ScaleY, 0);
-				_Scale = Apply("Z", _Scale, ScaleZ, 0);
-					
-				ScaleX = _Scale.X;
-				ScaleY = _Scale.Y;
-				ScaleZ = _Scale.Z;
-			}
-			else if( IsWheelDown() ) 
-			{
-				_Scale = Apply("X", _Scale, ScaleX, 0, true);
-				_Scale = Apply("Y", _Scale, ScaleY, 0, true);
-				_Scale = Apply("Z", _Scale, ScaleZ, 0, true);
-				
-				ScaleX = _Scale.X;
-				ScaleY = _Scale.Y;
-				ScaleZ = _Scale.Z;
-			}
-
-			ExplorerUtils.Get().ContextMenu.SetScaleValues(_Scale);
-				
-			if( Handle is AssetSnap.Front.Nodes.AsMeshInstance3D asMeshInstance3D) 
-			{
-				asMeshInstance3D.UpdateWaypointScale();
-			}
-		}
-				
-		/// <summary>
-		/// Scales on x angle.
-		/// </summary>
-		/// <param name="Handle">The node to scale.</param>
-		/// <returns>void</returns>
-		public void DoScaleX( Node3D Handle )
-		{
-			Vector3 _Scale = ExplorerUtils.Get().ContextMenu.GetScaleValues();
-			
-			if( IsWheelUp() ) 
-			{
-				_Scale = Apply("X", _Scale, ScaleX, 0);
-				ScaleX = _Scale.X;
-			}
-			else if( IsWheelDown() )
-			{
-				_Scale = Apply("X", _Scale, ScaleX, 0, true);
-				ScaleX = _Scale.X;
-			}
-			
-			ExplorerUtils.Get().ContextMenu.SetScaleValues(_Scale);
-				
-			if( Handle is AssetSnap.Front.Nodes.AsMeshInstance3D asMeshInstance3D) 
-			{
-				asMeshInstance3D.UpdateWaypointScale();
-			}
-		}
+		
 		
 		/// <summary>
-		/// Scales on y angle.
+		/// Fetches the current snap scale.
 		/// </summary>
-		/// <param name="Handle">The node to scale.</param>
-		/// <returns>void</returns>
-		public void DoScaleY( Node3D Handle )
+		/// <returns>The current snap height.</returns>
+		public float GetSnapHeight() 
 		{
-			Vector3 _Scale = ExplorerUtils.Get().ContextMenu.GetScaleValues();
-			
-			if( IsWheelUp() ) 
-			{
-				_Scale = Apply("Y", _Scale, ScaleY, 0);
-				ScaleY = _Scale.Y;
-			}
-			else if( IsWheelDown() )
-			{
-				_Scale = Apply("Y", _Scale, ScaleY, 0, true);
-				ScaleY = _Scale.Y;
-			}
-			
-			ExplorerUtils.Get().ContextMenu.SetScaleValues(_Scale);
-				
-			if( Handle is AssetSnap.Front.Nodes.AsMeshInstance3D asMeshInstance3D) 
-			{
-				asMeshInstance3D.UpdateWaypointScale();
-			}
-		}
-		
-		/// <summary>
-		/// Scales on z angle.
-		/// </summary>
-		/// <param name="Handle">The node to scale.</param>
-		/// <returns>void</returns>
-		public void DoScaleZ( Node3D Handle )
-		{
-			Vector3 _Scale = ExplorerUtils.Get().ContextMenu.GetScaleValues();
-			
-			if( IsWheelUp() ) 	
-			{
-				_Scale = Apply("Z", _Scale, ScaleZ, 0);
-				ScaleZ = _Scale.Z;
-			}
-			else if( IsWheelDown() )
-			{
-				_Scale = Apply("Z", _Scale, ScaleZ, 0, true);
-				ScaleZ = _Scale.Z;
-			}
-			
-			ExplorerUtils.Get().ContextMenu.SetScaleValues(_Scale);
-			
-			if( Handle is AssetSnap.Front.Nodes.AsMeshInstance3D asMeshInstance3D) 
-			{
-				asMeshInstance3D.UpdateWaypointScale();
-			}
+			return _SnapHeight;
 		}
 		
 		/// <summary>
@@ -387,10 +245,164 @@ namespace AssetSnap.Front.Components.Library
 		}
 		
 		/// <summary>
+		/// Scales on all angles.
+		/// </summary>
+		/// <param name="Handle">The node to scale.</param>
+		/// <returns>void</returns>
+		private void _DoScaleAll( Node3D Handle )
+		{
+			Vector3 _Scale = ExplorerUtils.Get().ContextMenu.GetScaleValues();
+			if( _IsWheelUp() ) 
+			{
+				_Scale = Apply("X", _Scale, ScaleX, 0);
+				_Scale = Apply("Y", _Scale, ScaleY, 0);
+				_Scale = Apply("Z", _Scale, ScaleZ, 0);
+					
+				ScaleX = _Scale.X;
+				ScaleY = _Scale.Y;
+				ScaleZ = _Scale.Z;
+			}
+			else if( _IsWheelDown() ) 
+			{
+				_Scale = Apply("X", _Scale, ScaleX, 0, true);
+				_Scale = Apply("Y", _Scale, ScaleY, 0, true);
+				_Scale = Apply("Z", _Scale, ScaleZ, 0, true);
+				
+				ScaleX = _Scale.X;
+				ScaleY = _Scale.Y;
+				ScaleZ = _Scale.Z;
+			}
+
+			ExplorerUtils.Get().ContextMenu.SetScaleValues(_Scale);
+				
+			if( Handle is AssetSnap.Front.Nodes.AsMeshInstance3D asMeshInstance3D) 
+			{
+				asMeshInstance3D.UpdateWaypointScale();
+			}
+		}
+				
+		/// <summary>
+		/// Scales on x angle.
+		/// </summary>
+		/// <param name="Handle">The node to scale.</param>
+		/// <returns>void</returns>
+		private void _DoScaleX( Node3D Handle )
+		{
+			Vector3 _Scale = ExplorerUtils.Get().ContextMenu.GetScaleValues();
+			
+			if( _IsWheelUp() ) 
+			{
+				_Scale = Apply("X", _Scale, ScaleX, 0);
+				ScaleX = _Scale.X;
+			}
+			else if( _IsWheelDown() )
+			{
+				_Scale = Apply("X", _Scale, ScaleX, 0, true);
+				ScaleX = _Scale.X;
+			}
+			
+			ExplorerUtils.Get().ContextMenu.SetScaleValues(_Scale);
+				
+			if( Handle is AssetSnap.Front.Nodes.AsMeshInstance3D asMeshInstance3D) 
+			{
+				asMeshInstance3D.UpdateWaypointScale();
+			}
+		}
+		
+		/// <summary>
+		/// Scales on y angle.
+		/// </summary>
+		/// <param name="Handle">The node to scale.</param>
+		/// <returns>void</returns>
+		private void _DoScaleY( Node3D Handle )
+		{
+			Vector3 _Scale = ExplorerUtils.Get().ContextMenu.GetScaleValues();
+			
+			if( _IsWheelUp() ) 
+			{
+				_Scale = Apply("Y", _Scale, ScaleY, 0);
+				ScaleY = _Scale.Y;
+			}
+			else if( _IsWheelDown() )
+			{
+				_Scale = Apply("Y", _Scale, ScaleY, 0, true);
+				ScaleY = _Scale.Y;
+			}
+			
+			ExplorerUtils.Get().ContextMenu.SetScaleValues(_Scale);
+				
+			if( Handle is AssetSnap.Front.Nodes.AsMeshInstance3D asMeshInstance3D) 
+			{
+				asMeshInstance3D.UpdateWaypointScale();
+			}
+		}
+		
+		/// <summary>
+		/// Scales on z angle.
+		/// </summary>
+		/// <param name="Handle">The node to scale.</param>
+		/// <returns>void</returns>
+		private void _DoScaleZ( Node3D Handle )
+		{
+			Vector3 _Scale = ExplorerUtils.Get().ContextMenu.GetScaleValues();
+			
+			if( _IsWheelUp() ) 	
+			{
+				_Scale = Apply("Z", _Scale, ScaleZ, 0);
+				ScaleZ = _Scale.Z;
+			}
+			else if( _IsWheelDown() )
+			{
+				_Scale = Apply("Z", _Scale, ScaleZ, 0, true);
+				ScaleZ = _Scale.Z;
+			}
+			
+			ExplorerUtils.Get().ContextMenu.SetScaleValues(_Scale);
+			
+			if( Handle is AssetSnap.Front.Nodes.AsMeshInstance3D asMeshInstance3D) 
+			{
+				asMeshInstance3D.UpdateWaypointScale();
+			}
+		}
+		
+		/// <summary>
+		/// Updates scale values on input changes.
+		/// </summary>
+		/// <param name="which">The type of scale change.</param>
+		/// <returns>void</returns>
+		private void _OnScaleListStateChange( string which )
+		{
+			if( null == ExplorerUtils.Get().ContextMenu ) 
+			{
+				return;
+			}
+			
+			if( which == "Scale" )  
+			{
+				Value = true;
+				
+				Vector3 _Scale = ExplorerUtils.Get().ContextMenu.GetScaleValues();
+				
+				ScaleX = _Scale.X;
+				ScaleY = _Scale.Y;
+				ScaleZ = _Scale.Z;
+			}
+			else 
+			{
+				if( Value == true ) 
+				{
+					// Means the value just changed 
+					
+				}
+				Value = false;
+			}
+		}
+		
+		/// <summary>
 		/// Checks if mouse wheel up is active.
 		/// </summary>
 		/// <returns>True if the mouse wheel is scrolling up, otherwise false.</returns>
-		public bool IsWheelUp()
+		private bool _IsWheelUp()
 		{
 			if( CurrentEvent is InputEventMouseButton MouseButtonEvent ) 
 			{
@@ -404,7 +416,7 @@ namespace AssetSnap.Front.Components.Library
 		/// Checks if mouse wheel down is active.
 		/// </summary>
 		/// <returns>True if the mouse wheel is scrolling down, otherwise false.</returns>
-		public bool IsWheelDown()
+		private bool _IsWheelDown()
 		{
 			if( CurrentEvent is InputEventMouseButton MouseButtonEvent ) 
 			{
@@ -419,9 +431,9 @@ namespace AssetSnap.Front.Components.Library
 		/// </summary>
 		/// <param name="angle">The current angle.</param>
 		/// <returns>True if scale on all angles should occur, otherwise false.</returns>
-		public bool ShouldScaleAll( int angle ) 
+		private bool _ShouldScaleAll( int angle ) 
 		{
-			if( value == true && CurrentEvent is InputEventMouseButton MouseButtonEvent ) 
+			if( Value == true && CurrentEvent is InputEventMouseButton MouseButtonEvent ) 
 			{
 				if( Input.IsKeyPressed(Key.Alt) && Input.IsKeyPressed(Key.Shift) ) 
 				{
@@ -437,9 +449,9 @@ namespace AssetSnap.Front.Components.Library
 		/// </summary>
 		/// <param name="angle">The current angle.</param>
 		/// <returns>True if scale on x angle should occur, otherwise false.</returns>
-		public bool ShouldScaleX( int angle ) 
+		private bool _ShouldScaleX( int angle ) 
 		{
-			if( value == true && CurrentEvent is InputEventMouseButton MouseButtonEvent ) 
+			if( Value == true && CurrentEvent is InputEventMouseButton MouseButtonEvent ) 
 			{
 				if( Input.IsKeyPressed(Key.Alt) && Input.IsKeyPressed(Key.Shift) ) 
 				{
@@ -455,9 +467,9 @@ namespace AssetSnap.Front.Components.Library
 		/// </summary>
 		/// <param name="angle">The current angle.</param>
 		/// <returns>True if scale on y angle should occur, otherwise false.</returns>
-		public bool ShouldScaleY( int angle ) 
+		private bool _ShouldScaleY( int angle ) 
 		{
-			if( value == true && CurrentEvent is InputEventMouseButton MouseButtonEvent ) 
+			if( Value == true && CurrentEvent is InputEventMouseButton MouseButtonEvent ) 
 			{
 				if( Input.IsKeyPressed(Key.Alt) && Input.IsKeyPressed(Key.Shift) ) 
 				{
@@ -473,9 +485,9 @@ namespace AssetSnap.Front.Components.Library
 		/// </summary>
 		/// <param name="angle">The current angle.</param>
 		/// <returns>True if scale on z angle should occur, otherwise false.</returns>
-		public bool ShouldScaleZ( int angle ) 
+		private bool _ShouldScaleZ( int angle ) 
 		{
-			if( value == true && CurrentEvent is InputEventMouseButton MouseButtonEvent ) 
+			if( Value == true && CurrentEvent is InputEventMouseButton MouseButtonEvent ) 
 			{
 				if( Input.IsKeyPressed(Key.Alt) && Input.IsKeyPressed(Key.Shift) ) 
 				{
@@ -484,15 +496,6 @@ namespace AssetSnap.Front.Components.Library
 			}
 			
 			return false;
-		}
-			
-		/// <summary>
-		/// Fetches the current snap scale.
-		/// </summary>
-		/// <returns>The current snap height.</returns>
-		public float GetSnapHeight() 
-		{
-			return SnapHeight;
 		}
 	}
 }

@@ -66,32 +66,32 @@ namespace AssetSnap.Nodes
 		/// <summary>
 		/// The type of collision.
 		/// </summary>
-		private Type CollisionType = Type.Box;
+		private Type _CollisionType = Type.Box;
 		
 		/// <summary>
 		/// The type of convex collision.
 		/// </summary>
-		private ConvexType ConvexCollisionType = ConvexType.None;
+		private ConvexType _ConvexCollisionType = ConvexType.None;
 		
 		/// <summary>
 		/// Indicates whether the parent node has children.
 		/// </summary>
-		private State HasChildren = State.False;
+		private State _HasChildren = State.False;
 
 		/// <summary>
 		/// The axis-aligned bounding box of the model.
 		/// </summary>
-		private Aabb ModelAabb;
+		private Aabb _ModelAabb;
 
 		/// <summary>
 		/// The parent node.
 		/// </summary>
-		private Node3D Parent;
+		private Node3D _Parent;
 
 		/// <summary>
 		/// The collision body.
 		/// </summary>
-		private AsStaticBody3D body;
+		private AsStaticBody3D _Body;
 
 		/// <summary>
 		/// Determines the type of collision to create for the parent node.
@@ -102,28 +102,28 @@ namespace AssetSnap.Nodes
 		/// </remarks>
 		public void RegisterCollisionType(Node3D node)
 		{
-			Parent = node;
-			ModelAabb = NodeUtils.CalculateNodeAabb(Parent);
-			CollisionType = _CalculateCollisionType();
+			_Parent = node;
+			_ModelAabb = NodeUtils.CalculateNodeAabb(_Parent);
+			_CollisionType = _CalculateCollisionType();
 
-			if (CollisionType == Type.Convex)
+			if (_CollisionType == Type.Convex)
 			{
-				ConvexCollisionType = _CalculateConvexCollisionType();
+				_ConvexCollisionType = _CalculateConvexCollisionType();
 			}
 			else
 			{
-				ConvexCollisionType = ConvexType.None;
+				_ConvexCollisionType = ConvexType.None;
 			}
 
-			if (Parent is IDriverableModel driverableModel)
+			if (_Parent is IDriverableModel driverableModel)
 			{
 				if (driverableModel.GetModelType() == ModelDriver.ModelTypes.Simple)
 				{
-					HasChildren = State.False;
+					_HasChildren = State.False;
 				}
 				else if (driverableModel.GetModelType() == ModelDriver.ModelTypes.SceneBased)
 				{
-					HasChildren = State.True;
+					_HasChildren = State.True;
 				}
 			}
 		}
@@ -133,45 +133,45 @@ namespace AssetSnap.Nodes
         /// </summary>
 		public void Render()
 		{
-			if (Parent is ICollisionableModel collisionableModel)
+			if (_Parent is ICollisionableModel collisionableModel)
 			{
 				if (collisionableModel.HasCollisions())
 				{
 					// If collision already exist merely repair the connection to it
-					body = collisionableModel.GetCollisionBody();
+					_Body = collisionableModel.GetCollisionBody();
 					return;
 				}
 
 				// Else we create the collisions and their connection
-				if (HasChildren == State.False)
+				if (_HasChildren == State.False)
 				{
-					body = new()
+					_Body = new()
 					{
 						Name = "CollisionBody",
-						Parent = Parent,
-						UsingMultiMesh = Parent is AsMultiMeshInstance3D,
-						ModelAabb = ModelAabb,
-						CollisionType = CollisionType,
-						CollisionSubType = ConvexCollisionType
+						Parent = _Parent,
+						UsingMultiMesh = _Parent is AsMultiMeshInstance3D,
+						ModelAabb = _ModelAabb,
+						CollisionType = _CollisionType,
+						CollisionSubType = _ConvexCollisionType
 					};
 
-					collisionableModel.ApplyCollision(body);
+					collisionableModel.ApplyCollision(_Body);
 					collisionableModel.UpdateViewability();
 				}
-				else if (HasChildren == State.True)
+				else if (_HasChildren == State.True)
 				{
-					foreach (Node3D node in Parent.GetChildren())
+					foreach (Node3D node in _Parent.GetChildren())
 					{
-						body = new()
+						_Body = new()
 						{
 							Name = "CollisionBody",
 							Parent = node,
 							UsingMultiMesh = node is AsMultiMeshInstance3D,
 							ModelAabb = NodeUtils.CalculateNodeAabb(node),
-							CollisionType = CollisionType,
-							CollisionSubType = ConvexCollisionType
+							CollisionType = _CollisionType,
+							CollisionSubType = _ConvexCollisionType
 						};
-						node.AddChild(body);
+						node.AddChild(_Body);
 					}
 				}
 			}

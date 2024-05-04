@@ -36,41 +36,41 @@ namespace AssetSnap.Front.Components
 	[Tool]
 	public partial class SettingsSpinBox : TraitableComponent
 	{
-		private float _value = 0.0f;
-		private string _key;
-
 		/// <summary>
 		/// The key associated with this setting.
 		/// </summary>
-		public string key
+		public string Key
 		{
-			get => _key;
+			get => _Key;
 			set
 			{
-				_key = value;
+				_Key = value;
 			}
 		}
 
 		/// <summary>
-        /// The value of the setting.
-        /// </summary>
-		public float value
+		/// The value of the setting.
+		/// </summary>
+		public float Value
 		{
-			get => _value;
+			get => _Value;
 			set
 			{
-				_value = value;
+				_Value = value;
 			}
 		}
+		
+		private float _Value = 0.0f;
+		private string _Key;
 
 		/// <summary>
-        /// Constructor of the component.
-        /// </summary>
+		/// Constructor of the component.
+		/// </summary>
 		public SettingsSpinBox()
 		{
 			Name = "SettingsSpinBox";
 
-			UsingTraits = new()
+			_UsingTraits = new()
 			{
 				{ typeof(Panelable).ToString() },
 				{ typeof(Containerable).ToString() },
@@ -82,16 +82,16 @@ namespace AssetSnap.Front.Components
 		}
 
 		/// <summary>
-        /// Initializes the component.
-        /// </summary>
+		/// Initializes the component.
+		/// </summary>
 		public override void Initialize()
 		{
 			base.Initialize();
 
-			string title = GetTitle(key);
-			string description = GetDescription(key);
+			string title = GetTitle(Key);
+			string description = GetDescription(Key);
 
-			Initiated = true;
+			_Initiated = true;
 
 			Trait<Panelable>()
 				.SetName("SettingsPanel")
@@ -114,12 +114,12 @@ namespace AssetSnap.Front.Components
 				.Instantiate();
 
 			Trait<Spinboxable>()
-				.SetName(key)
+				.SetName(Key)
 				.SetDimensions(0, 20)
 				.SetVerticalSizeFlags(Control.SizeFlags.ShrinkEnd)
 				.SetStep(0.0f)
 				.SetMaxValue(1000)
-				.SetValue(value)
+				.SetValue(Value)
 				.SetAction(new Callable(this, "UpdateKey"))
 				.Instantiate();
 
@@ -167,12 +167,44 @@ namespace AssetSnap.Front.Components
 					this
 				);
 		}
+		
+		/// <summary>
+		/// Updates the settings key and interval value.
+		/// </summary>
+		/// <param name="NewValue">The new value of the setting.</param>
+		public void UpdateKey(float NewValue)
+		{
+			Value = NewValue;
+			ExplorerUtils.Get().Settings.SetKey(Key, NewValue);
+		}
 
 		/// <summary>
-        /// Configures the title.
-        /// </summary>
-        /// <param name="title">The title of the setting.</param>
-        /// <param name="description">The description of the setting.</param>
+		/// Fetches the title of the setting.
+		/// </summary>
+		/// <param name="key">The key of the setting.</param>
+		/// <returns>The title of the setting.</returns>
+		public string GetTitle(string key)
+		{
+			string FinalKey = key + "_title";
+			return SettingsText.KeyToString(FinalKey);
+		}
+
+		/// <summary>
+		/// Fetches the description of the setting.
+		/// </summary>
+		/// <param name="key">The key of the setting.</param>
+		/// <returns>The description of the setting.</returns>
+		public string GetDescription(string key)
+		{
+			string FinalKey = key + "_description";
+			return SettingsText.KeyToString(FinalKey);
+		}
+
+		/// <summary>
+		/// Configures the title.
+		/// </summary>
+		/// <param name="title">The title of the setting.</param>
+		/// <param name="description">The description of the setting.</param>
 		private void ConfigureTitle(string title, string description)
 		{
 			if (title != null || description != null)
@@ -205,37 +237,6 @@ namespace AssetSnap.Front.Components
 			}
 		}
 
-		/// <summary>
-        /// Fetches the title of the setting.
-        /// </summary>
-        /// <param name="key">The key of the setting.</param>
-        /// <returns>The title of the setting.</returns>
-		public string GetTitle(string key)
-		{
-			string FinalKey = key + "_title";
-			return SettingsText.KeyToString(FinalKey);
-		}
-
-		/// <summary>
-        /// Fetches the description of the setting.
-        /// </summary>
-        /// <param name="key">The key of the setting.</param>
-        /// <returns>The description of the setting.</returns>
-		public string GetDescription(string key)
-		{
-			string FinalKey = key + "_description";
-			return SettingsText.KeyToString(FinalKey);
-		}
-
-		/// <summary>
-        /// Updates the settings key and interval value.
-        /// </summary>
-        /// <param name="NewValue">The new value of the setting.</param>
-		public void UpdateKey(float NewValue)
-		{
-			value = NewValue;
-			ExplorerUtils.Get().Settings.SetKey(key, NewValue);
-		}
 	}
 }
 

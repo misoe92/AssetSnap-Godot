@@ -20,54 +20,57 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using Godot;
+
 namespace AssetSnap.Trait
 {
-	using Godot;
-	
 	[Tool]
 	
 	public partial class Base : Node
 	{
-		/// <summary>
-		/// Public properties
-		/// </summary>
-		public int Iteration = 0;
-		public string TraitName = "";
-		[Export]
-		public bool Build = false;
 		[Export]
 		public string TypeString;
 		[Export]
 		public string OwnerName;
 		[Export]
+		public bool Build = false;
+		[Export]
 		public Godot.Collections.Array<GodotObject> Nodes;
+		
+		/// <summary>
+		/// Public properties
+		/// </summary>
+		public int Iteration = 0;
 		public int TotalCount = 0;
+		public string TraitName = "";
 		public bool disposed = false;
 		public Godot.Collections.Dictionary<string, Variant> Dependencies = new();
 	
 		/// <summary>
 		/// Protected properties
 		/// </summary>
-		protected Godot.Collections.Dictionary<string, int> Margin = new()
+		protected Godot.Collections.Dictionary<string, int> _Margin = new()
 		{
 			{"left", 0},
 			{"right", 0},
 			{"top", 0},
 			{"bottom", 0},
 		};
-		protected Godot.Collections.Dictionary<string, int> Padding = new()
+		protected Godot.Collections.Dictionary<string, int> _Padding = new()
 		{
 			{"left", 0},
 			{"right", 0},
 			{"top", 0},
 			{"bottom", 0},
 		};
-		protected Control.SizeFlags SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
-		protected Control.SizeFlags SizeFlagsVertical = Control.SizeFlags.ShrinkBegin;
-		protected Vector2 CustomMinimumSize = Vector2.Zero;
-		protected Vector2 Size = Vector2.Zero;
-		protected bool _select = true;
-		protected bool Visible = true;
+		protected Control.SizeFlags _SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+		protected Control.SizeFlags _SizeFlagsVertical = Control.SizeFlags.ShrinkBegin;
+		protected Vector2 _CustomMinimumSize = Vector2.Zero;
+		protected Vector2 _Size = Vector2.Zero;
+		protected bool _Selected = true;
+		protected bool _Visible = true;
 
 		/// <summary>
 		/// Constructor for the Base class.
@@ -110,42 +113,109 @@ namespace AssetSnap.Trait
 		}
 		
 		/// <summary>
-		/// Adds the trait to a given container.
+		/// Called before serialization.
 		/// </summary>
-		/// <param name="Container">The container node.</param>
-		/// <param name="Node">The node to add.</param>
-		/// <param name="index">The optional index.</param>
 		/// <returns>Void.</returns>
-		protected void _AddToContainer( Node Container, Node Node, int? index = null )
+		public void OnBeforeSerialize()
 		{
-			if( null == Node ) 
+			Build = true;
+		}
+		
+		/// <summary>
+		/// Called after deserialization.
+		/// </summary>
+		/// <returns>Void.</returns>
+		public void OnAfterDeserialize()
+		{
+			Build = false;
+		}
+		
+		/// <summary>
+		/// Clears the trait's instances.
+		/// </summary>
+		/// <param name="index">The index of the instance to clear.</param>
+		/// <param name="debug">Optional parameter to enable debugging.</param>
+		/// <returns>Void.</returns>
+		public virtual void Clear(int index = -1, bool debug = false)
+		{
+			if( null == TypeString || null == OwnerName || null == Plugin.Singleton || null == Plugin.Singleton.TraitGlobal ) 
 			{
-				GD.PushError("No node selected: ", TraitName, TypeString );
-				return;
-			}
-			
-			if( null == Container ) 
-			{
-				GD.PushError("Provided container is invalid: ", TraitName, TypeString );
-				// throw new Exception("");
+				Dependencies = new();
 				return;
 			}
 
-			if( Node == Container ) 
+			Godot.Collections.Dictionary<int, GodotObject> instances = Plugin.Singleton.TraitGlobal.AllInstances(TypeString, OwnerName, debug);
+			
+			if( null == instances || instances.Count == 0 ) 
 			{
-				GD.PushError("Provided container is the same as this object: ", TraitName, TypeString );
+				Dependencies = new();
 				return;
 			}
 			
-			// Single placement
-			if( index is int intIndex ) 
+			if( debug ) 
 			{
-				Container.AddChild(Node);
-				Container.MoveChild(Node, intIndex);
+				GD.Print("Keys::", instances.Keys);
 			}
-			else
+
+			if( -1 != index ) 
 			{
-				Container.AddChild(Node);
+				if( false == Plugin.Singleton.TraitGlobal.HasInstance(index,TypeString,OwnerName,debug) ) 
+				{
+					if( debug ) 
+					{
+						GD.Print("Index::", index, TypeString, OwnerName, "-- Not found");
+					}
+					return;
+				}
+				
+				GodotObject instance = Plugin.Singleton.TraitGlobal.GetInstance(index, TypeString, OwnerName, debug);
+				if( EditorPlugin.IsInstanceValid(instance) && instance is Node node ) 
+				{
+					if( debug ) 
+					{
+						GD.Print("Index::", index, TypeString, OwnerName, "--", node.Name);
+					}
+
+					Plugin.Singleton.TraitGlobal.RemoveInstance(index, TypeString, OwnerName, debug );
+					Iteration -= 1;
+				} 
+			}
+			else 
+			{
+				int maxCount = instances.Count;
+				for( int idx = 0; idx < maxCount; idx++)
+				{
+					if(debug)
+					{
+						GD.Print("INDEX::", idx, maxCount);
+					}
+					
+					GodotObject node = instances[idx];
+					if( EditorPlugin.IsInstanceValid(node) && node is Node instanceNode ) 
+					{
+						if( debug ) 
+						{
+							GD.Print("Index::", idx, TypeString, OwnerName, "--", instanceNode.Name);
+						}
+
+						Plugin.Singleton.TraitGlobal.RemoveInstance(idx, TypeString, OwnerName, debug );
+						
+						if( debug ) 
+						{
+							GD.Print("Instance Count::", Plugin.Singleton.TraitGlobal.Count());
+						}
+					}
+					else 
+					{
+						if( debug ) 
+						{
+							GD.Print("Instance Not valid::", idx);
+						}
+					}
+				}
+					
+				Dependencies = new();
+				Iteration = 0;
 			}
 		}
 		
@@ -167,10 +237,10 @@ namespace AssetSnap.Trait
 		/// <param name="index">The index of the instance.</param>
 		/// <param name="debug">Optional parameter to enable debugging.</param>
 		/// <returns>Void.</returns>
-		public virtual void _Select( int index, bool debug = false ) 
+		public virtual Trait.Base _Select( int index, bool debug = false ) 
 		{
 			Dependencies = new();
-			_select = true;
+			_Selected = true;
 
 			if( null == Plugin.Singleton ) 
 			{
@@ -178,18 +248,18 @@ namespace AssetSnap.Trait
 				{
 					GD.PushError("No PluginController found");
 				}
-				_select = false;
-				return;
+				_Selected = false;
+				return this;
 			}
 			
-			if( null == Plugin.Singleton.traitGlobal ) 
+			if( null == Plugin.Singleton.TraitGlobal ) 
 			{
 				if (debug)
 				{
 					GD.PushError("No global trait found");
 				}
-				_select = false;
-				return;
+				_Selected = false;
+				return this;
 			}
 			
 			if( null == TypeString ) 
@@ -198,7 +268,7 @@ namespace AssetSnap.Trait
 				{
 					GD.PushError("No typestring is currently set");
 				}
-				_select = false;
+				_Selected = false;
 			}
 			
 			if( null == OwnerName ) 
@@ -207,40 +277,40 @@ namespace AssetSnap.Trait
 				{
 					GD.PushError("No ownername is currently set");
 				}
-				_select = false;
+				_Selected = false;
 			}
 			
 			if( null == TypeString || null == OwnerName) 
 			{
-				return;
+				return this;
 			} 
 
-			string NameResult = Plugin.Singleton.traitGlobal.GetName(index, TypeString, OwnerName);
+			string NameResult = Plugin.Singleton.TraitGlobal.GetName(index, TypeString, OwnerName);
 			TraitName = NameResult;
 			
 
 			if (false == HasNodeEntries())	
 			{
-				_select = false;
+				_Selected = false;
 				if (debug)
 				{
 					GD.PushError("No Entries for owner: ", OwnerName, " - ", NameResult);
 				}
-				return;
+				return this;
 			}
 
 			if (false == ContainsIndex(index))
 			{
-				_select = false;
+				_Selected = false;
 				if (debug)
 				{
 					GD.PushError("No contain index");
 				}
 				
-				return;
+				return this;
 			}
 
-			GodotObject traitIndex = Plugin.Singleton.traitGlobal.GetInstance(index, TypeString, OwnerName, debug);
+			GodotObject traitIndex = Plugin.Singleton.TraitGlobal.GetInstance(index, TypeString, OwnerName, debug);
 			if (EditorPlugin.IsInstanceValid(traitIndex) && traitIndex is Control childNode)
 			{
 				Dependencies[TraitName + "_WorkingNode"] = childNode;
@@ -250,8 +320,8 @@ namespace AssetSnap.Trait
 					GD.Print("Node found");
 				}
 				
-				_select = true;
-				return;
+				_Selected = true;
+				return this;
 			}
 
 			if (debug)
@@ -259,8 +329,8 @@ namespace AssetSnap.Trait
 				GD.PushError("Failed: ", TraitName, "::", traitIndex, "::", OwnerName, "::", TypeString, "->", EditorPlugin.IsInstanceValid(traitIndex),"||", traitIndex is Control);
 			}
 			
-			_select = false;
-			return;
+			_Selected = false;
+			return this;
 		}
 		
 		/// <summary>
@@ -268,7 +338,7 @@ namespace AssetSnap.Trait
 		/// </summary>
 		/// <param name="name">The name of the instance.</param>
 		/// <returns>Void.</returns>
-		public virtual void _SelectByName( string name ) 
+		public virtual Trait.Base _SelectByName( string name ) 
 		{
 			foreach( Label label in Nodes ) 
 			{
@@ -278,6 +348,8 @@ namespace AssetSnap.Trait
 					break;
 				}
 			}
+
+			return this;
 		}
 		
 		/// <summary>
@@ -286,20 +358,21 @@ namespace AssetSnap.Trait
 		/// <param name="value">The value to set.</param>
 		/// <param name="side">The side to set.</param>
 		/// <returns>Void.</returns>
-		public virtual void _SetMargin( int value, string side ) 
+		public virtual Trait.Base _SetMargin( int value, string side ) 
 		{
 			if( side == "" ) 
 			{
-				Margin["top"] = value;
-				Margin["bottom"] = value;
-				Margin["left"] = value;
-				Margin["right"] = value;
+				_Margin["top"] = value;
+				_Margin["bottom"] = value;
+				_Margin["left"] = value;
+				_Margin["right"] = value;
 			}
 			else 
 			{
-				Margin[side] = value;
-				
+				_Margin[side] = value;
 			}
+
+			return this;
 		}
 		
 		/// <summary>
@@ -308,19 +381,21 @@ namespace AssetSnap.Trait
 		/// <param name="value">The value to set.</param>
 		/// <param name="side">The side to set.</param>
 		/// <returns>Void.</returns>
-		public virtual void _SetPadding( int value, string side ) 
+		public virtual Trait.Base _SetPadding( int value, string side ) 
 		{
 			if( side == "" ) 
 			{
-				Padding["top"] = value;
-				Padding["bottom"] = value;
-				Padding["left"] = value;
-				Padding["right"] = value;
+				_Padding["top"] = value;
+				_Padding["bottom"] = value;
+				_Padding["left"] = value;
+				_Padding["right"] = value;
 			}
 			else 
 			{
-				Padding[side] = value;
+				_Padding[side] = value;
 			}
+
+			return this;
 		}
 		
 		/// <summary>
@@ -328,9 +403,11 @@ namespace AssetSnap.Trait
 		/// </summary>
 		/// <param name="visible">The visibility state to set.</param>
 		/// <returns>Void.</returns>
-		public virtual void _SetVisible( bool visible ) 
+		public virtual Trait.Base _SetVisible( bool visible ) 
 		{
-			Visible = visible;
+			_Visible = visible;
+
+			return this;
 		}
 		
 		/// <summary>
@@ -338,9 +415,11 @@ namespace AssetSnap.Trait
 		/// </summary>
 		/// <param name="text">The name to set.</param>
 		/// <returns>Void.</returns>
-		public virtual void _SetName( string text ) 
+		public virtual Trait.Base _SetName( string text ) 
 		{
 			TraitName = text;
+
+			return this;
 		}
 		
 		/// <summary>
@@ -351,8 +430,8 @@ namespace AssetSnap.Trait
 		/// <returns>The updated container.</returns>
 		public virtual Base SetDimensions( int width, int height )
 		{
-			CustomMinimumSize = new Vector2( width, height);
-			Size = new Vector2( width, height);
+			_CustomMinimumSize = new Vector2( width, height);
+			_Size = new Vector2( width, height);
 
 			return this;
 		}
@@ -365,7 +444,7 @@ namespace AssetSnap.Trait
 		/// <returns>The updated container.</returns>
 		public virtual Base SetMinimumDimension( int width, int height )
 		{
-			CustomMinimumSize = new Vector2( width, height);
+			_CustomMinimumSize = new Vector2( width, height);
 
 			return this;
 		}
@@ -377,7 +456,7 @@ namespace AssetSnap.Trait
 		/// <returns>The updated container.</returns>
 		public virtual Base SetHorizontalSizeFlags(Control.SizeFlags flag)
 		{
-			SizeFlagsHorizontal = flag;
+			_SizeFlagsHorizontal = flag;
 			return this;
 		}
 		
@@ -388,7 +467,7 @@ namespace AssetSnap.Trait
 		/// <returns>The updated container.</returns>
 		public virtual Base SetVerticalSizeFlags(Control.SizeFlags flag)
 		{
-			SizeFlagsVertical = flag;
+			_SizeFlagsVertical = flag;
 			return this;
 		}
 	
@@ -445,6 +524,27 @@ namespace AssetSnap.Trait
 
 			return null;
 		}
+		
+		/// <summary>
+		/// Gets the count of trait instances.
+		/// </summary>
+		/// <returns>The count of trait instances.</returns>
+		public virtual int Count()
+		{
+			if( null == TypeString || null == OwnerName || null == Plugin.Singleton || null == Plugin.Singleton.TraitGlobal ) 
+			{
+				return 0;
+			}
+			
+			Godot.Collections.Dictionary<int, GodotObject> instances = Plugin.Singleton.TraitGlobal.AllInstances(TypeString, OwnerName);
+			
+			if( null == instances || instances.Count == 0 ) 
+			{
+				return 0;
+			}
+
+			return instances.Count;
+		}
 	
 		/// <summary>
 		/// Checks if the trait select was a success.
@@ -468,7 +568,7 @@ namespace AssetSnap.Trait
 				return false;
 			}
 			
-			if( _select == false ) 
+			if( _Selected == false ) 
 			{
 				if( debug ) 
 				{
@@ -508,7 +608,7 @@ namespace AssetSnap.Trait
 				return false;
 			}
 
-			if( null == Plugin.Singleton || null == Plugin.Singleton.traitGlobal ) 
+			if( null == Plugin.Singleton || null == Plugin.Singleton.TraitGlobal ) 
 			{
 				if( debug ) 
 				{
@@ -572,7 +672,7 @@ namespace AssetSnap.Trait
 		/// <returns>True if the nodes array contains the specified index, otherwise false.</returns>
 		public bool ContainsIndex( int index ) 
 		{
-			return Plugin.Singleton.traitGlobal.CountOwner( OwnerName ) >= index;
+			return Plugin.Singleton.TraitGlobal.CountOwner( OwnerName ) >= index;
 		}
 		
 		/// <summary>
@@ -581,7 +681,7 @@ namespace AssetSnap.Trait
 		/// <returns>True if the nodes array is empty or null, otherwise false.</returns>
 		private bool HasNodeEntries()
 		{
-			return Plugin.Singleton.traitGlobal.Count() != 0 && Plugin.Singleton.traitGlobal.CountOwner( OwnerName ) != 0;
+			return Plugin.Singleton.TraitGlobal.Count() != 0 && Plugin.Singleton.TraitGlobal.CountOwner( OwnerName ) != 0;
 		}
 		
 		/// <summary>
@@ -593,132 +693,47 @@ namespace AssetSnap.Trait
 			return null != TypeString && "" != TypeString;
 		}
 		
+		
 		/// <summary>
-		/// Clears the trait's instances.
+		/// Adds the trait to a given container.
 		/// </summary>
-		/// <param name="index">The index of the instance to clear.</param>
-		/// <param name="debug">Optional parameter to enable debugging.</param>
+		/// <param name="Container">The container node.</param>
+		/// <param name="Node">The node to add.</param>
+		/// <param name="index">The optional index.</param>
 		/// <returns>Void.</returns>
-		public virtual void Clear(int index = -1, bool debug = false)
+		protected void _AddToContainer( Node Container, Node Node, int? index = null )
 		{
-			if( null == TypeString || null == OwnerName || null == Plugin.Singleton || null == Plugin.Singleton.traitGlobal ) 
+			if( null == Node ) 
 			{
-				Dependencies = new();
-				return;
-			}
-
-			Godot.Collections.Dictionary<int, GodotObject> instances = Plugin.Singleton.traitGlobal.AllInstances(TypeString, OwnerName, debug);
-			
-			if( null == instances || instances.Count == 0 ) 
-			{
-				Dependencies = new();
+				GD.PushError("No node selected: ", TraitName, TypeString );
 				return;
 			}
 			
-			if( debug ) 
+			if( null == Container ) 
 			{
-				GD.Print("Keys::", instances.Keys);
+				GD.PushError("Provided container is invalid: ", TraitName, TypeString );
+				// throw new Exception("");
+				return;
 			}
 
-			if( -1 != index ) 
+			if( Node == Container ) 
 			{
-				if( false == Plugin.Singleton.traitGlobal.HasInstance(index,TypeString,OwnerName,debug) ) 
-				{
-					if( debug ) 
-					{
-						GD.Print("Index::", index, TypeString, OwnerName, "-- Not found");
-					}
-					return;
-				}
-				
-				GodotObject instance = Plugin.Singleton.traitGlobal.GetInstance(index, TypeString, OwnerName, debug);
-				if( EditorPlugin.IsInstanceValid(instance) && instance is Node node ) 
-				{
-					if( debug ) 
-					{
-						GD.Print("Index::", index, TypeString, OwnerName, "--", node.Name);
-					}
-
-					Plugin.Singleton.traitGlobal.RemoveInstance(index, TypeString, OwnerName, debug );
-					Iteration -= 1;
-				} 
-			}
-			else 
-			{
-				int maxCount = instances.Count;
-				for( int idx = 0; idx < maxCount; idx++)
-				{
-					if(debug)
-					{
-						GD.Print("INDEX::", idx, maxCount);
-					}
-					
-					GodotObject node = instances[idx];
-					if( EditorPlugin.IsInstanceValid(node) && node is Node instanceNode ) 
-					{
-						if( debug ) 
-						{
-							GD.Print("Index::", idx, TypeString, OwnerName, "--", instanceNode.Name);
-						}
-
-						Plugin.Singleton.traitGlobal.RemoveInstance(idx, TypeString, OwnerName, debug );
-						
-						if( debug ) 
-						{
-							GD.Print("Instance Count::", Plugin.Singleton.traitGlobal.Count());
-						}
-					}
-					else 
-					{
-						if( debug ) 
-						{
-							GD.Print("Instance Not valid::", idx);
-						}
-					}
-				}
-					
-				Dependencies = new();
-				Iteration = 0;
-			}
-		}
-		
-		/// <summary>
-		/// Gets the count of trait instances.
-		/// </summary>
-		/// <returns>The count of trait instances.</returns>
-		public virtual int Count()
-		{
-			if( null == TypeString || null == OwnerName || null == Plugin.Singleton || null == Plugin.Singleton.traitGlobal ) 
-			{
-				return 0;
+				GD.PushError("Provided container is the same as this object: ", TraitName, TypeString );
+				return;
 			}
 			
-			Godot.Collections.Dictionary<int, GodotObject> instances = Plugin.Singleton.traitGlobal.AllInstances(TypeString, OwnerName);
-			
-			if( null == instances || instances.Count == 0 ) 
+			// Single placement
+			if( index is int intIndex ) 
 			{
-				return 0;
+				Container.AddChild(Node);
+				Container.MoveChild(Node, intIndex);
 			}
-
-			return instances.Count;
-		}
-		
-		/// <summary>
-		/// Called before serialization.
-		/// </summary>
-		/// <returns>Void.</returns>
-		public void OnBeforeSerialize()
-		{
-			Build = true;
-		}
-		
-		/// <summary>
-		/// Called after deserialization.
-		/// </summary>
-		/// <returns>Void.</returns>
-		public void OnAfterDeserialize()
-		{
-			Build = false;
+			else
+			{
+				Container.AddChild(Node);
+			}
 		}
 	}
 }
+
+#endif

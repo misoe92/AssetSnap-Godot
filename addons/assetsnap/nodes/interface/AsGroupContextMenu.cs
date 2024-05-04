@@ -32,11 +32,12 @@ namespace AssetSnap.Front.Nodes
 	[Tool]
 	public partial class AsGroupContextMenu : Control
 	{
-		private readonly Theme _Theme = GD.Load<Theme>("res://addons/assetsnap/assets/themes/SnapMenu.tres");
-
 		public PanelContainer MenuPanelContainer;
 		public Button AddToCurrentGroup;
-		private string FocusedMesh = "";
+
+
+		private readonly Theme _Theme = GD.Load<Theme>("res://addons/assetsnap/assets/themes/SnapMenu.tres");
+		private string _FocusedMesh = "";
 
 		/// <summary>
 		/// Displays the context menu at the specified coordinates with the provided mesh path.
@@ -50,7 +51,7 @@ namespace AssetSnap.Front.Nodes
 				MenuPanelContainer.Visible = true;
 				MenuPanelContainer.Position = Coordinates;
 
-				FocusedMesh = MeshPath;
+				_FocusedMesh = MeshPath;
 			}
 		}
 
@@ -84,7 +85,7 @@ namespace AssetSnap.Front.Nodes
 		{
 			MenuPanelContainer.Visible = false;
 			MenuPanelContainer.Position = new Vector2(-400, -400);
-			FocusedMesh = "";
+			_FocusedMesh = "";
 		}
 
 		/// <summary>
@@ -177,11 +178,11 @@ namespace AssetSnap.Front.Nodes
 		}
 
 		/// <summary>
-        /// Event handler for the "Add to current group" button click event.
-        /// </summary>
+		/// Event handler for the "Add to current group" button click event.
+		/// </summary>
 		private void _OnAddToCurrentGroup()
 		{
-			ExplorerUtils.Get().GroupBuilder._Editor.AddMeshToGroup(FocusedMesh);
+			ExplorerUtils.Get().GroupBuilder._Editor.AddMeshToGroup(_FocusedMesh);
 			HideMenu();
 		}
 	}

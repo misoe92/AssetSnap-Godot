@@ -34,20 +34,9 @@ namespace AssetSnap.Front.Nodes
 	[Tool]
 	public partial class AsLibraryPanelContainer : PanelContainer
 	{
-		private AssetSnap.Library.Instance _Library;
-		private Mesh _Mesh;
-		private Node3D _Instance;
-		private bool _Active = false;
-		private string _FileName = "";
-		private string _Path = "";
-		private Resource _Ressource;
-		private bool _isMouseOver = false;
-		private Color _targetColor = new Color(1.0f, 1.0f, 1.0f, 1.0f);
-		private float _transitionSpeed = 6.0f; // Adjust the transition speed as needed
-
 		/// <summary>
-        /// Gets or sets the library instance.
-        /// </summary>
+		/// Gets or sets the library instance.
+		/// </summary>
 		[Export]
 		public AssetSnap.Library.Instance Library
 		{
@@ -57,6 +46,19 @@ namespace AssetSnap.Front.Nodes
 				_Library = value;
 			}
 		}
+		
+		private string _FileName = "";
+		private string _Path = "";
+		private float _TransitionSpeed = 6.0f; // Adjust the transition speed as needed
+		private bool _Active = false;
+		private bool _IsMouseOver = false;
+		private Color _TargetColor = new Color(1.0f, 1.0f, 1.0f, 1.0f);
+		private Mesh _Mesh;
+		private Node3D _Instance;
+		private Resource _Ressource;
+		private AssetSnap.Library.Instance _Library;
+
+		
 
 		/// <summary>
 		/// Sets flags, default data, and connects to signals.
@@ -81,7 +83,7 @@ namespace AssetSnap.Front.Nodes
 		public override void _Process(double delta)
 		{
 			// Smoothly interpolate the modulate property toward the target color
-			SelfModulate = SelfModulate.Lerp(_targetColor, (float)delta * _transitionSpeed);
+			SelfModulate = SelfModulate.Lerp(_TargetColor, (float)delta * _TransitionSpeed);
 		}
 
 		/// <summary>
@@ -116,8 +118,8 @@ namespace AssetSnap.Front.Nodes
 					SetState(true);
 					PrepareMeshInstance();
 
-					Library._LibrarySettings._LSSnapToHeight.SetState(true);
-					Library._LibrarySettings._LSSnapToHeight.Sync();
+					Library._LibrarySettings.SnapToHeight.SetState(true);
+					Library._LibrarySettings.SnapToHeight.Sync();
 
 					ExplorerUtils.Get().SetFocusToNode(_Instance);
 
@@ -177,7 +179,7 @@ namespace AssetSnap.Front.Nodes
 		public void SetState(bool state)
 		{
 			_Active = state;
-			_targetColor = new Color(1.0f, 1.0f, 1.0f, 1.0f);
+			_TargetColor = new Color(1.0f, 1.0f, 1.0f, 1.0f);
 
 			if (state == true)
 			{
@@ -275,15 +277,15 @@ namespace AssetSnap.Front.Nodes
 		/// </summary>
 		private void _OnMouseEntered()
 		{
-			_isMouseOver = true;
+			_IsMouseOver = true;
 
 			if (_Active == false)
 			{
-				_targetColor = new Color(0.25f, 0.25f, 0.25f, 1.0f);
+				_TargetColor = new Color(0.25f, 0.25f, 0.25f, 1.0f);
 			}
 			else
 			{
-				_targetColor = new Color(1.0f, 1.0f, 1.0f, 1.0f);
+				_TargetColor = new Color(1.0f, 1.0f, 1.0f, 1.0f);
 			}
 		}
 
@@ -292,8 +294,8 @@ namespace AssetSnap.Front.Nodes
 		/// </summary>
 		private void _OnMouseExited()
 		{
-			_isMouseOver = false;
-			_targetColor = new Color(1.0f, 1.0f, 1.0f, 1.0f);
+			_IsMouseOver = false;
+			_TargetColor = new Color(1.0f, 1.0f, 1.0f, 1.0f);
 		}
 
 		/// <summary>

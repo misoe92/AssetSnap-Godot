@@ -32,18 +32,6 @@ namespace AssetSnap.Modifier
 	public partial class Base
 	{
 		/// <summary>
-		/// The array modifier instance.
-		/// </summary>
-		public AsArrayModifier ArrayModifier = new();
-		
-		/// <summary>
-		/// The scatter modifier instance.
-		/// </summary>
-		public AsScatterModifier ScatterModifier = new();
-		
-		private static Base _Instance;
-		
-		/// <summary>
 		/// Gets the singleton instance of the Base class.
 		/// </summary>
 		public static Base Singleton 
@@ -60,8 +48,20 @@ namespace AssetSnap.Modifier
 		}
 		
 		/// <summary>
-        /// Called when the Base instance is exiting.
-        /// </summary>
+		/// The array modifier instance.
+		/// </summary>
+		public AsArrayModifier ArrayModifier = new();
+		
+		/// <summary>
+		/// The scatter modifier instance.
+		/// </summary>
+		public AsScatterModifier ScatterModifier = new();
+		
+		private static Base _Instance;
+		
+		/// <summary>
+		/// Called when the Base instance is exiting.
+		/// </summary>
 		public void _Exit()
 		{
 			ArrayModifier = null;
@@ -69,4 +69,5 @@ namespace AssetSnap.Modifier
 		}
 	}
 }
+
 #endif

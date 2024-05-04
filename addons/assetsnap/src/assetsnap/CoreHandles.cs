@@ -36,6 +36,17 @@ namespace AssetSnap.Core
 	public class CoreHandles : Core
 	{
 		/// <summary>
+		/// Resets the current handle.
+		/// </summary>
+		public void ResetHandle()
+		{
+			StatesUtils.Get().EditingTitle = null;
+			StatesUtils.Get().EditingObject = null;
+			StatesUtils.Get().Group = null;
+			StatesUtils.Get().GroupedObject = null;
+		}
+		
+		/// <summary>
 		/// Handles communication with the scene tree and performs actions depending on the current node in focus.
 		/// </summary>
 		/// <param name="_object">The object in focus.</param>
@@ -75,7 +86,7 @@ namespace AssetSnap.Core
 			{
 				if (null != StatesUtils.Get().CurrentLibrary)
 				{
-					StatesUtils.Get().CurrentLibrary._LibrarySettings._LSEditing.SetText("None");
+					StatesUtils.Get().CurrentLibrary._LibrarySettings.Editing.SetText("None");
 				}
 
 				if (null != ExplorerUtils.Get().Library && null != ExplorerUtils.Get().Library.Libraries)
@@ -86,7 +97,7 @@ namespace AssetSnap.Core
 						if (EditorPlugin.IsInstanceValid(_Library) && null != _Library._LibrarySettings)
 						{
 							_Library._LibrarySettings.ClearAll();
-							_Library._LibrarySettings._LSEditing.SetText("None");
+							_Library._LibrarySettings.Editing.SetText("None");
 						}
 					}
 				}
@@ -120,10 +131,8 @@ namespace AssetSnap.Core
 					{
 						instance.ClearAllPanelState();
 						instance._LibrarySettings.ClearAll();
-						instance._LibrarySettings._LSEditing.SetText("None");
+						instance._LibrarySettings.Editing.SetText("None");
 					}
-
-					ExplorerUtils.Get().Model = null;
 				}
 				StatesUtils.Get().EditingObject = _Node;
 
@@ -140,12 +149,12 @@ namespace AssetSnap.Core
 				}
 
 				ExplorerUtils.Get().BottomDock.SetTab(Library);
-				Library._LibrarySettings._LSEditing.SetText(_Node.Name);
+				Library._LibrarySettings.Editing.SetText(_Node.Name);
 
 				/** Update library settings **/
 				if (_Node.HasLibrarySettings())
 				{
-					HandleNodeLibrarySettings(_Node);
+					_HandleNodeLibrarySettings(_Node);
 				}
 
 				// Check if drag add is currently active
@@ -178,10 +187,8 @@ namespace AssetSnap.Core
 					{
 						instance.ClearAllPanelState();
 						instance._LibrarySettings.ClearAll();
-						instance._LibrarySettings._LSEditing.SetText("None");
+						instance._LibrarySettings.Editing.SetText("None");
 					}
-
-					ExplorerUtils.Get().Model = null;
 				}
 				StatesUtils.Get().EditingObject = _Node;
 
@@ -198,12 +205,12 @@ namespace AssetSnap.Core
 				}
 
 				ExplorerUtils.Get().BottomDock.SetTab(Library);
-				Library._LibrarySettings._LSEditing.SetText(_Node.Name);
+				Library._LibrarySettings.Editing.SetText(_Node.Name);
 
 				/** Update library settings **/
 				if (_Node.HasLibrarySettings())
 				{
-					HandleNodeLibrarySettings(_Node);
+					_HandleNodeLibrarySettings(_Node);
 				}
 
 				// Check if drag add is currently active
@@ -254,7 +261,7 @@ namespace AssetSnap.Core
 		/// Updates the library settings of the current node being worked on.
 		/// </summary>
 		/// <param name="_Node">The node whose library settings need to be updated.</param>
-		private void HandleNodeLibrarySettings(Node _Node)
+		private void _HandleNodeLibrarySettings(Node _Node)
 		{
 			if (_Node is AsNode3D node3d)
 			{
@@ -310,24 +317,13 @@ namespace AssetSnap.Core
 		}
 
 		/// <summary>
-        /// Converts the given object to a grouped node.
-        /// </summary>
-        /// <param name="_object">The object to convert.</param>
-        /// <returns>The converted grouped instance.</returns>
+		/// Converts the given object to a grouped node.
+		/// </summary>
+		/// <param name="_object">The object to convert.</param>
+		/// <returns>The converted grouped instance.</returns>
 		private AsGrouped3D _ObjectToGrouped(GodotObject _object)
 		{
 			return _object as AsGrouped3D;
-		}
-
-		/// <summary>
-        /// Resets the current handle.
-        /// </summary>
-		public void ResetHandle()
-		{
-			StatesUtils.Get().EditingTitle = null;
-			StatesUtils.Get().EditingObject = null;
-			StatesUtils.Get().Group = null;
-			StatesUtils.Get().GroupedObject = null;
 		}
 	}
 }

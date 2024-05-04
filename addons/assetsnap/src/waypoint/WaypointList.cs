@@ -22,24 +22,25 @@
 
 #if TOOLS
 
+using System;
+using System.Collections.Generic;
+using AssetSnap.Front.Nodes;
+using Godot;
+
 namespace AssetSnap.Waypoint
 {
-	using System;
-	using System.Collections.Generic;
-	using AssetSnap.Front.Nodes;
-	using Godot;
-
 	/// <summary>
 	/// Represents a list of waypoints.
 	/// </summary>
 	public class WaypointList
 	{
-		private BaseWaypoint[] Waypoints;
 		public delegate void CallableMethod(BaseWaypoint waypoint);
+		
+		private BaseWaypoint[] _Waypoints;
 
 		public WaypointList()
 		{
-			Waypoints = Array.Empty<BaseWaypoint>();
+			_Waypoints = Array.Empty<BaseWaypoint>();
 		}
 		
 		/// <summary>
@@ -51,10 +52,10 @@ namespace AssetSnap.Waypoint
 		/// <param name="Scale">The scale of the waypoint.</param>
 		public void Add(Node3D _model, Vector3 Origin, Vector3 Rotation, Vector3 Scale)
 		{
-			List<BaseWaypoint> _WaypointList = new List<BaseWaypoint>(Waypoints);
+			List<BaseWaypoint> _WaypointList = new List<BaseWaypoint>(_Waypoints);
 			BaseWaypoint Waypoint = new(Origin, Rotation, Scale, _model);
 			_WaypointList.Add(Waypoint);
-			Waypoints = _WaypointList.ToArray();
+			_Waypoints = _WaypointList.ToArray();
 		}
 
 		/// <summary>
@@ -64,10 +65,10 @@ namespace AssetSnap.Waypoint
 		/// <param name="Origin">The origin of the waypoint to remove.</param>
 		public void Remove(Node ModelInstance, Vector3 Origin)
 		{
-			for (int i = 0; i < Waypoints.Length; i++)
+			for (int i = 0; i < _Waypoints.Length; i++)
 			{
 				bool state = true;
-				BaseWaypoint Point = Waypoints[i];
+				BaseWaypoint Point = _Waypoints[i];
 
 				if (EditorPlugin.IsInstanceValid(Point.GetModel()) && Point.GetModel().HasMeta("AsModel"))
 				{
@@ -93,9 +94,9 @@ namespace AssetSnap.Waypoint
 
 				if (false == EditorPlugin.IsInstanceValid(Point.GetModel()) || Point.GetOrigin() == Origin && state)
 				{
-					List<BaseWaypoint> _SpawnPointsList = new List<BaseWaypoint>(Waypoints);
+					List<BaseWaypoint> _SpawnPointsList = new List<BaseWaypoint>(_Waypoints);
 					_SpawnPointsList.Remove(Point);
-					Waypoints = _SpawnPointsList.ToArray();
+					_Waypoints = _SpawnPointsList.ToArray();
 				}
 			}
 		}
@@ -110,7 +111,7 @@ namespace AssetSnap.Waypoint
 		{
 			if ("Scale" == Type)
 			{
-				foreach (BaseWaypoint Waypoint in Waypoints)
+				foreach (BaseWaypoint Waypoint in _Waypoints)
 				{
 					if (Waypoint.GetOrigin() == Where)
 					{
@@ -127,7 +128,7 @@ namespace AssetSnap.Waypoint
 		/// <returns>True if the node is contained within any waypoint; otherwise, false.</returns>
 		public bool Has(Node3D node)
 		{
-			foreach (BaseWaypoint Waypoint in Waypoints)
+			foreach (BaseWaypoint Waypoint in _Waypoints)
 			{
 				if (Waypoint.GetModel() == node)
 				{
@@ -139,12 +140,12 @@ namespace AssetSnap.Waypoint
 		}
 
 		/// <summary>
-        /// Executes a callback method for each waypoint in the list.
-        /// </summary>
-        /// <param name="callback">The callback method to execute for each waypoint.</param>
+		/// Executes a callback method for each waypoint in the list.
+		/// </summary>
+		/// <param name="callback">The callback method to execute for each waypoint.</param>
 		public void Each(CallableMethod callback)
 		{
-			foreach (BaseWaypoint Waypoint in Waypoints)
+			foreach (BaseWaypoint Waypoint in _Waypoints)
 			{
 				if (EditorPlugin.IsInstanceValid(Waypoint.GetModel()))
 				{
@@ -152,20 +153,20 @@ namespace AssetSnap.Waypoint
 				}
 				else
 				{
-					List<BaseWaypoint> _SpawnPointsList = new List<BaseWaypoint>(Waypoints);
+					List<BaseWaypoint> _SpawnPointsList = new List<BaseWaypoint>(_Waypoints);
 					_SpawnPointsList.Remove(Waypoint);
-					Waypoints = _SpawnPointsList.ToArray();
+					_Waypoints = _SpawnPointsList.ToArray();
 				}
 			}
 		}
 
 		/// <summary>
-        /// Checks if the waypoint list is empty.
-        /// </summary>
-        /// <returns>True if the waypoint list is empty; otherwise, false.</returns>
+		/// Checks if the waypoint list is empty.
+		/// </summary>
+		/// <returns>True if the waypoint list is empty; otherwise, false.</returns>
 		public bool IsEmpty()
 		{
-			return Waypoints.Length == 0;
+			return _Waypoints.Length == 0;
 		}
 
 		/// <summary>
@@ -173,9 +174,9 @@ namespace AssetSnap.Waypoint
 		/// </summary>
 		public void _Exit()
 		{
-			if (Waypoints.Length != 0)
+			if (_Waypoints.Length != 0)
 			{
-				Waypoints = Array.Empty<BaseWaypoint>();
+				_Waypoints = Array.Empty<BaseWaypoint>();
 			}
 		}
 	}

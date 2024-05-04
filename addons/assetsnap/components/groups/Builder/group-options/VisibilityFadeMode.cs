@@ -41,7 +41,7 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 		{
 			Name = "GroupsBuilderGroupOptionsVisibilityFadeMode";
 			
-			UsingTraits = new()
+			_UsingTraits = new()
 			{
 				{ typeof(Selectable).ToString() },
 			};

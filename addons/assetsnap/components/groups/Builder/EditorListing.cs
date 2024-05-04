@@ -42,7 +42,7 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		{
 			Name = "GroupBuilderEditorListing";
 
-			UsingTraits = new()
+			_UsingTraits = new()
 			{
 				{ typeof(Containerable).ToString() },
 				{ typeof(Labelable).ToString() },
@@ -62,14 +62,14 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			SizeFlagsVertical = Control.SizeFlags.ExpandFill;
 			SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
 
-			if (Initiated == true)
+			if (_Initiated == true)
 			{
 				return;
 			}
 
 			base.Initialize();
 
-			Initiated = true;
+			_Initiated = true;
 
 			_InitializeFields();
 

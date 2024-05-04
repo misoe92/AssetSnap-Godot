@@ -38,6 +38,15 @@ namespace AssetSnap.Front.Modifiers
 		public string Name = "AsArrayModifier";
 
 		/// <summary>
+		/// Fetches the current handle.
+		/// </summary>
+		/// <returns>Returns the current handle.</returns>
+		public Node GetHandle()
+		{
+			return StatesUtils.Get().EditingObject;
+		}
+		
+		/// <summary>
 		/// Apply the array modifier.
 		/// </summary>
 		/// <returns>Returns true if the modifier is successfully applied, otherwise false.</returns>
@@ -54,9 +63,9 @@ namespace AssetSnap.Front.Modifiers
 		}
 
 		/// <summary>
-        /// Apply the array modifier with simple conditions.
-        /// </summary>
-        /// <returns>Returns true if the modifier is successfully applied, otherwise false.</returns>
+		/// Apply the array modifier with simple conditions.
+		/// </summary>
+		/// <returns>Returns true if the modifier is successfully applied, otherwise false.</returns>
 		public bool ApplySimple()
 		{
 			Node3D Handle = GetHandle() as Node3D;
@@ -97,18 +106,9 @@ namespace AssetSnap.Front.Modifiers
 		}
 
 		/// <summary>
-        /// Fetches the current handle.
-        /// </summary>
-        /// <returns>Returns the current handle.</returns>
-		public Node GetHandle()
-		{
-			return StatesUtils.Get().EditingObject;
-		}
-
-		/// <summary>
-        /// Checks if handle exists.
-        /// </summary>
-        /// <returns>Returns true if the handle exists, otherwise false.</returns>
+		/// Checks if handle exists.
+		/// </summary>
+		/// <returns>Returns true if the handle exists, otherwise false.</returns>
 		public bool HasHandle()
 		{
 			Node3D Handle = StatesUtils.Get().EditingObject;

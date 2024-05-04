@@ -23,6 +23,7 @@
 #if TOOLS
 
 using AssetSnap.Component;
+using AssetSnap.States;
 using Godot;
 
 namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
@@ -40,7 +41,7 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 		{
 			Name = "GroupsBuilderGroupOptionsPlacementOptimized";
 			
-			UsingTraits = new()
+			_UsingTraits = new()
 			{
 				{ typeof(Checkable).ToString() },
 			};
@@ -64,10 +65,10 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
         /// </summary>
 		private void _OnCheck()
 		{
-			_GlobalExplorer.States.PlacingType = GlobalStates.PlacingTypeEnum.Optimized;
+			StatesUtils.Get().PlacingType = GlobalStates.PlacingTypeEnum.Optimized;
 			
 			Parent._UpdateGroupOptions();
-			_MaybeUpdateGrouped("PlacementOptimized", _GlobalExplorer.States.PlacingType == GlobalStates.PlacingTypeEnum.Optimized);
+			_MaybeUpdateGrouped("PlacementOptimized", StatesUtils.Get().PlacingType == GlobalStates.PlacingTypeEnum.Optimized);
 			_HasGroupDataHasChanged();
 		}
 	}

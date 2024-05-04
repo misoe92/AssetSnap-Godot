@@ -43,7 +43,7 @@ namespace AssetSnap.Front.Components.Library
 		{
 			Name = "LibrarySnapGrab";
 
-			UsingTraits = new() { };
+			_UsingTraits = new() { };
 
 			//_include = false;  
 		}

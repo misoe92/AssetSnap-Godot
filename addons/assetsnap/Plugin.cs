@@ -180,7 +180,7 @@ namespace AssetSnap
 		{
 			// Finalize Initialize of plugin 
 
-			OnRemoveFolder += (string title) => { CallDeferred("DoRemoveFolder", title); };
+			OnRemoveFolder += (string title) => { CallDeferred("_DoRemoveFolder", title); };
 
 			ModelPreviewer.Singleton.Enter();
 			ModelPreviewer.Singleton.GeneratePreviews();
@@ -232,6 +232,16 @@ namespace AssetSnap
 			new ASNode.Types.AsOptimizedMultiMeshGroupType().Dispose( this );
 			new ASNode.Types.AsMultiMeshType().Dispose( this );
 			
+			Plugin.Singleton.RemoveChild(ExplorerUtils.Get().Library);
+			Plugin.Singleton.RemoveChild(ExplorerUtils.Get().Components);
+			Plugin.Singleton.RemoveChild(ExplorerUtils.Get().ContextMenu);
+			Plugin.Singleton.RemoveChild(ExplorerUtils.Get().Inspector);
+
+			ExplorerUtils.Get().Library.Free();
+			ExplorerUtils.Get().Components.Free();
+			ExplorerUtils.Get().ContextMenu.Free();
+			ExplorerUtils.Get().Inspector.Free();
+			
 			foreach (GodotObject _object in TraitGlobal.DisposeQueue)
 			{
 				if (IsInstanceValid(_object) && _object is Node node)
@@ -262,7 +272,7 @@ namespace AssetSnap
 				{
 					if (IsInstanceValid(gobject) && gobject is Node node)
 					{
-						node.QueueFree();
+						node.Free();
 					}
 				}
 			}
@@ -270,7 +280,7 @@ namespace AssetSnap
 			if (null != Dock)
 			{
 				RemoveControlFromBottomPanel(Dock);
-				Dock.QueueFree();
+				Dock.Free();
 			}
 			
 			if ( HasInternalContainer() && null != GetInternalContainer())
@@ -280,7 +290,7 @@ namespace AssetSnap
 
 			if (null != TraitGlobal)
 			{
-				TraitGlobal.QueueFree();
+				TraitGlobal.Free();
 			}
 		}
 		
@@ -451,9 +461,9 @@ namespace AssetSnap
 			if (EditorInterface.Singleton.GetInspector().GetEditedObject() == null)
 			{
 				explorer.HandleNode = null;
-				if (null != explorer.CurrentLibrary)
+				if (null != StatesUtils.Get().CurrentLibrary)
 				{
-					explorer.CurrentLibrary._LibrarySettings._LSEditing.SetText("None");
+					StatesUtils.Get().CurrentLibrary._LibrarySettings.Editing.SetText("None");
 				}
 				else
 				{
@@ -465,7 +475,7 @@ namespace AssetSnap
 							if (null != _Library._LibrarySettings)
 							{
 								_Library._LibrarySettings.ClearAll();
-								_Library._LibrarySettings._LSEditing.SetText("None");
+								_Library._LibrarySettings.Editing.SetText("None");
 							}
 						}
 					}

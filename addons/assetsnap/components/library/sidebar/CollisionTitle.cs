@@ -33,7 +33,7 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 	public partial class CollisionTitle : LibraryComponent
 	{
 		private readonly string _MainTitle = "Collision shapes";
-		private bool Exited = false;
+		private bool _Exited = false;
 	
 		private MarginContainer _MarginContainer;
 		private VBoxContainer _InnerContainer;

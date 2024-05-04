@@ -41,7 +41,7 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject.AdvancedContaine
 		{
 			Text = "Sphere Collision";
 			
-			UsingTraits = new()
+			_UsingTraits = new()
 			{
 				{ typeof(Containerable).ToString() },
 				{ typeof(Labelable).ToString() },

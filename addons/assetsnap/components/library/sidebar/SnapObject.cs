@@ -23,6 +23,7 @@
 #if TOOLS
 
 using AssetSnap.Component;
+using AssetSnap.States;
 using Godot;
 
 namespace AssetSnap.Front.Components.Library.Sidebar
@@ -37,7 +38,7 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		/// Gets or sets the state of the SnapObject.
 		/// </summary>
 		/// <value>The state of the SnapObject.</value>
-		public bool state 
+		public bool State 
 		{
 			get => GetState();
 			set 
@@ -62,7 +63,7 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		{
 			Name = "LSSnapObject";
 			
-			UsingTraits = new()
+			_UsingTraits = new()
 			{
 				{ typeof(Checkable).ToString() },
 			};
@@ -95,7 +96,7 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 
 			Callable _callable = Callable.From(() => { _OnCheckboxPressed(); });
 			
-			Initiated = true;
+			_Initiated = true;
 		
 			Trait<Checkable>()
 				.SetName("SnapObjectCheckbox")
@@ -111,13 +112,13 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 				.Select(0)
 				.AddToContainer( this );
 	
-			Plugin.GetInstance().StatesChanged += (Godot.Collections.Array data) => { MaybeUpdateValue(); };
+			Plugin.GetInstance().StatesChanged += (Godot.Collections.Array data) => { _MaybeUpdateValue(); };
 		}
 		
 		/// <summary>
 		/// Handles synchronization of the checkboxes to match the state of the model.
 		/// </summary>	
-		public void MaybeUpdateValue()
+		public void _MaybeUpdateValue()
 		{
 			if( 
 				false == IsValid()
@@ -128,12 +129,43 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			
 			if( IsSnapToObject() && false == IsCheckboxChecked() ) 
 			{
-				state = true;
+				State = true;
 			}
 			else if( false == IsSnapToObject() && true == IsCheckboxChecked() ) 
 			{
-				state = false;
+				State = false;
 			}
+		}
+		
+		/// <summary>
+		/// Resets the SnapObject component.
+		/// </summary>
+		public void Reset()
+		{
+			StatesUtils.Get().SnapToObject = GlobalStates.LibraryStateEnum.Disabled;
+			State = false;
+		}
+			
+		/// <summary>
+		/// Synchronizes the SnapObject's value to a global central state controller.
+		/// </summary>
+		public override void Sync() 
+		{
+			StatesUtils.Get().SnapToObject = State ? GlobalStates.LibraryStateEnum.Enabled : GlobalStates.LibraryStateEnum.Disabled;
+		}
+		
+		/// <summary>
+		/// Checks if the SnapObject component is valid.
+		/// </summary>
+		/// <returns>True if the SnapObject component is valid, otherwise false.</returns>
+		public bool IsValid()
+		{
+			return
+				null != _GlobalExplorer &&
+				null != StatesUtils.Get() &&
+				false != _Initiated &&
+				null != Trait<Checkable>() &&
+				false != HasTrait<Checkable>();
 		}
 		
 		/// <summary>
@@ -145,7 +177,7 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			
 			if( false == IsSnapToObject() ) 
 			{
-				_GlobalExplorer.States.SnapToObject = GlobalStates.LibraryStateEnum.Enabled;
+				StatesUtils.Get().SnapToObject = GlobalStates.LibraryStateEnum.Enabled;
 				
 				Trait<Checkable>()
 					.Select(0)
@@ -159,7 +191,7 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 					.Select(0)
 					.SetMargin(10, "bottom");
 					
-				_GlobalExplorer.States.SnapToObject = GlobalStates.LibraryStateEnum.Disabled;
+				StatesUtils.Get().SnapToObject = GlobalStates.LibraryStateEnum.Disabled;
 			}
 									
 			UpdateSpawnSettings("SnapToObject", state);
@@ -171,38 +203,7 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		/// <returns>True if the checkbox is checked, otherwise false.</returns>
 		private bool IsCheckboxChecked()
 		{
-			return state == true;
-		}
-		
-		/// <summary>
-		/// Resets the SnapObject component.
-		/// </summary>
-		public void Reset()
-		{
-			_GlobalExplorer.States.SnapToObject = GlobalStates.LibraryStateEnum.Disabled;
-			state = false;
-		}
-		
-		/// <summary>
-		/// Checks if the SnapObject component is valid.
-		/// </summary>
-		/// <returns>True if the SnapObject component is valid, otherwise false.</returns>
-		public bool IsValid()
-		{
-			return
-				null != _GlobalExplorer &&
-				null != _GlobalExplorer.States &&
-				false != Initiated &&
-				null != Trait<Checkable>() &&
-				false != HasTrait<Checkable>();
-		}
-		
-		/// <summary>
-		/// Synchronizes the SnapObject's value to a global central state controller.
-		/// </summary>
-		public override void Sync() 
-		{
-			_GlobalExplorer.States.SnapToObject = state ? GlobalStates.LibraryStateEnum.Enabled : GlobalStates.LibraryStateEnum.Disabled;
+			return State == true;
 		}
 	}
 }

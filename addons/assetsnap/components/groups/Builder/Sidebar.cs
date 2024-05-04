@@ -38,9 +38,9 @@ namespace AssetSnap.Front.Components.Groups.Builder
 	[Tool]
 	public partial class Sidebar : LibraryComponent
 	{
-		private readonly string TitleText = "Current Groups";
-		private readonly string ButtonText = "Create new Group";
-		private VBoxContainer GroupContainer;
+		private readonly string _TitleText = "Current Groups";
+		private readonly string _ButtonText = "Create new Group";
+		private VBoxContainer _GroupContainer;
 		private Godot.Collections.Dictionary<string, ListingEntry> _Instances;
 
 		/// <summary>
@@ -50,7 +50,7 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		{
 			Name = "GroupBuilderSidebar";
 
-			UsingTraits = new()
+			_UsingTraits = new()
 			{
 				{ typeof(Buttonable).ToString() },
 				{ typeof(Labelable).ToString() },
@@ -69,7 +69,7 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		public override void Initialize()
 		{
 			base.Initialize();
-			Initiated = true;
+			_Initiated = true;
 
 			_SetupTopbar();
 			_SetupExistingGroupList();
@@ -197,6 +197,65 @@ namespace AssetSnap.Front.Components.Groups.Builder
 				}
 			}
 		}
+		
+		/// <summary>
+		/// Removes a group given its file path.
+		/// </summary>
+		/// <param name="filepath">The file path of the group to remove.</param>
+		public void RemoveGroup(string filepath)
+		{
+			string absolutePath = ProjectSettings.GlobalizePath(filepath);
+			// Check if the file exists
+			if (File.Exists(absolutePath))
+			{
+				// Delete the file
+				File.Delete(absolutePath);
+
+				GD.Print("File removed successfully: " + absolutePath);
+			}
+			else
+			{
+				GD.PrintErr("File not found: " + absolutePath);
+			}
+		}
+
+		/// <summary>
+		/// Clears the sidebar.
+		/// </summary>
+		/// <param name="debug">Whether to output debug information.</param>
+		public override void Clear(bool debug = false)
+		{
+			base.Clear(debug);
+		}
+		
+		/// <summary>
+		/// Refreshes the existing groups within the sidebar.
+		/// </summary>
+		public void RefreshExistingGroups()
+		{
+			Trait<Labelable>()
+				.Clear(1);
+
+			if (_Instances.Count > 0)
+			{
+				foreach ((string title, ListingEntry entry) in _Instances)
+				{
+					entry.GetParent().RemoveChild(entry);
+					entry.QueueFree();
+				}
+			}
+
+			_SetupExistingGroupList();
+		}
+
+		/// <summary>
+		/// Exits the tree and performs cleanup.
+		/// </summary>
+		public override void _ExitTree()
+		{
+			_Instances = null;
+			base._ExitTree();
+		}
 
 		/// <summary>
 		/// Sets up the top bar of the sidebar.
@@ -275,33 +334,13 @@ namespace AssetSnap.Front.Components.Groups.Builder
 				{
 					ListingEntry SingleEntry = GlobalExplorer.GetInstance().Components.Single<ListingEntry>(true);
 
-					SingleEntry.title = title;
+					SingleEntry.Title = title;
 					SingleEntry.Initialize();
 
 					_Instances.Add(title, SingleEntry);
 					AddChild(SingleEntry);
 				}
 			}
-		}
-
-		/// <summary>
-		/// Refreshes the existing groups within the sidebar.
-		/// </summary>
-		public void RefreshExistingGroups()
-		{
-			Trait<Labelable>()
-				.Clear(1);
-
-			if (_Instances.Count > 0)
-			{
-				foreach ((string title, ListingEntry entry) in _Instances)
-				{
-					entry.GetParent().RemoveChild(entry);
-					entry.QueueFree();
-				}
-			}
-
-			_SetupExistingGroupList();
 		}
 
 		/// <summary>
@@ -314,7 +353,7 @@ namespace AssetSnap.Front.Components.Groups.Builder
 				.SetName("GroupBuilderSidebarTitle")
 				.SetHorizontalSizeFlags(Control.SizeFlags.ExpandFill)
 				.SetType(Labelable.TitleType.HeaderMedium)
-				.SetText(TitleText)
+				.SetText(_TitleText)
 				.SetMargin(0)
 				.SetMargin(2, "top")
 				.Instantiate()
@@ -353,6 +392,33 @@ namespace AssetSnap.Front.Components.Groups.Builder
 						.Select(1)
 						.GetInnerContainer()
 				);
+		}
+		
+		/// <summary>
+		/// Sets up a new group.
+		/// </summary>
+		private void _SetupNewGroup()
+		{
+			string Name = "Group-" + UniqueHelper.GenerateId();
+			GroupResource _Resource = new()
+			{
+				Name = Name
+			};
+
+			string savePath = "res://groups/" + Name + ".tres";
+			// Save the texture to the specified path
+			Error success = ResourceSaver.Save(_Resource, savePath);
+
+			if (success == Error.Ok)
+			{
+				GD.Print("New group saved successfully at: " + savePath);
+			}
+			else
+			{
+				GD.PrintErr("Failed to save group at: " + savePath);
+			}
+
+			RefreshExistingGroups();
 		}
 
 		/// <summary>
@@ -399,72 +465,6 @@ namespace AssetSnap.Front.Components.Groups.Builder
 
 			// Convert the list to an array and return
 			return filePaths.ToArray();
-		}
-
-		/// <summary>
-		/// Sets up a new group.
-		/// </summary>
-		private void _SetupNewGroup()
-		{
-			string Name = "Group-" + UniqueHelper.GenerateId();
-			GroupResource _Resource = new()
-			{
-				Name = Name
-			};
-
-			string savePath = "res://groups/" + Name + ".tres";
-			// Save the texture to the specified path
-			Error success = ResourceSaver.Save(_Resource, savePath);
-
-			if (success == Error.Ok)
-			{
-				GD.Print("New group saved successfully at: " + savePath);
-			}
-			else
-			{
-				GD.PrintErr("Failed to save group at: " + savePath);
-			}
-
-			RefreshExistingGroups();
-		}
-
-		/// <summary>
-		/// Removes a group given its file path.
-		/// </summary>
-		/// <param name="filepath">The file path of the group to remove.</param>
-		public void RemoveGroup(string filepath)
-		{
-			string absolutePath = ProjectSettings.GlobalizePath(filepath);
-			// Check if the file exists
-			if (File.Exists(absolutePath))
-			{
-				// Delete the file
-				File.Delete(absolutePath);
-
-				GD.Print("File removed successfully: " + absolutePath);
-			}
-			else
-			{
-				GD.PrintErr("File not found: " + absolutePath);
-			}
-		}
-
-		/// <summary>
-        /// Clears the sidebar.
-        /// </summary>
-        /// <param name="debug">Whether to output debug information.</param>
-		public override void Clear(bool debug = false)
-		{
-			base.Clear(debug);
-		}
-
-		/// <summary>
-		/// Exits the tree and performs cleanup.
-		/// </summary>
-		public override void _ExitTree()
-		{
-			_Instances = null;
-			base._ExitTree();
 		}
 	}
 }

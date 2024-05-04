@@ -37,20 +37,20 @@ namespace AssetSnap.Component
 	[Tool]
 	public partial class BaseComponent : AbstractComponentBase
 	{
-		/* Debugging Purpose */
-		public bool _include = true;
-		protected bool Disposed = false;
-		/* -- */
-
 		/// <summary>
 		/// The type string representing the component's type.
 		/// </summary>
 		public string TypeString = "";
 		
+		/* Debugging Purpose */
+		public bool Include = true;
+		protected bool _Disposed = false;
+		/* -- */
+		
 		/// <summary>
 		/// The list of traits used by this component.
 		/// </summary>
-		public Array<string> UsingTraits = new(){};
+		protected Array<string> _UsingTraits = new(){};
 		
 		/// <summary>
 		/// Virtual method for entering. Ensures that there is always an enter method to call.
@@ -197,9 +197,9 @@ namespace AssetSnap.Component
 		}
 			
 		/// <summary>
-        /// Clears the component.
-        /// </summary>
-        /// <param name="debug">Optional parameter to enable debugging output.</param>	
+		/// Clears the component.
+		/// </summary>
+		/// <param name="debug">Optional parameter to enable debugging output.</param>	
 		public virtual void Clear( bool debug = false )
 		{
 			ExplorerUtils.Get().Components.Remove(this);

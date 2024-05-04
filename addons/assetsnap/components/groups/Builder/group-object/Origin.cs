@@ -45,7 +45,7 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 		{
 			Name = "GroupsBuilderGroupObjectOrigin";
 
-			UsingTraits = new()
+			_UsingTraits = new()
 			{
 				{ typeof(Spinboxable).ToString() },
 				{ typeof(Labelable).ToString() },

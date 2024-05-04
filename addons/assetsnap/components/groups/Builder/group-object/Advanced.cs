@@ -44,7 +44,7 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 		public Advanced()
 		{
 			Name = "GroupsBuilderGroupObjectAdvanced";
-			UsingTraits = new()
+			_UsingTraits = new()
 			{
 				{ typeof(Buttonable).ToString() },
 				{ typeof(Labelable).ToString() },

@@ -21,6 +21,7 @@
 // SOFTWARE.
 
 #if TOOLS
+
 using System.Collections.Generic;
 using AssetSnap.Trait;
 using Godot;
@@ -30,17 +31,15 @@ namespace AssetSnap.Component
 	[Tool]
 	public partial class Spinboxable : ContainerTrait
 	{
-		/*
-		** Private
-		*/
+		private string _Prefix = "";
+		private string _TooltipText = "";
+		private float _Step = 1;
+		private float _MinimumValue = 0;
+		private float _MaximumValue = 0;
+		private double _DefaultValue = 0;
+		
 		private List<Callable?> _Actions = new();
 		private Callable? _Action;
-		private string _Prefix = "";
-		private string TooltipText = "";
-		private float _Step = 1;
-		private float MinimumValue = 0;
-		private float MaximumValue = 0;
-		private double DefaultValue = 0;
 		
 		/* The `public Spinboxable()` constructor in the `Spinboxable` class is initializing the `Name`
 		property to "Spinboxable" and setting the `TypeString` property to the string representation of
@@ -50,6 +49,29 @@ namespace AssetSnap.Component
 		{
 			Name = "Spinboxable";
 			TypeString = GetType().ToString();
+		}
+		
+		/// <summary>
+		/// The AddToContainer function adds the currently chosen button to a specified container after
+		/// checking for its existence in the Dependencies dictionary.
+		/// </summary>
+		/// <param name="Node">The `Node` parameter in the `AddToContainer` method represents the container to
+		/// which the currently chosen button will be added. It is the target container where the button will
+		/// be placed.</param>
+		/// <returns>
+		/// void
+		/// </returns>
+		public void AddToContainer( Node Container )
+		{
+			if( false == Dependencies.ContainsKey(TraitName + "_MarginContainer") ) 
+			{
+				GD.PushError("Container was not found @ AddToContainer");
+				GD.PushError("AddToContainer::Keys-> ", Dependencies.Keys);
+				GD.PushError("AddToContainer::ADDTO-> ", TraitName + "_MarginContainer");
+				return;
+			}
+			
+			_AddToContainer(Container, Dependencies[TraitName + "_MarginContainer"].As<MarginContainer>());
 		}
 		
 		/// <summary>
@@ -69,34 +91,34 @@ namespace AssetSnap.Component
 				Name = TraitName,
 				Prefix = _Prefix,
 				Step = _Step,
-				TooltipText = TooltipText,
-				SizeFlagsHorizontal = SizeFlagsHorizontal,
-				SizeFlagsVertical = SizeFlagsVertical
+				TooltipText = _TooltipText,
+				SizeFlagsHorizontal = _SizeFlagsHorizontal,
+				SizeFlagsVertical = _SizeFlagsVertical
 			};
 		
-			if( MaximumValue != 0 ) 
+			if( _MaximumValue != 0 ) 
 			{
-				WorkingInput.MaxValue = MaximumValue;
+				WorkingInput.MaxValue = _MaximumValue;
 			}
 			
-			if( MinimumValue != 0 ) 
+			if( _MinimumValue != 0 ) 
 			{
-				WorkingInput.MinValue = MinimumValue;
+				WorkingInput.MinValue = _MinimumValue;
 			}
 				
-			if( 0 != DefaultValue ) 
+			if( 0 != _DefaultValue ) 
 			{
-				WorkingInput.Value = DefaultValue;
+				WorkingInput.Value = _DefaultValue;
 			}
 			
-			if( Vector2.Zero != CustomMinimumSize ) 
+			if( Vector2.Zero != _CustomMinimumSize ) 
 			{
-				WorkingInput.CustomMinimumSize = CustomMinimumSize;
+				WorkingInput.CustomMinimumSize = _CustomMinimumSize;
 			}
 			
-			if( Vector2.Zero != Size ) 
+			if( Vector2.Zero != _Size ) 
 			{
-				WorkingInput.Size = Size;
+				WorkingInput.Size = _Size;
 			}
 			
 			if( _Action is Callable _callable ) 
@@ -106,8 +128,8 @@ namespace AssetSnap.Component
 
 			Dependencies[TraitName + "_WorkingNode"] = WorkingInput;
 			
-			Plugin.Singleton.traitGlobal.AddInstance(Iteration, WorkingInput, OwnerName, TypeString, Dependencies);
-			Plugin.Singleton.traitGlobal.AddName(Iteration, TraitName, OwnerName, TypeString);
+			Plugin.Singleton.TraitGlobal.AddInstance(Iteration, WorkingInput, OwnerName, TypeString, Dependencies);
+			Plugin.Singleton.TraitGlobal.AddName(Iteration, TraitName, OwnerName, TypeString);
 			
 			_Actions.Add(_Action);
 
@@ -139,7 +161,7 @@ namespace AssetSnap.Component
 			
 			if( false != Dependencies.ContainsKey(TraitName + "_WorkingNode") ) 
 			{
-				Godot.Collections.Dictionary<string, Variant> dependencies = Plugin.Singleton.traitGlobal.GetDependencies(index, TypeString, OwnerName);
+				Godot.Collections.Dictionary<string, Variant> dependencies = Plugin.Singleton.TraitGlobal.GetDependencies(index, TypeString, OwnerName);
 				Dependencies = dependencies;
 			}
 			
@@ -169,29 +191,6 @@ namespace AssetSnap.Component
 			}
 
 			return this;
-		}
-		
-		/// <summary>
-		/// The AddToContainer function adds the currently chosen button to a specified container after
-		/// checking for its existence in the Dependencies dictionary.
-		/// </summary>
-		/// <param name="Node">The `Node` parameter in the `AddToContainer` method represents the container to
-		/// which the currently chosen button will be added. It is the target container where the button will
-		/// be placed.</param>
-		/// <returns>
-		/// void
-		/// </returns>
-		public void AddToContainer( Node Container )
-		{
-			if( false == Dependencies.ContainsKey(TraitName + "_MarginContainer") ) 
-			{
-				GD.PushError("Container was not found @ AddToContainer");
-				GD.PushError("AddToContainer::Keys-> ", Dependencies.Keys);
-				GD.PushError("AddToContainer::ADDTO-> ", TraitName + "_MarginContainer");
-				return;
-			}
-			
-			_AddToContainer(Container, Dependencies[TraitName + "_MarginContainer"].As<MarginContainer>());
 		}
 		
 		/// <summary>
@@ -236,7 +235,7 @@ namespace AssetSnap.Component
 		/// </returns>
 		public Spinboxable SetTooltipText( string text ) 
 		{
-			TooltipText = text;
+			_TooltipText = text;
 			
 			return this;
 		}
@@ -269,7 +268,7 @@ namespace AssetSnap.Component
 		/// </returns>
 		public Spinboxable SetMinValue(float minValue ) 
 		{
-			MinimumValue = minValue;
+			_MinimumValue = minValue;
 			
 			return this;
 		}
@@ -285,7 +284,7 @@ namespace AssetSnap.Component
 		/// </returns>
 		public Spinboxable SetMaxValue(float maxValue ) 
 		{
-			MaximumValue = maxValue;
+			_MaximumValue = maxValue;
 			
 			return this;
 		}
@@ -301,7 +300,7 @@ namespace AssetSnap.Component
 		/// </returns>
 		public Spinboxable SetValue( double value )
 		{
-			DefaultValue = value;
+			_DefaultValue = value;
 			
 			if( false != Dependencies.ContainsKey(TraitName + "_WorkingNode") && Dependencies[TraitName + "_WorkingNode"].As<GodotObject>() is SpinBox WorkingInput) 
 			{
@@ -436,14 +435,14 @@ namespace AssetSnap.Component
 		/// </summary>
 		protected override void Reset()
 		{
-			Size = Vector2.Zero;
-			CustomMinimumSize = Vector2.Zero;
+			_Size = Vector2.Zero;
+			_CustomMinimumSize = Vector2.Zero;
 			_Prefix = "";
-			TooltipText = "";
-			DefaultValue = 0;
+			_TooltipText = "";
+			_DefaultValue = 0;
 			_Step = 1;
-			MinimumValue = 0;
-			MaximumValue = 0;
+			_MinimumValue = 0;
+			_MaximumValue = 0;
 			_Action = null;
 
 			base.Reset();

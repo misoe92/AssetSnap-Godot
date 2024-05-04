@@ -19,6 +19,9 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+
+#if TOOLS
+
 using Godot;
 using Godot.Collections;
 
@@ -30,9 +33,6 @@ namespace AssetSnap.Trait
 	[Tool]
 	public partial class TraitGlobal : Node, ISerializationListener
 	{
-		private string version = "0.0.1";
-		public static TraitGlobal _Instance = null;
-
 		[Export]
 		public Godot.Collections.Dictionary<string, Godot.Collections.Dictionary<string, Godot.Collections.Dictionary<int, string>>> Names { get; set; } = new();
 		
@@ -59,57 +59,30 @@ namespace AssetSnap.Trait
 				return _Instance;
 			}
 		}
+		public bool IsSingleton = false;
+		
+		private static TraitGlobal _Instance = null;
+		private string _Version = "0.0.1";
 		
 		public TraitGlobal()
 		{
 			Name = "TraitGlobal";
 		}
-
-		public bool IsSingleton = false;
+		
+		/// <summary>
+		/// Called before serialization.
+		/// </summary>
+		public void OnBeforeSerialize()
+		{
+			// 
+		}
 
 		/// <summary>
-		/// Retrieves the name associated with the given index, type, and owner.
+		/// Called after deserialization.
 		/// </summary>
-		/// <param name="index">The index of the name.</param>
-		/// <param name="typeString">The type string.</param>
-		/// <param name="owner">The owner of the name.</param>
-		/// <param name="debug">Optional debug flag. If true, error messages will be printed.</param>
-		/// <returns>The retrieved name.</returns>
-		public string GetName( int index, string typeString, string owner, bool debug = false ) 
+		public void OnAfterDeserialize()
 		{
-			string typeKey = FormatTypeString(typeString);
-			
-			if( false == Names.ContainsKey(owner) ) 
-			{
-				if( debug ) 
-				{
-					GD.PushError("No name with owner: ", owner );
-				}
-
-				return "NaN";
-			}
-			
-			if( Names.ContainsKey(owner) && false == Names[owner].ContainsKey(typeKey) ) 
-			{
-				if( debug ) 
-				{
-					GD.PushError("No name with type: ", typeKey, "::", owner, Names[owner].Keys);
-				}
-				
-				return "NaN";
-			}
-
-			if( Names.ContainsKey(owner) && Names[owner].ContainsKey(typeKey) && false == Names[owner][typeKey].ContainsKey(index) ) 
-			{
-				if( debug ) 
-				{
-					GD.PushError("No name at that index: ", index, Names[owner][typeKey].Keys, "--", typeKey, "--", owner);
-				}
-				
-				return "NaN";
-			}
-			
-			return Names[owner][typeKey][index];
+			_Instance = this;
 		}
 		
 		/// <summary>
@@ -206,6 +179,52 @@ namespace AssetSnap.Trait
 			}
 		}
 		
+		
+		/// <summary>
+		/// Retrieves the name associated with the given index, type, and owner.
+		/// </summary>
+		/// <param name="index">The index of the name.</param>
+		/// <param name="typeString">The type string.</param>
+		/// <param name="owner">The owner of the name.</param>
+		/// <param name="debug">Optional debug flag. If true, error messages will be printed.</param>
+		/// <returns>The retrieved name.</returns>
+		public string GetName( int index, string typeString, string owner, bool debug = false ) 
+		{
+			string typeKey = FormatTypeString(typeString);
+			
+			if( false == Names.ContainsKey(owner) ) 
+			{
+				if( debug ) 
+				{
+					GD.PushError("No name with owner: ", owner );
+				}
+
+				return "NaN";
+			}
+			
+			if( Names.ContainsKey(owner) && false == Names[owner].ContainsKey(typeKey) ) 
+			{
+				if( debug ) 
+				{
+					GD.PushError("No name with type: ", typeKey, "::", owner, Names[owner].Keys);
+				}
+				
+				return "NaN";
+			}
+
+			if( Names.ContainsKey(owner) && Names[owner].ContainsKey(typeKey) && false == Names[owner][typeKey].ContainsKey(index) ) 
+			{
+				if( debug ) 
+				{
+					GD.PushError("No name at that index: ", index, Names[owner][typeKey].Keys, "--", typeKey, "--", owner);
+				}
+				
+				return "NaN";
+			}
+			
+			return Names[owner][typeKey][index];
+		}
+		
 		/// <summary>
 		/// Formats the given type string.
 		/// </summary>
@@ -260,60 +279,6 @@ namespace AssetSnap.Trait
 		}
 		
 		/// <summary>
-		/// Checks if an instance exists at the specified index, type, and owner.
-		/// </summary>
-		/// <param name="index">The index of the instance.</param>
-		/// <param name="typeString">The type string.</param>
-		/// <param name="owner">The owner of the instance.</param>
-		/// <param name="debug">Optional debug flag. If true, error messages will be printed.</param>
-		/// <returns>True if the instance exists, false otherwise.</returns>
-		public bool HasInstance( int index, string typeString, string owner, bool debug = false ) 
-		{
-			if( null == typeString || null == owner ) 
-			{
-				return false;
-			}
-			
-			if( false == Instances.ContainsKey(owner) ) 
-			{
-				if( debug ) 
-				{
-					GD.PushError("No instance at owner: ", owner);
-				}
-
-				return false;
-			}
-
-			string typeKey = FormatTypeString(typeString);
-			if( false == Instances[owner].ContainsKey(typeKey) ) 
-			{
-				if( debug ) 
-				{
-					GD.PushError("No instance at type: ", typeKey, "::", owner, Instances[owner].Keys);
-				}
-				return false;
-			}
-			
-			if( false == Instances[owner][typeKey].ContainsKey(index) ) 
-			{
-				if( debug ) 
-				{
-					GD.PushError("No instance at index: ", index, " :: ", typeKey, "::", owner, Instances[owner][typeKey].Keys, Instances[owner].Keys);
-				}
-				return false;
-			}
-			
-			bool res = EditorPlugin.IsInstanceValid(Instances[owner][typeKey][index]);
-			
-			if( false == res ) 
-			{
-				Instances[owner][typeKey].Remove(index);
-			}
-
-			return res;
-		}
-
-		/// <summary>
 		/// Retrieves an instance at the specified index, type, and owner.
 		/// </summary>
 		/// <param name="index">The index of the instance.</param>
@@ -367,6 +332,129 @@ namespace AssetSnap.Trait
 			}
 			
 			return Instances[owner][typeKey][index];
+		}
+		
+		/// <summary>
+		/// Retrieves the dependencies for the instance at the specified index, type, and owner.
+		/// </summary>
+		/// <param name="index">The index of the instance.</param>
+		/// <param name="typeString">The type string.</param>
+		/// <param name="name">The name of the instance.</param>
+		/// <returns>The dictionary containing dependencies for the instance.</returns>
+		public Godot.Collections.Dictionary<string, Variant> GetDependencies( int index, string typeString, string name )
+		{
+			string typeKey = typeString.Split(".").Join("");
+			if( false == InstanceDependencies.ContainsKey( name ) ) 
+			{
+				GD.PushError("No named dependency found: ", name);
+				return null;
+			}
+			
+			if( false == InstanceDependencies[name].ContainsKey( typeKey ) ) 
+			{
+				GD.PushError("No named dependency found: ", name);
+				return null;
+			}
+
+			if( false == InstanceDependencies[name][typeKey].ContainsKey(index) )
+			{
+				GD.PushError("No indexed dependency found: " + index);
+				return null;
+			}
+
+			return InstanceDependencies[name][typeKey][index];
+		}
+		
+		/// <summary>
+		/// Counts the total number of instances.
+		/// </summary>
+		/// <returns>The total number of instances.</returns>
+		public int Count()
+		{
+			return Instances.Count;
+		}
+		
+		/// <summary>
+		/// Counts the total number of instances owned by the specified owner.
+		/// </summary>
+		/// <param name="owner">The owner whose instances to count.</param>
+		/// <param name="debug">Optional debug flag. If true, error messages will be printed.</param>
+		/// <returns>The total number of instances owned by the specified owner.</returns>
+		public int CountOwner( string owner, bool debug = false )
+		{
+			int count = 0;
+
+			foreach ((string item, Dictionary<string, Dictionary<int, string>> obj) in Names)
+			{
+				if (item == owner)
+				{
+					foreach( (string typeKey, Dictionary<int, string> finalObj ) in obj ) 
+					{
+						count += finalObj.Count;
+					}
+				}
+			}
+
+			if( debug && count == 0 ) 
+			{
+				GD.Print("MISSINGOWNER::", owner);
+			}
+
+			return count;
+		}
+		
+		/// <summary>
+		/// Checks if an instance exists at the specified index, type, and owner.
+		/// </summary>
+		/// <param name="index">The index of the instance.</param>
+		/// <param name="typeString">The type string.</param>
+		/// <param name="owner">The owner of the instance.</param>
+		/// <param name="debug">Optional debug flag. If true, error messages will be printed.</param>
+		/// <returns>True if the instance exists, false otherwise.</returns>
+		public bool HasInstance( int index, string typeString, string owner, bool debug = false ) 
+		{
+			if( null == typeString || null == owner ) 
+			{
+				return false;
+			}
+			
+			if( false == Instances.ContainsKey(owner) ) 
+			{
+				if( debug ) 
+				{
+					GD.PushError("No instance at owner: ", owner);
+				}
+
+				return false;
+			}
+
+			string typeKey = FormatTypeString(typeString);
+			if( false == Instances[owner].ContainsKey(typeKey) ) 
+			{
+				if( debug ) 
+				{
+					GD.PushError("No instance at type: ", typeKey, "::", owner, Instances[owner].Keys);
+				}
+				return false;
+			}
+			
+			if( false == Instances[owner][typeKey].ContainsKey(index) ) 
+			{
+				if( debug ) 
+				{
+					GD.PushError("No instance at index: ", index, " :: ", typeKey, "::", owner, Instances[owner][typeKey].Keys, Instances[owner].Keys);
+				}
+				return false;
+			}
+			
+			bool res = EditorPlugin.IsInstanceValid(Instances[owner][typeKey][index]);
+			
+			if( false == res ) 
+			{
+				Instances[owner][typeKey].Remove(index);
+			}
+
+			return res;
 		}
 		
 		/// <summary>
@@ -480,7 +568,7 @@ namespace AssetSnap.Trait
 				if( Instances[owner][typeKey].Count == 0 ) 
 				{
 					Instances[owner].Remove(typeKey);
-					Plugin.Singleton.traitGlobal.RemoveName(index, owner, typeString);
+					Plugin.Singleton.TraitGlobal.RemoveName(index, owner, typeString);
 					if( debug )
 					{
 						GD.PushError("Removed type: ", typeKey);
@@ -524,90 +612,7 @@ namespace AssetSnap.Trait
 			
 			return false;
 		}
-		
-		/// <summary>
-		/// Retrieves the dependencies for the instance at the specified index, type, and owner.
-		/// </summary>
-		/// <param name="index">The index of the instance.</param>
-		/// <param name="typeString">The type string.</param>
-		/// <param name="name">The name of the instance.</param>
-		/// <returns>The dictionary containing dependencies for the instance.</returns>
-		public Godot.Collections.Dictionary<string, Variant> GetDependencies( int index, string typeString, string name )
-		{
-			string typeKey = typeString.Split(".").Join("");
-			if( false == InstanceDependencies.ContainsKey( name ) ) 
-			{
-				GD.PushError("No named dependency found: ", name);
-				return null;
-			}
-			
-			if( false == InstanceDependencies[name].ContainsKey( typeKey ) ) 
-			{
-				GD.PushError("No named dependency found: ", name);
-				return null;
-			}
-
-			if( false == InstanceDependencies[name][typeKey].ContainsKey(index) )
-			{
-				GD.PushError("No indexed dependency found: " + index);
-				return null;
-			}
-
-			return InstanceDependencies[name][typeKey][index];
-		}
-		
-		/// <summary>
-		/// Counts the total number of instances.
-		/// </summary>
-		/// <returns>The total number of instances.</returns>
-		public int Count()
-		{
-			return Instances.Count;
-		}
-		
-		/// <summary>
-		/// Counts the total number of instances owned by the specified owner.
-		/// </summary>
-		/// <param name="owner">The owner whose instances to count.</param>
-		/// <param name="debug">Optional debug flag. If true, error messages will be printed.</param>
-		/// <returns>The total number of instances owned by the specified owner.</returns>
-		public int CountOwner( string owner, bool debug = false )
-		{
-			int count = 0;
-
-			foreach ((string item, Dictionary<string, Dictionary<int, string>> obj) in Names)
-			{
-				if (item == owner)
-				{
-					foreach( (string typeKey, Dictionary<int, string> finalObj ) in obj ) 
-					{
-						count += finalObj.Count;
-					}
-				}
-			}
-
-			if( debug && count == 0 ) 
-			{
-				GD.Print("MISSINGOWNER::", owner);
-			}
-
-			return count;
-		}
-
-		/// <summary>
-		/// Called before serialization.
-		/// </summary>
-		public void OnBeforeSerialize()
-		{
-			// 
-		}
-
-		/// <summary>
-		/// Called after deserialization.
-		/// </summary>
-		public void OnAfterDeserialize()
-		{
-			_Instance = this;
-		}
 	}
 }
+
+#endif

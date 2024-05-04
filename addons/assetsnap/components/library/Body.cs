@@ -40,7 +40,7 @@ namespace AssetSnap.Front.Components.Library
 		{
 			Name = "LibraryBody";
 			
-			UsingTraits = new()
+			_UsingTraits = new()
 			{
 				{ typeof(Containerable).ToString() },
 			};
@@ -54,7 +54,7 @@ namespace AssetSnap.Front.Components.Library
 		public override void Initialize()
 		{
 			base.Initialize();
-			Initiated = true;
+			_Initiated = true;
 			
 			SizeFlagsHorizontal = SizeFlags.ExpandFill;
 			SizeFlagsVertical = SizeFlags.ExpandFill;

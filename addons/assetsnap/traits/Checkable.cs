@@ -21,6 +21,7 @@
 // SOFTWARE.
 
 #if TOOLS
+
 using System.Collections.Generic;
 using AssetSnap.Trait;
 using Godot;
@@ -33,18 +34,15 @@ namespace AssetSnap.Component
 	[Tool]
 	public partial class Checkable : ContainerTrait
 	{
-		/*
-        ** Private fields
-        */
+		private string _Text = "";
+		private string _TooltipText = "";
+		private bool _ButtonPressed = false;
 		private List<Callable?> _Actions = new();
 		private Callable? _Action;
-		private string Text = "";
-		private string TooltipText = "";
-		private bool ButtonPressed = false;
 		
 		/// <summary>
-        /// Constructor for the Checkable class.
-        /// </summary>
+		/// Constructor for the Checkable class.
+		/// </summary>
 		public Checkable()
 		{
 			Name = "Checkable";
@@ -52,9 +50,26 @@ namespace AssetSnap.Component
 		}
 		
 		/// <summary>
-        /// Instantiate an instance of the trait.
-        /// </summary>
-        /// <returns>Returns the instantiated Checkable instance.</returns>
+		/// Adds the currently chosen button to a specified container.
+		/// </summary>
+		/// <param name="Container">The container to which the chosen button will be added.</param>
+		public void AddToContainer( Node Container )
+		{
+			if( false == Dependencies.ContainsKey(TraitName + "_MarginContainer") ) 
+			{
+				GD.PushError("Container was not found @ AddToContainer");
+				GD.PushError("AddToContainer::Keys-> ", Dependencies.Keys);
+				GD.PushError("AddToContainer::ADDTO-> ", TraitName + "_MarginContainer");
+				return;
+			}
+			
+			_AddToContainer(Container, Dependencies[TraitName + "_MarginContainer"].As<MarginContainer>());
+		}
+		
+		/// <summary>
+		/// Instantiate an instance of the trait.
+		/// </summary>
+		/// <returns>Returns the instantiated Checkable instance.</returns>
 		public override Checkable Instantiate()
 		{
 			base._Instantiate();
@@ -64,21 +79,21 @@ namespace AssetSnap.Component
 			CheckBox WorkingInput = new()
 			{
 				Name = TraitName,
-				Text = Text,
-				TooltipText = TooltipText,
-				ButtonPressed = ButtonPressed,
-				SizeFlagsHorizontal = SizeFlagsHorizontal,
-				SizeFlagsVertical = SizeFlagsVertical
+				Text = _Text,
+				TooltipText = _TooltipText,
+				ButtonPressed = _ButtonPressed,
+				SizeFlagsHorizontal = _SizeFlagsHorizontal,
+				SizeFlagsVertical = _SizeFlagsVertical
 			};
 
-			if( Vector2.Zero != CustomMinimumSize ) 
+			if( Vector2.Zero != _CustomMinimumSize ) 
 			{
-				WorkingInput.CustomMinimumSize = CustomMinimumSize;
+				WorkingInput.CustomMinimumSize = _CustomMinimumSize;
 			}
 			
-			if( Vector2.Zero != Size ) 
+			if( Vector2.Zero != _Size ) 
 			{
-				WorkingInput.Size = Size;
+				WorkingInput.Size = _Size;
 			}
 
 			// Setup node structure
@@ -93,8 +108,8 @@ namespace AssetSnap.Component
 			Dependencies[TraitName + "_WorkingNode"] = WorkingInput;
 			
 			// Add the button to the nodes array			
-			Plugin.Singleton.traitGlobal.AddInstance(Iteration, WorkingInput, OwnerName, TypeString, Dependencies);
-			Plugin.Singleton.traitGlobal.AddName(Iteration, TraitName, OwnerName, TypeString);
+			Plugin.Singleton.TraitGlobal.AddInstance(Iteration, WorkingInput, OwnerName, TypeString, Dependencies);
+			Plugin.Singleton.TraitGlobal.AddName(Iteration, TraitName, OwnerName, TypeString);
 			
 			// Add the action to the actions array			
 			_Actions.Add(_Action);
@@ -109,18 +124,18 @@ namespace AssetSnap.Component
 		}
 		
 		/// <summary>
-        /// Selects a placed checkbox in the nodes array by index.
-        /// </summary>
-        /// <param name="index">The index of the checkbox to select.</param>
-        /// <param name="debug">Optional parameter to enable debugging.</param>
-        /// <returns>Returns the updated Checkable instance.</returns>
+		/// Selects a placed checkbox in the nodes array by index.
+		/// </summary>
+		/// <param name="index">The index of the checkbox to select.</param>
+		/// <param name="debug">Optional parameter to enable debugging.</param>
+		/// <returns>Returns the updated Checkable instance.</returns>
 		public override Checkable Select(int index, bool debug = false)
 		{
 			base._Select(index, debug);
 			
 			if( false != Dependencies.ContainsKey(TraitName + "_WorkingNode")) 
 			{
-				Godot.Collections.Dictionary<string, Variant> dependencies = Plugin.Singleton.traitGlobal.GetDependencies(index, TypeString, OwnerName);
+				Godot.Collections.Dictionary<string, Variant> dependencies = Plugin.Singleton.TraitGlobal.GetDependencies(index, TypeString, OwnerName);
 				Dependencies = dependencies;
 			}
 			
@@ -128,10 +143,10 @@ namespace AssetSnap.Component
 		}
 		
 		/// <summary>
-        /// Selects a placed checkbox in the nodes array by name.
-        /// </summary>
-        /// <param name="name">The name of the checkbox to select.</param>
-        /// <returns>Returns the updated Checkable instance.</returns>
+		/// Selects a placed checkbox in the nodes array by name.
+		/// </summary>
+		/// <param name="name">The name of the checkbox to select.</param>
+		/// <returns>Returns the updated Checkable instance.</returns>
 		public override Checkable SelectByName( string name ) 
 		{
 			foreach( Button button in Nodes ) 
@@ -147,27 +162,10 @@ namespace AssetSnap.Component
 		}
 		
 		/// <summary>
-        /// Adds the currently chosen button to a specified container.
-        /// </summary>
-        /// <param name="Container">The container to which the chosen button will be added.</param>
-		public void AddToContainer( Node Container )
-		{
-			if( false == Dependencies.ContainsKey(TraitName + "_MarginContainer") ) 
-			{
-				GD.PushError("Container was not found @ AddToContainer");
-				GD.PushError("AddToContainer::Keys-> ", Dependencies.Keys);
-				GD.PushError("AddToContainer::ADDTO-> ", TraitName + "_MarginContainer");
-				return;
-			}
-			
-			_AddToContainer(Container, Dependencies[TraitName + "_MarginContainer"].As<MarginContainer>());
-		}
-		
-		/// <summary>
-        /// Sets the name of the current checkbox.
-        /// </summary>
-        /// <param name="text">The name to set.</param>
-        /// <returns>Returns the updated Checkable instance.</returns>
+		/// Sets the name of the current checkbox.
+		/// </summary>
+		/// <param name="text">The name to set.</param>
+		/// <returns>Returns the updated Checkable instance.</returns>
 		public Checkable SetName( string text ) 
 		{
 			base._SetName(text);
@@ -176,34 +174,34 @@ namespace AssetSnap.Component
 		}
 		
 		/// <summary>
-        /// Sets the text of the current checkbox.
-        /// </summary>
-        /// <param name="text">The text to set.</param>
-        /// <returns>Returns the updated Checkable instance.</returns>
+		/// Sets the text of the current checkbox.
+		/// </summary>
+		/// <param name="text">The text to set.</param>
+		/// <returns>Returns the updated Checkable instance.</returns>
 		public Checkable SetText( string text ) 
 		{
-			Text = text;
+			_Text = text;
 			
 			return this;
 		}
 		
 		/// <summary>
-        /// Sets the tooltip text of the current checkbox.
-        /// </summary>
-        /// <param name="text">The tooltip text to set.</param>
-        /// <returns>Returns the updated Checkable instance.</returns>
+		/// Sets the tooltip text of the current checkbox.
+		/// </summary>
+		/// <param name="text">The tooltip text to set.</param>
+		/// <returns>Returns the updated Checkable instance.</returns>
 		public Checkable SetTooltipText( string text ) 
 		{
-			TooltipText = text;
+			_TooltipText = text;
 			
 			return this;
 		}
 		
 		/// <summary>
-        /// Sets the value of the current checkbox.
-        /// </summary>
-        /// <param name="value">The value to set.</param>
-        /// <returns>Returns the updated Checkable instance.</returns>
+		/// Sets the value of the current checkbox.
+		/// </summary>
+		/// <param name="value">The value to set.</param>
+		/// <returns>Returns the updated Checkable instance.</returns>
 		public Checkable SetValue( bool value )
 		{
 			if(
@@ -215,17 +213,17 @@ namespace AssetSnap.Component
 			}
 			else 
 			{
-				ButtonPressed = value;
+				_ButtonPressed = value;
 			}
 
 			return this;
 		}
 		
 		/// <summary>
-        /// Sets the visibility state of the currently chosen checkbox.
-        /// </summary>
-        /// <param name="state">The visibility state to set.</param>
-        /// <returns>Returns the updated Checkable instance.</returns>
+		/// Sets the visibility state of the currently chosen checkbox.
+		/// </summary>
+		/// <param name="state">The visibility state to set.</param>
+		/// <returns>Returns the updated Checkable instance.</returns>
 		public override Checkable SetVisible( bool state ) 
 		{
 			base.SetVisible(state);
@@ -234,10 +232,10 @@ namespace AssetSnap.Component
 		}
 		
 		/// <summary>
-        /// Sets the horizontal size flag, which controls the x axis.
-        /// </summary>
-        /// <param name="flag">The size flag to set.</param>
-        /// <returns>Returns the updated Checkable instance.</returns>
+		/// Sets the horizontal size flag, which controls the x axis.
+		/// </summary>
+		/// <param name="flag">The size flag to set.</param>
+		/// <returns>Returns the updated Checkable instance.</returns>
 		public override Checkable SetHorizontalSizeFlags(Control.SizeFlags flag)
 		{
 			base.SetHorizontalSizeFlags(flag); 
@@ -246,10 +244,10 @@ namespace AssetSnap.Component
 		}
 		
 		/// <summary>
-        /// Sets the vertical size flag, which controls the y axis.
-        /// </summary>
-        /// <param name="flag">The size flag to set.</param>
-        /// <returns>Returns the updated Checkable instance.</returns>
+		/// Sets the vertical size flag, which controls the y axis.
+		/// </summary>
+		/// <param name="flag">The size flag to set.</param>
+		/// <returns>Returns the updated Checkable instance.</returns>
 		public override Checkable SetVerticalSizeFlags(Control.SizeFlags flag)
 		{
 			base.SetVerticalSizeFlags(flag); 
@@ -258,10 +256,10 @@ namespace AssetSnap.Component
 		}
 		
 		/// <summary>
-        /// Sets the callable for the currently chosen checkbox.
-        /// </summary>
-        /// <param name="action">The callable action to set.</param>
-        /// <returns>Returns the updated Checkable instance.</returns>
+		/// Sets the callable for the currently chosen checkbox.
+		/// </summary>
+		/// <param name="action">The callable action to set.</param>
+		/// <returns>Returns the updated Checkable instance.</returns>
 		public Checkable SetAction( Callable action ) 
 		{
 			_Action = action;			
@@ -269,11 +267,11 @@ namespace AssetSnap.Component
 		}
 		
 		/// <summary>
-        /// Sets margin values for the currently chosen checkbox.
-        /// </summary>
-        /// <param name="value">The margin value.</param>
-        /// <param name="side">The side for which to set the margin.</param>
-        /// <returns>Returns the updated Checkable instance.</returns>
+		/// Sets margin values for the currently chosen checkbox.
+		/// </summary>
+		/// <param name="value">The margin value.</param>
+		/// <param name="side">The side for which to set the margin.</param>
+		/// <returns>Returns the updated Checkable instance.</returns>
 		public override Checkable SetMargin( int value, string side = "" ) 
 		{
 			base.SetMargin(value, side);
@@ -281,11 +279,11 @@ namespace AssetSnap.Component
 		}
 		
 		/// <summary>
-        /// Sets the dimensions for the checkbox.
-        /// </summary>
-        /// <param name="width">The width to set.</param>
-        /// <param name="height">The height to set.</param>
-        /// <returns>Returns the updated Checkable instance.</returns>
+		/// Sets the dimensions for the checkbox.
+		/// </summary>
+		/// <param name="width">The width to set.</param>
+		/// <param name="height">The height to set.</param>
+		/// <returns>Returns the updated Checkable instance.</returns>
 		public override Checkable SetDimensions( int width, int height )
 		{
 			base.SetDimensions(width, height);
@@ -294,9 +292,9 @@ namespace AssetSnap.Component
 		}
 		
 		/// <summary>
-        /// Fetches the value of the current checkbox.
-        /// </summary>
-        /// <returns>Returns the value of the current checkbox.</returns>
+		/// Fetches the value of the current checkbox.
+		/// </summary>
+		/// <returns>Returns the value of the current checkbox.</returns>
 		public bool GetValue()
 		{
 			if( false != Dependencies.ContainsKey(TraitName + "_WorkingNode") && Dependencies[TraitName + "_WorkingNode"].As<GodotObject>() is CheckBox WorkingInput) 
@@ -309,17 +307,17 @@ namespace AssetSnap.Component
 		}
 		
 		/// <summary>
-        /// Checks if any nodes exist.
-        /// </summary>
-        /// <returns>Returns true if nodes exist; otherwise, false.</returns>
+		/// Checks if any nodes exist.
+		/// </summary>
+		/// <returns>Returns true if nodes exist; otherwise, false.</returns>
 		public bool HasNodes()
 		{
 			return null != Nodes && Nodes.Count != 0;
 		}
 		
 		/// <summary>
-        /// Resets the trait to a cleared state.
-        /// </summary>
+		/// Resets the trait to a cleared state.
+		/// </summary>
 		protected override void Reset()
 		{
 			_Action = null;
@@ -327,4 +325,5 @@ namespace AssetSnap.Component
 		}
 	}
 }
+
 #endif

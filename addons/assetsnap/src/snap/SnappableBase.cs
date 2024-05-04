@@ -35,13 +35,6 @@ namespace AssetSnap.Snap
 	public class SnappableBase
 	{
 		/// <summary>
-		/// The default snap distance.
-		/// </summary>
-		public float SnapDistance = 1.0f;
-		
-		private static SnappableBase _Instance;
-		
-		/// <summary>
 		/// Gets the singleton instance of the <see cref="SnappableBase"/> class.
 		/// </summary>
 		public static SnappableBase Singleton
@@ -56,6 +49,13 @@ namespace AssetSnap.Snap
 				return _Instance;
 			}
 		}
+		
+		/// <summary>
+		/// The default snap distance.
+		/// </summary>
+		public float SnapDistance = 1.0f;
+		
+		private static SnappableBase _Instance;
 		
 		/// <summary>
 		/// Snaps the given coordinates to nearby waypoints.
@@ -260,11 +260,11 @@ namespace AssetSnap.Snap
 		}
 		
 		/// <summary>
-        /// Checks if the snap layer of the model is valid.
-        /// </summary>
-        /// <param name="model">The 3D model node.</param>
-        /// <param name="Layer">The snap layer to check.</param>
-        /// <returns>True if the snap layer is valid, false otherwise.</returns>
+		/// Checks if the snap layer of the model is valid.
+		/// </summary>
+		/// <param name="model">The 3D model node.</param>
+		/// <param name="Layer">The snap layer to check.</param>
+		/// <returns>True if the snap layer is valid, false otherwise.</returns>
 		private bool IsSnapLayerValid( Node3D model, int Layer = 0)
 		{
 			if( model is AsMeshInstance3D asMeshInstance3D ) 

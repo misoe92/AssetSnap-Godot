@@ -35,12 +35,6 @@ namespace AssetSnap.Front.Nodes
 	[Tool]
 	public partial class AsArrayModifier3D : AsGroup3D
 	{
-		private Node _Duplicates;
-		public AsStaticBody3D _Parent;
-		private string _Name;
-		private string _DuplicateType;
-		private bool Initialized = false;
-
 		[ExportGroup("Settings")]
 		[ExportSubgroup("Modifier")]
 
@@ -85,7 +79,6 @@ namespace AssetSnap.Front.Nodes
 		}
 		
 		[ExportSubgroup("Mesh")]
-		private Mesh _Mesh;
 
 		/// <summary>
 		/// The mesh used for duplication.
@@ -100,7 +93,6 @@ namespace AssetSnap.Front.Nodes
 			}
 		}
 
-		private Godot.Collections.Array<Mesh> _Meshes;
 
 		/// <summary>
 		/// An array of meshes.
@@ -115,7 +107,6 @@ namespace AssetSnap.Front.Nodes
 			}
 		}
 
-		private string _InstanceName;
 
 		/// <summary>
 		/// The name of the instance.
@@ -130,7 +121,6 @@ namespace AssetSnap.Front.Nodes
 			}
 		}
 
-		private string _InstanceLibrary;
 
 		/// <summary>
 		/// The library containing the instance.
@@ -146,7 +136,6 @@ namespace AssetSnap.Front.Nodes
 		}
 
 		[ExportSubgroup("Optimization")]
-		private bool _UseMultiMesh = false;
 
 		/// <summary>
 		/// Determines whether to use MultiMesh.
@@ -158,12 +147,11 @@ namespace AssetSnap.Front.Nodes
 			set
 			{
 				_UseMultiMesh = value;
-				UpdateArray();
+				_UpdateArray();
 			}
 		}
 
 		[ExportSubgroup("Collisions")]
-		private bool _ForceCollisions = false;
 
 		/// <summary>
 		/// Determines whether to force collisions.
@@ -175,10 +163,9 @@ namespace AssetSnap.Front.Nodes
 			set
 			{
 				_ForceCollisions = value;
-				UpdateArray();
+				_UpdateArray();
 			}
 		}
-		private bool _NoCollisions = false;
 
 		/// <summary>
 		/// Determines whether to disable collisions.
@@ -190,7 +177,7 @@ namespace AssetSnap.Front.Nodes
 			set
 			{
 				_NoCollisions = value;
-				UpdateArray();
+				_UpdateArray();
 			}
 		}
 
@@ -204,11 +191,10 @@ namespace AssetSnap.Front.Nodes
 			set
 			{
 				_UseSphere = value;
-				UpdateArray();
+				_UpdateArray();
 				NotifyPropertyListChanged();
 			}
 		}
-		private bool _UseSphere = false;
 
 		/// <summary>
 		/// Determines whether to use convex polygons for collisions.
@@ -220,11 +206,10 @@ namespace AssetSnap.Front.Nodes
 			set
 			{
 				_UseConvexPolygon = value;
-				UpdateArray();
+				_UpdateArray();
 				NotifyPropertyListChanged();
 			}
 		}
-		private bool _UseConvexPolygon = false;
 
 		/// <summary>
 		/// Determines whether to clean convex polygons.
@@ -236,11 +221,10 @@ namespace AssetSnap.Front.Nodes
 			set
 			{
 				_UseConvexClean = value;
-				UpdateArray();
+				_UpdateArray();
 				NotifyPropertyListChanged();
 			}
 		}
-		private bool _UseConvexClean = false;
 
 		/// <summary>
 		/// Determines whether to simplify convex polygons.
@@ -252,11 +236,10 @@ namespace AssetSnap.Front.Nodes
 			set
 			{
 				_UseConvexSimplify = value;
-				UpdateArray();
+				_UpdateArray();
 				NotifyPropertyListChanged();
 			}
 		}
-		private bool _UseConvexSimplify = false;
 
 		/// <summary>
 		/// Determines whether to use concave polygons for collisions.
@@ -268,11 +251,10 @@ namespace AssetSnap.Front.Nodes
 			set
 			{
 				_UseConcavePolygon = value;
-				UpdateArray();
+				_UpdateArray();
 				NotifyPropertyListChanged();
 			}
 		}
-		private bool _UseConcavePolygon = false;
 
 		[ExportCategory("General")]
 		
@@ -287,11 +269,10 @@ namespace AssetSnap.Front.Nodes
 			set
 			{
 				_OffsetBySize = value;
-				UpdateArray();
+				_UpdateArray();
 				NotifyPropertyListChanged();
 			}
 		}
-		private bool _OffsetBySize = true;
 
 		/// <summary>
 		/// Determines whether to offset instances by the X angle.
@@ -303,10 +284,9 @@ namespace AssetSnap.Front.Nodes
 			set
 			{
 				_OffsetByXAngle = value;
-				UpdateArray();
+				_UpdateArray();
 			}
 		}
-		private bool _OffsetByXAngle = true;
 
 		/// <summary>
 		/// Determines whether to offset instances by the Z angle.
@@ -318,10 +298,9 @@ namespace AssetSnap.Front.Nodes
 			set
 			{
 				_OffsetByZAngle = value;
-				UpdateArray();
+				_UpdateArray();
 			}
 		}
-		private bool _OffsetByZAngle = false;
 
 		/// <summary>
 		/// Determines whether to reverse the offset angle.
@@ -333,10 +312,9 @@ namespace AssetSnap.Front.Nodes
 			set
 			{
 				_ReverseOffsetAngle = value;
-				UpdateArray();
+				_UpdateArray();
 			}
 		}
-		private bool _ReverseOffsetAngle = false;
 
 		/// <summary>
 		/// The amount of instances in the array.
@@ -348,10 +326,9 @@ namespace AssetSnap.Front.Nodes
 			set
 			{
 				_Amount = value;
-				UpdateArray();
+				_UpdateArray();
 			}
 		}
-		private int _Amount = 1;
 
 		/// <summary>
 		/// The X offset of instances in the array.
@@ -363,10 +340,9 @@ namespace AssetSnap.Front.Nodes
 			set
 			{
 				_OffsetX = value;
-				UpdateArray();
+				_UpdateArray();
 			}
 		}
-		private float _OffsetX = 0.0f;
 
 		/// <summary>
 		/// The Y offset of instances in the array.
@@ -378,14 +354,13 @@ namespace AssetSnap.Front.Nodes
 			set
 			{
 				_OffsetY = value;
-				UpdateArray();
+				_UpdateArray();
 			}
 		}
-		private float _OffsetY = 0.0f;
 
 		/// <summary>
-        /// The Z offset of instances in the array.
-        /// </summary>
+		/// The Z offset of instances in the array.
+		/// </summary>
 		[Export]
 		public float OffsetZ
 		{
@@ -393,24 +368,50 @@ namespace AssetSnap.Front.Nodes
 			set
 			{
 				_OffsetZ = value;
-				UpdateArray();
+				_UpdateArray();
 			}
 		}
+		
+
+		private string _InstanceName;
+		private string _InstanceLibrary;
+		private string _Name;
+		private string _DuplicateType;
+		private int _Amount = 1;
+		private float _OffsetX = 0.0f;
+		private float _OffsetY = 0.0f;
 		private float _OffsetZ = 0.0f;
+		private bool _ReverseOffsetAngle = false;
+		private bool _OffsetByZAngle = false;
+		private bool _OffsetByXAngle = true;
+		private bool _OffsetBySize = true;
+		private bool _UseConcavePolygon = false;
+		private bool _UseConvexSimplify = false;
+		private bool _UseConvexClean = false;
+		private bool _UseConvexPolygon = false;
+		private bool _UseSphere = false;
+		private bool _NoCollisions = false;
+		private bool _ForceCollisions = false;
+		private bool _UseMultiMesh = false;
+		private bool _Initialized = false;
+		
+		private Node _Duplicates;
+		private Godot.Collections.Array<Mesh> _Meshes;
+		private Mesh _Mesh;
 
 		/// <summary>
 		/// Called when the node enters the scene tree for the first time.
 		/// </summary>
 		public override void _Ready()
 		{
-			Initialized = true;
+			_Initialized = true;
 			_SceneRoot = Plugin.Singleton.GetTree().EditedSceneRoot;
 
 			base._Ready();
 
 			if (GetChildCount() == 0)
 			{
-				UpdateArray();
+				_UpdateArray();
 			}
 		}
 
@@ -494,15 +495,15 @@ namespace AssetSnap.Front.Nodes
 		/// </summary>
 		public void Update()
 		{
-			UpdateArray();
+			_UpdateArray();
 		}
 
 		/// <summary>
 		/// Updates the array based on current settings.
 		/// </summary>
-		private void UpdateArray()
+		private void _UpdateArray()
 		{
-			if (false == Initialized || null == Duplicates)
+			if (false == _Initialized || null == Duplicates)
 			{
 				return;
 			}
@@ -558,18 +559,18 @@ namespace AssetSnap.Front.Nodes
 
 			if (UseMultiMesh == false)
 			{
-				CreateSimpleArray();
+				_CreateSimpleArray();
 			}
 			else
 			{
-				CreateMultiArray();
+				_CreateMultiArray();
 			}
 		}
 
 		/// <summary>
 		/// Creates a simple array of nodes.
 		/// </summary>
-		private void CreateSimpleArray()
+		private void _CreateSimpleArray()
 		{
 			try
 			{
@@ -602,17 +603,17 @@ namespace AssetSnap.Front.Nodes
 						}
 					}
 
-					transform = ApplyModelTransforms(transform, new Vector3(ExtraOffsetX, ExtraOffsetY, ExtraOffsetZ), i);
+					transform = _ApplyModelTransforms(transform, new Vector3(ExtraOffsetX, ExtraOffsetY, ExtraOffsetZ), i);
 					if (_Model is AsMeshInstance3D)
 					{
-						ApplyModelMeta(_Model);
+						_ApplyModelMeta(_Model);
 					}
 
 					if (_Model is AsNode3D)
 					{
 						foreach (Node child in _Model.GetChildren())
 						{
-							ApplyModelMeta(child);
+							_ApplyModelMeta(child);
 						}
 					}
 
@@ -659,7 +660,7 @@ namespace AssetSnap.Front.Nodes
 		/// <summary>
 		/// Creates a array of models using multimesh.
 		/// </summary>
-		private void CreateMultiArray()
+		private void _CreateMultiArray()
 		{
 			// Check if duplicated item is AsMeshInstance
 			// If yes SimpleMultiMeshArray
@@ -677,7 +678,24 @@ namespace AssetSnap.Front.Nodes
 
 			// Randomnize();
 		}
+		
+		/// <summary>
+		/// Applies metadata to the model.
+		/// </summary>
+		/// <param name="_Model">The model to apply metadata to.</param>
+		private void _ApplyModelMeta(Node _Model)
+		{
+			if (ForceCollisions)
+			{
+				_Model.SetMeta("Collision", true);
+			}
 
+			if (NoCollisions)
+			{
+				_Model.SetMeta("Collision", false);
+			}
+		}
+		
 		/// <summary>
 		/// Creates a simple MultiMesh array.
 		/// </summary>
@@ -695,7 +713,7 @@ namespace AssetSnap.Front.Nodes
 			{
 				Multimesh = _MultiMesh
 			};
-			ApplyModelMeta(_MultiMeshInstance);
+			_ApplyModelMeta(_MultiMeshInstance);
 
 			List<Vector3> positions = new List<Vector3>();
 
@@ -722,7 +740,7 @@ namespace AssetSnap.Front.Nodes
 					}
 				}
 
-				transform = ApplyModelTransforms(transform, new Vector3(ExtraOffsetX, ExtraOffsetY, ExtraOffsetZ), i);
+				transform = _ApplyModelTransforms(transform, new Vector3(ExtraOffsetX, ExtraOffsetY, ExtraOffsetZ), i);
 				_MultiMesh.SetInstanceTransform(i, transform);
 				positions.Add(transform.Origin);
 			}
@@ -753,7 +771,7 @@ namespace AssetSnap.Front.Nodes
 					{
 						Multimesh = _MultiMesh
 					};
-					ApplyModelMeta(_MultiMeshInstance);
+					_ApplyModelMeta(_MultiMeshInstance);
 
 					List<Vector3> positions = new List<Vector3>();
 
@@ -780,7 +798,7 @@ namespace AssetSnap.Front.Nodes
 							}
 						}
 
-						transform = ApplyModelTransforms(transform, new Vector3(ExtraOffsetX, ExtraOffsetY, ExtraOffsetZ), i);
+						transform = _ApplyModelTransforms(transform, new Vector3(ExtraOffsetX, ExtraOffsetY, ExtraOffsetZ), i);
 						_MultiMesh.SetInstanceTransform(i, transform);
 						positions.Add(transform.Origin);
 					}
@@ -799,7 +817,7 @@ namespace AssetSnap.Front.Nodes
 		/// <param name="ExtraOffset">The extra offset to apply.</param>
 		/// <param name="i">The index of the transformation.</param>
 		/// <returns>The transformed model.</returns>
-		private Transform3D ApplyModelTransforms(Transform3D transform, Vector3 ExtraOffset, int i)
+		private Transform3D _ApplyModelTransforms(Transform3D transform, Vector3 ExtraOffset, int i)
 		{
 			if (ReverseOffsetAngle)
 			{
@@ -818,27 +836,10 @@ namespace AssetSnap.Front.Nodes
 		}
 
 		/// <summary>
-		/// Applies metadata to the model.
-		/// </summary>
-		/// <param name="_Model">The model to apply metadata to.</param>
-		private void ApplyModelMeta(Node _Model)
-		{
-			if (ForceCollisions)
-			{
-				_Model.SetMeta("Collision", true);
-			}
-
-			if (NoCollisions)
-			{
-				_Model.SetMeta("Collision", false);
-			}
-		}
-
-		/// <summary>
 		/// Determines whether to add collision based on settings.
 		/// </summary>
 		/// <returns>True if collision should be added, false otherwise.</returns>
-		private bool ShouldAddCollision()
+		private bool _ShouldAddCollision()
 		{
 			return SettingsStatic.ShouldAddCollision();
 		}

@@ -28,8 +28,8 @@ using Godot;
 namespace AssetSnap.Component
 {
 	/// <summary>
-    /// Base class for components managing group options.
-    /// </summary>
+	/// Base class for components managing group options.
+	/// </summary>
 	[Tool]
 	public partial class GroupOptionComponent : TraitableComponent
 	{
@@ -39,6 +39,15 @@ namespace AssetSnap.Component
 		[Signal]
 		public delegate void GroupOptionChangedEventHandler(string name, Variant value);
 
+		/// <summary>
+		/// Gets the value of the group option as a Variant.
+		/// </summary>
+		/// <returns>The value of the group option as a Variant.</returns>
+		public virtual Variant GetValueVariant()
+		{
+			return false;
+		}
+		
 		/// <summary>
 		/// Updates the grouped data with the specified key and value.
 		/// </summary>
@@ -60,15 +69,6 @@ namespace AssetSnap.Component
 		protected void _HasGroupDataHasChanged()
 		{
 			EmitSignal(SignalName.GroupOptionChanged, Name, GetValueVariant());
-		}
-
-		/// <summary>
-		/// Gets the value of the group option as a Variant.
-		/// </summary>
-		/// <returns>The value of the group option as a Variant.</returns>
-		public virtual Variant GetValueVariant()
-		{
-			return false;
 		}
 	}
 }

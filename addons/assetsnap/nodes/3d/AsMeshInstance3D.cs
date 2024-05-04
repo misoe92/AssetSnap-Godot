@@ -33,9 +33,9 @@ namespace AssetSnap.Front.Nodes
 	[Tool]
 	public partial class AsMeshInstance3D : Base, ICollisionableModel
 	{
-		private float fadeDuration = SettingsStatic.TransparencyFadeDuration(); // Fade duration in seconds
-		private float fadeTimer = 0.0f;
-		private ModelCollision Collision;
+		private float _FadeDuration = SettingsStatic.TransparencyFadeDuration(); // Fade duration in seconds
+		private float _FadeTimer = 0.0f;
+		private ModelCollision _Collision;
 
 		/// <summary>
 		/// Constructor for AsMeshInstance3D class.
@@ -56,7 +56,7 @@ namespace AssetSnap.Front.Nodes
 				Transparency = 1 - SettingsStatic.TransparencyLevel();
 			}
 
-			Collision = new();
+			_Collision = new();
 
 			base._EnterTree();
 		}
@@ -67,7 +67,7 @@ namespace AssetSnap.Front.Nodes
 		public async override void _Ready()
 		{
 			base._Ready();
-			Collision.RegisterCollisionType(this);
+			_Collision.RegisterCollisionType(this);
 
 			await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
 
@@ -84,7 +84,7 @@ namespace AssetSnap.Front.Nodes
 			{
 				if (null != Owner)
 				{
-					Collision.Render();
+					_Collision.Render();
 				}
 			}
 		}
@@ -95,56 +95,29 @@ namespace AssetSnap.Front.Nodes
 		public override void _Process(double delta)
 		{
 			if (
-				fadeTimer != fadeDuration &&
+				_FadeTimer != _FadeDuration &&
 				IsPlaced() &&
 				SettingsStatic.ModelTransparencyActive()
 			)
 			{
 				// Increment the timer
-				fadeTimer += (float)delta;
+				_FadeTimer += (float)delta;
 
 				// Calculate the alpha value based on the timer
-				float alpha = Mathf.Clamp(fadeTimer / fadeDuration, 0.25f, 1.0f);
+				float alpha = Mathf.Clamp(_FadeTimer / _FadeDuration, 0.25f, 1.0f);
 
 				// Update the alpha property of the shader material
 				Transparency = 1 - alpha;
 
 				// Check if the fade-in is complete
-				if (fadeTimer >= fadeDuration)
+				if (_FadeTimer >= _FadeDuration)
 				{
 					// Reset the timer or stop the fade-in effect
-					fadeTimer = fadeDuration;
+					_FadeTimer = _FadeDuration;
 				}
 			}
 
 			base._Process(delta);
-		}
-
-		/// <summary>
-		/// Gets the collision body associated with this mesh instance.
-		/// </summary>
-		/// <returns>The collision body as AsStaticBody3D, or null if not found.</returns>
-		public AsStaticBody3D GetCollisionBody()
-		{
-			if (GetChildCount() > 0)
-			{
-				Node child = GetChild(0);
-				if (null != child && child is AsStaticBody3D body)
-				{
-					return body;
-				}
-			}
-
-			return null;
-		}
-
-		/// <summary>
-		/// Checks if the mesh instance has collision nodes.
-		/// </summary>
-		/// <returns>True if the mesh instance has collision nodes, otherwise false.</returns>
-		public bool HasCollisions()
-		{
-			return GetChildCount() != 0;
 		}
 
 		/// <summary>
@@ -158,9 +131,9 @@ namespace AssetSnap.Front.Nodes
 		}
 
 		/// <summary>
-        /// Updates the viewability of the mesh instance.
-        /// </summary>
-        /// <param name="owner">The owner node.</param>
+		/// Updates the viewability of the mesh instance.
+		/// </summary>
+		/// <param name="owner">The owner node.</param>
 		public void UpdateViewability(Node owner = null)
 		{
 			if (null == GetParent())
@@ -178,6 +151,33 @@ namespace AssetSnap.Front.Nodes
 			GetCollisionBody().Owner = owner;
 			// Shape
 			GetCollisionBody().GetChild(0).Owner = owner;
+		}
+		
+		/// <summary>
+		/// Gets the collision body associated with this mesh instance.
+		/// </summary>
+		/// <returns>The collision body as AsStaticBody3D, or null if not found.</returns>
+		public AsStaticBody3D GetCollisionBody()
+		{
+			if (GetChildCount() > 0)
+			{
+				Node child = GetChild(0);
+				if (null != child && child is AsStaticBody3D body)
+				{
+					return body;
+				}
+			}
+
+			return null;
+		}
+		
+		/// <summary>
+		/// Checks if the mesh instance has collision nodes.
+		/// </summary>
+		/// <returns>True if the mesh instance has collision nodes, otherwise false.</returns>
+		public bool HasCollisions()
+		{
+			return GetChildCount() != 0;
 		}
 	}
 }

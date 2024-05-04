@@ -38,7 +38,7 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		/// Gets or sets the value of the X-axis offset.
 		/// </summary>
 		/// <remarks>If the component is not valid or the spin box trait is null, setting the value will not take effect.</remarks>
-		public float value
+		public float Value
 		{
 			get => IsValid() ? (float)Trait<Spinboxable>().GetValue() : 0;
 			set
@@ -60,7 +60,7 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		{
 			Name = "LSSnapOffsetX";
 
-			UsingTraits = new()
+			_UsingTraits = new()
 			{
 				{ typeof(Spinboxable).ToString() },
 			};
@@ -77,7 +77,7 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 
 			Callable _callable = Callable.From((double value) => { _OnSpinBoxValueChange((float)value); });
 
-			Initiated = true;
+			_Initiated = true;
 
 			Trait<Spinboxable>()
 				.SetName("SnapObjectOffsetX")
@@ -96,7 +96,83 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 				.Select(0)
 				.AddToContainer(this);
 
-			Plugin.GetInstance().StatesChanged += (Godot.Collections.Array data) => { MaybeUpdateValue(data); };
+			Plugin.GetInstance().StatesChanged += (Godot.Collections.Array data) => { _MaybeUpdateValue(data); };
+		}
+
+		/// <summary>
+		/// Sets the visibility state of the SnapOffsetX component.
+		/// </summary>
+		/// <param name="state">The visibility state to set.</param>
+		public override void SetVisible(bool state)
+		{
+			if (false == IsValid())
+			{
+				return;
+			}
+
+			Trait<Spinboxable>()
+				.Select(0)
+				.SetVisible(state);
+		}
+		
+		/// <summary>
+		/// Synchronizes the SnapOffsetX component's value with the global central state controller.
+		/// </summary>
+		public override void Sync()
+		{
+			if (false == IsValid())
+			{
+				return;
+			}
+
+			StatesUtils.Get().SnapToObjectOffsetXValue = (float)Trait<Spinboxable>().Select(0).GetValue();
+		}
+		
+		/// <summary>
+		/// Retrieves the current value of the SnapOffsetX component.
+		/// </summary>
+		/// <returns>The current X-axis offset value.</returns>
+		public float GetValue()
+		{
+			return StatesUtils.Get().SnapToObjectOffsetXValue;
+		}
+
+		/// <summary>
+		/// Resets the SnapOffsetX component to its default state.
+		/// </summary>
+		public void Reset()
+		{
+			StatesUtils.Get().SnapToObjectOffsetXValue = 0.0f;
+		}
+		
+		/// <summary>
+		/// Checks if the SnapOffsetX component is currently visible.
+		/// </summary>
+		/// <returns>True if visible, false otherwise.</returns>
+		public override bool IsVisible()
+		{
+			if (false == IsValid())
+			{
+				return false;
+			}
+
+			return Trait<Spinboxable>()
+				.Select(0)
+				.IsVisible();
+		}
+
+		/// <summary>
+		/// Checks if the SnapOffsetX component is valid.
+		/// </summary>
+		/// <returns>True if the component is valid, false otherwise.</returns>
+		public bool IsValid()
+		{
+			return
+				null != _GlobalExplorer &&
+				null != StatesUtils.Get() &&
+				false != _Initiated &&
+				null != Trait<Spinboxable>() &&
+				false != HasTrait<Spinboxable>();
 		}
 
 		/// <summary>
@@ -108,7 +184,7 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		/// It specifically checks if the data indicates changes related to snapping to objects or changes in the offset X value.
 		/// If the component is not valid or the data does not indicate relevant changes, the method returns without performing any updates.
 		/// </remarks>
-		private void MaybeUpdateValue(Godot.Collections.Array data)
+		private void _MaybeUpdateValue(Godot.Collections.Array data)
 		{
 			if (data[0].As<string>() == "SnapToObject" || data[0].As<string>() == "SnapToObjectOffsetXValue")
 			{
@@ -139,89 +215,13 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		}
 
 		/// <summary>
-		/// Sets the visibility state of the SnapOffsetX component.
-		/// </summary>
-		/// <param name="state">The visibility state to set.</param>
-		public override void SetVisible(bool state)
-		{
-			if (false == IsValid())
-			{
-				return;
-			}
-
-			Trait<Spinboxable>()
-				.Select(0)
-				.SetVisible(state);
-		}
-		
-		/// <summary>
-		/// Checks if the SnapOffsetX component is currently visible.
-		/// </summary>
-		/// <returns>True if visible, false otherwise.</returns>
-		public override bool IsVisible()
-		{
-			if (false == IsValid())
-			{
-				return false;
-			}
-
-			return Trait<Spinboxable>()
-				.Select(0)
-				.IsVisible();
-		}
-
-		/// <summary>
 		/// Updates spawn settings when the input value changes.
 		/// </summary>
 		/// <param name="value">The new value of the spin box.</param>
 		private void _OnSpinBoxValueChange(float value)
 		{
-			_GlobalExplorer.States.SnapToObjectOffsetXValue = value;
+			StatesUtils.Get().SnapToObjectOffsetXValue = value;
 			UpdateSpawnSettings("SnapToObjectOffsetXValue", value);
-		}
-
-		/// <summary>
-		/// Retrieves the current value of the SnapOffsetX component.
-		/// </summary>
-		/// <returns>The current X-axis offset value.</returns>
-		public float GetValue()
-		{
-			return _GlobalExplorer.States.SnapToObjectOffsetXValue;
-		}
-
-		/// <summary>
-		/// Resets the SnapOffsetX component to its default state.
-		/// </summary>
-		public void Reset()
-		{
-			_GlobalExplorer.States.SnapToObjectOffsetXValue = 0.0f;
-		}
-
-		/// <summary>
-		/// Checks if the SnapOffsetX component is valid.
-		/// </summary>
-		/// <returns>True if the component is valid, false otherwise.</returns>
-		public bool IsValid()
-		{
-			return
-				null != _GlobalExplorer &&
-				null != _GlobalExplorer.States &&
-				false != Initiated &&
-				null != Trait<Spinboxable>() &&
-				false != HasTrait<Spinboxable>();
-		}
-
-		/// <summary>
-		/// Synchronizes the SnapOffsetX component's value with the global central state controller.
-		/// </summary>
-		public override void Sync()
-		{
-			if (false == IsValid())
-			{
-				return;
-			}
-
-			_GlobalExplorer.States.SnapToObjectOffsetXValue = (float)Trait<Spinboxable>().Select(0).GetValue();
 		}
 	}
 }

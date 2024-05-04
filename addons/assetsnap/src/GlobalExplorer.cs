@@ -21,23 +21,22 @@
 // SOFTWARE.
 
 #if TOOLS
+
+using System;
+using System.Reflection;
+using AssetSnap.Front.Nodes;
+using AssetSnap.Instance.Input;
+using AssetSnap.States;
+using Godot;
+
 namespace AssetSnap
 {
-	using System;
-	using System.Reflection;
-	using AssetSnap.Front.Nodes;
-	using AssetSnap.Instance.Input;
-	using AssetSnap.States;
-	using Godot;
-
 	/// <summary>
 	/// Partial class for managing global methods and interaction with AssetSnap.
 	/// </summary>
 	[Tool]
 	public partial class GlobalExplorer : NodeExplorer
 	{
-		private static GlobalExplorer Instance;
-		
 		/// <summary>
 		/// Singleton instance of the GlobalExplorer.
 		/// </summary>
@@ -45,23 +44,25 @@ namespace AssetSnap
 		{
 			get
 			{
-				if (Instance == null)
+				if (_Instance == null)
 				{
-					Instance = new();
+					_Instance = new();
 				}
 
-				return Instance;
+				return _Instance;
 			}
 		}
-
+		
 		/// <summary>
 		/// Gets the input driver currently in use.
 		/// </summary>
 		/// <returns>The input driver instance.</returns>
 		public Instance.Input.BaseInputDriver InputDriver
 		{
-			get => DragIsAllowed() ? DragAddInputDriver.GetInstance() : BaseInputDriver.GetInstance();
+			get => _DragIsAllowed() ? DragAddInputDriver.GetInstance() : BaseInputDriver.GetInstance();
 		}
+		
+		private static GlobalExplorer _Instance;
 
 		/// <summary>
 		/// Initializes the GlobalExplorer singleton instance.
@@ -69,9 +70,9 @@ namespace AssetSnap
 		/// <returns>The initialized GlobalExplorer instance.</returns>
 		public static GlobalExplorer InitializeExplorer()
 		{
-			if (null == Instance)
+			if (null == _Instance)
 			{
-				Instance = new GlobalExplorer()
+				_Instance = new GlobalExplorer()
 				{
 					_Settings = Front.Configs.SettingsConfig.Singleton,
 					_Waypoints = new(),
@@ -90,7 +91,7 @@ namespace AssetSnap
 				};
 			}
 
-			return Instance;
+			return _Instance;
 		}
 
 		/// <summary>
@@ -101,129 +102,7 @@ namespace AssetSnap
 		{
 			return Singleton;
 		}
-
-		/// <summary>
-		/// Retrieves a library instance by its name.
-		/// </summary>
-		/// <param name="name">The name of the library instance to retrieve.</param>
-		/// <returns>The library instance.</returns>
-		public Library.Instance GetLibraryByName(string name)
-		{
-			foreach (Library.Instance instance in Library.Libraries)
-			{
-				if (EditorPlugin.IsInstanceValid(instance) && instance.GetName() == name)
-				{
-					return instance;
-				}
-			}
-
-			return null;
-		}
-
-		/// <summary>
-		/// Retrieves a library instance by its index.
-		/// </summary>
-		/// <param name="index">The index of the library instance to retrieve.</param>
-		/// <returns>The library instance.</returns>
-		public Library.Instance GetLibraryByIndex(int index)
-		{
-			if (index > -1 && Library.Libraries.Count > index && EditorPlugin.IsInstanceValid(Library.Libraries[index]))
-			{
-				return Library.Libraries[index] as Library.Instance;
-			}
-
-			return null;
-		}
-
-		/// <summary>
-		/// Prints the names of child nodes.
-		/// </summary>
-		/// <param name="which">The node whose child names to print.</param>
-		public void PrintChildNames(Node which)
-		{
-			foreach (Node child in which.GetChildren())
-			{
-				if (child is Control childControl && HasProperty(childControl, "Text"))
-				{
-					string text = "";
-					TryGetProperty(childControl, "Text", out text);
-				}
-
-				if (0 != child.GetChildCount())
-				{
-					PrintChildNames(child);
-				}
-			}
-		}
-
-		/// <summary>
-		/// Sets focus to a specific 3D node.
-		/// </summary>
-		/// <param name="Node">The 3D node to set focus to.</param>
-		public void SetFocusToNode(Node3D Node)
-		{
-			if (null == Node)
-			{
-				StatesUtils.Get().CurrentLibrary.ClearActivePanelState(null);
-				StatesUtils.Get().CurrentLibrary._LibrarySettings._LSEditing.SetText("None");
-
-				StatesUtils.Get().EditingObject = null;
-				StatesUtils.Get().Group = null;
-				StatesUtils.Get().GroupedObject = null;
-
-				return;
-			}
-
-			EditorInterface.Singleton.EditNode(Node);
-			StatesUtils.Get().EditingObject = Node;
-			StatesUtils.Get().EditingTitle = Node.Name;
-
-			if (Node is AsMeshInstance3D _instance)
-			{
-				HandleNode = _instance;
-				Model = _instance;
-
-				Library.Instance Library = GetLibraryByName(_instance.GetLibraryName());
-				Library._LibrarySettings._LSEditing.SetText(Node.Name);
-				StatesUtils.Get().CurrentLibrary = Library;
-
-				if (InputDriver is DragAddInputDriver DraggableInputDriver)
-				{
-					DraggableInputDriver.CalculateObjectSize();
-				}
-			}
-
-			if (Node is AsNode3D _nodeInstance)
-			{
-				HandleNode = _nodeInstance;
-
-				Library.Instance Library = GetLibraryByName(_nodeInstance.GetLibraryName());
-				Library._LibrarySettings._LSEditing.SetText(Node.Name);
-				StatesUtils.Get().CurrentLibrary = Library;
-
-				if (InputDriver is DragAddInputDriver DraggableInputDriver)
-				{
-					DraggableInputDriver.CalculateObjectSize();
-				}
-			}
-
-			if (Node is AsGrouped3D _Grouped3D)
-			{
-				StatesUtils.Get().PlacingMode = GlobalStates.PlacingModeEnum.Group;
-
-				Transform3D transform = _Grouped3D.Transform;
-				transform.Origin = new Vector3(0, 0, 0);
-				_Grouped3D.Transform = transform;
-
-				StatesUtils.Get().GroupedObject = _Grouped3D;
-
-				if (InputDriver is DragAddInputDriver DraggableInputDriver)
-				{
-					DraggableInputDriver.CalculateObjectSize();
-				}
-			}
-		}
-
+		
 		/// <summary>
 		/// Checks whether a Control has a specified property.
 		/// </summary>
@@ -268,11 +147,32 @@ namespace AssetSnap
 				return false;
 			}
 		}
-
+		
 		/// <summary>
-        /// Prints the fields of a Node.
-        /// </summary>
-        /// <param name="which">The Node whose fields to print.</param>
+		/// Prints the names of child nodes.
+		/// </summary>
+		/// <param name="which">The node whose child names to print.</param>
+		public void PrintChildNames(Node which)
+		{
+			foreach (Node child in which.GetChildren())
+			{
+				if (child is Control childControl && HasProperty(childControl, "Text"))
+				{
+					string text = "";
+					TryGetProperty(childControl, "Text", out text);
+				}
+
+				if (0 != child.GetChildCount())
+				{
+					PrintChildNames(child);
+				}
+			}
+		}
+		
+		/// <summary>
+		/// Prints the fields of a Node.
+		/// </summary>
+		/// <param name="which">The Node whose fields to print.</param>
 		public void PrintFields(Node which)
 		{
 			Type type = which.GetType();
@@ -286,17 +186,116 @@ namespace AssetSnap
 				GD.Print($"{field.Name}: {value}");
 			}
 		}
+		
+		/// <summary>
+		/// Sets focus to a specific 3D node.
+		/// </summary>
+		/// <param name="Node">The 3D node to set focus to.</param>
+		public void SetFocusToNode(Node3D Node)
+		{
+			if (null == Node)
+			{
+				StatesUtils.Get().CurrentLibrary.ClearActivePanelState(null);
+				StatesUtils.Get().CurrentLibrary._LibrarySettings.Editing.SetText("None");
+
+				StatesUtils.Get().EditingObject = null;
+				StatesUtils.Get().Group = null;
+				StatesUtils.Get().GroupedObject = null;
+
+				return;
+			}
+
+			EditorInterface.Singleton.EditNode(Node);
+			StatesUtils.Get().EditingObject = Node;
+			StatesUtils.Get().EditingTitle = Node.Name;
+
+			if (Node is AsMeshInstance3D _instance)
+			{
+				HandleNode = _instance;
+
+				Library.Instance Library = GetLibraryByName(_instance.GetLibraryName());
+				Library._LibrarySettings.Editing.SetText(Node.Name);
+				StatesUtils.Get().CurrentLibrary = Library;
+
+				if (InputDriver is DragAddInputDriver DraggableInputDriver)
+				{
+					DraggableInputDriver.CalculateObjectSize();
+				}
+			}
+
+			if (Node is AsNode3D _nodeInstance)
+			{
+				HandleNode = _nodeInstance;
+
+				Library.Instance Library = GetLibraryByName(_nodeInstance.GetLibraryName());
+				Library._LibrarySettings.Editing.SetText(Node.Name);
+				StatesUtils.Get().CurrentLibrary = Library;
+
+				if (InputDriver is DragAddInputDriver DraggableInputDriver)
+				{
+					DraggableInputDriver.CalculateObjectSize();
+				}
+			}
+
+			if (Node is AsGrouped3D _Grouped3D)
+			{
+				StatesUtils.Get().PlacingMode = GlobalStates.PlacingModeEnum.Group;
+
+				Transform3D transform = _Grouped3D.Transform;
+				transform.Origin = new Vector3(0, 0, 0);
+				_Grouped3D.Transform = transform;
+
+				StatesUtils.Get().GroupedObject = _Grouped3D;
+
+				if (InputDriver is DragAddInputDriver DraggableInputDriver)
+				{
+					DraggableInputDriver.CalculateObjectSize();
+				}
+			}
+		}
 
 		/// <summary>
-        /// Checks whether drag adding of models is allowed.
-        /// </summary>
-        /// <returns>True if drag adding is allowed; otherwise, false.</returns>
-		private bool DragIsAllowed()
+		/// Retrieves a library instance by its name.
+		/// </summary>
+		/// <param name="name">The name of the library instance to retrieve.</param>
+		/// <returns>The library instance.</returns>
+		public Library.Instance GetLibraryByName(string name)
+		{
+			foreach (Library.Instance instance in Library.Libraries)
+			{
+				if (EditorPlugin.IsInstanceValid(instance) && instance.GetName() == name)
+				{
+					return instance;
+				}
+			}
+
+			return null;
+		}
+
+		/// <summary>
+		/// Retrieves a library instance by its index.
+		/// </summary>
+		/// <param name="index">The index of the library instance to retrieve.</param>
+		/// <returns>The library instance.</returns>
+		public Library.Instance GetLibraryByIndex(int index)
+		{
+			if (index > -1 && Library.Libraries.Count > index && EditorPlugin.IsInstanceValid(Library.Libraries[index]))
+			{
+				return Library.Libraries[index] as Library.Instance;
+			}
+
+			return null;
+		}
+
+		/// <summary>
+		/// Checks whether drag adding of models is allowed.
+		/// </summary>
+		/// <returns>True if drag adding is allowed; otherwise, false.</returns>
+		private bool _DragIsAllowed()
 		{
 			bool value = Settings.GetKey("allow_drag_add").As<bool>();
 			return value;
 		}
-
 	}
 }
 #endif

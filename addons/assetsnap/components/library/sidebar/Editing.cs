@@ -23,6 +23,7 @@
 #if TOOLS
 
 using AssetSnap.Component;
+using AssetSnap.States;
 using Godot;
 
 namespace AssetSnap.Front.Components.Library.Sidebar
@@ -57,7 +58,7 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		{
 			base.Initialize();
 			
-			Initiated = true;
+			_Initiated = true;
 			
 			_MarginContainer = new();
 			_InnerMarginContainer = new();
@@ -75,7 +76,7 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			_LabelEditing = new()
 			{
 				ThemeTypeVariation = "HeaderSmall", 
-				Text = _GlobalExplorer.HasModel ? GetModelName() : "None",
+				Text = _GlobalExplorer.HasModel ? _GetModelName() : "None",
 			};
 			
 			_MarginContainer.AddThemeConstantOverride("margin_left", 0); 
@@ -98,13 +99,31 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		}
 		
 		/// <summary>
+		/// Sets the text of the editing label.
+		/// </summary>
+		/// <param name="text">The text to set.</param>
+		public void SetText( string text ) 
+		{
+			_LabelEditing.Text = _PrepareModelName(text);
+			StatesUtils.Get().EditingTitle = _PrepareModelName(text);
+		}
+
+		/// <summary>
+		/// Synchronizes the editing title with the global explorer.
+		/// </summary>
+		public override void Sync() 
+		{
+			StatesUtils.Get().EditingTitle = _PrepareModelName(_LabelEditing.Text);
+		}
+		
+		/// <summary>
 		/// Retrieves the name of the model being edited.
 		/// </summary>
 		/// <returns>The name of the model being edited.</returns>
-		private string GetModelName()
+		private string _GetModelName()
 		{
 			string _Name = _GlobalExplorer.GetHandle().Name;
-			return PrepareModelName( _Name );
+			return _PrepareModelName( _Name );
 		}
 		
 		/// <summary>
@@ -112,7 +131,7 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		/// </summary>
 		/// <param name="name">The original model name.</param>
 		/// <returns>The prepared model name.</returns>
-		private string PrepareModelName( string name ) 
+		private string _PrepareModelName( string name ) 
 		{
 			string _Name = name;
 			if( _Name.Length > 20 ) 
@@ -122,24 +141,6 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			}
 
 			return _Name;
-		}
-		
-		/// <summary>
-		/// Sets the text of the editing label.
-		/// </summary>
-		/// <param name="text">The text to set.</param>
-		public void SetText( string text ) 
-		{
-			_LabelEditing.Text = PrepareModelName(text);
-			_GlobalExplorer.States.EditingTitle = PrepareModelName(text);
-		}
-
-		/// <summary>
-        /// Synchronizes the editing title with the global explorer.
-        /// </summary>
-		public override void Sync() 
-		{
-			_GlobalExplorer.States.EditingTitle = PrepareModelName(_LabelEditing.Text);
 		}
 	}
 }

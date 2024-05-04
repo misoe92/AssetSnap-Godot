@@ -47,7 +47,7 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			TooltipText = "Will let you place the group of objects in the 3D world";
 			MouseDefaultCursorShape = Control.CursorShape.PointingHand;
 
-			UsingTraits = new()
+			_UsingTraits = new()
 			{
 				{ typeof(Buttonable).ToString() },
 			};
@@ -60,14 +60,14 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		/// </summary>
 		public override void Initialize()
 		{
-			if (Initiated)
+			if (_Initiated)
 			{
 				return;
 			}
 
 			base.Initialize();
 
-			Initiated = true;
+			_Initiated = true;
 
 			_InitializeFields();
 			_FinalizeFields();

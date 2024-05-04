@@ -33,11 +33,13 @@ namespace AssetSnap.Front.Nodes
 	public partial class AsGroup3D : Node3D
 	{
 		/// <summary>
-		/// Private field representing the root node of the scene.
+		/// Event signal emitted when the node is loaded.
 		/// </summary>
-		protected Node _SceneRoot;
-
+		[Signal]
+		public delegate void LoadedEventHandler();
+		
 		[ExportCategory("Rotation Randomnization")]
+		
 		/// <summary>
 		/// Determines whether rotation randomization is enabled.
 		/// </summary>
@@ -52,7 +54,6 @@ namespace AssetSnap.Front.Nodes
 				NotifyPropertyListChanged();
 			}
 		}
-		private bool _RandomnizeRotation = false;
 
 		/// <summary>
 		/// Determines whether rotation on the X-axis is excluded from randomization.
@@ -67,7 +68,6 @@ namespace AssetSnap.Front.Nodes
 				Randomnize();
 			}
 		}
-		private bool _ExcludeRotationOnX = false;
 
 		/// <summary>
 		/// Determines whether rotation on the Y-axis is excluded from randomization.
@@ -82,7 +82,6 @@ namespace AssetSnap.Front.Nodes
 				Randomnize();
 			}
 		}
-		private bool _ExcludeRotationOnY = false;
 
 		/// <summary>
 		/// Determines whether rotation on the Z-axis is excluded from randomization.
@@ -97,7 +96,6 @@ namespace AssetSnap.Front.Nodes
 				Randomnize();
 			}
 		}
-		private bool _ExcludeRotationOnZ = false;
 
 		/// <summary>
 		/// The minimum rotation angle used in randomization.
@@ -112,7 +110,6 @@ namespace AssetSnap.Front.Nodes
 				Randomnize();
 			}
 		}
-		private int _MinRotationAngle = 0;
 
 		/// <summary>
 		/// The maximum rotation angle used in randomization.
@@ -127,7 +124,6 @@ namespace AssetSnap.Front.Nodes
 				Randomnize();
 			}
 		}
-		private int _MaxRotationAngle = 0;
 
 		[ExportCategory("Scale Randomnization")]
 		
@@ -145,7 +141,6 @@ namespace AssetSnap.Front.Nodes
 				NotifyPropertyListChanged();
 			}
 		}
-		private bool _RandomnizeScale = false;
 
 		/// <summary>
 		/// Gets or sets a value indicating whether scaling on the X-axis is excluded from randomization.
@@ -160,7 +155,6 @@ namespace AssetSnap.Front.Nodes
 				Randomnize();
 			}
 		}
-		private bool _ExcludeScaleOnX = false;
 
 		/// <summary>
 		/// Gets or sets a value indicating whether scaling on the Y-axis is excluded from randomization.
@@ -175,7 +169,6 @@ namespace AssetSnap.Front.Nodes
 				Randomnize();
 			}
 		}
-		private bool _ExcludeScaleOnY = false;
 
 		/// <summary>
 		/// Gets or sets a value indicating whether scaling on the Z-axis is excluded from randomization.
@@ -190,7 +183,6 @@ namespace AssetSnap.Front.Nodes
 				Randomnize();
 			}
 		}
-		private bool _ExcludeScaleOnZ = false;
 
 		/// <summary>
 		/// Gets or sets the minimum scale used in randomization.
@@ -205,11 +197,10 @@ namespace AssetSnap.Front.Nodes
 				Randomnize();
 			}
 		}
-		private double _MinScale = 1.00;
 
 		/// <summary>
-        /// Gets or sets the maximum scale used in randomization.
-        /// </summary>
+		/// Gets or sets the maximum scale used in randomization.
+		/// </summary>
 		[Export]
 		public double MaxScale
 		{
@@ -220,16 +211,36 @@ namespace AssetSnap.Front.Nodes
 				Randomnize();
 			}
 		}
+		
+		/// <summary>
+		/// Private field representing the root node of the scene.
+		/// </summary>
+		
+		private int _MaxRotationAngle = 0;
+		private int _MinRotationAngle = 0;
+		private double _MinScale = 1.00;
 		private double _MaxScale = 1.00;
-
+		private bool _RandomnizeRotation = false;
+		private bool _ExcludeScaleOnZ = false;
+		private bool _ExcludeScaleOnY = false;
+		private bool _ExcludeScaleOnX = false;
+		private bool _RandomnizeScale = false;
+		private bool _ExcludeRotationOnZ = false;
+		private bool _ExcludeRotationOnY = false;
+		private bool _ExcludeRotationOnX = false;
+		
+		protected Node _SceneRoot;
 		protected Vector3[] _RotationBuffer;
 		protected Vector3[] _ScaleBuffer;
-
+		
 		/// <summary>
-		/// Event signal emitted when the node is loaded.
+		/// Default constructor for AsGroup3D.
 		/// </summary>
-		[Signal]
-		public delegate void LoadedEventHandler();
+		public AsGroup3D()
+		{
+			Name = "AsGroup";
+			SetMeta("AsGroup", true);
+		}
 
 		/// <summary>
 		/// Validates the properties of the node and updates property usage flags accordingly.
@@ -278,273 +289,40 @@ namespace AssetSnap.Front.Nodes
 
 			base._ValidateProperty(property);
 		}
-
+		
 		/// <summary>
-		/// Default constructor for AsGroup3D.
+		/// Clears all current child nodes.
 		/// </summary>
-		public AsGroup3D()
+		public void ClearCurrentChildren()
 		{
-			Name = "AsGroup";
-			SetMeta("AsGroup", true);
-		}
-
-		/// <summary>
-		/// Randomizes the rotation and scale of child nodes based on current settings.
-		/// </summary>
-		protected void Randomnize()
-		{
-			if (GetChildCount() == 0)
+			foreach (Node child in GetChildren())
 			{
-				return;
-			}
-
-			var _child = GetChild(0);
-			_RotationBuffer = Array.Empty<Vector3>();
-			_ScaleBuffer = Array.Empty<Vector3>();
-
-			if (_child is MultiMeshInstance3D childMulti)
-			{
-				MultiMesh _MultiMesh = childMulti.Multimesh;
-				int instanceCount = _MultiMesh.InstanceCount;
-
-				if (_RandomnizeRotation == false && _RandomnizeScale == false)
+				if (IsInstanceValid(child))
 				{
-					for (int i = 0; i < instanceCount; i++)
-					{
-						// Get the transform of the current instance
-						Transform3D transform = _MultiMesh.GetInstanceTransform(i);
-
-						transform = Transform3D.Identity.Translated(transform.Origin)
-											.Rotated(Vector3.Up, Mathf.DegToRad(0))
-											.Rotated(Vector3.Right, Mathf.DegToRad(0))
-											.Rotated(Vector3.Forward, Mathf.DegToRad(0))
-											.Scaled(new Vector3(1, 1, 1));
-
-						_MultiMesh.SetInstanceTransform(i, transform);
-
-						AsStaticBody3D _body = GetChild<AsStaticBody3D>(i + 1);
-
-						if (null != _body && IsInstanceValid(_body))
-						{
-							_body.Scale = new Vector3(1, 1, 1);
-						}
-					}
-					return;
-				}
-
-				for (int i = 0; i < instanceCount; i++)
-				{
-					float scale = (float)GD.RandRange(MinScale, MaxScale);
-					Vector3 Scale = new Vector3(1, 1, 1);
-					Vector3 Rot = new Vector3(0, 0, 0);
-					// Get the transform of the current instance
-					Transform3D transform = _MultiMesh.GetInstanceTransform(i);
-					AsStaticBody3D _body = GetChild<AsStaticBody3D>(i + 1);
-
-					if (_RandomnizeScale && false == _ExcludeScaleOnX)
-					{
-						Scale.X = scale;
-					}
-
-					if (_RandomnizeScale && false == _ExcludeScaleOnY)
-					{
-						Scale.Y = scale;
-					}
-
-					if (_RandomnizeScale && false == _ExcludeScaleOnZ)
-					{
-						Scale.Z = scale;
-					}
-
-					if (_RandomnizeRotation && false == _ExcludeRotationOnX)
-					{
-						float rotationX = (float)GD.RandRange(MinRotationAngle, MaxRotationAngle);
-						Rot.X = rotationX;
-					}
-
-					if (_RandomnizeRotation && false == _ExcludeRotationOnY)
-					{
-						float rotationY = (float)GD.RandRange(MinRotationAngle, MaxRotationAngle);
-						Rot.Y = rotationY;
-					}
-
-					if (_RandomnizeRotation && false == _ExcludeRotationOnZ)
-					{
-						float rotationZ = (float)GD.RandRange(MinRotationAngle, MaxRotationAngle);
-						Rot.Z = rotationZ;
-					}
-
-					if (_RandomnizeRotation)
-					{
-						transform = UpdateRotation(transform, Rot);
-						_body.RotationDegrees = Rot;
-					}
-
-					if (_RandomnizeScale)
-					{
-						transform = UpdateScale(transform, Scale);
-						_body.Scale = Scale;
-					}
-
-					_MultiMesh.SetInstanceTransform(i, transform);
-				}
-			}
-			else
-			{
-				if (_RandomnizeRotation == false && _RandomnizeScale == false)
-				{
-					foreach (Node3D child in GetChildren())
-					{
-						if (IsInstanceValid(child))
-						{
-							child.RotationDegrees = new Vector3(0, 0, 0);
-							child.Scale = new Vector3(1, 1, 1);
-						}
-					}
-					return;
-				}
-
-				foreach (Node3D child in GetChildren())
-				{
-					if (IsInstanceValid(child))
-					{
-						float scale = (float)GD.RandRange(MinScale, MaxScale);
-						Vector3 Rot = child.RotationDegrees;
-						Vector3 Scale = child.Scale;
-
-						if (false == _ExcludeRotationOnX)
-						{
-							float rotationX = (float)GD.RandRange(MinRotationAngle, MaxRotationAngle);
-							Rot.X = rotationX;
-						}
-
-						if (false == _ExcludeRotationOnY)
-						{
-							float rotationY = (float)GD.RandRange(MinRotationAngle, MaxRotationAngle);
-							Rot.Y = rotationY;
-						}
-
-						if (false == _ExcludeRotationOnZ)
-						{
-							float rotationZ = (float)GD.RandRange(MinRotationAngle, MaxRotationAngle);
-							Rot.Z = rotationZ;
-						}
-
-						if (false == _ExcludeScaleOnX)
-						{
-							Scale.X = scale;
-						}
-
-						if (false == _ExcludeScaleOnY)
-						{
-							Scale.Y = scale;
-						}
-
-						if (false == _ExcludeScaleOnZ)
-						{
-							Scale.Z = scale;
-						}
-
-						if (_ExcludeRotationOnX && _ExcludeRotationOnY && _ExcludeRotationOnZ)
-						{
-							Rot.X = 0;
-							Rot.Y = 0;
-							Rot.Z = 0;
-						}
-
-						if (_ExcludeScaleOnX && _ExcludeScaleOnY && _ExcludeScaleOnZ)
-						{
-							Scale.X = 1;
-							Scale.Y = 1;
-							Scale.Z = 1;
-						}
-
-						child.RotationDegrees = Rot;
-						child.Scale = Scale;
-					}
+					RemoveChild(child);
+					child.Free();
 				}
 			}
 		}
 
 		/// <summary>
-		/// Updates the collision information for each instance in a MultiMeshInstance3D.
+		/// Overrides the _ExitTree method to perform additional cleanup.
 		/// </summary>
-		/// <param name="_MultiMeshInstance">The MultiMeshInstance3D to update collisions for.</param>
-		private void _UpdateMultiCollisions(MultiMeshInstance3D _MultiMeshInstance)
+		public override void _ExitTree()
 		{
-			int instanceCount = _MultiMeshInstance.Multimesh.InstanceCount;
-
-			for (int i = 0; i < instanceCount; i++)
+			if (null != _SceneRoot)
 			{
-				if (GetChildCount() > i + 1)
-				{
-					AsStaticBody3D _body = GetChild<AsStaticBody3D>(i + 1);
-					_body.Scale = _MultiMeshInstance.Multimesh.GetInstanceTransform(i).Basis.Scale;
-				}
-			}
-		}
-
-		/// <summary>
-		/// Updates the rotation of a transform based on the provided rotation degrees.
-		/// </summary>
-		/// <param name="transform">The transform to update.</param>
-		/// <param name="RotationDegrees">The rotation degrees to apply.</param>
-		/// <returns>The updated transform.</returns>
-		private Transform3D UpdateRotation(Transform3D transform, Vector3 RotationDegrees)
-		{
-			Vector3 currentTranslation = transform.Origin;
-			Transform3D newTransform = new(Basis.Identity, Vector3.Up);
-
-			// Save the original translation and scale
-			newTransform = newTransform.Rotated(Vector3.Right, Mathf.DegToRad(RotationDegrees.X));
-			newTransform = newTransform.Rotated(Vector3.Up, Mathf.DegToRad(RotationDegrees.Y));
-			newTransform = newTransform.Rotated(Vector3.Forward, Mathf.DegToRad(RotationDegrees.Z));
-
-			// Set back the original translation and scale
-			newTransform.Origin = currentTranslation;
-
-			List<Vector3> _List = new(_RotationBuffer)
-			{
-				RotationDegrees
-			};
-			_RotationBuffer = _List.ToArray();
-
-			return newTransform;
-		}
-
-		/// <summary>
-		/// Updates the scale of a transform based on the provided scale vector.
-		/// </summary>
-		/// <param name="transform">The transform to update.</param>
-		/// <param name="Scale">The scale vector to apply.</param>
-		/// <returns>The updated transform.</returns>
-		private Transform3D UpdateScale(Transform3D transform, Vector3 Scale)
-		{
-			// Save the original translation
-			Vector3 currentTranslation = transform.Origin;
-
-			if (_RandomnizeRotation == false)
-			{
-				transform = new(Basis.Identity, Vector3.Up);
+				_SceneRoot = null;
 			}
 
-			// Create a new basis with the desired scale
-			transform = transform.Scaled(Scale);
-			transform.Origin = currentTranslation;
-
-			List<Vector3> _List = new(_ScaleBuffer)
-			{
-				Scale
-			};
-			_ScaleBuffer = _List.ToArray();
-
-			return transform;
+			ClearCurrentChildren();
+			base._ExitTree();
 		}
-
+		
 		/// <summary>
 		/// Randomizes the rotation of child nodes.
 		/// </summary>
-		protected void RandomnizeChildrenRotation()
+		protected void _RandomnizeChildrenRotation()
 		{
 			var _child = GetChild(0);
 
@@ -689,7 +467,7 @@ namespace AssetSnap.Front.Nodes
 		/// <summary>
 		/// Randomizes the scale of child nodes.
 		/// </summary>
-		protected void RandomnizeChildrenScale()
+		protected void _RandomnizeChildrenScale()
 		{
 			var _child = GetChild(0);
 
@@ -798,32 +576,256 @@ namespace AssetSnap.Front.Nodes
 		}
 
 		/// <summary>
-		/// Clears all current child nodes.
+		/// Randomizes the rotation and scale of child nodes based on current settings.
 		/// </summary>
-		public void ClearCurrentChildren()
+		protected void Randomnize()
 		{
-			foreach (Node child in GetChildren())
+			if (GetChildCount() == 0)
 			{
-				if (IsInstanceValid(child))
+				return;
+			}
+
+			var _child = GetChild(0);
+			_RotationBuffer = Array.Empty<Vector3>();
+			_ScaleBuffer = Array.Empty<Vector3>();
+
+			if (_child is MultiMeshInstance3D childMulti)
+			{
+				MultiMesh _MultiMesh = childMulti.Multimesh;
+				int instanceCount = _MultiMesh.InstanceCount;
+
+				if (_RandomnizeRotation == false && _RandomnizeScale == false)
 				{
-					RemoveChild(child);
-					child.Free();
+					for (int i = 0; i < instanceCount; i++)
+					{
+						// Get the transform of the current instance
+						Transform3D transform = _MultiMesh.GetInstanceTransform(i);
+
+						transform = Transform3D.Identity.Translated(transform.Origin)
+											.Rotated(Vector3.Up, Mathf.DegToRad(0))
+											.Rotated(Vector3.Right, Mathf.DegToRad(0))
+											.Rotated(Vector3.Forward, Mathf.DegToRad(0))
+											.Scaled(new Vector3(1, 1, 1));
+
+						_MultiMesh.SetInstanceTransform(i, transform);
+
+						AsStaticBody3D _body = GetChild<AsStaticBody3D>(i + 1);
+
+						if (null != _body && IsInstanceValid(_body))
+						{
+							_body.Scale = new Vector3(1, 1, 1);
+						}
+					}
+					return;
+				}
+
+				for (int i = 0; i < instanceCount; i++)
+				{
+					float scale = (float)GD.RandRange(MinScale, MaxScale);
+					Vector3 Scale = new Vector3(1, 1, 1);
+					Vector3 Rot = new Vector3(0, 0, 0);
+					// Get the transform of the current instance
+					Transform3D transform = _MultiMesh.GetInstanceTransform(i);
+					AsStaticBody3D _body = GetChild<AsStaticBody3D>(i + 1);
+
+					if (_RandomnizeScale && false == _ExcludeScaleOnX)
+					{
+						Scale.X = scale;
+					}
+
+					if (_RandomnizeScale && false == _ExcludeScaleOnY)
+					{
+						Scale.Y = scale;
+					}
+
+					if (_RandomnizeScale && false == _ExcludeScaleOnZ)
+					{
+						Scale.Z = scale;
+					}
+
+					if (_RandomnizeRotation && false == _ExcludeRotationOnX)
+					{
+						float rotationX = (float)GD.RandRange(MinRotationAngle, MaxRotationAngle);
+						Rot.X = rotationX;
+					}
+
+					if (_RandomnizeRotation && false == _ExcludeRotationOnY)
+					{
+						float rotationY = (float)GD.RandRange(MinRotationAngle, MaxRotationAngle);
+						Rot.Y = rotationY;
+					}
+
+					if (_RandomnizeRotation && false == _ExcludeRotationOnZ)
+					{
+						float rotationZ = (float)GD.RandRange(MinRotationAngle, MaxRotationAngle);
+						Rot.Z = rotationZ;
+					}
+
+					if (_RandomnizeRotation)
+					{
+						transform = _UpdateRotation(transform, Rot);
+						_body.RotationDegrees = Rot;
+					}
+
+					if (_RandomnizeScale)
+					{
+						transform = _UpdateScale(transform, Scale);
+						_body.Scale = Scale;
+					}
+
+					_MultiMesh.SetInstanceTransform(i, transform);
+				}
+			}
+			else
+			{
+				if (_RandomnizeRotation == false && _RandomnizeScale == false)
+				{
+					foreach (Node3D child in GetChildren())
+					{
+						if (IsInstanceValid(child))
+						{
+							child.RotationDegrees = new Vector3(0, 0, 0);
+							child.Scale = new Vector3(1, 1, 1);
+						}
+					}
+					return;
+				}
+
+				foreach (Node3D child in GetChildren())
+				{
+					if (IsInstanceValid(child))
+					{
+						float scale = (float)GD.RandRange(MinScale, MaxScale);
+						Vector3 Rot = child.RotationDegrees;
+						Vector3 Scale = child.Scale;
+
+						if (false == _ExcludeRotationOnX)
+						{
+							float rotationX = (float)GD.RandRange(MinRotationAngle, MaxRotationAngle);
+							Rot.X = rotationX;
+						}
+
+						if (false == _ExcludeRotationOnY)
+						{
+							float rotationY = (float)GD.RandRange(MinRotationAngle, MaxRotationAngle);
+							Rot.Y = rotationY;
+						}
+
+						if (false == _ExcludeRotationOnZ)
+						{
+							float rotationZ = (float)GD.RandRange(MinRotationAngle, MaxRotationAngle);
+							Rot.Z = rotationZ;
+						}
+
+						if (false == _ExcludeScaleOnX)
+						{
+							Scale.X = scale;
+						}
+
+						if (false == _ExcludeScaleOnY)
+						{
+							Scale.Y = scale;
+						}
+
+						if (false == _ExcludeScaleOnZ)
+						{
+							Scale.Z = scale;
+						}
+
+						if (_ExcludeRotationOnX && _ExcludeRotationOnY && _ExcludeRotationOnZ)
+						{
+							Rot.X = 0;
+							Rot.Y = 0;
+							Rot.Z = 0;
+						}
+
+						if (_ExcludeScaleOnX && _ExcludeScaleOnY && _ExcludeScaleOnZ)
+						{
+							Scale.X = 1;
+							Scale.Y = 1;
+							Scale.Z = 1;
+						}
+
+						child.RotationDegrees = Rot;
+						child.Scale = Scale;
+					}
 				}
 			}
 		}
 
 		/// <summary>
-		/// Overrides the _ExitTree method to perform additional cleanup.
+		/// Updates the collision information for each instance in a MultiMeshInstance3D.
 		/// </summary>
-		public override void _ExitTree()
+		/// <param name="_MultiMeshInstance">The MultiMeshInstance3D to update collisions for.</param>
+		private void _UpdateMultiCollisions(MultiMeshInstance3D _MultiMeshInstance)
 		{
-			if (null != _SceneRoot)
+			int instanceCount = _MultiMeshInstance.Multimesh.InstanceCount;
+
+			for (int i = 0; i < instanceCount; i++)
 			{
-				_SceneRoot = null;
+				if (GetChildCount() > i + 1)
+				{
+					AsStaticBody3D _body = GetChild<AsStaticBody3D>(i + 1);
+					_body.Scale = _MultiMeshInstance.Multimesh.GetInstanceTransform(i).Basis.Scale;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Updates the rotation of a transform based on the provided rotation degrees.
+		/// </summary>
+		/// <param name="transform">The transform to update.</param>
+		/// <param name="RotationDegrees">The rotation degrees to apply.</param>
+		/// <returns>The updated transform.</returns>
+		private Transform3D _UpdateRotation(Transform3D transform, Vector3 RotationDegrees)
+		{
+			Vector3 currentTranslation = transform.Origin;
+			Transform3D newTransform = new(Basis.Identity, Vector3.Up);
+
+			// Save the original translation and scale
+			newTransform = newTransform.Rotated(Vector3.Right, Mathf.DegToRad(RotationDegrees.X));
+			newTransform = newTransform.Rotated(Vector3.Up, Mathf.DegToRad(RotationDegrees.Y));
+			newTransform = newTransform.Rotated(Vector3.Forward, Mathf.DegToRad(RotationDegrees.Z));
+
+			// Set back the original translation and scale
+			newTransform.Origin = currentTranslation;
+
+			List<Vector3> _List = new(_RotationBuffer)
+			{
+				RotationDegrees
+			};
+			_RotationBuffer = _List.ToArray();
+
+			return newTransform;
+		}
+
+		/// <summary>
+		/// Updates the scale of a transform based on the provided scale vector.
+		/// </summary>
+		/// <param name="transform">The transform to update.</param>
+		/// <param name="Scale">The scale vector to apply.</param>
+		/// <returns>The updated transform.</returns>
+		private Transform3D _UpdateScale(Transform3D transform, Vector3 Scale)
+		{
+			// Save the original translation
+			Vector3 currentTranslation = transform.Origin;
+
+			if (_RandomnizeRotation == false)
+			{
+				transform = new(Basis.Identity, Vector3.Up);
 			}
 
-			ClearCurrentChildren();
-			base._ExitTree();
+			// Create a new basis with the desired scale
+			transform = transform.Scaled(Scale);
+			transform.Origin = currentTranslation;
+
+			List<Vector3> _List = new(_ScaleBuffer)
+			{
+				Scale
+			};
+			_ScaleBuffer = _List.ToArray();
+
+			return transform;
 		}
 	}
 }

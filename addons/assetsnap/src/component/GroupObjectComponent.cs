@@ -61,7 +61,7 @@ namespace AssetSnap.Component
 			base.Initialize();
 		
 			_RegisterTraits();
-			Initiated = true;
+			_Initiated = true;
 			_InitializeFields();
 			_FinalizeFields();
 		}

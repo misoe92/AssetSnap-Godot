@@ -35,9 +35,9 @@ namespace AssetSnap.Front.Components
 	[Tool]
 	public partial class LibrariesListing : TraitableComponent
 	{
-		private readonly string TitleText = "Libraries";
-		private readonly string NotFoundText = "No folder libraries was found, to start using the addon add a folder first by using the button on the left with the label 'Add Library'.";
-		private int CurrentFolderCount = 0;
+		private readonly string _TitleText = "Libraries";
+		private readonly string _NotFoundText = "No folder libraries was found, to start using the addon add a folder first by using the button on the left with the label 'Add Library'.";
+		private int _CurrentFolderCount = 0;
 		private Godot.Collections.Array<BaseComponent> _Entries = new();
 
 		/// <summary>
@@ -47,7 +47,7 @@ namespace AssetSnap.Front.Components
 		{
 			Name = "LibrariesListing";
 			
-			UsingTraits = new()
+			_UsingTraits = new()
 			{
 				{ typeof(Labelable).ToString() },
 				{ typeof(Listable).ToString() },
@@ -79,7 +79,7 @@ namespace AssetSnap.Front.Components
 				return;
 			}
 			
-			CurrentFolderCount = _GlobalExplorer.Settings.FolderCount;
+			_CurrentFolderCount = _GlobalExplorer.Settings.FolderCount;
 				
 			if( null == Trait<Labelable>().Select(0).GetNode() ) 
 			{
@@ -87,7 +87,7 @@ namespace AssetSnap.Front.Components
 					.SetMargin(0, "bottom")
 					.SetName( "ListingTitle" )
 					.SetType( Labelable.TitleType.HeaderLarge)
-					.SetText( TitleText )
+					.SetText( _TitleText )
 					.Instantiate()
 					.Select(0)
 					.AddToContainer( this ) ;
@@ -184,13 +184,13 @@ namespace AssetSnap.Front.Components
 		private void _UpdateListTable()
 		{
 			if(
-				ExplorerUtils.Get().Settings.FolderCount == CurrentFolderCount
+				ExplorerUtils.Get().Settings.FolderCount == _CurrentFolderCount
 			) 
 			{
 				return; 
 			}
 
-			CurrentFolderCount = ExplorerUtils.Get().Settings.FolderCount;
+			_CurrentFolderCount = ExplorerUtils.Get().Settings.FolderCount;
 			
 			if( 
 				ExplorerUtils.Get()
@@ -233,7 +233,7 @@ namespace AssetSnap.Front.Components
 						if (null != component && IsInstanceValid(component) && component is LibrariesListingEntry _component)
 						{
 							string title = _GlobalExplorer.Settings.Folders[index];
-							_component.title = title;
+							_component.Title = title;
 							_component.Initialize();
 						}
 					}
@@ -269,7 +269,7 @@ namespace AssetSnap.Front.Components
 			Trait<Labelable>()
 				.SetName( "NotFoundText" )
 				.SetType(Labelable.TitleType.TextMedium)
-				.SetText(NotFoundText)
+				.SetText(_NotFoundText)
 				.SetAutoWrap( TextServer.AutowrapMode.Word )
 				.SetDimensions(400, 0)
 				.SetHorizontalSizeFlags(Control.SizeFlags.ShrinkBegin)

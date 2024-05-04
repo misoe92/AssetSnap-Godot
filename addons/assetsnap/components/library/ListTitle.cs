@@ -33,7 +33,7 @@ namespace AssetSnap.Front.Components.Library
 	[Tool]
 	public partial class ListTitle : LibraryComponent
 	{
-		private readonly string Title = "Library List";
+		private readonly string _Title = "Library List";
 		private	Label _Label;
 		
 		/// <summary>
@@ -43,7 +43,7 @@ namespace AssetSnap.Front.Components.Library
 		{
 			Name = "LibraryListTitle";
 			
-			UsingTraits = new()
+			_UsingTraits = new()
 			{
 				{ typeof(Labelable).ToString() },
 			};
@@ -57,11 +57,11 @@ namespace AssetSnap.Front.Components.Library
 		public override void Initialize()
 		{
 			base.Initialize();
-			Initiated = true;
+			_Initiated = true;
 			
 			Trait<Labelable>()
 				.SetName("LibraryListTitle")
-				.SetText(Title)
+				.SetText(_Title)
 				.SetType(Labelable.TitleType.HeaderMedium)
 				.SetMargin(2, "top")
 				.SetMargin(0, "bottom")	

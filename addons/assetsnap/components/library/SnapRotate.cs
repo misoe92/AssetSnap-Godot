@@ -38,7 +38,7 @@ namespace AssetSnap.Front.Components.Library
 		/// <summary>
 		/// A flag indicating whether rotation is active.
 		/// </summary>
-		public bool value = false;
+		public bool Value = false;
 		
 		/// <summary>
 		/// The rotation angle along the X-axis.
@@ -61,8 +61,8 @@ namespace AssetSnap.Front.Components.Library
 		public InputEvent CurrentEvent;
 
 		/// <summary>
-        /// Default constructor for SnapRotate.
-        /// </summary>
+		/// Default constructor for SnapRotate.
+		/// </summary>
 		public SnapRotate()
 		{
 			Name = "LibrarySnapRotate";
@@ -70,11 +70,11 @@ namespace AssetSnap.Front.Components.Library
 		}
 		
 		/// <summary>
-        /// Initialization of the SnapRotate component.
-        /// </summary>
+		/// Initialization of the SnapRotate component.
+		/// </summary>
 		public override void Initialize() 
 		{
-			UsingTraits = new(){};
+			_UsingTraits = new(){};
 			
 			base.Initialize();
 			
@@ -90,7 +90,7 @@ namespace AssetSnap.Front.Components.Library
 
 			ContextMenu.Base ContextMenu = ExplorerUtils.Get().ContextMenu;
 			
-			value = false;
+			Value = false;
 			RotationX = 0.0f;
 			RotationY = 0.0f;
 			RotationZ = 0.0f;
@@ -103,36 +103,9 @@ namespace AssetSnap.Front.Components.Library
 		}
 		
 		/// <summary>
-        /// Updates rotation values on input changes.
-        /// </summary>
-        /// <param name="which">The type of change.</param>
-		private void _OnListStateChange( string which ) 
-		{
-			if( null == ExplorerUtils.Get().ContextMenu ) 
-			{
-				return;
-			}
-			
-			if( which == "Rotate" )  
-			{
-				Vector3 _Rotation = ExplorerUtils.Get().ContextMenu.GetRotateValues();
-				
-				RotationX = _Rotation.X;
-				RotationY = _Rotation.Y;
-				RotationZ = _Rotation.Z;
-				
-				value = true; 
-			}
-			else 
-			{
-				value = false;
-			}
-		}
-		
-		/// <summary>
-        /// Handles input events for rotation.
-        /// </summary>
-        /// <param name="event">The input event.</param>
+		/// Handles input events for rotation.
+		/// </summary>
+		/// <param name="event">The input event.</param>
 		public override void _Input(InputEvent @event)
 		{
 			if(
@@ -155,132 +128,46 @@ namespace AssetSnap.Front.Components.Library
 			
 			Vector3 Value = Handle.RotationDegrees; 
 			
-			if( ShouldRotateAll(angle) ) 
+			if( _ShouldRotateAll(angle) ) 
 			{
-				DoRotateAll(Value, Handle);
+				_DoRotateAll(Value, Handle);
 				ExplorerUtils.Get().AllowScroll = Abstracts.AbstractExplorerBase.ScrollState.SCROLL_DISABLED;
 			}
-			else if( ShouldRotateX(angle) ) 
+			else if( _ShouldRotateX(angle) ) 
 			{
-				DoRotateX(Value, Handle);
+				_DoRotateX(Value, Handle);
 				ExplorerUtils.Get().AllowScroll = Abstracts.AbstractExplorerBase.ScrollState.SCROLL_DISABLED;
 			}
-			else if( ShouldRotateY(angle) ) 
+			else if( _ShouldRotateY(angle) ) 
 			{
-				DoRotateY(Value, Handle);
+				_DoRotateY(Value, Handle);
 				ExplorerUtils.Get().AllowScroll = Abstracts.AbstractExplorerBase.ScrollState.SCROLL_DISABLED;
 			}
-			else if( ShouldRotateZ(angle) ) 
+			else if( _ShouldRotateZ(angle) ) 
 			{
-				DoRotateZ(Value, Handle);
+				_DoRotateZ(Value, Handle);
 				ExplorerUtils.Get().AllowScroll = Abstracts.AbstractExplorerBase.ScrollState.SCROLL_DISABLED;
 			}
 		}
-		
+			
 		/// <summary>
-        /// Rotates the node on all angles.
-        /// </summary>
-        /// <param name="Rotation">The current rotation.</param>
-        /// <param name="Handle">The node handle.</param>
-		public void DoRotateAll( Vector3 Rotation, Node3D Handle )
+		/// Fetches the current rotation vector.
+		/// </summary>
+		/// <returns>The current rotation vector.</returns>
+		public Vector3 GetRotationVector() 
 		{
-			Vector3 _RotationDegrees = Handle.RotationDegrees;
-			if( IsWheelUp() ) 
-			{
-				
-				_RotationDegrees = Apply("X", _RotationDegrees, RotationX, 0);
-				_RotationDegrees = Apply("Y", _RotationDegrees, RotationY, 0);
-				_RotationDegrees = Apply("Z", _RotationDegrees, RotationZ, 0);
-					
-				RotationX = _RotationDegrees.X;
-				RotationY = _RotationDegrees.Y;
-				RotationZ = _RotationDegrees.Z;
-			}
-			else if( IsWheelDown() ) 
-			{
-				_RotationDegrees = Apply("X", _RotationDegrees, RotationX, 0, true);
-				_RotationDegrees = Apply("Y", _RotationDegrees, RotationY, 0, true);
-				_RotationDegrees = Apply("Z", _RotationDegrees, RotationZ, 0, true);
-				
-				RotationX = _RotationDegrees.X;
-				RotationY = _RotationDegrees.Y;
-				RotationZ = _RotationDegrees.Z;
-			}
-			ExplorerUtils.Get().ContextMenu.SetRotationValues(_RotationDegrees);
+			return new Vector3(RotationX, RotationY, RotationZ);
 		}
 		
 		/// <summary>
-        /// Rotates the node along the X-axis.
-        /// </summary>
-        /// <param name="Rotation">The current rotation.</param>
-        /// <param name="Handle">The node handle.</param>
-		public void DoRotateX( Vector3 Rotation, Node3D Handle )
-		{
-			if( IsWheelUp() ) 
-			{
-				Vector3 _RotationDegrees = Apply("X", Rotation, RotationX, 0);
-				RotationX = _RotationDegrees.X;
-				ExplorerUtils.Get().ContextMenu.SetRotationValues(_RotationDegrees);
-			}
-			else if( IsWheelDown() )
-			{
-				Vector3 _RotationDegrees = Apply("X", Rotation, RotationX, 0, true);
-				RotationX = _RotationDegrees.X;
-				ExplorerUtils.Get().ContextMenu.SetRotationValues(_RotationDegrees);
-			}
-		}
-		
-		/// <summary>
-        /// Rotates the node along the Y-axis.
-        /// </summary>
-        /// <param name="Rotation">The current rotation.</param>
-        /// <param name="Handle">The node handle.</param>
-		public void DoRotateY( Vector3 Rotation, Node3D Handle )
-		{
-			if( IsWheelUp() ) 
-			{
-				Vector3 _RotationDegrees = Apply("Y", Rotation, RotationY, 0);
-				RotationY = _RotationDegrees.Y;
-				ExplorerUtils.Get().ContextMenu.SetRotationValues(_RotationDegrees);
-			}
-			else if( IsWheelDown() ) 
-			{
-				Vector3 _RotationDegrees = Apply("Y", Rotation, RotationY, 0, true);
-				RotationY = _RotationDegrees.Y;
-				ExplorerUtils.Get().ContextMenu.SetRotationValues(_RotationDegrees);
-			}
-		}
-		
-		/// <summary>
-        /// Rotates the node along the Z-axis.
-        /// </summary>
-        /// <param name="Rotation">The current rotation.</param>
-        /// <param name="Handle">The node handle.</param>
-		public void DoRotateZ( Vector3 Rotation, Node3D Handle )
-		{
-			if( IsWheelUp() ) 	
-			{
-				Vector3 _RotationDegrees = Apply("Z", Rotation, RotationZ, 0);
-				RotationZ = _RotationDegrees.Z;
-				ExplorerUtils.Get().ContextMenu.SetRotationValues(_RotationDegrees);
-			}
-			else if( IsWheelDown() )
-			{
-				Vector3 _RotationDegrees = Apply("Z", Rotation, RotationZ, 0, true);
-				RotationZ = _RotationDegrees.Z;
-				ExplorerUtils.Get().ContextMenu.SetRotationValues(_RotationDegrees);
-			}
-		}
-		
-		/// <summary>
-        /// Applies the rotation changes.
-        /// </summary>
-        /// <param name="angle">The angle of rotation.</param>
-        /// <param name="Rotation">The current rotation.</param>
-        /// <param name="CurrentAngleRotation">The current angle of rotation.</param>
-        /// <param name="_default">The default rotation value.</param>
-        /// <param name="reverse">Whether to reverse the rotation.</param>
-        /// <returns>The updated rotation vector.</returns>
+		/// Applies the rotation changes.
+		/// </summary>
+		/// <param name="angle">The angle of rotation.</param>
+		/// <param name="Rotation">The current rotation.</param>
+		/// <param name="CurrentAngleRotation">The current angle of rotation.</param>
+		/// <param name="_default">The default rotation value.</param>
+		/// <param name="reverse">Whether to reverse the rotation.</param>
+		/// <returns>The updated rotation vector.</returns>
 		public Vector3 Apply( string angle, Vector3 Rotation, float CurrentAngleRotation, float _default, bool reverse = false )
 		{
 			bool specific = false;
@@ -350,10 +237,131 @@ namespace AssetSnap.Front.Components.Library
 		}
 		
 		/// <summary>
-        /// Checks if the mouse wheel up event is active.
+        /// Updates rotation values on input changes.
         /// </summary>
-        /// <returns>True if mouse wheel up is active, false otherwise.</returns>
-		public bool IsWheelUp()
+        /// <param name="which">The type of change.</param>
+		private void _OnListStateChange( string which ) 
+		{
+			if( null == ExplorerUtils.Get().ContextMenu ) 
+			{
+				return;
+			}
+			
+			if( which == "Rotate" )  
+			{
+				Vector3 _Rotation = ExplorerUtils.Get().ContextMenu.GetRotateValues();
+				
+				RotationX = _Rotation.X;
+				RotationY = _Rotation.Y;
+				RotationZ = _Rotation.Z;
+				
+				Value = true; 
+			}
+			else 
+			{
+				Value = false;
+			}
+		}
+		
+		/// <summary>
+		/// Rotates the node on all angles.
+		/// </summary>
+		/// <param name="Rotation">The current rotation.</param>
+		/// <param name="Handle">The node handle.</param>
+		private void _DoRotateAll( Vector3 Rotation, Node3D Handle )
+		{
+			Vector3 _RotationDegrees = Handle.RotationDegrees;
+			if( _IsWheelUp() ) 
+			{
+				_RotationDegrees = Apply("X", _RotationDegrees, RotationX, 0);
+				_RotationDegrees = Apply("Y", _RotationDegrees, RotationY, 0);
+				_RotationDegrees = Apply("Z", _RotationDegrees, RotationZ, 0);
+					
+				RotationX = _RotationDegrees.X;
+				RotationY = _RotationDegrees.Y;
+				RotationZ = _RotationDegrees.Z;
+			}
+			else if( _IsWheelDown() ) 
+			{
+				_RotationDegrees = Apply("X", _RotationDegrees, RotationX, 0, true);
+				_RotationDegrees = Apply("Y", _RotationDegrees, RotationY, 0, true);
+				_RotationDegrees = Apply("Z", _RotationDegrees, RotationZ, 0, true);
+				
+				RotationX = _RotationDegrees.X;
+				RotationY = _RotationDegrees.Y;
+				RotationZ = _RotationDegrees.Z;
+			}
+			ExplorerUtils.Get().ContextMenu.SetRotationValues(_RotationDegrees);
+		}
+		
+		/// <summary>
+		/// Rotates the node along the X-axis.
+		/// </summary>
+		/// <param name="Rotation">The current rotation.</param>
+		/// <param name="Handle">The node handle.</param>
+		private void _DoRotateX( Vector3 Rotation, Node3D Handle )
+		{
+			if( _IsWheelUp() ) 
+			{
+				Vector3 _RotationDegrees = Apply("X", Rotation, RotationX, 0);
+				RotationX = _RotationDegrees.X;
+				ExplorerUtils.Get().ContextMenu.SetRotationValues(_RotationDegrees);
+			}
+			else if( _IsWheelDown() )
+			{
+				Vector3 _RotationDegrees = Apply("X", Rotation, RotationX, 0, true);
+				RotationX = _RotationDegrees.X;
+				ExplorerUtils.Get().ContextMenu.SetRotationValues(_RotationDegrees);
+			}
+		}
+		
+		/// <summary>
+		/// Rotates the node along the Y-axis.
+		/// </summary>
+		/// <param name="Rotation">The current rotation.</param>
+		/// <param name="Handle">The node handle.</param>
+		private void _DoRotateY( Vector3 Rotation, Node3D Handle )
+		{
+			if( _IsWheelUp() ) 
+			{
+				Vector3 _RotationDegrees = Apply("Y", Rotation, RotationY, 0);
+				RotationY = _RotationDegrees.Y;
+				ExplorerUtils.Get().ContextMenu.SetRotationValues(_RotationDegrees);
+			}
+			else if( _IsWheelDown() ) 
+			{
+				Vector3 _RotationDegrees = Apply("Y", Rotation, RotationY, 0, true);
+				RotationY = _RotationDegrees.Y;
+				ExplorerUtils.Get().ContextMenu.SetRotationValues(_RotationDegrees);
+			}
+		}
+		
+		/// <summary>
+		/// Rotates the node along the Z-axis.
+		/// </summary>
+		/// <param name="Rotation">The current rotation.</param>
+		/// <param name="Handle">The node handle.</param>
+		private void _DoRotateZ( Vector3 Rotation, Node3D Handle )
+		{
+			if( _IsWheelUp() ) 	
+			{
+				Vector3 _RotationDegrees = Apply("Z", Rotation, RotationZ, 0);
+				RotationZ = _RotationDegrees.Z;
+				ExplorerUtils.Get().ContextMenu.SetRotationValues(_RotationDegrees);
+			}
+			else if( _IsWheelDown() )
+			{
+				Vector3 _RotationDegrees = Apply("Z", Rotation, RotationZ, 0, true);
+				RotationZ = _RotationDegrees.Z;
+				ExplorerUtils.Get().ContextMenu.SetRotationValues(_RotationDegrees);
+			}
+		}
+		
+		/// <summary>
+		/// Checks if the mouse wheel up event is active.
+		/// </summary>
+		/// <returns>True if mouse wheel up is active, false otherwise.</returns>
+		private bool _IsWheelUp()
 		{
 			if( CurrentEvent is InputEventMouseButton MouseButtonEvent ) 
 			{
@@ -364,10 +372,10 @@ namespace AssetSnap.Front.Components.Library
 		}
 		
 		/// <summary>
-        /// Checks if the mouse wheel down event is active.
-        /// </summary>
-        /// <returns>True if mouse wheel down is active, false otherwise.</returns>
-		public bool IsWheelDown()
+		/// Checks if the mouse wheel down event is active.
+		/// </summary>
+		/// <returns>True if mouse wheel down is active, false otherwise.</returns>
+		private bool _IsWheelDown()
 		{
 			if( CurrentEvent is InputEventMouseButton MouseButtonEvent ) 
 			{
@@ -378,13 +386,13 @@ namespace AssetSnap.Front.Components.Library
 		} 
 		
 		/// <summary>
-        /// Checks if rotation on all angles should occur.
-        /// </summary>
-        /// <param name="angle">The angle of rotation.</param>
-        /// <returns>True if rotation on all angles should occur, false otherwise.</returns>
-		public bool ShouldRotateAll( int angle ) 
+		/// Checks if rotation on all angles should occur.
+		/// </summary>
+		/// <param name="angle">The angle of rotation.</param>
+		/// <returns>True if rotation on all angles should occur, false otherwise.</returns>
+		private bool _ShouldRotateAll( int angle ) 
 		{
-			if( value == true && CurrentEvent is InputEventMouseButton MouseButtonEvent ) 
+			if( Value == true && CurrentEvent is InputEventMouseButton MouseButtonEvent ) 
 			{
 				if( MouseButtonEvent.AltPressed && MouseButtonEvent.ShiftPressed ) 
 				{
@@ -396,13 +404,13 @@ namespace AssetSnap.Front.Components.Library
 		}
 		
 		/// <summary>
-        /// Checks if rotation on the X-axis should occur.
-        /// </summary>
-        /// <param name="angle">The angle of rotation.</param>
-        /// <returns>True if rotation on the X-axis should occur, false otherwise.</returns>
-		public bool ShouldRotateX( int angle ) 
+		/// Checks if rotation on the X-axis should occur.
+		/// </summary>
+		/// <param name="angle">The angle of rotation.</param>
+		/// <returns>True if rotation on the X-axis should occur, false otherwise.</returns>
+		private bool _ShouldRotateX( int angle ) 
 		{
-			if( value == true && CurrentEvent is InputEventMouseButton MouseButtonEvent ) 
+			if( Value == true && CurrentEvent is InputEventMouseButton MouseButtonEvent ) 
 			{
 				if( MouseButtonEvent.AltPressed && MouseButtonEvent.ShiftPressed ) 
 				{
@@ -414,13 +422,13 @@ namespace AssetSnap.Front.Components.Library
 		}
 		
 		/// <summary>
-        /// Checks if rotation on the Y-axis should occur.
-        /// </summary>
-        /// <param name="angle">The angle of rotation.</param>
-        /// <returns>True if rotation on the Y-axis should occur, false otherwise.</returns>
-		public bool ShouldRotateY( int angle ) 
+		/// Checks if rotation on the Y-axis should occur.
+		/// </summary>
+		/// <param name="angle">The angle of rotation.</param>
+		/// <returns>True if rotation on the Y-axis should occur, false otherwise.</returns>
+		private bool _ShouldRotateY( int angle ) 
 		{
-			if( value == true && CurrentEvent is InputEventMouseButton MouseButtonEvent ) 
+			if( Value == true && CurrentEvent is InputEventMouseButton MouseButtonEvent ) 
 			{
 				if( MouseButtonEvent.AltPressed && MouseButtonEvent.ShiftPressed ) 
 				{
@@ -432,13 +440,13 @@ namespace AssetSnap.Front.Components.Library
 		}
 		
 		/// <summary>
-        /// Checks if rotation on the Z-axis should occur.
-        /// </summary>
-        /// <param name="angle">The angle of rotation.</param>
-        /// <returns>True if rotation on the Z-axis should occur, false otherwise.</returns>
-		public bool ShouldRotateZ( int angle ) 
+		/// Checks if rotation on the Z-axis should occur.
+		/// </summary>
+		/// <param name="angle">The angle of rotation.</param>
+		/// <returns>True if rotation on the Z-axis should occur, false otherwise.</returns>
+		private bool _ShouldRotateZ( int angle ) 
 		{
-			if( value == true && CurrentEvent is InputEventMouseButton MouseButtonEvent ) 
+			if( Value == true && CurrentEvent is InputEventMouseButton MouseButtonEvent ) 
 			{
 				if( MouseButtonEvent.AltPressed && MouseButtonEvent.ShiftPressed ) 
 				{
@@ -450,21 +458,12 @@ namespace AssetSnap.Front.Components.Library
 		}
 
 		/// <summary>
-        /// Checks if the rotation state is currently active.
-        /// </summary>
-        /// <returns>True if rotation is active, false otherwise.</returns>
-		public bool IsActive()
+		/// Checks if the rotation state is currently active.
+		/// </summary>
+		/// <returns>True if rotation is active, false otherwise.</returns>
+		private bool _IsActive()
 		{
-			return value == true;
-		}
-		
-		/// <summary>
-        /// Fetches the current rotation vector.
-        /// </summary>
-        /// <returns>The current rotation vector.</returns>
-		public Vector3 GetRotationVector() 
-		{
-			return new Vector3(RotationX, RotationY, RotationZ);
+			return Value == true;
 		}
 	}
 }

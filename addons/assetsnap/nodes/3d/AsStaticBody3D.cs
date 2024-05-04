@@ -32,11 +32,7 @@ namespace AssetSnap.Front.Nodes
 	[Tool]
 	public partial class AsStaticBody3D : StaticBody3D
 	{
-		private bool IsModelPlaced { get; set; } = false;
-		private Vector3 InstanceOrigin;
-
 		[ExportGroup("Settings")]
-
 		/// <summary>
 		/// The parent node for this static body.
 		/// </summary>
@@ -67,22 +63,15 @@ namespace AssetSnap.Front.Nodes
 		[Export]
 		public bool UsingMultiMesh { get; set; } = false;
 
-
+		private bool _IsModelPlaced { get; set; } = false;
+		private Vector3 _InstanceOrigin;
+		
 		/// <summary>
 		/// Constructor for AsStaticBody3D class.
 		/// </summary>
 		public AsStaticBody3D()
 		{
 			SetMeta("AsBody", true);
-		}
-
-		/// <summary>
-		/// Checks if the node has been placed in the scene.
-		/// </summary>
-		/// <returns>True if the node has been placed, false otherwise.</returns>
-		public bool IsPlaced()
-		{
-			return GetParent() != null;
 		}
 
 		/// <summary>
@@ -102,7 +91,7 @@ namespace AssetSnap.Front.Nodes
 					AsMultiMeshInstance3D asMultiMeshInstance3D = Parent as AsMultiMeshInstance3D;
 					for (int i = 0; i < asMultiMeshInstance3D.Multimesh.InstanceCount; i++)
 					{
-						InstanceOrigin = asMultiMeshInstance3D.Multimesh.GetInstanceTransform(i).Origin;
+						_InstanceOrigin = asMultiMeshInstance3D.Multimesh.GetInstanceTransform(i).Origin;
 						_InitializeCollisionInstance();
 					}
 				}
@@ -149,6 +138,15 @@ namespace AssetSnap.Front.Nodes
 			// Initialize the collisions again
 			Initialize();
 		}
+		
+		/// <summary>
+		/// Checks if the node has been placed in the scene.
+		/// </summary>
+		/// <returns>True if the node has been placed, false otherwise.</returns>
+		public bool IsPlaced()
+		{
+			return GetParent() != null;
+		}
 
 		/// <summary>
 		/// Initializes the collision instance based on the specified collision type.
@@ -190,7 +188,7 @@ namespace AssetSnap.Front.Nodes
 			try
 			{
 				Aabb _aabb = ModelAabb;
-				Shape3D _Shape = CreateSimpleShape(IsSphere);
+				Shape3D _Shape = _CreateSimpleShape(IsSphere);
 				CollisionShape3D _Collision = new()
 				{
 					Name = "Collision",
@@ -216,7 +214,7 @@ namespace AssetSnap.Front.Nodes
 		/// </summary>
 		/// <param name="IsSphere">Specifies whether to create a sphere shape.</param>
 		/// <returns>The created shape.</returns>
-		private Shape3D CreateSimpleShape(bool IsSphere)
+		private Shape3D _CreateSimpleShape(bool IsSphere)
 		{
 			Shape3D _Shape = null;
 
@@ -307,9 +305,9 @@ namespace AssetSnap.Front.Nodes
 
 			if (UsingMultiMesh)
 			{
-				ColTrans.Origin.X = InstanceOrigin.X;
-				ColTrans.Origin.Y = InstanceOrigin.Y;
-				ColTrans.Origin.Z = InstanceOrigin.Z;
+				ColTrans.Origin.X = _InstanceOrigin.X;
+				ColTrans.Origin.Y = _InstanceOrigin.Y;
+				ColTrans.Origin.Z = _InstanceOrigin.Z;
 			}
 
 			_Collision.Transform = ColTrans;
@@ -346,7 +344,7 @@ namespace AssetSnap.Front.Nodes
 		{
 			// We merely need to add it to our main node
 			// since we have no children
-			CollisionShape3D _Collision = CreateConcaveCollision();
+			CollisionShape3D _Collision = _CreateConcaveCollision();
 
 			AddChild(_Collision, true);
 			_Collision.Owner = Tree.EditedSceneRoot;
@@ -357,7 +355,7 @@ namespace AssetSnap.Front.Nodes
 		/// Creates a concave collision shape.
 		/// </summary>
 		/// <returns>The concave collision shape.</returns>
-		private CollisionShape3D CreateConcaveCollision()
+		private CollisionShape3D _CreateConcaveCollision()
 		{
 			ConcavePolygonShape3D _Shape = new();
 
@@ -385,9 +383,9 @@ namespace AssetSnap.Front.Nodes
 
 			if (UsingMultiMesh)
 			{
-				ColTrans.Origin.X = InstanceOrigin.X;
-				ColTrans.Origin.Y = InstanceOrigin.Y;
-				ColTrans.Origin.Z = InstanceOrigin.Z;
+				ColTrans.Origin.X = _InstanceOrigin.X;
+				ColTrans.Origin.Y = _InstanceOrigin.Y;
+				ColTrans.Origin.Z = _InstanceOrigin.Z;
 			}
 
 			_Collision.Transform = ColTrans;
@@ -416,9 +414,9 @@ namespace AssetSnap.Front.Nodes
 
 			if (UsingMultiMesh)
 			{
-				ColTrans.Origin.X = InstanceOrigin.X;
-				ColTrans.Origin.Y = InstanceOrigin.Y;
-				ColTrans.Origin.Z = InstanceOrigin.Z;
+				ColTrans.Origin.X = _InstanceOrigin.X;
+				ColTrans.Origin.Y = _InstanceOrigin.Y;
+				ColTrans.Origin.Z = _InstanceOrigin.Z;
 			}
 
 			ColTrans.Origin.Y += aabb.Size.Y / 2;
@@ -432,14 +430,6 @@ namespace AssetSnap.Front.Nodes
 		private void _ApplyCollisionMeta(CollisionShape3D _Collision)
 		{
 			_Collision.SetMeta("AsCollision", true);
-		}
-
-		/// <summary>
-		/// Called when the node is about to be removed from the scene tree.
-		/// </summary>
-		public override void _ExitTree()
-		{
-			base._ExitTree();
 		}
 	}
 }

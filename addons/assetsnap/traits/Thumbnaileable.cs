@@ -21,6 +21,7 @@
 // SOFTWARE.
 
 #if TOOLS
+
 using System.Collections.Generic;
 using AssetSnap.Front.Nodes;
 using AssetSnap.Nodes;
@@ -32,12 +33,9 @@ namespace AssetSnap.Component
 	[Tool]
 	public partial class Thumbnaileable : ContainerTrait
 	{
-		/*
-		** Private
-		*/
-		private TextureRect.ExpandModeEnum ExpandMode = TextureRect.ExpandModeEnum.KeepSize;
-		private TextureRect.StretchModeEnum StretchMode = TextureRect.StretchModeEnum.Keep;
-		private string FilePath;
+		private string _FilePath;
+		private TextureRect.ExpandModeEnum _ExpandMode = TextureRect.ExpandModeEnum.KeepSize;
+		private TextureRect.StretchModeEnum _StretchMode = TextureRect.StretchModeEnum.Keep;
 
 		
 		/* The `public Thumbnaileable()` constructor in the C# code snippet is initializing the
@@ -49,6 +47,29 @@ namespace AssetSnap.Component
 		{
 			Name = "Thumbnaileable";
 			TypeString = GetType().ToString();
+		}
+		
+		/// <summary>
+		/// The function AddToContainer adds the currently chosen thumbnail to a specified container in C#.
+		/// </summary>
+		/// <param name="Node">In the provided code snippet, the `Node Container` parameter represents a node
+		/// that serves as the container where the currently chosen thumbnail will be added. This method
+		/// `AddToContainer` is responsible for adding the thumbnail to the specified container node.</param>
+		/// <returns>
+		/// The code snippet provided is a method named `AddToContainer` that adds the currently chosen
+		/// thumbnail to a specified container.
+		/// </returns>
+		public void AddToContainer(Node Container)
+		{
+			if (false == Dependencies.ContainsKey(TraitName + "_MarginContainer"))
+			{
+				GD.PushError("Container was not found @ AddToContainer");
+				GD.PushError("AddToContainer::Keys-> ", Dependencies.Keys);
+				GD.PushError("AddToContainer::ADDTO-> ", TraitName + "_MarginContainer");
+				return;
+			}
+
+			base._AddToContainer(Container, Dependencies[TraitName + "_MarginContainer"].As<MarginContainer>());
 		}
 
 		/// <summary>
@@ -67,12 +88,12 @@ namespace AssetSnap.Component
 			AsModelViewerRect _TextureRect = new()
 			{
 				Name = TraitName + "-Preview",
-				ExpandMode = ExpandMode,
-				StretchMode = StretchMode,
+				ExpandMode = _ExpandMode,
+				StretchMode = _StretchMode,
 				CustomMinimumSize = new Vector2I(62, 62)
 			};
 
-			List<string> folderList = new(FilePath.Split("/"));
+			List<string> folderList = new(_FilePath.Split("/"));
 			string FileName = folderList.ToArray()[folderList.Count - 1];
 			string LibraryName = folderList.ToArray()[folderList.Count - 2];
 			folderList.RemoveAt(folderList.Count - 1);
@@ -92,8 +113,8 @@ namespace AssetSnap.Component
 
 			Dependencies[TraitName + "_WorkingNode"] = _TextureRect;
 
-			Plugin.Singleton.traitGlobal.AddInstance(Iteration, _TextureRect, OwnerName, TypeString, Dependencies);
-			Plugin.Singleton.traitGlobal.AddName(Iteration, TraitName, OwnerName, TypeString);
+			Plugin.Singleton.TraitGlobal.AddInstance(Iteration, _TextureRect, OwnerName, TypeString, Dependencies);
+			Plugin.Singleton.TraitGlobal.AddName(Iteration, TraitName, OwnerName, TypeString);
 
 			Reset();
 			Iteration += 1;
@@ -120,7 +141,7 @@ namespace AssetSnap.Component
 
 			if (false != Dependencies.ContainsKey(TraitName + "_WorkingNode"))
 			{
-				Godot.Collections.Dictionary<string, Variant> dependencies = Plugin.Singleton.traitGlobal.GetDependencies(index, TypeString, OwnerName);
+				Godot.Collections.Dictionary<string, Variant> dependencies = Plugin.Singleton.TraitGlobal.GetDependencies(index, TypeString, OwnerName);
 				Dependencies = dependencies;
 			}
 
@@ -152,29 +173,6 @@ namespace AssetSnap.Component
 		}
 
 		/// <summary>
-		/// The function AddToContainer adds the currently chosen thumbnail to a specified container in C#.
-		/// </summary>
-		/// <param name="Node">In the provided code snippet, the `Node Container` parameter represents a node
-		/// that serves as the container where the currently chosen thumbnail will be added. This method
-		/// `AddToContainer` is responsible for adding the thumbnail to the specified container node.</param>
-		/// <returns>
-		/// The code snippet provided is a method named `AddToContainer` that adds the currently chosen
-		/// thumbnail to a specified container.
-		/// </returns>
-		public void AddToContainer(Node Container)
-		{
-			if (false == Dependencies.ContainsKey(TraitName + "_MarginContainer"))
-			{
-				GD.PushError("Container was not found @ AddToContainer");
-				GD.PushError("AddToContainer::Keys-> ", Dependencies.Keys);
-				GD.PushError("AddToContainer::ADDTO-> ", TraitName + "_MarginContainer");
-				return;
-			}
-
-			base._AddToContainer(Container, Dependencies[TraitName + "_MarginContainer"].As<MarginContainer>());
-		}
-
-		/// <summary>
 		/// This C# function sets the name of the thumbnail and returns the object implementing the Thumbnaileable
 		/// interface.
 		/// </summary>
@@ -201,7 +199,7 @@ namespace AssetSnap.Component
 		/// </returns>
 		public Thumbnaileable SetFilePath(string path)
 		{
-			FilePath = path;
+			_FilePath = path;
 
 			return this;
 		}
@@ -268,7 +266,7 @@ namespace AssetSnap.Component
 		/// </returns>
 		public Thumbnaileable SetExpandMode(TextureRect.ExpandModeEnum mode)
 		{
-			ExpandMode = mode;
+			_ExpandMode = mode;
 
 			return this;
 		}
@@ -284,7 +282,7 @@ namespace AssetSnap.Component
 		/// </returns>
 		public Thumbnaileable SetStretchMode(TextureRect.StretchModeEnum mode)
 		{
-			StretchMode = mode;
+			_StretchMode = mode;
 
 			return this;
 		}

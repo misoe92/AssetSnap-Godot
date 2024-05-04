@@ -49,7 +49,7 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		/// <summary>
 		/// Gets or sets the title of the listing entry.
 		/// </summary>
-		public string title { get; set; }
+		public string Title { get; set; }
 
 		/// <summary>
 		/// The container for removing a row.
@@ -84,7 +84,12 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		/// <summary>
 		/// The title label.
 		/// </summary>
-		public Label Title;
+		public Label TitleLabel;
+		
+		/// <summary>
+		/// The title label.
+		/// </summary>
+		public Label RemoveLabel;
 		
 		/// <summary>
 		/// The inner row container.
@@ -114,12 +119,12 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		/// <summary>
 		/// The active theme.
 		/// </summary>
-		private readonly Theme ActiveTheme = GD.Load<Theme>("res://addons/assetsnap/assets/themes/SnapThemeActiveGroup.tres");
+		private readonly Theme _ActiveTheme = GD.Load<Theme>("res://addons/assetsnap/assets/themes/SnapThemeActiveGroup.tres");
 
 		/// <summary>
 		/// The root sidebar list.
 		/// </summary>
-		private readonly List<string> RootSidebar = new()
+		private readonly List<string> _RootSidebar = new()
 		{
 			"Groups.Builder.Sidebar",
 		};
@@ -127,7 +132,7 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		/// <summary>
 		/// The group editor list.
 		/// </summary>
-		private readonly List<string> GroupEditor = new()
+		private readonly List<string> _GroupEditor = new()
 		{
 			"Groups.Builder.Editor",
 		};
@@ -139,7 +144,7 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		{
 			base.Initialize();
 
-			Initiated = true;
+			_Initiated = true;
 
 			OuterMarginContainer = new()
 			{
@@ -193,16 +198,16 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		{
 			Component.Base Components = _GlobalExplorer.Components;
 
-			if (Components.HasAll(GroupEditor.ToArray()))
+			if (Components.HasAll(_GroupEditor.ToArray()))
 			{
 				Editor Editor = Components.Single<Editor>();
 				Editor.GroupPath = null;
 			}
 
-			if (Components.HasAll(RootSidebar.ToArray()))
+			if (Components.HasAll(_RootSidebar.ToArray()))
 			{
 				Sidebar _Sidebar = Components.Single<Sidebar>();
-				_Sidebar.UnFocusGroup(title);
+				_Sidebar.UnFocusGroup(Title);
 			}
 		}
 
@@ -213,16 +218,16 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		{
 			Component.Base Components = _GlobalExplorer.Components;
 
-			if (Components.HasAll(GroupEditor.ToArray()))
+			if (Components.HasAll(_GroupEditor.ToArray()))
 			{
 				Editor Editor = Components.Single<Editor>();
-				Editor.GroupPath = title;
+				Editor.GroupPath = Title;
 			}
 
-			if (Components.HasAll(RootSidebar.ToArray()))
+			if (Components.HasAll(_RootSidebar.ToArray()))
 			{
 				Sidebar _Sidebar = Components.Single<Sidebar>();
-				_Sidebar.FocusGroup(title);
+				_Sidebar.FocusGroup(Title);
 			}
 		}
 
@@ -231,7 +236,7 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		/// </summary>
 		public void Focus()
 		{
-			_PanelContainer.Theme = ActiveTheme;
+			_PanelContainer.Theme = _ActiveTheme;
 		}
 
 		/// <summary>
@@ -247,13 +252,13 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		/// </summary>
 		private void _SetupTitle()
 		{
-			Title = new()
+			TitleLabel = new()
 			{
-				Text = _FormatTitle(title),
+				Text = _FormatTitle(Title),
 				SizeFlagsHorizontal = Control.SizeFlags.ExpandFill
 			};
 
-			Row.AddChild(Title);
+			Row.AddChild(TitleLabel);
 		}
 
 		/// <summary>
@@ -270,14 +275,14 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			_RemoveTitleContainer.AddThemeConstantOverride("margin_top", 2);
 			_RemoveTitleContainer.AddThemeConstantOverride("margin_bottom", 2);
 
-			Title = new()
+			RemoveLabel = new()
 			{
 				Text = "Are you sure you wish to continue?",
 				ThemeTypeVariation = "HeaderSmall",
 				SizeFlagsHorizontal = Control.SizeFlags.ExpandFill
 			};
 
-			_RemoveTitleContainer.AddChild(Title);
+			_RemoveTitleContainer.AddChild(RemoveLabel);
 			RemoveRow.AddChild(_RemoveTitleContainer);
 		}
 
@@ -420,25 +425,25 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		private void _OnConfirmRemoveGroup()
 		{
 			Component.Base Components = ExplorerUtils.Get().Components;
-			if (Components.HasAll(RootSidebar.ToArray()))
+			if (Components.HasAll(_RootSidebar.ToArray()))
 			{
 				Sidebar _Sidebar = Components.Single<Sidebar>();
-				_Sidebar.RemoveGroup(title);
+				_Sidebar.RemoveGroup(Title);
 				_Sidebar.RefreshExistingGroups();
 			}
 		}
 
 		/// <summary>
-        /// Handles the selection of the group.
-        /// </summary>
+		/// Handles the selection of the group.
+		/// </summary>
 		private void _OnSelectGroup()
 		{
 			Component.Base Components = ExplorerUtils.Get().Components;
 
-			if (Components.HasAll(GroupEditor.ToArray()))
+			if (Components.HasAll(_GroupEditor.ToArray()))
 			{
 				Editor Editor = Components.Single<Editor>();
-				Editor.GroupPath = title;
+				Editor.GroupPath = Title;
 
 
 				StatesUtils.Get().Group = Editor.Group;
@@ -448,7 +453,7 @@ namespace AssetSnap.Front.Components.Groups.Builder
 				StatesUtils.Get().CurrentLibrary = null;
 			}
 
-			if (Components.HasAll(RootSidebar.ToArray()))
+			if (Components.HasAll(_RootSidebar.ToArray()))
 			{
 				Sidebar _Sidebar = Components.Single<Sidebar>();
 				_Sidebar.Update();

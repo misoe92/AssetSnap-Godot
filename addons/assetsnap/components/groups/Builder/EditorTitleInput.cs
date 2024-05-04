@@ -55,7 +55,7 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		{
 			base.Initialize();
 
-			Initiated = true;
+			_Initiated = true;
 
 			_InputField = new()
 			{

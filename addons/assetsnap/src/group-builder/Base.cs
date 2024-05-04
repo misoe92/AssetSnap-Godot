@@ -38,11 +38,6 @@ namespace AssetSnap.GroupBuilder
 	public partial class Base
 	{
 		/// <summary>
-		/// Indicates whether the group builder is initialized.
-		/// </summary>
-		public bool Initialized = false;
-
-		/// <summary>
 		/// Gets the singleton instance of the Base class.
 		/// </summary>
 		public static Base Singleton
@@ -57,16 +52,19 @@ namespace AssetSnap.GroupBuilder
 				return _Instance;
 			}
 		}
-
+		
 		public PanelContainer Container;
 		public Front.Components.Groups.Container _GroupContainer;
 		public Sidebar _Sidebar;
 		public Editor _Editor;
+		
+		/// <summary>
+		/// Indicates whether the group builder is initialized.
+		/// </summary>
+		public bool Initialized = false;
 
-
-		/*
-		** Private
-		*/
+		private static Base _Instance;
+		
 		private readonly List<string> OuterComponents = new()
 		{
 			"Groups.Container",
@@ -76,7 +74,6 @@ namespace AssetSnap.GroupBuilder
 			"Groups.Builder.Sidebar",
 			"Groups.Builder.Editor",
 		};
-		private static Base _Instance;
 
 		/// <summary>
 		/// Initializes the group builder.
@@ -220,7 +217,7 @@ namespace AssetSnap.GroupBuilder
 			{
 				_GroupContainer = Components.Single<AssetSnap.Front.Components.Groups.Container>();
 
-				if (HasGroupContainer())
+				if (_HasGroupContainer())
 				{
 					_GroupContainer.Initialize();
 					Container.AddChild(_GroupContainer);
@@ -230,13 +227,13 @@ namespace AssetSnap.GroupBuilder
 						_Sidebar = Components.Single<Sidebar>();
 						_Editor = Components.Single<Editor>();
 
-						if (HasSidebar())
+						if (_HasSidebar())
 						{
 							_Sidebar.Initialize();
 							_GroupContainer.GetLeftInnerContainer().AddChild(_Sidebar);
 						}
 
-						if (HasListing())
+						if (_HasListing())
 						{
 							_Editor.Initialize();
 							_GroupContainer.GetRightInnerContainer().AddChild(_Editor);
@@ -288,7 +285,7 @@ namespace AssetSnap.GroupBuilder
 		/// Checks if the sidebar exists.
 		/// </summary>
 		/// <returns>True if the sidebar exists, false otherwise.</returns>
-		public bool HasSidebar()
+		private bool _HasSidebar()
 		{
 			return null != _Sidebar;
 		}
@@ -297,7 +294,7 @@ namespace AssetSnap.GroupBuilder
 		/// Checks if the editor listing exists.
 		/// </summary>
 		/// <returns>True if the editor listing exists, false otherwise.</returns>
-		public bool HasListing()
+		private bool _HasListing()
 		{
 			return null != _Editor;
 		}
@@ -306,7 +303,7 @@ namespace AssetSnap.GroupBuilder
 		/// Checks if the group container exists.
 		/// </summary>
 		/// <returns>True if the group container exists, false otherwise.</returns>
-		private bool HasGroupContainer()
+		private bool _HasGroupContainer()
 		{
 			return null != _GroupContainer;
 		}

@@ -33,9 +33,9 @@ namespace AssetSnap.Front.Components.Library
 	[Tool]
 	public partial class TotalItems : LibraryComponent
 	{
-		private readonly string Title = "Total items";
+		private readonly string _Title = "Total items";
 
-		private int ItemCount = 0;
+		private int _ItemCount = 0;
 
 		/// <summary>
 		/// Component constructor.
@@ -44,7 +44,7 @@ namespace AssetSnap.Front.Components.Library
 		{
 			Name = "LibraryItems";
 			
-			UsingTraits = new()
+			_UsingTraits = new()
 			{
 				{ typeof(Labelable).ToString() },
 			};
@@ -58,13 +58,13 @@ namespace AssetSnap.Front.Components.Library
 		public override void Initialize()
 		{
 			base.Initialize();
-			Initiated = true;
+			_Initiated = true;
 			Library.ItemCountUpdated += _OnItemCountUpdated; 
-			ItemCount = Library.ItemCount;
+			_ItemCount = Library.ItemCount;
 			
 			Trait<Labelable>()
 				.SetName("LibraryItemsCount")
-				.SetText(Title + ": " + ItemCount)
+				.SetText(_Title + ": " + _ItemCount)
 				.SetType(Labelable.TitleType.HeaderSmall)
 				.SetMargin(3, "top")
 				.SetMargin(0, "bottom")	
@@ -79,28 +79,19 @@ namespace AssetSnap.Front.Components.Library
 		}
 		
 		/// <summary>
-		/// Gets the total item count.
-		/// </summary>
-		/// <returns>The total item count.</returns>
-		public int GetItemCount() 
-		{
-			return ItemCount;
-		}
-		
-		/// <summary>
 		/// Sets the total item count.
 		/// </summary>
 		/// <param name="count">The new total item count.</param>
 		public void SetItemCount(int count ) 
 		{
-			ItemCount = count;
+			_ItemCount = count;
 			
 			if( 
 				HasTrait<Labelable>() &&
 				Trait<Labelable>().Select(0).IsValid()
 			) 
 			{
-				Trait<Labelable>().SetText(Title + ": " + count);
+				Trait<Labelable>().SetText(_Title + ": " + count);
 			}
 			else 
 			{
@@ -109,21 +100,30 @@ namespace AssetSnap.Front.Components.Library
 		}
 		
 		/// <summary>
-		/// Handles the event when the item count is updated.
+		/// Overrides the _ExitTree method to detach from events before being removed from the scene tree.
 		/// </summary>
-		/// <param name="count">The new item count.</param>
-		private void _OnItemCountUpdated(int count )
-		{
-			SetItemCount(count);
-		}
-
-		/// <summary>
-        /// Overrides the _ExitTree method to detach from events before being removed from the scene tree.
-        /// </summary>
 		public override void _ExitTree()
 		{
 			Library.ItemCountUpdated -= _OnItemCountUpdated; 
 			base._ExitTree();
+		}
+		
+		/// <summary>
+		/// Gets the total item count.
+		/// </summary>
+		/// <returns>The total item count.</returns>
+		public int GetItemCount() 
+		{
+			return _ItemCount;
+		}
+		
+		/// <summary>
+		/// Handles the event when the item count is updated.
+		/// </summary>
+		/// <param name="count">The new item count.</param>
+		private void _OnItemCountUpdated(int count)
+		{
+			SetItemCount(count);
 		}
 	}
 }

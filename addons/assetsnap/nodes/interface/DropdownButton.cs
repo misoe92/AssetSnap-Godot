@@ -32,15 +32,15 @@ namespace AssetSnap.Front.Nodes
 	[Tool] 
 	public partial class DropdownButton : Button
 	{
-		private static readonly Texture2D OpenIcon = GD.Load<Texture2D>("res://addons/assetsnap/assets/icons/chevron-down.svg");	
-		private static readonly Texture2D CloseIcon = GD.Load<Texture2D>("res://addons/assetsnap/assets/icons/chevron-up.svg");
-		
 		/// <summary>
 		/// The margins of the dropdown button.
 		/// </summary>
 		[Export]
 		public Godot.Collections.Dictionary<string, int> Margin = new();
-
+		
+		private static readonly Texture2D _OpenIcon = GD.Load<Texture2D>("res://addons/assetsnap/assets/icons/chevron-down.svg");	
+		private static readonly Texture2D _CloseIcon = GD.Load<Texture2D>("res://addons/assetsnap/assets/icons/chevron-up.svg");
+		
 		/// <summary>
 		/// Called when entering the scene tree.
 		/// </summary>
@@ -65,19 +65,19 @@ namespace AssetSnap.Front.Nodes
 			
 			if( container.Visible ) 
 			{
-				Icon = CloseIcon;				
+				Icon = _CloseIcon;				
 				_MarginContainer.AddThemeConstantOverride("margin_bottom", 10);
 			}
 			else 
 			{
-				Icon = OpenIcon;
+				Icon = _OpenIcon;
 				_MarginContainer.AddThemeConstantOverride("margin_bottom", Margin["bottom"]);
 			}
 		}
 		
 		/// <summary>
-        /// Called when exiting the scene tree.
-        /// </summary>
+		/// Called when exiting the scene tree.
+		/// </summary>
 		public override void _ExitTree()
 		{
 			if( IsConnected( SignalName.Pressed, Callable.From( () => { _OnToggleVisibility(); } ) ) ) 

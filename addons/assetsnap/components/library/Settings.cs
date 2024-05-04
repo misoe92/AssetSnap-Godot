@@ -36,24 +36,25 @@ namespace AssetSnap.Front.Components.Library
 	[Tool]
 	public partial class Settings : LibraryComponent
 	{
+		public SnapObject SnapObject;
+		public Editing Editing;
+		public SnapLayer SnapLayer;
+		public SimpleSphereCollision SimpleSphereCollision;
+		public ConvexPolygonCollision ConvexPolygonCollision;
+		public ConcaveCollision ConcaveCollision;
+		public SnapOffsetX SnapOffsetX;
+		public SnapOffsetZ SnapOffsetZ;
+		public SnapToHeight SnapToHeight;
+		public SnapToX SnapToX;
+		public SnapToZ SnapToZ;
+		public OptimizedPlacement OptimizedPlacement;
+		public SimplePlacement SimplePlacement;
+		public LevelOfDetails LevelOfDetails;
+		public VisibilityRange VisibilityRange;
+		
 		private ScrollContainer _ScrollContainer;
 		private VBoxContainer _BoxContainer;
 		private Label _SnapTitle;
-		public SnapObject _LSSnapObject;
-		public Editing _LSEditing;
-		public SnapLayer _LSSnapLayer;
-		public SimpleSphereCollision _LSSimpleSphereCollision;
-		public ConvexPolygonCollision _LSConvexPolygonCollision;
-		public ConcaveCollision _LSConcaveCollision;
-		public SnapOffsetX _LSSnapOffsetX;
-		public SnapOffsetZ _LSSnapOffsetZ;
-		public SnapToHeight _LSSnapToHeight;
-		public SnapToX _LSSnapToX;
-		public SnapToZ _LSSnapToZ;
-		public OptimizedPlacement _LSOptimizedPlacement;
-		public SimplePlacement _LSSimplePlacement;
-		public LevelOfDetails _LSLevelOfDetails;
-		public VisibilityRange _LSVisibilityRange;
 		
 		/// <summary>
 		/// Constructor for the Settings class.
@@ -62,7 +63,7 @@ namespace AssetSnap.Front.Components.Library
 		{
 			Name = "LibrarySettings";
 			
-			UsingTraits = new()
+			_UsingTraits = new()
 			{
 				{ typeof(Containerable).ToString() },
 				{ typeof(Labelable).ToString() },
@@ -79,7 +80,7 @@ namespace AssetSnap.Front.Components.Library
 		public override void Initialize()
 		{
 			base.Initialize();
-			Initiated = true;
+			_Initiated = true;
 			
 			SizeFlagsHorizontal = SizeFlags.ExpandFill;
 			SizeFlagsVertical = SizeFlags.ExpandFill;
@@ -182,179 +183,179 @@ namespace AssetSnap.Front.Components.Library
 			
 			if (GlobalExplorer.GetInstance().Components.HasAll( Components.ToArray() )) 
 			{
-				_LSEditing = GlobalExplorer.GetInstance().Components.Single<Editing>(true);
-				_LSSimplePlacement = GlobalExplorer.GetInstance().Components.Single<SimplePlacement>(true);
-				_LSOptimizedPlacement = GlobalExplorer.GetInstance().Components.Single<OptimizedPlacement>(true);
+				Editing = GlobalExplorer.GetInstance().Components.Single<Editing>(true);
+				SimplePlacement = GlobalExplorer.GetInstance().Components.Single<SimplePlacement>(true);
+				OptimizedPlacement = GlobalExplorer.GetInstance().Components.Single<OptimizedPlacement>(true);
 				
-				_LSSnapLayer = GlobalExplorer.GetInstance().Components.Single<SnapLayer>(true);
-				_LSSnapObject = GlobalExplorer.GetInstance().Components.Single<SnapObject>(true);
-				_LSSnapOffsetX = GlobalExplorer.GetInstance().Components.Single<SnapOffsetX>(true);
-				_LSSnapOffsetZ = GlobalExplorer.GetInstance().Components.Single<SnapOffsetZ>(true);
+				SnapLayer = GlobalExplorer.GetInstance().Components.Single<SnapLayer>(true);
+				SnapObject = GlobalExplorer.GetInstance().Components.Single<SnapObject>(true);
+				SnapOffsetX = GlobalExplorer.GetInstance().Components.Single<SnapOffsetX>(true);
+				SnapOffsetZ = GlobalExplorer.GetInstance().Components.Single<SnapOffsetZ>(true);
 			
-				_LSSnapToHeight = GlobalExplorer.GetInstance().Components.Single<SnapToHeight>(true);
-				_LSSnapToX = GlobalExplorer.GetInstance().Components.Single<SnapToX>(true);
-				_LSSnapToZ = GlobalExplorer.GetInstance().Components.Single<SnapToZ>(true);
+				SnapToHeight = GlobalExplorer.GetInstance().Components.Single<SnapToHeight>(true);
+				SnapToX = GlobalExplorer.GetInstance().Components.Single<SnapToX>(true);
+				SnapToZ = GlobalExplorer.GetInstance().Components.Single<SnapToZ>(true);
 			
-				_LSSimpleSphereCollision = GlobalExplorer.GetInstance().Components.Single<SimpleSphereCollision>(true);
-				_LSConvexPolygonCollision = GlobalExplorer.GetInstance().Components.Single<ConvexPolygonCollision>(true);
-				_LSConcaveCollision = GlobalExplorer.GetInstance().Components.Single<ConcaveCollision>(true);
+				SimpleSphereCollision = GlobalExplorer.GetInstance().Components.Single<SimpleSphereCollision>(true);
+				ConvexPolygonCollision = GlobalExplorer.GetInstance().Components.Single<ConvexPolygonCollision>(true);
+				ConcaveCollision = GlobalExplorer.GetInstance().Components.Single<ConcaveCollision>(true);
 				
-				_LSLevelOfDetails = GlobalExplorer.GetInstance().Components.Single<LevelOfDetails>(true);
-				_LSVisibilityRange = GlobalExplorer.GetInstance().Components.Single<VisibilityRange>(true);
+				LevelOfDetails = GlobalExplorer.GetInstance().Components.Single<LevelOfDetails>(true);
+				VisibilityRange = GlobalExplorer.GetInstance().Components.Single<VisibilityRange>(true);
 				
-				if( _LSEditing != null ) 
+				if( Editing != null ) 
 				{
-					_LSEditing.LibraryName = LibraryName;
-					_LSEditing.Initialize();
-					container.AddChild(_LSEditing);
+					Editing.LibraryName = LibraryName;
+					Editing.Initialize();
+					container.AddChild(Editing);
 				}
 				
-				if( _LSSimplePlacement != null ) 
+				if( SimplePlacement != null ) 
 				{
-					_LSSimplePlacement.LibraryName = LibraryName;
-					_LSSimplePlacement.Initialize();
+					SimplePlacement.LibraryName = LibraryName;
+					SimplePlacement.Initialize();
 					Trait<Dropdownable>()
 						.Select(0)
 						.GetDropdownContainer()
-						.AddChild(_LSSimplePlacement);
+						.AddChild(SimplePlacement);
 				}
 				
-				if( _LSOptimizedPlacement != null ) 
+				if( OptimizedPlacement != null ) 
 				{
-					_LSOptimizedPlacement.LibraryName = LibraryName;
-					_LSOptimizedPlacement.Initialize();
+					OptimizedPlacement.LibraryName = LibraryName;
+					OptimizedPlacement.Initialize();
 
 					Trait<Dropdownable>()
 						.Select(0)
 						.GetDropdownContainer()
-						.AddChild(_LSOptimizedPlacement);
+						.AddChild(OptimizedPlacement);
 				}
 				
 				
-				if( _LSSnapLayer != null ) 
+				if( SnapLayer != null ) 
 				{
-					_LSSnapLayer.LibraryName = LibraryName;
-					_LSSnapLayer.Initialize();
+					SnapLayer.LibraryName = LibraryName;
+					SnapLayer.Initialize();
 					
 					Trait<Dropdownable>()
 						.Select(1)
 						.GetDropdownContainer()
-						.AddChild(_LSSnapLayer);
+						.AddChild(SnapLayer);
 				}
 				
-				if( _LSSnapObject != null ) 
+				if( SnapObject != null ) 
 				{
-					_LSSnapObject.LibraryName = LibraryName;
-					_LSSnapObject.Initialize();
+					SnapObject.LibraryName = LibraryName;
+					SnapObject.Initialize();
 					
 					Trait<Dropdownable>()
 						.Select(1)
 						.GetDropdownContainer()
-						.AddChild(_LSSnapObject);
+						.AddChild(SnapObject);
 				} 
 				
-				if( _LSSnapOffsetX != null ) 
+				if( SnapOffsetX != null ) 
 				{
-					_LSSnapOffsetX.LibraryName = LibraryName;
-					_LSSnapOffsetX.Initialize();
+					SnapOffsetX.LibraryName = LibraryName;
+					SnapOffsetX.Initialize();
 					
 					Trait<Dropdownable>()
 						.Select(1)
 						.GetDropdownContainer()
-						.AddChild(_LSSnapOffsetX);
+						.AddChild(SnapOffsetX);
 				}
 				
-				if( _LSSnapOffsetZ != null ) 
+				if( SnapOffsetZ != null ) 
 				{
-					_LSSnapOffsetZ.LibraryName = LibraryName;
-					_LSSnapOffsetZ.Initialize();
+					SnapOffsetZ.LibraryName = LibraryName;
+					SnapOffsetZ.Initialize();
 					
 					Trait<Dropdownable>()
 						.Select(1)
 						.GetDropdownContainer()
-						.AddChild(_LSSnapOffsetZ);
+						.AddChild(SnapOffsetZ);
 				}
 				
 					
-				if( _LSSnapToHeight != null ) 
+				if( SnapToHeight != null ) 
 				{
-					_LSSnapToHeight.LibraryName = LibraryName;
-					_LSSnapToHeight.Initialize();
+					SnapToHeight.LibraryName = LibraryName;
+					SnapToHeight.Initialize();
 					
 					Trait<Dropdownable>()
 						.Select(2)
 						.GetDropdownContainer()
-						.AddChild(_LSSnapToHeight);
+						.AddChild(SnapToHeight);
 				}
 				
-				if( _LSSnapToX != null ) 
+				if( SnapToX != null ) 
 				{
-					_LSSnapToX.LibraryName = LibraryName;
-					_LSSnapToX.Initialize();
+					SnapToX.LibraryName = LibraryName;
+					SnapToX.Initialize();
 					Trait<Dropdownable>()
 						.Select(2)
 						.GetDropdownContainer()
-						.AddChild(_LSSnapToX);
+						.AddChild(SnapToX);
 				}
 				
-				if( _LSSnapToZ != null ) 
+				if( SnapToZ != null ) 
 				{
-					_LSSnapToZ.LibraryName = LibraryName;
-					_LSSnapToZ.Initialize();
+					SnapToZ.LibraryName = LibraryName;
+					SnapToZ.Initialize();
 					Trait<Dropdownable>()
 						.Select(2)
 						.GetDropdownContainer()
-						.AddChild(_LSSnapToZ);
+						.AddChild(SnapToZ);
 				}
 				
-				if( _LSSimpleSphereCollision != null )
+				if( SimpleSphereCollision != null )
 				{
-					_LSSimpleSphereCollision.LibraryName = LibraryName;
-					_LSSimpleSphereCollision.Initialize();
+					SimpleSphereCollision.LibraryName = LibraryName;
+					SimpleSphereCollision.Initialize();
 					Trait<Dropdownable>()
 						.Select(3)
 						.GetDropdownContainer()
-						.AddChild(_LSSimpleSphereCollision);
+						.AddChild(SimpleSphereCollision);
 				}
 				
-				if( _LSConvexPolygonCollision != null ) 
+				if( ConvexPolygonCollision != null ) 
 				{
-					_LSConvexPolygonCollision.LibraryName = LibraryName;
-					_LSConvexPolygonCollision.Initialize();
+					ConvexPolygonCollision.LibraryName = LibraryName;
+					ConvexPolygonCollision.Initialize();
 					Trait<Dropdownable>()
 						.Select(3)
 						.GetDropdownContainer()
-						.AddChild(_LSConvexPolygonCollision);
+						.AddChild(ConvexPolygonCollision);
 				}
 				
-				if( _LSConcaveCollision != null )
+				if( ConcaveCollision != null )
 				{
-					_LSConcaveCollision.LibraryName = LibraryName;
-					_LSConcaveCollision.Initialize();
+					ConcaveCollision.LibraryName = LibraryName;
+					ConcaveCollision.Initialize();
 					Trait<Dropdownable>()
 						.Select(3)
 						.GetDropdownContainer()
-						.AddChild(_LSConcaveCollision);
+						.AddChild(ConcaveCollision);
 				}
 				
-				if( _LSLevelOfDetails != null ) 
+				if( LevelOfDetails != null ) 
 				{
-					_LSLevelOfDetails.LibraryName = LibraryName;
-					_LSLevelOfDetails.Initialize();
+					LevelOfDetails.LibraryName = LibraryName;
+					LevelOfDetails.Initialize();
 					Trait<Dropdownable>()
 						.Select(4)
 						.GetDropdownContainer()
-						.AddChild(_LSLevelOfDetails);
+						.AddChild(LevelOfDetails);
 				}
 				
-				if( _LSVisibilityRange != null ) 
+				if( VisibilityRange != null ) 
 				{
-					_LSVisibilityRange.LibraryName = LibraryName;
-					_LSVisibilityRange.Initialize();
+					VisibilityRange.LibraryName = LibraryName;
+					VisibilityRange.Initialize();
 					Trait<Dropdownable>()
 						.Select(5)
 						.GetDropdownContainer()
-						.AddChild(_LSVisibilityRange);
+						.AddChild(VisibilityRange);
 				}
 			}
 			
@@ -396,61 +397,61 @@ namespace AssetSnap.Front.Components.Library
 		}
 		
 		/// <summary>
-        /// Synchronizes the settings with their corresponding components.
-        /// </summary>
+		/// Synchronizes the settings with their corresponding components.
+		/// </summary>
 		public override void Sync()
 		{
-			if( null != _LSSnapObject && IsInstanceValid(_LSSnapObject)) 
+			if( null != SnapObject && IsInstanceValid(SnapObject)) 
 			{
-				_LSSnapObject.Sync();
+				SnapObject.Sync();
 			}
-			if( null != _LSEditing && IsInstanceValid(_LSEditing)) 
+			if( null != Editing && IsInstanceValid(Editing)) 
 			{
-				_LSEditing.Sync();
+				Editing.Sync();
 			}
-			if( null != _LSSnapLayer && IsInstanceValid(_LSSnapLayer)) 
+			if( null != SnapLayer && IsInstanceValid(SnapLayer)) 
 			{
-				_LSSnapLayer.Sync();
+				SnapLayer.Sync();
 			}
-			if( null != _LSSnapOffsetX && IsInstanceValid(_LSSnapOffsetX)) 
+			if( null != SnapOffsetX && IsInstanceValid(SnapOffsetX)) 
 			{
-				_LSSnapOffsetX.Sync();
+				SnapOffsetX.Sync();
 			}
-			if( null != _LSSnapOffsetZ && IsInstanceValid(_LSSnapOffsetZ)) 
+			if( null != SnapOffsetZ && IsInstanceValid(SnapOffsetZ)) 
 			{
-				_LSSnapOffsetZ.Sync();
+				SnapOffsetZ.Sync();
 			}
-			if( null != _LSSnapToHeight && IsInstanceValid(_LSSnapToHeight)) 
+			if( null != SnapToHeight && IsInstanceValid(SnapToHeight)) 
 			{
-				_LSSnapToHeight.Sync();
+				SnapToHeight.Sync();
 			}
-			if( null != _LSSnapToX && IsInstanceValid(_LSSnapToX))
+			if( null != SnapToX && IsInstanceValid(SnapToX))
 			{
-				_LSSnapToX.Sync();
+				SnapToX.Sync();
 			}
-			if( null != _LSSnapToZ && IsInstanceValid(_LSSnapToZ)) 
+			if( null != SnapToZ && IsInstanceValid(SnapToZ)) 
 			{
-				_LSSnapToZ.Sync();
+				SnapToZ.Sync();
 			}
-			if( null != _LSSimpleSphereCollision && IsInstanceValid(_LSSimpleSphereCollision)) 
+			if( null != SimpleSphereCollision && IsInstanceValid(SimpleSphereCollision)) 
 			{
-				_LSSimpleSphereCollision.Sync();
+				SimpleSphereCollision.Sync();
 			}
-			if( null != _LSConvexPolygonCollision && IsInstanceValid(_LSConvexPolygonCollision)) 
+			if( null != ConvexPolygonCollision && IsInstanceValid(ConvexPolygonCollision)) 
 			{
-				_LSConvexPolygonCollision.Sync();
+				ConvexPolygonCollision.Sync();
 			}
-			if( null != _LSConcaveCollision && IsInstanceValid(_LSConcaveCollision)) 
+			if( null != ConcaveCollision && IsInstanceValid(ConcaveCollision)) 
 			{
-				_LSConcaveCollision.Sync();
+				ConcaveCollision.Sync();
 			}
 		}
 			
 		/// <summary>
-        /// Fetches a component by its key name.
-        /// </summary>
-        /// <param name="key">The key name of the component.</param>
-        /// <returns>The fetched component.</returns>
+		/// Fetches a component by its key name.
+		/// </summary>
+		/// <param name="key">The key name of the component.</param>
+		/// <returns>The fetched component.</returns>
 		public BaseComponent AccessField( string key )
 		{
 			Type type = GetType();
@@ -468,65 +469,65 @@ namespace AssetSnap.Front.Components.Library
 		}
 		
 		/// <summary>
-        /// Clears all current setting values.
-        /// </summary>
+		/// Clears all current setting values.
+		/// </summary>
 		public void ClearAll()
 		{
-			if( null != _LSSnapObject && IsInstanceValid(_LSSnapObject)) 
+			if( null != SnapObject && IsInstanceValid(SnapObject)) 
 			{
-				_LSSnapObject.Reset();
+				SnapObject.Reset();
 			}
-			if( null != _LSSnapObject && IsInstanceValid(_LSSnapLayer)) 
+			if( null != SnapLayer && IsInstanceValid(SnapLayer)) 
 			{
-				_LSSnapLayer.Reset();
-			}
-			
-			if( null != _LSSnapObject && IsInstanceValid(_LSSnapOffsetX)) 
-			{
-				_LSSnapOffsetX.Reset();
+				SnapLayer.Reset();
 			}
 			
-			if( null != _LSSnapObject && IsInstanceValid(_LSSnapOffsetZ)) 
+			if( null != SnapOffsetX && IsInstanceValid(SnapOffsetX)) 
 			{
-				_LSSnapOffsetZ.Reset();
+				SnapOffsetX.Reset();
 			}
 			
-			if( null != _LSSnapObject && IsInstanceValid(_LSSnapToHeight)) 
+			if( null != SnapOffsetZ && IsInstanceValid(SnapOffsetZ)) 
 			{
-				_LSSnapToHeight.Reset(); 
+				SnapOffsetZ.Reset();
 			}
 			
-			if( null != _LSSnapObject && IsInstanceValid(_LSSnapToX)) 
+			if( null != SnapToHeight && IsInstanceValid(SnapToHeight)) 
 			{
-				_LSSnapToX.Reset();
+				SnapToHeight.Reset(); 
 			}
 			
-			if( null != _LSSnapObject && IsInstanceValid(_LSSnapToZ)) 
+			if( null != SnapToX && IsInstanceValid(SnapToX)) 
 			{
-				_LSSnapToZ.Reset();
+				SnapToX.Reset();
 			}
 			
-			if( null != _LSSnapObject && IsInstanceValid(_LSSimpleSphereCollision)) 
+			if( null != SnapToZ && IsInstanceValid(SnapToZ)) 
 			{
-				_LSSimpleSphereCollision.Reset();
+				SnapToZ.Reset();
 			}
 			
-			if( null != _LSSnapObject && IsInstanceValid(_LSConvexPolygonCollision)) 
+			if( null != SimpleSphereCollision && IsInstanceValid(SimpleSphereCollision)) 
 			{
-				_LSConvexPolygonCollision.Reset();
+				SimpleSphereCollision.Reset();
 			}
 			
-			if( null != _LSSnapObject && IsInstanceValid(_LSConcaveCollision)) 
+			if( null != ConvexPolygonCollision && IsInstanceValid(ConvexPolygonCollision)) 
 			{
-				_LSConcaveCollision.Reset();
+				ConvexPolygonCollision.Reset();
+			}
+			
+			if( null != ConcaveCollision && IsInstanceValid(ConcaveCollision)) 
+			{
+				ConcaveCollision.Reset();
 			}
 		}
 		
 		/// <summary>
-        /// Checks if a field exists in the Settings class.
-        /// </summary>
-        /// <param name="fieldName">The name of the field to check.</param>
-        /// <returns>True if the field exists, otherwise false.</returns>
+		/// Checks if a field exists in the Settings class.
+		/// </summary>
+		/// <param name="fieldName">The name of the field to check.</param>
+		/// <returns>True if the field exists, otherwise false.</returns>
 		public bool FieldExists(string fieldName)
 		{
 			Type type = typeof(Settings);

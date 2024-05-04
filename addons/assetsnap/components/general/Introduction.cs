@@ -33,8 +33,8 @@ namespace AssetSnap.Front.Components
 	[Tool]
 	public partial class Introduction : TraitableComponent
 	{
-		private readonly string TitleText = "AssetSnap";
-		private readonly string DescriptionText = "Add folders to start, when an folder has been added a tab with the folder name will appear, Then go to the folder tab and browse your assets and place them. \n\nIf you wish to remove a library all you will have to do is click the red button on the right. In the same column as the library you wish to remove.";
+		private readonly string _TitleText = "AssetSnap";
+		private readonly string _DescriptionText = "Add folders to start, when an folder has been added a tab with the folder name will appear, Then go to the folder tab and browse your assets and place them. \n\nIf you wish to remove a library all you will have to do is click the red button on the right. In the same column as the library you wish to remove.";
 	
 		/// <summary>
         /// Constructor of the Introduction class.
@@ -43,7 +43,7 @@ namespace AssetSnap.Front.Components
 		{
 			Name = "Introduction";
 			
-			UsingTraits = new()
+			_UsingTraits = new()
 			{
 				{ typeof(Labelable).ToString() },
 			};
@@ -58,13 +58,13 @@ namespace AssetSnap.Front.Components
 		{
 			base.Initialize();
 			
-			Initiated = true;
+			_Initiated = true;
 
 			Trait<Labelable>()
 				.SetMargin(0, "bottom")
 				.SetName("IntroductionTitle")
 				.SetType(Labelable.TitleType.HeaderLarge)
-				.SetText(TitleText)
+				.SetText(_TitleText)
 				.SetSuffix("V." + _GlobalExplorer._Plugin.GetVersionString())
 				.Instantiate();
 
@@ -73,7 +73,7 @@ namespace AssetSnap.Front.Components
 				.SetMargin(0, "bottom")
 				.SetName("IntroductionDescription")
 				.SetType(Labelable.TitleType.TextMedium)
-				.SetText(DescriptionText)
+				.SetText(_DescriptionText)
 				.SetAutoWrap(TextServer.AutowrapMode.Word)
 				.Instantiate();
 				

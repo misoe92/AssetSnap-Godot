@@ -33,7 +33,7 @@ namespace AssetSnap.Front.Components.Groups.Builder
 	[Tool]
 	public partial class EditorSave : LibraryComponent
 	{
-		private static readonly string Text = "Save";
+		private static readonly string _Text = "Save";
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="EditorSave"/> class.
@@ -44,7 +44,7 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			TooltipText = "Will save the title and the object values";
 			MouseDefaultCursorShape = Control.CursorShape.PointingHand;
 
-			UsingTraits = new()
+			_UsingTraits = new()
 			{
 				{ typeof(Buttonable).ToString() },
 				{ typeof(Containerable).ToString() },
@@ -58,14 +58,14 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		/// </summary>
 		public override void Initialize()
 		{
-			if (Initiated)
+			if (_Initiated)
 			{
 				return;
 			}
 
 			base.Initialize();
 
-			Initiated = true;
+			_Initiated = true;
 
 			_InitializeFields();
 			_FinalizeFields();
@@ -112,7 +112,7 @@ namespace AssetSnap.Front.Components.Groups.Builder
 
 			Trait<Buttonable>()
 				.SetName("GroupBuilderEditorSave")
-				.SetText(Text)
+				.SetText(_Text)
 				.SetTooltipText(TooltipText)
 				.SetType(Buttonable.ButtonType.SmallSuccesButton)
 				.SetCursorShape(MouseDefaultCursorShape)
