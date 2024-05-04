@@ -107,8 +107,8 @@ namespace AssetSnap.Component
 
 			if ("" != _Suffix)
 			{
-				Orientation = ContainerOrientation.Horizontal;
-				InnerOrientation = ContainerOrientation.Vertical;
+				_Orientation = ContainerOrientation.Horizontal;
+				_InnerOrientation = ContainerOrientation.Vertical;
 				SizeFlagsHorizontal = Control.SizeFlags.ShrinkBegin;
 			}
 

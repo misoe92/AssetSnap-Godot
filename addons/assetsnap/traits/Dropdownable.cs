@@ -94,7 +94,7 @@ namespace AssetSnap.Component
 		/// <returns>Returns the instantiated Dropdownable instance.</returns>
 		public Dropdownable Instantiate(int i)
 		{
-			UsePaddingContainer = false;
+			_UsePaddingContainer = false;
 			base._Instantiate();
 			base.Instantiate();
 

@@ -21,16 +21,15 @@
 // SOFTWARE.
 
 #if TOOLS
+
+using Godot;
+
 namespace AssetSnap.Trait
 {
-	using Godot;
 
 	[Tool]
 	public partial class ContainerTrait : Base
 	{
-		/*
-		** Enums
-		*/
 		public enum ContainerLayout
 		{
 			OneColumn,
@@ -45,18 +44,13 @@ namespace AssetSnap.Trait
 			Vertical,
 		};
 
-		/*
-		** Protected
-		*/
-		protected ContainerLayout Layout = ContainerLayout.OneColumn;
-		protected ContainerOrientation Orientation = ContainerOrientation.Vertical;
-		protected ContainerOrientation InnerOrientation = ContainerOrientation.Horizontal;
-
-		protected Control.SizeFlags ContainerHorizontalSizeFlag = Control.SizeFlags.ExpandFill;
-
-		protected int Seperation = 1;
-
-		protected bool UsePaddingContainer = true;
+		
+		protected int _Seperation = 1;
+		protected bool _UsePaddingContainer = true;
+		protected ContainerLayout _Layout = ContainerLayout.OneColumn;
+		protected ContainerOrientation _Orientation = ContainerOrientation.Vertical;
+		protected ContainerOrientation _InnerOrientation = ContainerOrientation.Horizontal;
+		protected Control.SizeFlags _ContainerHorizontalSizeFlag = Control.SizeFlags.ExpandFill;
 
 		/// <summary>
 		/// Shows the current container.
@@ -95,7 +89,7 @@ namespace AssetSnap.Trait
 				return this;
 			}
 
-			Godot.Collections.Dictionary<string, Variant> dependencies = Plugin.Singleton.traitGlobal.GetDependencies(index, TypeString, OwnerName);
+			Godot.Collections.Dictionary<string, Variant> dependencies = Plugin.Singleton.TraitGlobal.GetDependencies(index, TypeString, OwnerName);
 			Dependencies = dependencies;
 
 			return this;
@@ -126,7 +120,7 @@ namespace AssetSnap.Trait
 		/// <returns>The container with the updated layout.</returns>
 		public virtual ContainerTrait SetLayout(ContainerLayout layout)
 		{
-			Layout = layout;
+			_Layout = layout;
 
 			return this;
 		}
@@ -138,7 +132,7 @@ namespace AssetSnap.Trait
 		/// <returns>The container with the updated size flag.</returns>
 		public virtual ContainerTrait SetContainerHorizontalSizeFlag(Control.SizeFlags flag)
 		{
-			ContainerHorizontalSizeFlag = flag;
+			_ContainerHorizontalSizeFlag = flag;
 
 			return this;
 		}
@@ -201,7 +195,7 @@ namespace AssetSnap.Trait
 		/// <returns>The container with the updated orientation.</returns>
 		public virtual ContainerTrait SetOrientation(ContainerOrientation orientation)
 		{
-			Orientation = orientation;
+			_Orientation = orientation;
 			return this;
 		}
 
@@ -212,7 +206,7 @@ namespace AssetSnap.Trait
 		/// <returns>The container with the updated separation.</returns>
 		public virtual ContainerTrait SetSeparation(int seperation)
 		{
-			Seperation = seperation;
+			_Seperation = seperation;
 			return this;
 		}
 
@@ -223,7 +217,7 @@ namespace AssetSnap.Trait
 		/// <returns>The container with the updated inner orientation.</returns>
 		public virtual ContainerTrait SetInnerOrientation(ContainerOrientation orientation)
 		{
-			InnerOrientation = orientation;
+			_InnerOrientation = orientation;
 			return this;
 		}
 
@@ -350,42 +344,18 @@ namespace AssetSnap.Trait
 		}
 
 		/// <summary>
-		/// Checks if the container is visible.
-		/// </summary>
-		/// <param name="debug">Optional parameter to enable debugging.</param>
-		/// <returns>True if the container is visible; otherwise, false.</returns>
-		public virtual bool IsVisible( bool debug = false )
-		{
-			if (false != Dependencies.ContainsKey(TraitName + "_MarginContainer"))
-			{
-				if( debug ) 
-				{
-					GD.Print("Visibility state found", Dependencies[TraitName + "_MarginContainer"].As<MarginContainer>().Visible);
-				}
-				return Dependencies[TraitName + "_MarginContainer"].As<MarginContainer>().Visible == true;
-			}
-			
-			if( debug ) 
-			{
-				GD.Print("Visibility state not found");
-			}
-
-			return false;
-		}
-
-		/// <summary>
 		/// Instantiates the container trait.
 		/// </summary>
 		/// <returns>The instantiated container trait.</returns>
 		public virtual ContainerTrait Instantiate()
 		{
-			int ColumnCount = (int)Layout + 1;
+			int ColumnCount = (int)_Layout + 1;
 			string prefix = TraitName;
 
 			MarginContainer _MarginContainer = new()
 			{
 				Name = prefix + "-ContainerMargin",
-				SizeFlagsHorizontal = ContainerHorizontalSizeFlag,
+				SizeFlagsHorizontal = _ContainerHorizontalSizeFlag,
 				SizeFlagsVertical = SizeFlagsVertical,
 				Visible = Visible,
 			};
@@ -403,13 +373,13 @@ namespace AssetSnap.Trait
 			MarginContainer _PaddingContainer = new()
 			{
 				Name = prefix + "-ContainerPadding",
-				SizeFlagsHorizontal = ContainerHorizontalSizeFlag,
+				SizeFlagsHorizontal = _ContainerHorizontalSizeFlag,
 				SizeFlagsVertical = SizeFlagsVertical,
 			};
 
 			Container _InnerContainer;
 
-			if (InnerOrientation == ContainerOrientation.Vertical)
+			if (_InnerOrientation == ContainerOrientation.Vertical)
 			{
 				_InnerContainer = new VBoxContainer()
 				{
@@ -445,7 +415,7 @@ namespace AssetSnap.Trait
 			// 	GD.Print(SizeFlagsVertical, Name );
 			// }
 
-			if (UsePaddingContainer)
+			if (_UsePaddingContainer)
 			{
 				foreach ((string side, int value) in Padding)
 				{
@@ -455,12 +425,12 @@ namespace AssetSnap.Trait
 
 			for (int i = 0; i < ColumnCount; i++)
 			{
-				Container innerContainer = Orientation == ContainerOrientation.Horizontal ? new HBoxContainer() : new VBoxContainer();
+				Container innerContainer = _Orientation == ContainerOrientation.Horizontal ? new HBoxContainer() : new VBoxContainer();
 				innerContainer.SizeFlagsHorizontal = SizeFlagsHorizontal;
 				innerContainer.SizeFlagsVertical = SizeFlagsVertical;
 				innerContainer.Name = prefix + "-inner-" + i;
 
-				innerContainer.AddThemeConstantOverride("separation", Seperation);
+				innerContainer.AddThemeConstantOverride("separation", _Seperation);
 
 				_InnerContainer.AddChild(innerContainer);
 			}
@@ -481,15 +451,39 @@ namespace AssetSnap.Trait
 
 			return this;
 		}
+		
+		/// <summary>
+		/// Checks if the container is visible.
+		/// </summary>
+		/// <param name="debug">Optional parameter to enable debugging.</param>
+		/// <returns>True if the container is visible; otherwise, false.</returns>
+		public virtual bool IsVisible( bool debug = false )
+		{
+			if (false != Dependencies.ContainsKey(TraitName + "_MarginContainer"))
+			{
+				if( debug ) 
+				{
+					GD.Print("Visibility state found", Dependencies[TraitName + "_MarginContainer"].As<MarginContainer>().Visible);
+				}
+				return Dependencies[TraitName + "_MarginContainer"].As<MarginContainer>().Visible == true;
+			}
+			
+			if( debug ) 
+			{
+				GD.Print("Visibility state not found");
+			}
+
+			return false;
+		}
 
 		/// <summary>
 		/// Resets the trait to a cleared state.
 		/// </summary>
 		protected virtual void Reset()
 		{
-			Layout = ContainerLayout.OneColumn;
-			Orientation = ContainerOrientation.Vertical;
-			InnerOrientation = ContainerOrientation.Vertical;
+			_Layout = ContainerLayout.OneColumn;
+			_Orientation = ContainerOrientation.Vertical;
+			_InnerOrientation = ContainerOrientation.Vertical;
 			Size = Vector2.Zero;
 			CustomMinimumSize = Vector2.Zero;
 			Dependencies = new();

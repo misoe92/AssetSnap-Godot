@@ -74,7 +74,7 @@ namespace AssetSnap.Component
 		/// <returns>Returns the instantiated ScrollContainerable.</returns>
 		public override ScrollContainerable Instantiate()
 		{
-			UsePaddingContainer = false;
+			_UsePaddingContainer = false;
 			base._Instantiate();
 			base.Instantiate();
 			
@@ -295,7 +295,7 @@ namespace AssetSnap.Component
 		/// </summary>
 		protected override void Reset()
 		{
-			Orientation = ContainerOrientation.Vertical;
+			_Orientation = ContainerOrientation.Vertical;
 			base.Reset();
 		}
 	}
