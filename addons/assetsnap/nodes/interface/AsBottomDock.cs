@@ -25,6 +25,7 @@
 using System.Collections.Generic;
 using AssetSnap.Component;
 using AssetSnap.Front.Components;
+using AssetSnap.States;
 using Godot;
 
 namespace AssetSnap.Front.Nodes
@@ -37,7 +38,11 @@ namespace AssetSnap.Front.Nodes
 	{
 		public VBoxContainer _LoadingContainer;
 		public TabContainer _TabContainer;
-		private List<string> GeneralComponents = new()
+		
+		private static readonly string _ThemePath = "res://addons/assetsnap/assets/themes/SnapTheme.tres";
+		private readonly Theme _Theme = GD.Load<Theme>(_ThemePath);
+		private readonly Callable _Callable = Callable.From((int index) => { _OnTabChanged(index); });
+		private List<string> _GeneralComponents = new()
 		{
 			"Introduction",
 			"Actions",
@@ -45,15 +50,11 @@ namespace AssetSnap.Front.Nodes
 			"Contribute",
 		};
 		private PanelContainer _PanelContainer;
-		private HBoxContainer MainContainer;
-		private VBoxContainer SubContainerOne;
-		private VBoxContainer SubContainerTwo;
-		private VBoxContainer SubContainerThree;
-		private static readonly string ThemePath = "res://addons/assetsnap/assets/themes/SnapTheme.tres";
-		private readonly Theme _Theme = GD.Load<Theme>(ThemePath);
-		public new Control.SizeFlags SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
-		public new Control.SizeFlags SizeFlagsVertical = Control.SizeFlags.ExpandFill;
-		private readonly Callable _callable = Callable.From((int index) => { _OnTabChanged(index); });
+		private HBoxContainer _MainContainer;
+		private VBoxContainer _SubContainerOne;
+		private VBoxContainer _SubContainerTwo;
+		private VBoxContainer _SubContainerThree;
+
 
 		/// <summary>
 		/// Called when the node enters the scene tree.
@@ -62,6 +63,9 @@ namespace AssetSnap.Front.Nodes
 		{
 			Name = "BottomDock";
 			Theme = _Theme;
+			
+			SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+			SizeFlagsVertical = Control.SizeFlags.ExpandFill;
 
 			// CustomMinimumSize = new Vector2(0, 205);
 			SetupGeneralTab();
@@ -78,7 +82,7 @@ namespace AssetSnap.Front.Nodes
 
 			InitializeGeneralTabComponents();
 
-			_TabContainer.Connect(TabContainer.SignalName.TabChanged, _callable);
+			_TabContainer.Connect(TabContainer.SignalName.TabChanged, _Callable);
 
 			AddChild(_TabContainer);
 			AddChild(_LoadingContainer);
@@ -137,28 +141,28 @@ namespace AssetSnap.Front.Nodes
 				SizeFlagsVertical = Control.SizeFlags.ExpandFill,
 			};
 
-			MainContainer = new()
+			_MainContainer = new()
 			{
 				Name = "GeneralMainContainer",
 				SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
 				SizeFlagsVertical = Control.SizeFlags.ExpandFill,
 			};
 
-			SubContainerOne = new()
+			_SubContainerOne = new()
 			{
 				Name = "GeneralSubContainerOne",
 				SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
 				SizeFlagsVertical = Control.SizeFlags.ExpandFill,
 			};
 
-			SubContainerTwo = new()
+			_SubContainerTwo = new()
 			{
 				Name = "GeneralSubContainerTwo",
 				SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
 				SizeFlagsVertical = Control.SizeFlags.ExpandFill,
 			};
 
-			SubContainerThree = new()
+			_SubContainerThree = new()
 			{
 				Name = "GeneralSubContainerThree",
 				SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
@@ -171,11 +175,11 @@ namespace AssetSnap.Front.Nodes
 		/// </summary>
 		private void PlaceGeneralTabContainers()
 		{
-			MainContainer.AddChild(SubContainerOne);
-			MainContainer.AddChild(SubContainerTwo);
-			MainContainer.AddChild(SubContainerThree);
+			_MainContainer.AddChild(_SubContainerOne);
+			_MainContainer.AddChild(_SubContainerTwo);
+			_MainContainer.AddChild(_SubContainerThree);
 
-			_PanelContainer.AddChild(MainContainer);
+			_PanelContainer.AddChild(_MainContainer);
 			_TabContainer.AddChild(_PanelContainer);
 		}
 
@@ -184,14 +188,14 @@ namespace AssetSnap.Front.Nodes
 		/// </summary>
 		private void InitializeGeneralTabComponents()
 		{
-			if (GlobalExplorer.GetInstance().Components.HasAll(GeneralComponents.ToArray()))
+			if (GlobalExplorer.GetInstance().Components.HasAll(_GeneralComponents.ToArray()))
 			{
 				Introduction _Introduction = GlobalExplorer.GetInstance().Components.Single<Introduction>();
 
 				if (_Introduction != null)
 				{
 					_Introduction.Initialize();
-					SubContainerOne.AddChild(_Introduction);
+					_SubContainerOne.AddChild(_Introduction);
 				}
 
 				Actions _Actions = GlobalExplorer.GetInstance().Components.Single<Actions>();
@@ -199,7 +203,7 @@ namespace AssetSnap.Front.Nodes
 				if (_Actions != null)
 				{
 					_Actions.Initialize();
-					SubContainerOne.AddChild(_Actions);
+					_SubContainerOne.AddChild(_Actions);
 				}
 
 				Contribute Contribute = GlobalExplorer.GetInstance().Components.Single<Contribute>();
@@ -207,7 +211,7 @@ namespace AssetSnap.Front.Nodes
 				if (Contribute != null)
 				{
 					Contribute.Initialize();
-					SubContainerThree.AddChild(Contribute);
+					_SubContainerThree.AddChild(Contribute);
 				}
 
 				Plugin.Singleton.FoldersLoaded += () => { _OnLoadListing(); };
@@ -225,26 +229,26 @@ namespace AssetSnap.Front.Nodes
 			if (_LibrariesListing != null)
 			{
 				_LibrariesListing.Initialize();
-				SubContainerTwo.AddChild(_LibrariesListing);
+				_SubContainerTwo.AddChild(_LibrariesListing);
 			}
 		}
 
 		/// <summary>
-        /// Event handler for tab changes.
-        /// </summary>
-        /// <param name="index">The index of the tab.</param>
+		/// Event handler for tab changes.
+		/// </summary>
+		/// <param name="index">The index of the tab.</param>
 		private static void _OnTabChanged(int index)
 		{
 			if (
 				null == GlobalExplorer.GetInstance() ||
-				null == GlobalExplorer.GetInstance().States ||
+				null == StatesUtils.Get() ||
 				null == GlobalExplorer.GetInstance().GetLibraryByIndex(index - 1)
 			)
 			{
 				return;
 			}
 
-			GlobalExplorer.GetInstance().States.CurrentLibrary = GlobalExplorer.GetInstance().GetLibraryByIndex(index - 1);
+			StatesUtils.Get().CurrentLibrary = GlobalExplorer.GetInstance().GetLibraryByIndex(index - 1);
 		}
 	}
 }
