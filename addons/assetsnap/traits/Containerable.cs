@@ -21,6 +21,7 @@
 // SOFTWARE.
 
 #if TOOLS
+
 using AssetSnap.Trait;
 using Godot;
 
@@ -40,51 +41,7 @@ namespace AssetSnap.Component
 			Name = "Containerable";
 			TypeString = GetType().ToString();
 		}
-
-		/// <summary>
-		/// Instantiate an instance of the trait.
-		/// </summary>
-		/// <returns>Returns the instantiated Containerable instance.</returns>
-		public override Containerable Instantiate()
-		{
-			base._Instantiate();
-			base.Instantiate();
-
-			Plugin.Singleton.traitGlobal.AddInstance(Iteration, Dependencies[TraitName + "_Container"].As<Container>(), OwnerName, TypeString, Dependencies);
-			Plugin.Singleton.traitGlobal.AddName(Iteration, TraitName, OwnerName, TypeString);
-
-			Reset();
-			Iteration += 1;
-			Dependencies = new();
-
-			return this;
-		}
-
-		/// <summary>
-		/// Selects a placed container in the nodes array by index.
-		/// </summary>
-		/// <param name="index">The index of the container to select.</param>
-		/// <param name="debug">Optional parameter to enable debugging.</param>
-		/// <returns>Returns the updated Containerable instance.</returns>
-		public override Containerable Select(int index, bool debug = false)
-		{
-			base.Select(index, debug);
-
-			return this;
-		}
-
-		/// <summary>
-		/// Selects a placed container in the nodes array by name.
-		/// </summary>
-		/// <param name="name">The name of the container to select.</param>
-		/// <returns>Returns the updated Containerable instance.</returns>
-		public override Containerable SelectByName(string name)
-		{
-			base.SelectByName(name);
-
-			return this;
-		}
-
+		
 		/// <summary>
 		/// Adds the currently chosen container to a specified container.
 		/// </summary>
@@ -121,6 +78,50 @@ namespace AssetSnap.Component
 			}
 
 			base._AddToContainer(Container, Dependencies[TraitName + "_MarginContainer"].As<MarginContainer>(), index);
+		}
+
+		/// <summary>
+		/// Instantiate an instance of the trait.
+		/// </summary>
+		/// <returns>Returns the instantiated Containerable instance.</returns>
+		public override Containerable Instantiate()
+		{
+			base._Instantiate();
+			base.Instantiate();
+
+			Plugin.Singleton.TraitGlobal.AddInstance(Iteration, Dependencies[TraitName + "_Container"].As<Container>(), OwnerName, TypeString, Dependencies);
+			Plugin.Singleton.TraitGlobal.AddName(Iteration, TraitName, OwnerName, TypeString);
+
+			Reset();
+			Iteration += 1;
+			Dependencies = new();
+
+			return this;
+		}
+
+		/// <summary>
+		/// Selects a placed container in the nodes array by index.
+		/// </summary>
+		/// <param name="index">The index of the container to select.</param>
+		/// <param name="debug">Optional parameter to enable debugging.</param>
+		/// <returns>Returns the updated Containerable instance.</returns>
+		public override Containerable Select(int index, bool debug = false)
+		{
+			base.Select(index, debug);
+
+			return this;
+		}
+
+		/// <summary>
+		/// Selects a placed container in the nodes array by name.
+		/// </summary>
+		/// <param name="name">The name of the container to select.</param>
+		/// <returns>Returns the updated Containerable instance.</returns>
+		public override Containerable SelectByName(string name)
+		{
+			base.SelectByName(name);
+
+			return this;
 		}
 
 		/// <summary>
@@ -290,9 +291,9 @@ namespace AssetSnap.Component
 		}
 
 		/// <summary>
-        /// Returns the parent container of the current container.
-        /// </summary>
-        /// <returns>Returns the parent container.</returns>
+		/// Returns the parent container of the current container.
+		/// </summary>
+		/// <returns>Returns the parent container.</returns>
 		public Node GetContainerParent()
 		{
 			return GetParentContainer();
