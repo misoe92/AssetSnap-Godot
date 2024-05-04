@@ -21,6 +21,7 @@
 // SOFTWARE.
 
 #if TOOLS
+
 using AssetSnap.Trait;
 using Godot;
 
@@ -32,9 +33,6 @@ namespace AssetSnap.Component
 	[Tool]
 	public partial class Labelable : ContainerTrait
 	{
-		/*
-		** Enums
-		*/
 		public enum TitleType
 		{
 			HeaderSmall,
@@ -48,10 +46,10 @@ namespace AssetSnap.Component
 		/*
 		** Protected
 		*/
-		protected string Title = "";
-		protected string Suffix = "";
-		protected TitleType Type = TitleType.HeaderMedium;
-		protected TextServer.AutowrapMode AutowrapMode = TextServer.AutowrapMode.Off;
+		protected string _Title = "";
+		protected string _Suffix = "";
+		protected TitleType _Type = TitleType.HeaderMedium;
+		protected TextServer.AutowrapMode _AutowrapMode = TextServer.AutowrapMode.Off;
 		protected HorizontalAlignment _HorizontalAlignment;
 
 		/// <summary>
@@ -60,6 +58,7 @@ namespace AssetSnap.Component
 		public Labelable()
 		{
 			Name = "Labelable";
+			
 			Margin = new()
 			{
 				{"left", 15},
@@ -72,6 +71,31 @@ namespace AssetSnap.Component
 			SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
 			SizeFlagsVertical = Control.SizeFlags.ShrinkBegin;
 		}
+		
+		/// <summary>
+		/// Adds the currently chosen button to a specified container.
+		/// </summary>
+		/// <param name="Container">The container to add the button to.</param>
+		/// <param name="index">The optional index at which to add the button.</param>
+		public void AddToContainer(Node Container, int? index = null)
+		{
+			if (null == Dependencies)
+			{
+				GD.PushError("Dependencies not set @ AddToContainer");
+				return;
+			}
+
+			if (false == Dependencies.ContainsKey(TraitName + "_MarginContainer"))
+			{
+				GD.PushError("Container was not found @ AddToContainer");
+				GD.PushError("AddToContainer::Keys-> ", Dependencies.Keys);
+				GD.PushError("AddToContainer::ADDTO-> ", TraitName + "_MarginContainer");
+				return;
+			}
+
+			base._AddToContainer(Container, Dependencies[TraitName + "_MarginContainer"].As<MarginContainer>(), index);
+			Reset();
+		}
 
 		/// <summary>
 		/// Instantiate an instance of the trait.
@@ -81,7 +105,7 @@ namespace AssetSnap.Component
 		{
 			base._Instantiate();
 
-			if ("" != Suffix)
+			if ("" != _Suffix)
 			{
 				Orientation = ContainerOrientation.Horizontal;
 				InnerOrientation = ContainerOrientation.Vertical;
@@ -89,7 +113,7 @@ namespace AssetSnap.Component
 			}
 
 			base.Instantiate();
-			if (Title == "")
+			if (_Title == "")
 			{
 				GD.PushWarning("Title not found");
 				return this;
@@ -98,25 +122,25 @@ namespace AssetSnap.Component
 			Label Label = new()
 			{
 				Name = TraitName,
-				Text = Title,
+				Text = _Title,
 				CustomMinimumSize = CustomMinimumSize,
 				Size = Size,
-				ThemeTypeVariation = Type.ToString(),
+				ThemeTypeVariation = _Type.ToString(),
 				SizeFlagsHorizontal = SizeFlagsHorizontal,
 				SizeFlagsVertical = SizeFlagsVertical,
-				AutowrapMode = AutowrapMode,
+				AutowrapMode = _AutowrapMode,
 				HorizontalAlignment = _HorizontalAlignment
 			};
 
 			GetInnerContainer(0)
 				.AddChild(Label);
 
-			if ("" != Suffix)
+			if ("" != _Suffix)
 			{
 				Label suffix = new()
 				{
 					Name = TraitName + "-suffix",
-					Text = Suffix,
+					Text = _Suffix,
 					ThemeTypeVariation = "TextExtraSmall",
 					SizeFlagsHorizontal = Control.SizeFlags.ShrinkCenter,
 					SizeFlagsVertical = Control.SizeFlags.ShrinkBegin,
@@ -131,8 +155,8 @@ namespace AssetSnap.Component
 
 			Dependencies[TraitName + "_WorkingNode"] = Label;
 
-			Plugin.Singleton.traitGlobal.AddInstance(Iteration, Label, OwnerName, TypeString, Dependencies);
-			Plugin.Singleton.traitGlobal.AddName(Iteration, TraitName, OwnerName, TypeString);
+			Plugin.Singleton.TraitGlobal.AddInstance(Iteration, Label, OwnerName, TypeString, Dependencies);
+			Plugin.Singleton.TraitGlobal.AddName(Iteration, TraitName, OwnerName, TypeString);
 
 
 			Reset();
@@ -159,7 +183,7 @@ namespace AssetSnap.Component
 
 			if (false != Dependencies.ContainsKey(TraitName + "_WorkingNode"))
 			{
-				Godot.Collections.Dictionary<string, Variant> dependencies = Plugin.Singleton.traitGlobal.GetDependencies(index, TypeString, OwnerName);
+				Godot.Collections.Dictionary<string, Variant> dependencies = Plugin.Singleton.TraitGlobal.GetDependencies(index, TypeString, OwnerName);
 				Dependencies = dependencies;
 				if (debug)
 				{
@@ -190,31 +214,6 @@ namespace AssetSnap.Component
 		}
 
 		/// <summary>
-		/// Adds the currently chosen button to a specified container.
-		/// </summary>
-		/// <param name="Container">The container to add the button to.</param>
-		/// <param name="index">The optional index at which to add the button.</param>
-		public void AddToContainer(Node Container, int? index = null)
-		{
-			if (null == Dependencies)
-			{
-				GD.PushError("Dependencies not set @ AddToContainer");
-				return;
-			}
-
-			if (false == Dependencies.ContainsKey(TraitName + "_MarginContainer"))
-			{
-				GD.PushError("Container was not found @ AddToContainer");
-				GD.PushError("AddToContainer::Keys-> ", Dependencies.Keys);
-				GD.PushError("AddToContainer::ADDTO-> ", TraitName + "_MarginContainer");
-				return;
-			}
-
-			base._AddToContainer(Container, Dependencies[TraitName + "_MarginContainer"].As<MarginContainer>(), index);
-			Reset();
-		}
-
-		/// <summary>
 		/// Sets the name of the current label.
 		/// </summary>
 		/// <param name="text">The name to set.</param>
@@ -233,7 +232,7 @@ namespace AssetSnap.Component
 		/// <returns>Returns the modified Labelable.</returns>
 		public Labelable SetText(string text)
 		{
-			Title = text;
+			_Title = text;
 
 			if (
 				false != Dependencies.ContainsKey(TraitName + "_WorkingNode") &&
@@ -253,7 +252,7 @@ namespace AssetSnap.Component
 		/// <returns>Returns the modified Labelable.</returns>
 		public Labelable SetSuffix(string text)
 		{
-			Suffix = text;
+			_Suffix = text;
 
 			return this;
 		}
@@ -265,16 +264,16 @@ namespace AssetSnap.Component
 		/// <returns>Returns the modified Labelable.</returns>
 		public Labelable SetType(TitleType type)
 		{
-			Type = type;
+			_Type = type;
 
 			return this;
 		}
 
 		/// <summary>
-        /// Sets the horizontal size flag for the container, controlling the behavior of the x-axis.
-        /// </summary>
-        /// <param name="flag">The size flag to set.</param>
-        /// <returns>The updated <see cref="Labelable"/> instance.</returns>
+		/// Sets the horizontal size flag for the container, controlling the behavior of the x-axis.
+		/// </summary>
+		/// <param name="flag">The size flag to set.</param>
+		/// <returns>The updated <see cref="Labelable"/> instance.</returns>
 		public override Labelable SetContainerHorizontalSizeFlag(Control.SizeFlags flag)
 		{
 			base.SetContainerHorizontalSizeFlag(flag);
@@ -338,7 +337,7 @@ namespace AssetSnap.Component
 		/// <returns>Returns the modified Labelable.</returns>
 		public Labelable SetAutoWrap(TextServer.AutowrapMode mode)
 		{
-			AutowrapMode = mode;
+			_AutowrapMode = mode;
 
 			return this;
 		}
@@ -362,7 +361,7 @@ namespace AssetSnap.Component
 		/// <returns>Returns the text of the label.</returns>
 		public string GetTitle()
 		{
-			return Title;
+			return _Title;
 		}
 
 		/// <summary>
@@ -406,8 +405,8 @@ namespace AssetSnap.Component
 		/// </summary>
 		protected override void Reset()
 		{
-			Title = "";
-			Suffix = "";
+			_Title = "";
+			_Suffix = "";
 
 			base.Reset();
 
