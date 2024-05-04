@@ -30,10 +30,6 @@ namespace AssetSnap.Front.Nodes
 	[Tool]
 	public partial class HoverableMarginContainer : MarginContainer
 	{
-		private Callable? MouseEnterCallable; 
-		private Callable? MouseLeaveCallable; 
-		private Callable? MouseClickCallable;
-
 		/// <summary>
 		/// The color when not hovered.
 		/// </summary>
@@ -65,39 +61,43 @@ namespace AssetSnap.Front.Nodes
 		public Color TextHoverColor = new Color(189.0f / 255.0f,189.0f / 255.0f,189.0f / 255.0f,255.0f / 255.0f);
 		
 		/// <summary>
-        /// The text color when focused.
-        /// </summary>
+		/// The text color when focused.
+		/// </summary>
 		[Export]
 		public Color TextFocusColor = new Color(189.0f / 255.0f,189.0f / 255.0f,189.0f / 255.0f,255.0f / 255.0f);
+		
+		private Callable? _MouseEnterCallable; 
+		private Callable? _MouseLeaveCallable; 
+		private Callable? _MouseClickCallable;
 	
 		/// <summary>
-        /// Configures the hoverable margin container.
-        /// </summary>
+		/// Configures the hoverable margin container.
+		/// </summary>
 		public override void _EnterTree()
 		{
-			MouseEnterCallable = new Callable(this, "_MouseEnter");
-			MouseLeaveCallable = new Callable(this, "_MouseLeave");
-			MouseClickCallable = new Callable(this, "_MouseClick");
+			_MouseEnterCallable = new Callable(this, "_MouseEnter");
+			_MouseLeaveCallable = new Callable(this, "_MouseLeave");
+			_MouseClickCallable = new Callable(this, "_MouseClick");
 			
-			if( MouseEnterCallable is Callable _EnterCallable ) 
+			if( _MouseEnterCallable is Callable _EnterCallable ) 
 			{
 				Connect(Control.SignalName.MouseEntered, _EnterCallable);		
 			}
 			
-			if( MouseLeaveCallable is Callable _LeaveCallable ) 
+			if( _MouseLeaveCallable is Callable _LeaveCallable ) 
 			{
 				Connect(Control.SignalName.MouseExited, _LeaveCallable); 
 			}
 				
-			if( MouseClickCallable is Callable _ClickCallable ) 
+			if( _MouseClickCallable is Callable _ClickCallable ) 
 			{
 				Connect(Control.SignalName.GuiInput, _ClickCallable); 
 			}
 		}
 
 		/// <summary>
-        /// Handles transitions to hover color.
-        /// </summary>
+		/// Handles transitions to hover color.
+		/// </summary>
 		public virtual void _MouseEnter()
 		{
 			Label _Label = GetNode<Label>("VBoxContainer/Label");
@@ -113,8 +113,8 @@ namespace AssetSnap.Front.Nodes
 		}
 		
 		/// <summary>
-        /// Handles transitions back to normal color.
-        /// </summary>
+		/// Handles transitions back to normal color.
+		/// </summary>
 		public virtual void _MouseLeave()
 		{
 			Label _Label = GetNode<Label>("VBoxContainer/Label");
@@ -130,9 +130,9 @@ namespace AssetSnap.Front.Nodes
 		}
 		
 		/// <summary>
-        /// If parent is a select list, on click sets the active of said select list to that of this class.
-        /// </summary>
-        /// <param name="event">The input event.</param>
+		/// If parent is a select list, on click sets the active of said select list to that of this class.
+		/// </summary>
+		/// <param name="event">The input event.</param>
 		public virtual void _MouseClick( InputEvent @event )
 		{
 			if( @event is InputEventMouseButton EventMouseButton ) 
@@ -157,9 +157,9 @@ namespace AssetSnap.Front.Nodes
 		}
 		
 		/// <summary>
-        /// Checks if parent is a select list, if so checks if this item equals the active item.
-        /// </summary>
-        /// <returns>True if active, false otherwise.</returns>
+		/// Checks if parent is a select list, if so checks if this item equals the active item.
+		/// </summary>
+		/// <returns>True if active, false otherwise.</returns>
 		public virtual bool IsActive()
 		{
 			var _parent = GetParent();
@@ -176,11 +176,11 @@ namespace AssetSnap.Front.Nodes
 		}
 
 		/// <summary>
-        /// Cleans up references, parameters, and fields.
-        /// </summary>
+		/// Cleans up references, parameters, and fields.
+		/// </summary>
 		public override void _ExitTree()
 		{
-			if( MouseEnterCallable is Callable _EnterCallable ) 
+			if( _MouseEnterCallable is Callable _EnterCallable ) 
 			{
 				if(IsConnected(Control.SignalName.MouseEntered, _EnterCallable)) 
 				{
@@ -188,7 +188,7 @@ namespace AssetSnap.Front.Nodes
 				}
 			}
 			
-			if( MouseLeaveCallable is Callable _LeaveCallable ) 
+			if( _MouseLeaveCallable is Callable _LeaveCallable ) 
 			{
 				if(IsConnected(Control.SignalName.MouseExited, _LeaveCallable)) 
 				{
@@ -196,7 +196,7 @@ namespace AssetSnap.Front.Nodes
 				}
 			}
 				 
-			if( MouseClickCallable is Callable _ClickCallable ) 
+			if( _MouseClickCallable is Callable _ClickCallable ) 
 			{
 				if(IsConnected(Control.SignalName.GuiInput, _ClickCallable)) 
 				{
@@ -204,9 +204,9 @@ namespace AssetSnap.Front.Nodes
 				}
 			}
 
-			MouseEnterCallable = null;
-			MouseLeaveCallable = null;
-			MouseClickCallable = null;
+			_MouseEnterCallable = null;
+			_MouseLeaveCallable = null;
+			_MouseClickCallable = null;
 			
 			base._ExitTree();
 		}

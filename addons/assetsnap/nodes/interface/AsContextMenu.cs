@@ -40,21 +40,17 @@ namespace AssetSnap.Front.Nodes
 		
 		public bool Active = false;
 		
-		private float ScaleValueX = 1.0f;
-		private float ScaleValueY = 1.0f;
-		private float ScaleValueZ = 1.0f;
-		private float RotValueX = 0.0f;
-		private float RotValueY = 0.0f;
-		private float RotValueZ = 0.0f;
-		
-		/** Responsive Params **/
-		private int largeScreenOffsetX = 135;
-		private int mediumScreenOffsetX = 140;
-		private int smallScreenOffsetX = 145;
-
-		private int screenOffsetY = 123;
-
-		private string BelongsToSceneName = "";
+		private string _BelongsToSceneName = "";
+		private float _ScaleValueX = 1.0f;
+		private float _ScaleValueY = 1.0f;
+		private float _ScaleValueZ = 1.0f;
+		private float _RotValueX = 0.0f;
+		private float _RotValueY = 0.0f;
+		private float _RotValueZ = 0.0f;
+		private int _LargeScreenOffsetX = 135;
+		private int _MediumScreenOffsetX = 140;
+		private int _SmallScreenOffsetX = 145;
+		private int _ScreenOffsetY = 123;
 
 		/// <summary>
 		/// Called when the node enters the scene tree.
@@ -149,8 +145,8 @@ namespace AssetSnap.Front.Nodes
 		/// <param name="Rot">The rotation value to set.</param>
 		public void SetRotationX( float Rot ) 
 		{
-			RotValueX = Rot;
-			UpdateRotate();
+			_RotValueX = Rot;
+			_UpdateRotate();
 		}
 		
 		/// <summary>
@@ -159,8 +155,8 @@ namespace AssetSnap.Front.Nodes
 		/// <param name="Rot">The rotation value to set.</param>
 		public void SetRotationY( float Rot ) 
 		{
-			RotValueY = Rot;
-			UpdateRotate();
+			_RotValueY = Rot;
+			_UpdateRotate();
 		}
 		
 		/// <summary>
@@ -169,8 +165,8 @@ namespace AssetSnap.Front.Nodes
 		/// <param name="Rot">The rotation value to set.</param>
 		public void SetRotationZ( float Rot ) 
 		{
-			RotValueZ = Rot;
-			UpdateRotate();
+			_RotValueZ = Rot;
+			_UpdateRotate();
 		}
 		
 		/// <summary>
@@ -179,8 +175,8 @@ namespace AssetSnap.Front.Nodes
 		/// <param name="value">The scaling value to set.</param>
 		public void SetScaleX( float value ) 
 		{
-			ScaleValueX = value;
-			UpdateScale();
+			_ScaleValueX = value;
+			_UpdateScale();
 		}
 		
 		/// <summary>
@@ -189,8 +185,8 @@ namespace AssetSnap.Front.Nodes
 		/// <param name="value">The scaling value to set.</param>
 		public void SetScaleY( float value ) 
 		{
-			ScaleValueY = value;
-			UpdateScale();
+			_ScaleValueY = value;
+			_UpdateScale();
 		}
 		
 		/// <summary>
@@ -199,8 +195,8 @@ namespace AssetSnap.Front.Nodes
 		/// <param name="value">The scaling value to set.</param>
 		public void SetScaleZ( float value ) 
 		{
-			ScaleValueZ = value;
-			UpdateScale();
+			_ScaleValueZ = value;
+			_UpdateScale();
 		}
 		
 		/// <summary>
@@ -209,7 +205,7 @@ namespace AssetSnap.Front.Nodes
 		/// <returns>The rotation value around the X-axis.</returns>
 		public float GetRotationX() 
 		{
-			return RotValueX;
+			return _RotValueX;
 		}
 		
 		/// <summary>
@@ -218,7 +214,7 @@ namespace AssetSnap.Front.Nodes
 		/// <returns>The rotation value around the Y-axis.</returns>
 		public float GetRotationY() 
 		{
-			return RotValueY;
+			return _RotValueY;
 		}
 		
 		/// <summary>
@@ -227,7 +223,7 @@ namespace AssetSnap.Front.Nodes
 		/// <returns>The rotation value around the Z-axis.</returns>
 		public float GetRotationZ() 
 		{
-			return RotValueZ;
+			return _RotValueZ;
 		}
 		
 		/// <summary>
@@ -236,7 +232,7 @@ namespace AssetSnap.Front.Nodes
 		/// <returns>The scaling value along the X-axis.</returns>
 		public float GetScaleX() 
 		{
-			return ScaleValueX;
+			return _ScaleValueX;
 		}
 		
 		/// <summary>
@@ -245,7 +241,7 @@ namespace AssetSnap.Front.Nodes
 		/// <returns>The scaling value along the Y-axis.</returns>
 		public float GetScaleY() 
 		{
-			return ScaleValueY;
+			return _ScaleValueY;
 		}
 		
 		/// <summary>
@@ -254,7 +250,7 @@ namespace AssetSnap.Front.Nodes
 		/// <returns>The scaling value along the Z-axis.</returns>
 		public float GetScaleZ() 
 		{
-			return ScaleValueZ;
+			return _ScaleValueZ;
 		}
 		
 		/// <summary>
@@ -263,137 +259,7 @@ namespace AssetSnap.Front.Nodes
 		/// <returns>The index of the angle.</returns>
 		public int GetAngleIndex()
 		{
-			return GetAngles()._ActiveIndex;
-		}
-		
-		/// <summary>
-		/// Called when the X-axis rotation value is changed.
-		/// </summary>
-		/// <param name="value">The new X-axis rotation value.</param>
-		public void _OnRotateXChanged( float value )
-		{
-			if( RotValueX == value ) 
-			{
-				return;
-			}
-			
-			RotValueX = value;
-		}
-		
-		/// <summary>
-		/// Called when the Y-axis rotation value is changed.
-		/// </summary>
-		/// <param name="value">The new Y-axis rotation value.</param>
-		public void _OnRotateYChanged( float value )
-		{
-			if( RotValueY == value ) 
-			{
-				return;
-			}
-			
-			RotValueY = value;
-		}
-		
-		/// <summary>
-		/// Called when the node receives a change in rotation around the X-axis.
-		/// </summary>
-		/// <param name="value">The new rotation value around the X-axis.</param>
-		public void _OnRotateZChanged( float value )
-		{
-			if( RotValueZ == value ) 
-			{
-				return;
-			}
-			
-			RotValueZ = value;
-		}
-		
-		/// <summary>
-		/// Called when the X-axis scaling value is changed.
-		/// </summary>
-		/// <param name="value">The new X-axis scaling value.</param>
-		public void _OnScaleXChanged( float value )
-		{
-			if( ScaleValueX == value ) 
-			{
-				return;
-			}
-			
-			ScaleValueX = value;
-		}
-		
-		/// <summary>
-		/// Called when the Y-axis scaling value is changed.
-		/// </summary>
-		/// <param name="value">The new Y-axis scaling value.</param>
-		public void _OnScaleYChanged( float value )
-		{
-			if( ScaleValueY == value ) 
-			{
-				return;
-			}
-			
-			ScaleValueY = value;
-		}
-		
-		/// <summary>
-		/// Called when the Z-axis scaling value is changed.
-		/// </summary>
-		/// <param name="value">The new Z-axis scaling value.</param>
-		public void _OnScaleZChanged( float value )
-		{
-			if( ScaleValueZ == value ) 
-			{
-				return;
-			}
-			
-			ScaleValueZ = value;
-		}
-		
-		/// <summary>
-		/// Adjusts the position of the context menu based on the current window size.
-		/// </summary>
-		private void _OnResize()
-		{
-			Vector2 WindowSize = EditorInterface.Singleton.GetBaseControl().Size;
-			Control DockOne = EditorInterface.Singleton.GetFileSystemDock().GetParent<Control>();
-			Vector2 CurrentPosition = Position;
-			
-			if( WindowSize.X < 1300.0f ) 
-			{
-				CurrentPosition.X = DockOne.Size.X + smallScreenOffsetX;
-			}
-			else if( WindowSize.X < 1600.0f ) 
-			{
-				CurrentPosition.X = DockOne.Size.X + mediumScreenOffsetX;
-			}
-			else 
-			{
-				CurrentPosition.X = DockOne.Size.X + largeScreenOffsetX;
-			}
-			
-			CurrentPosition.Y = screenOffsetY;
-			Position = CurrentPosition;
-		}
-
-		/// <summary>
-		/// Updates the scale values displayed in the UI.
-		/// </summary>
-		private void UpdateScale()
-		{
-			ScaleNodeX().Value = GetScaleX();
-			ScaleNodeY().Value = GetScaleY();
-			ScaleNodeZ().Value = GetScaleZ();
-		}
-		
-		/// <summary>
-		/// Updates the rotation values displayed in the UI.
-		/// </summary>
-		private void UpdateRotate()
-		{
-			RotationNodeX().Value = GetRotationX();
-			RotationNodeY().Value = GetRotationY();
-			RotationNodeZ().Value = GetRotationZ();
+			return GetAngles().ActiveIndex;
 		}
 		
 		/// <summary>
@@ -415,10 +281,140 @@ namespace AssetSnap.Front.Nodes
 		}
 		
 		/// <summary>
+		/// Called when the X-axis rotation value is changed.
+		/// </summary>
+		/// <param name="value">The new X-axis rotation value.</param>
+		private void _OnRotateXChanged( float value )
+		{
+			if( _RotValueX == value ) 
+			{
+				return;
+			}
+			
+			_RotValueX = value;
+		}
+		
+		/// <summary>
+		/// Called when the Y-axis rotation value is changed.
+		/// </summary>
+		/// <param name="value">The new Y-axis rotation value.</param>
+		private void _OnRotateYChanged( float value )
+		{
+			if( _RotValueY == value ) 
+			{
+				return;
+			}
+			
+			_RotValueY = value;
+		}
+		
+		/// <summary>
+		/// Called when the node receives a change in rotation around the X-axis.
+		/// </summary>
+		/// <param name="value">The new rotation value around the X-axis.</param>
+		private void _OnRotateZChanged( float value )
+		{
+			if( _RotValueZ == value ) 
+			{
+				return;
+			}
+			
+			_RotValueZ = value;
+		}
+		
+		/// <summary>
+		/// Called when the X-axis scaling value is changed.
+		/// </summary>
+		/// <param name="value">The new X-axis scaling value.</param>
+		private void _OnScaleXChanged( float value )
+		{
+			if( _ScaleValueX == value ) 
+			{
+				return;
+			}
+			
+			_ScaleValueX = value;
+		}
+		
+		/// <summary>
+		/// Called when the Y-axis scaling value is changed.
+		/// </summary>
+		/// <param name="value">The new Y-axis scaling value.</param>
+		private void _OnScaleYChanged( float value )
+		{
+			if( _ScaleValueY == value ) 
+			{
+				return;
+			}
+			
+			_ScaleValueY = value;
+		}
+		
+		/// <summary>
+		/// Called when the Z-axis scaling value is changed.
+		/// </summary>
+		/// <param name="value">The new Z-axis scaling value.</param>
+		private void _OnScaleZChanged( float value )
+		{
+			if( _ScaleValueZ == value ) 
+			{
+				return;
+			}
+			
+			_ScaleValueZ = value;
+		}
+		
+		/// <summary>
+		/// Adjusts the position of the context menu based on the current window size.
+		/// </summary>
+		private void _OnResize()
+		{
+			Vector2 WindowSize = EditorInterface.Singleton.GetBaseControl().Size;
+			Control DockOne = EditorInterface.Singleton.GetFileSystemDock().GetParent<Control>();
+			Vector2 CurrentPosition = Position;
+			
+			if( WindowSize.X < 1300.0f ) 
+			{
+				CurrentPosition.X = DockOne.Size.X + _SmallScreenOffsetX;
+			}
+			else if( WindowSize.X < 1600.0f ) 
+			{
+				CurrentPosition.X = DockOne.Size.X + _MediumScreenOffsetX;
+			}
+			else 
+			{
+				CurrentPosition.X = DockOne.Size.X + _LargeScreenOffsetX;
+			}
+			
+			CurrentPosition.Y = _ScreenOffsetY;
+			Position = CurrentPosition;
+		}
+
+		/// <summary>
+		/// Updates the scale values displayed in the UI.
+		/// </summary>
+		private void _UpdateScale()
+		{
+			_ScaleNodeX().Value = GetScaleX();
+			_ScaleNodeY().Value = GetScaleY();
+			_ScaleNodeZ().Value = GetScaleZ();
+		}
+		
+		/// <summary>
+		/// Updates the rotation values displayed in the UI.
+		/// </summary>
+		private void _UpdateRotate()
+		{
+			_RotationNodeX().Value = GetRotationX();
+			_RotationNodeY().Value = GetRotationY();
+			_RotationNodeZ().Value = GetRotationZ();
+		}
+		
+		/// <summary>
 		/// Retrieves the SpinBox node for X-axis rotation.
 		/// </summary>
 		/// <returns>The SpinBox node for X-axis rotation.</returns>
-		private SpinBox RotationNodeX()
+		private SpinBox _RotationNodeX()
 		{
 			return GetNode<SpinBox>("HBoxContainer/RotateValues/RotateAngleX/SpinBox");
 		}
@@ -427,7 +423,7 @@ namespace AssetSnap.Front.Nodes
 		/// Retrieves the SpinBox node for Y-axis rotation.
 		/// </summary>
 		/// <returns>The SpinBox node for Y-axis rotation.</returns>
-		private SpinBox RotationNodeY()
+		private SpinBox _RotationNodeY()
 		{
 			return GetNode<SpinBox>("HBoxContainer/RotateValues/RotateAngleY/SpinBox");
 		}
@@ -436,7 +432,7 @@ namespace AssetSnap.Front.Nodes
 		/// Retrieves the SpinBox node for Z-axis rotation.
 		/// </summary>
 		/// <returns>The SpinBox node for Z-axis rotation.</returns>
-		private SpinBox RotationNodeZ()
+		private SpinBox _RotationNodeZ()
 		{
 			return GetNode<SpinBox>("HBoxContainer/RotateValues/RotateAngleZ/SpinBox");
 		}
@@ -445,7 +441,7 @@ namespace AssetSnap.Front.Nodes
 		/// Retrieves the SpinBox node for X-axis scaling.
 		/// </summary>
 		/// <returns>The SpinBox node for X-axis scaling.</returns>
-		private SpinBox ScaleNodeX()
+		private SpinBox _ScaleNodeX()
 		{
 			return GetNode<SpinBox>("HBoxContainer/ScaleValues/ScaleAngleX/SpinBox");
 		}
@@ -454,16 +450,16 @@ namespace AssetSnap.Front.Nodes
 		/// Retrieves the SpinBox node for Y-axis scaling.
 		/// </summary>
 		/// <returns>The SpinBox node for Y-axis scaling.</returns>
-		private SpinBox ScaleNodeY()
+		private SpinBox _ScaleNodeY()
 		{
 			return GetNode<SpinBox>("HBoxContainer/ScaleValues/ScaleAngleY/SpinBox");
 		}
 		
 		/// <summary>
-        /// Retrieves the SpinBox node for Z-axis scaling.
-        /// </summary>
-        /// <returns>The SpinBox node for Z-axis scaling.</returns>
-		private SpinBox ScaleNodeZ()
+		/// Retrieves the SpinBox node for Z-axis scaling.
+		/// </summary>
+		/// <returns>The SpinBox node for Z-axis scaling.</returns>
+		private SpinBox _ScaleNodeZ()
 		{
 			return GetNode<SpinBox>("HBoxContainer/ScaleValues/ScaleAngleZ/SpinBox");
 		}

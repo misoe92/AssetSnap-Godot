@@ -43,37 +43,7 @@ namespace AssetSnap.Front.Nodes
 		/// </summary>
 		[Export]
 		public string Title { get; set; } = "";
-
-		/// <summary>
-		/// The paths of resource.
-		/// </summary>
-		[Export]
-		public Godot.Collections.Array<string> _Paths { get; set; } = new();
-
-		/// <summary>
-		/// The origins of resource.
-		/// </summary>
-		[Export]
-		public Godot.Collections.Dictionary<int, Vector3> _Origins { get; set; } = new();
-
-		/// <summary>
-		/// The rotations of resource.
-		/// </summary>
-		[Export]
-		public Godot.Collections.Dictionary<int, Vector3> _Rotations { get; set; } = new();
-
-		/// <summary>
-		/// The scales of resource.
-		/// </summary>
-		[Export]
-		public Godot.Collections.Dictionary<int, Vector3> _Scales { get; set; } = new();
-
-		/// <summary>
-		/// The options for resource children.
-		/// </summary>
-		[Export]
-		public Godot.Collections.Array<Godot.Collections.Dictionary<string, Variant>> _Options { get; set; } = new();
-
+		
 		/// <summary>
 		/// The snap layer value.
 		/// </summary>
@@ -163,6 +133,36 @@ namespace AssetSnap.Front.Nodes
         /// </summary>
 		[Export]
 		public bool SnapToZ { get; set; } = false;
+
+		/// <summary>
+		/// The paths of resource.
+		/// </summary>
+		[Export]
+		public Godot.Collections.Array<string> _Paths { get; set; } = new();
+
+		/// <summary>
+		/// The origins of resource.
+		/// </summary>
+		[Export]
+		public Godot.Collections.Dictionary<int, Vector3> _Origins { get; set; } = new();
+
+		/// <summary>
+		/// The rotations of resource.
+		/// </summary>
+		[Export]
+		public Godot.Collections.Dictionary<int, Vector3> _Rotations { get; set; } = new();
+
+		/// <summary>
+		/// The scales of resource.
+		/// </summary>
+		[Export]
+		public Godot.Collections.Dictionary<int, Vector3> _Scales { get; set; } = new();
+
+		/// <summary>
+		/// The options for resource children.
+		/// </summary>
+		[Export]
+		public Godot.Collections.Array<Godot.Collections.Dictionary<string, Variant>> _Options { get; set; } = new();
 
 		/// <summary>
 		/// Iterates over each property and performs an action.
