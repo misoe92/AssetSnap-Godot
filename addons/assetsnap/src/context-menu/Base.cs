@@ -36,15 +36,6 @@ namespace AssetSnap.ContextMenu
 	/// </summary>
 	public partial class Base : Node, ISerializationListener
 	{
-		private readonly PackedScene _Scene = GD.Load<PackedScene>("res://addons/assetsnap/scenes/ContextMenu.tscn");
-		public static bool _Instantiated = false;
-		private List<string> Components = new()
-		{
-			"LibrarySnapRotate",
-			"LibrarySnapScale",
-		}; 
-		
-		private static Base _Instance;
 		public static Base Singleton
 		{
 			get
@@ -52,6 +43,15 @@ namespace AssetSnap.ContextMenu
 				return _Instance;
 			}
 		}
+		
+		private static Base _Instance;
+		
+		private readonly PackedScene _Scene = GD.Load<PackedScene>("res://addons/assetsnap/scenes/ContextMenu.tscn");
+		private List<string> _Components = new()
+		{
+			"LibrarySnapRotate",
+			"LibrarySnapScale",
+		}; 
 		
 		/// <summary>
 		/// Constructor for the Base class.
@@ -99,9 +99,9 @@ namespace AssetSnap.ContextMenu
 				AddChild(_NodeInstance);
 			}
 
-			if ( HasComponents() )
+			if ( _HasComponents() )
 			{
-				InitializeComponents();
+				_InitializeComponents();
 			}
 		}
 		
@@ -204,6 +204,21 @@ namespace AssetSnap.ContextMenu
 		}
 		
 		/// <summary>
+		/// Sets the visibility state of the context menu.
+		/// </summary>
+		/// <param name="state">The visibility state.</param>
+		public void SetVisible(bool state)
+		{
+			if( false == HasInstance() ) 
+			{
+				return;
+			}
+			
+			GetInstance().Visible = state;
+			GetInstance().Active = state;
+		}
+		
+		/// <summary>
 		/// Gets the instance of the context menu.
 		/// </summary>
 		/// <returns>The instance of the context menu.</returns>
@@ -215,20 +230,6 @@ namespace AssetSnap.ContextMenu
 			}
 
 			return GetNode("AsContextMenu") as AsContextMenu;
-		}
-		
-		/// <summary>
-		/// Checks if an instance of the context menu exists.
-		/// </summary>
-		/// <returns>True if an instance exists, false otherwise.</returns>
-		public bool HasInstance()
-		{
-			if( false == HasNode("AsContextMenu") || false == EditorPlugin.IsInstanceValid( GetNode("AsContextMenu") ) ) 
-			{
-				return false;
-			}
-
-			return true;
 		}
 		
 		/// <summary>
@@ -289,21 +290,6 @@ namespace AssetSnap.ContextMenu
 		}
 		
 		/// <summary>
-		/// Sets the visibility state of the context menu.
-		/// </summary>
-		/// <param name="state">The visibility state.</param>
-		public void SetVisible(bool state)
-		{
-			if( false == HasInstance() ) 
-			{
-				return;
-			}
-			
-			GetInstance().Visible = state;
-			GetInstance().Active = state;
-		}
-		
-		/// <summary>
 		/// Checks if the context menu is hidden.
 		/// </summary>
 		/// <returns>True if the context menu is hidden, false otherwise.</returns>
@@ -315,6 +301,21 @@ namespace AssetSnap.ContextMenu
 			}
 			
 			return GetInstance().Visible == false;
+		}
+		
+		
+		/// <summary>
+		/// Checks if an instance of the context menu exists.
+		/// </summary>
+		/// <returns>True if an instance exists, false otherwise.</returns>
+		public bool HasInstance()
+		{
+			if( false == HasNode("AsContextMenu") || false == EditorPlugin.IsInstanceValid( GetNode("AsContextMenu") ) ) 
+			{
+				return false;
+			}
+
+			return true;
 		}
 		
 		/// <summary>
@@ -347,7 +348,7 @@ namespace AssetSnap.ContextMenu
 		/// <summary>
 		/// Initializes the components needed for the context menu.
 		/// </summary>
-		public void InitializeComponents()
+		private void _InitializeComponents()
 		{
 			if( false == Plugin.Singleton.HasInternalContainer() ) 
 			{
@@ -381,9 +382,9 @@ namespace AssetSnap.ContextMenu
 		/// Checks if the components needed for the context menu are available.
 		/// </summary>
 		/// <returns>True if all components are available, false otherwise.</returns>
-		public bool HasComponents() 
+		private bool _HasComponents() 
 		{
-			return ExplorerUtils.Get().Components.HasAll(Components.ToArray());
+			return ExplorerUtils.Get().Components.HasAll(_Components.ToArray());
 		}
 		
 		/// <summary>
