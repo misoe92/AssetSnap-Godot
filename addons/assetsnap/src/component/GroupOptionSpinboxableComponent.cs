@@ -21,41 +21,60 @@
 // SOFTWARE.
 
 #if TOOLS
-using AssetSnap.Front.Components;
+
+using AssetSnap.Front.Components.Groups.Builder;
 using Godot;
 
 namespace AssetSnap.Component
 {
+	/// <summary>
+	/// Component for managing group options with spinboxable functionality.
+	/// </summary>
 	[Tool]
 	public partial class GroupOptionSpinboxableComponent : GroupOptionComponent
 	{
-		public GroupBuilderEditorGroupOptions Parent;
+		/// <summary>
+		/// The parent editor group options.
+		/// </summary>
+		public EditorGroupOptions Parent;
 		
+		/// <summary>
+		/// Initializes the component.
+		/// </summary>
 		public override void Initialize()
 		{
-			AddTrait(typeof(Spinboxable));
-			Initiated = true;
+			base.Initialize();
+		
+			_Initiated = true;
 			
 			_InitializeFields();
 			_FinalizeFields();
-			
-			base.Initialize();
 		}
 		
-		public void Show()
+		/// <summary>
+		/// Shows the spinbox input.
+		/// </summary>
+		public void InputShow()
 		{
 			Trait<Spinboxable>()
 				.Select(0)
 				.SetVisible(true);
 		}
 		
-		public void Hide()
+		/// <summary>
+		/// Hides the spinbox input.
+		/// </summary>
+		public void InputHide()
 		{
 			Trait<Spinboxable>()
 				.Select(0)
 				.SetVisible(false);
 		}
 		
+		/// <summary>
+		/// Sets the value of the spinbox.
+		/// </summary>
+		/// <param name="value">The value to set.</param>
 		public void SetValue( double value )
 		{
 			Trait<Spinboxable>()
@@ -64,6 +83,10 @@ namespace AssetSnap.Component
 				.Value = value;
 		}
 		
+		/// <summary>
+		/// Gets the value of the spinbox.
+		/// </summary>
+		/// <returns>The value of the spinbox.</returns>
 		public double GetValue()
 		{
 			return Trait<Spinboxable>()
@@ -72,6 +95,10 @@ namespace AssetSnap.Component
 				.Value;
 		}
 		
+		/// <summary>
+		/// Gets the value of the spinbox as a Variant.
+		/// </summary>
+		/// <returns>The value of the spinbox as a Variant.</returns>
 		public override Variant GetValueVariant()
 		{
 			return Trait<Spinboxable>()
@@ -80,6 +107,10 @@ namespace AssetSnap.Component
 				.Value;
 		}
 		
+		/// <summary>
+		/// Checks if the spinbox input is hidden.
+		/// </summary>
+		/// <returns>True if the spinbox input is hidden, false otherwise.</returns>
 		public bool IsHidden()
 		{
 			return Trait<Spinboxable>()
@@ -87,14 +118,21 @@ namespace AssetSnap.Component
 				.IsVisible() == false;
 		}
 		
+		/// <summary>
+		/// Initializes additional fields of the component.
+		/// </summary>
 		protected virtual void _InitializeFields(){}
 		
+		/// <summary>
+        /// Finalizes the initialization of the fields.
+        /// </summary>
 		protected void _FinalizeFields()
 		{
 			Trait<Spinboxable>()
 				.Select(0)
-				.AddToContainer(Container);
+				.AddToContainer(this);
 		}
 	}
 }
+
 #endif

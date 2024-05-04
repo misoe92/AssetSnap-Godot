@@ -20,30 +20,40 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace AssetSnap.Core 
+#if TOOLS
+
+using AssetSnap.Explorer;
+using AssetSnap.Front.Nodes;
+using Godot;
+
+namespace AssetSnap.Core
 {
-	using AssetSnap.Front.Nodes;
-	using Godot;
-	public class CoreInput : Core 
+	/// <summary>
+    /// Handles input events for the core functionality.
+    /// </summary>
+	public class CoreInput : Core
 	{
 		private EventMouse _MouseEvent = EventMouse.EventNone;
-		
-		/*
-		** Handle GUI input events
-		*/
+
+		/// <summary>
+        /// Handles GUI input events.
+        /// </summary>
+        /// <param name="Camera">The 3D camera.</param>
+        /// <param name="event">The input event.</param>
+        /// <returns>An integer representing the action to take after handling the input.</returns>
 		public int Handle(Camera3D Camera, InputEvent @event)
 		{
-			if( null == _GlobalExplorer )
+			if (null == ExplorerUtils.Get())
 			{
 				return (int)EditorPlugin.AfterGuiInput.Pass;
 			}
 
 			// If no handle is currently set
-			if( false == HasHandle() ) 
+			if (false == _HasHandle())
 			{
-				if( ScrollAllowed() == GlobalExplorer.ScrollState.SCROLL_DISABLED ) 
+				if (_ScrollAllowed() == GlobalExplorer.ScrollState.SCROLL_DISABLED)
 				{
-					_GlobalExplorer.AllowScroll = GlobalExplorer.ScrollState.SCROLL_ENABLED;
+					ExplorerUtils.Get().AllowScroll = GlobalExplorer.ScrollState.SCROLL_ENABLED;
 					return (int)EditorPlugin.AfterGuiInput.Stop;
 				}
 				else
@@ -51,24 +61,25 @@ namespace AssetSnap.Core
 					return (int)EditorPlugin.AfterGuiInput.Pass;
 				}
 			}
-			
-			if( 
-				_GlobalExplorer.GetHandle() is AsMeshInstance3D meshInstance3D && meshInstance3D.IsPlaced() ||
-				_GlobalExplorer.GetHandle() is AsGrouped3D grouped3D && grouped3D.IsPlaced()
-			) 
+
+			if (
+				ExplorerUtils.Get().GetHandle() is AsMeshInstance3D meshInstance3D && meshInstance3D.IsPlaced() ||
+				ExplorerUtils.Get().GetHandle() is AsGrouped3D grouped3D && grouped3D.IsPlaced() ||
+				ExplorerUtils.Get().GetHandle() is AsNode3D node3D && node3D.IsPlaced()
+			)
 			{
 				return (int)EditorPlugin.AfterGuiInput.Pass;
 			}
 
 			// Maybe project from camera, depending on the current event
-			MaybeProjectFromCamera(Camera, @event);
+			_MaybeProjectFromCamera(Camera, @event);
 
 			// Run the input driver, depending on wheather it's drag or normal
-			_GlobalExplorer.InputDriver._Input(Camera, @event);
-			
-			if( ScrollAllowed() == GlobalExplorer.ScrollState.SCROLL_DISABLED ) 
+			ExplorerUtils.Get().InputDriver._Input(Camera, @event);
+
+			if (_ScrollAllowed() == GlobalExplorer.ScrollState.SCROLL_DISABLED)
 			{
-				_GlobalExplorer.AllowScroll = GlobalExplorer.ScrollState.SCROLL_ENABLED;
+				ExplorerUtils.Get().AllowScroll = GlobalExplorer.ScrollState.SCROLL_ENABLED;
 				return (int)EditorPlugin.AfterGuiInput.Stop;
 			}
 			else
@@ -76,86 +87,80 @@ namespace AssetSnap.Core
 				return (int)EditorPlugin.AfterGuiInput.Pass;
 			}
 		}
-		
-		/*
-		** Projects origin and normals from the camera, given the event
-		** position.
-		**
-		** @param Camera3D Camera
-		** @param InputEvent @event
-		** @return void
-		*/
-		private void MaybeProjectFromCamera(Camera3D Camera, InputEvent @event)
+
+		/// <summary>
+        /// Projects origin and normals from the camera, given the event position.
+        /// </summary>
+        /// <param name="Camera">The 3D camera.</param>
+        /// <param name="event">The input event.</param>
+        /// <returns>void</returns>
+		private void _MaybeProjectFromCamera(Camera3D Camera, InputEvent @event)
 		{
-			if( @event is InputEventMouseMotion _MotionEvent ) 
+			if (@event is InputEventMouseMotion _MotionEvent)
 			{
-				if( _GlobalExplorer._CurrentMouseInput != EventMouse.EventClick) 
+				if (ExplorerUtils.Get()._CurrentMouseInput != EventMouse.EventClick)
 				{
-					_GlobalExplorer.ProjectRayOrigin = Camera.ProjectRayOrigin(_MotionEvent.Position);
-					_GlobalExplorer.ProjectRayNormal = Camera.ProjectRayNormal(_MotionEvent.Position);
-					_GlobalExplorer._CurrentMouseInput = EventMouse.EventMove;
+					ExplorerUtils.Get().ProjectRayOrigin = Camera.ProjectRayOrigin(_MotionEvent.Position);
+					ExplorerUtils.Get().ProjectRayNormal = Camera.ProjectRayNormal(_MotionEvent.Position);
+					ExplorerUtils.Get()._CurrentMouseInput = EventMouse.EventMove;
 				}
 			}
 		}
-		
-		/*
-		** Checks if dragging is currently enabled
-		**
-		** @return bool
-		*/
-		public bool ShouldDrag()
+
+		/// <summary>
+        /// Checks if dragging is currently enabled.
+        /// </summary>
+        /// <returns>True if dragging is enabled, otherwise false.</returns>
+		private bool _ShouldDrag()
 		{
-			bool value = _GlobalExplorer.Settings.GetKey("allow_drag_add").As<bool>();
-			
-			if( value is bool valueBool ) 
+			bool value = ExplorerUtils.Get().Settings.GetKey("allow_drag_add").As<bool>();
+
+			if (value is bool valueBool)
 			{
 				return valueBool;
 			}
 
 			return false;
 		}
-		
-		/*
-		** Checks if scroll is disallowed
-		**
-		** @return bool
-		*/
-		public GlobalExplorer.ScrollState ScrollAllowed()
+
+		/// <summary>
+        /// Checks if scroll is disallowed.
+        /// </summary>
+        /// <returns>The current scroll state.</returns>
+		private GlobalExplorer.ScrollState _ScrollAllowed()
 		{
-			return _GlobalExplorer.AllowScroll;
+			return ExplorerUtils.Get().AllowScroll;
 		}
-		
-		/*
-		** Checks if we have a handle, and if its valid
-		**
-		** @return bool
-		*/
-		public bool HasHandle()
+
+		/// <summary>
+        /// Checks if we have a handle, and if it's valid.
+        /// </summary>
+        /// <returns>True if a handle exists and is valid, otherwise false.</returns>
+		private bool _HasHandle()
 		{
-			Node NodeHandle = _GlobalExplorer.GetHandle();
-			return null != NodeHandle; 
+			Node NodeHandle = ExplorerUtils.Get().GetHandle();
+			return null != NodeHandle;
 		}
-		
-		/*
-		** Sets the mouse event that are currently 
-		** being used
-		**
-		** @param EventMouse value
-		** @return void
-		*/
-		public void SetMouseEvent( EventMouse value )
+
+		/// <summary>
+        /// Sets the mouse event that is currently being used.
+        /// </summary>
+        /// <param name="value">The mouse event value.</param>
+        /// <returns>void</returns>
+		private void _SetMouseEvent(EventMouse value)
 		{
 			_MouseEvent = value;
 		}
-		
-		/*
-		** Fetches the current mouse event
-		**
-		** @return EventMouse
-		*/
-		public EventMouse GetMouseEvent()
+
+		/// <summary>
+        /// Fetches the current mouse event.
+        /// </summary>
+        /// <returns>The current mouse event.</returns>
+		private EventMouse _GetMouseEvent()
 		{
 			return _MouseEvent;
 		}
 	}
 }
+
+#endif

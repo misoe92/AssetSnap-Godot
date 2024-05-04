@@ -21,35 +21,77 @@
 // SOFTWARE.
 
 #if TOOLS
+
+using System;
+using System.Collections.Generic;
+using System.Reflection;
+using AssetSnap.Explorer;
+using Godot;
+
 namespace AssetSnap.Debug
 {
-	using System;
-	using System.Collections.Generic;
-	using System.Reflection;
-	using Godot;
-
-	public partial class Inspector : Node
+	/// <summary>
+	/// Partial class for managing the inspector in AssetSnap.
+	/// </summary>
+	public partial class Inspector : Node, ISerializationListener
 	{
-		private static readonly string ThemePath = "res://addons/assetsnap/assets/themes/SnapTheme.tres";
+		/// <summary>
+		/// Singleton instance of the Inspector class.
+		/// </summary>
+		public static Inspector Singleton 
+		{
+			get
+			{
+				return _Instance;
+			}
+		}
+		
+		private static readonly string _ThemePath = "res://addons/assetsnap/assets/themes/SnapTheme.tres";
+		private static Inspector _Instance;
+		
 		private VBoxContainer _Control;
 		private ScrollContainer _ScrollContainer;
 		private VBoxContainer _InnerContainer;
 		private GlobalExplorer _GlobalExplorer;
-
-		private List<string> Categories = new List<string>();
+		private List<string> _Categories = new List<string>();
+		private Godot.Collections.Dictionary<string, Node> _InspectorOptionInstances = new();
 		
+		/// <summary>
+		/// Constructor for Inspector class.
+		/// </summary>
 		public Inspector()
 		{
 			Name = "Inspector";
-		}		
+			_Instance = this;
+		}
+
+		/// <summary>
+		/// Method called before serialization.
+		/// </summary>
+		public void OnBeforeSerialize()
+		{
+			//
+		}
+
+		/// <summary>
+		/// Method called after deserialization.
+		/// </summary>
+		public void OnAfterDeserialize()
+		{
+			_Instance = this;
+		}
+
+		/// <summary>
+		/// Initializes the inspector.
+		/// </summary>
 		public void Initialize()
 		{
-			_GlobalExplorer = GlobalExplorer.GetInstance();
+			_GlobalExplorer = ExplorerUtils.Get();
 		
 			_Control = new()
 			{
 				Name = "AssetSnap Inspector",
-				Theme = GD.Load<Theme>(ThemePath),
+				Theme = GD.Load<Theme>(_ThemePath),
 				SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
 				SizeFlagsVertical = Control.SizeFlags.ExpandFill,
 			};
@@ -73,9 +115,12 @@ namespace AssetSnap.Debug
 			_InitializeInspectorTitle();
 			_BuildChildList();
 
-			_GlobalExplorer._Plugin.StatesChanged += () => { _OnUpdate(); };
+			_GlobalExplorer._Plugin.StatesChanged += (Godot.Collections.Array data) => { _OnUpdate(data); };
 		}	
 		
+		/// <summary>
+		/// Adds the inspector to the dock.
+		/// </summary>
 		public void AddToDock()
 		{
 			if( null == _GlobalExplorer || null == _Control ) 
@@ -86,44 +131,11 @@ namespace AssetSnap.Debug
 			_GlobalExplorer._Plugin.AddControlToDock( EditorPlugin.DockSlot.RightUl, _Control );
 		}
 		
-		private void _InitializeInspectorTitle()
-		{
-			VBoxContainer LabelContainer = new()
-			{
-				SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
-				SizeFlagsVertical = Control.SizeFlags.ShrinkBegin,
-			};
-			
-			MarginContainer marginContainer = new()
-			{
-				SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
-				SizeFlagsVertical = Control.SizeFlags.ShrinkBegin,
-			};
-			
-			marginContainer.AddThemeConstantOverride("margin_left", 15);
-			marginContainer.AddThemeConstantOverride("margin_right", 15);
-			marginContainer.AddThemeConstantOverride("margin_top", 10);
-			marginContainer.AddThemeConstantOverride("margin_bottom", 10);
-			
-			Label title = new()
-			{
-				Text = "State Inspection",
-				ThemeTypeVariation = "HeaderMedium",
-			};
-			
-			Label description = new()
-			{
-				Text = "Use the field below to keep an eye on the various states currently set by the addon. These states will update in real time",
-				AutowrapMode = TextServer.AutowrapMode.Word,
-			};
-
-			LabelContainer.AddChild(title);
-			LabelContainer.AddChild(description);
-			marginContainer.AddChild(LabelContainer);
-			_InnerContainer.AddChild(marginContainer);
-		}
-		
-		public void AddTitle( string titleText )
+		/// <summary>
+		/// Adds a title to the inspector with the specified text.
+		/// </summary>
+		/// <param name="titleText">The text of the title to be added.</param>
+		private void _AddTitle( string titleText )
 		{
 			VBoxContainer LabelContainer = new()
 			{
@@ -154,7 +166,12 @@ namespace AssetSnap.Debug
 			_InnerContainer.AddChild(marginContainer);
 		}
 		
-		public void AddCheckbox( string name, bool value ) 
+		/// <summary>
+		/// Adds a checkbox with the specified name and value to the inspector.
+		/// </summary>
+		/// <param name="name">The name of the checkbox.</param>
+		/// <param name="value">The initial value of the checkbox.</param>
+		private void _AddCheckbox( string name, bool value ) 
 		{
 			PanelContainer panelContainer = new()
 			{
@@ -199,6 +216,8 @@ namespace AssetSnap.Debug
 				SizeFlagsVertical = Control.SizeFlags.ShrinkBegin,
 			};
 
+			_InspectorOptionInstances.Add(name, checkbox);
+
 			InputContainer.AddChild(checkbox);
 			OuterContainer.AddChild(InputContainer);
 			marginContainer.AddChild(OuterContainer);
@@ -206,7 +225,12 @@ namespace AssetSnap.Debug
 			_InnerContainer.AddChild(panelContainer);
 		}
 		
-		public void AddLabelBox(string name, string value )
+		/// <summary>
+		/// Adds a label box with the specified name and value to the inspector.
+		/// </summary>
+		/// <param name="name">The name of the label box.</param>
+		/// <param name="value">The initial value of the label box.</param>
+		private void _AddLabelBox(string name, string value )
 		{
 			PanelContainer panelContainer = new()
 			{
@@ -255,6 +279,7 @@ namespace AssetSnap.Debug
 				SizeFlagsVertical = Control.SizeFlags.ShrinkBegin,
 				AutowrapMode = TextServer.AutowrapMode.WordSmart,
 			};
+			_InspectorOptionInstances.Add(name, valueLabel);
 
 			LabelContainer.AddChild(label);
 			OuterContainer.AddChild(LabelContainer);
@@ -267,7 +292,12 @@ namespace AssetSnap.Debug
 			_InnerContainer.AddChild(panelContainer);
 		}
 		
-		public void AddSpinbox( string name, float value ) 
+		/// <summary>
+		/// Adds a spinbox with the specified name and value to the inspector.
+		/// </summary>
+		/// <param name="name">The name of the spinbox.</param>
+		/// <param name="value">The initial value of the spinbox.</param>
+		private void _AddSpinbox( string name, float value ) 
 		{
 			PanelContainer panelContainer = new()
 			{
@@ -316,6 +346,7 @@ namespace AssetSnap.Debug
 				SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
 				SizeFlagsVertical = Control.SizeFlags.ShrinkBegin,
 			};
+			_InspectorOptionInstances.Add(name, spinbox);
 
 			LabelContainer.AddChild(label);
 			OuterContainer.AddChild(LabelContainer);
@@ -328,6 +359,68 @@ namespace AssetSnap.Debug
 			_InnerContainer.AddChild(panelContainer);
 		}
 		
+		/// <summary>
+		/// Gets the name of the export category for the specified property.
+		/// </summary>
+		/// <param name="propertyInfo">The property info.</param>
+		/// <returns>The name of the export category.</returns>
+		private string _GetExportCategoryName(PropertyInfo propertyInfo)
+		{
+			// Check if the property has ExportCategory attribute
+			ExportCategoryAttribute exportCategoryAttribute = propertyInfo.GetCustomAttribute<ExportCategoryAttribute>();
+
+			if (exportCategoryAttribute != null)
+			{
+				return exportCategoryAttribute.Name;
+			}
+
+			// If the property does not have ExportCategory attribute, return empty string
+			return "";
+		}
+		
+		/// <summary>
+		/// Initializes the inspector title with a predefined text and description.
+		/// </summary>
+		private void _InitializeInspectorTitle()
+		{
+			VBoxContainer LabelContainer = new()
+			{
+				SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
+				SizeFlagsVertical = Control.SizeFlags.ShrinkBegin,
+			};
+			
+			MarginContainer marginContainer = new()
+			{
+				SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
+				SizeFlagsVertical = Control.SizeFlags.ShrinkBegin,
+			};
+			
+			marginContainer.AddThemeConstantOverride("margin_left", 15);
+			marginContainer.AddThemeConstantOverride("margin_right", 15);
+			marginContainer.AddThemeConstantOverride("margin_top", 10);
+			marginContainer.AddThemeConstantOverride("margin_bottom", 10);
+			
+			Label title = new()
+			{
+				Text = "State Inspection",
+				ThemeTypeVariation = "HeaderMedium",
+			};
+			
+			Label description = new()
+			{
+				Text = "Use the field below to keep an eye on the various states currently set by the addon. These states will update in real time",
+				AutowrapMode = TextServer.AutowrapMode.Word,
+			};
+
+			LabelContainer.AddChild(title);
+			LabelContainer.AddChild(description);
+			marginContainer.AddChild(LabelContainer);
+			_InnerContainer.AddChild(marginContainer);
+		}
+		
+		/// <summary>
+		/// Builds the child list of the inspector, adding fields and properties as appropriate.
+		/// </summary>
 		private void _BuildChildList()
 		{
 			Type type = _GlobalExplorer.States.GetType();
@@ -348,23 +441,23 @@ namespace AssetSnap.Debug
 					object value = field.GetValue(_GlobalExplorer.States); // Get the value of the field
 					if( value is bool BoolVal ) 
 					{
-						AddCheckbox(field.Name, BoolVal);
+						_AddCheckbox(field.Name, BoolVal);
 					}
 					else if( value is int intVal )
 					{
-						AddSpinbox(field.Name, (float)intVal);
+						_AddSpinbox(field.Name, (float)intVal);
 					}
 					else if( value is double doubleVal )
 					{
-						AddSpinbox(field.Name, (float)doubleVal);
+						_AddSpinbox(field.Name, (float)doubleVal);
 					}
 					else if( value is float floatVal )
 					{
-						AddSpinbox(field.Name, floatVal);
+						_AddSpinbox(field.Name, floatVal);
 					}
 					else if( null != value ) 
 					{
-						GD.Print(field.Name);
+						// GD.Print(field.Name);
 					}
 				}
 			}
@@ -374,13 +467,13 @@ namespace AssetSnap.Debug
 				ExportAttribute exportAttribute = Attribute.GetCustomAttribute(property, typeof(ExportAttribute)) as ExportAttribute;
 				if ( null != exportAttribute )
 				{
-					string title = GetExportCategoryName(property);
+					string title = _GetExportCategoryName(property);
 					if( "" != title ) 
 					{
-						if( false == Categories.Contains(title) ) 
+						if( false == _Categories.Contains(title) ) 
 						{
-							AddTitle(title);
-							Categories.Add(title);							
+							_AddTitle(title);
+							_Categories.Add(title);							
 						}
 					}
 					
@@ -389,59 +482,47 @@ namespace AssetSnap.Debug
 					
 					if( value is bool BoolVal ) 
 					{
-						AddCheckbox(property.Name, BoolVal);
+						_AddCheckbox(property.Name, BoolVal);
 					}
 					else if( value is int intVal )
 					{
-						AddSpinbox(property.Name, (float)intVal);
+						_AddSpinbox(property.Name, (float)intVal);
 					}
 					else if( value is double doubleVal )
 					{
-						AddSpinbox(property.Name, (float)doubleVal);
+						_AddSpinbox(property.Name, (float)doubleVal);
 					}
 					else if( value is float floatVal )
 					{
-						AddSpinbox(property.Name, floatVal);
+						_AddSpinbox(property.Name, floatVal);
 					}
 					else if( value is Library.Instance libraryValue )
 					{
-						AddLabelBox(property.Name, libraryValue.GetName());
+						_AddLabelBox(property.Name, libraryValue.GetName());
 					}
 					else if( value is Node NodeValue )
 					{
-						if( IsInstanceValid( NodeValue ) ) 
+						if( EditorPlugin.IsInstanceValid( NodeValue ) ) 
 						{
-							AddLabelBox(property.Name, NodeValue.Name);
+							_AddLabelBox(property.Name, NodeValue.Name);
 						}
 					}
 					else if( null != value )
 					{
-						AddLabelBox(property.Name, value.ToString());
+						_AddLabelBox(property.Name, value.ToString());
 					}
 					else 
 					{
-						AddLabelBox(property.Name, "N/A");
+						_AddLabelBox(property.Name, "N/A");
 					}
-
 				}
 			}
 		}
 		
-		public string GetExportCategoryName(PropertyInfo propertyInfo)
-		{
-			// Check if the property has ExportCategory attribute
-			ExportCategoryAttribute exportCategoryAttribute = propertyInfo.GetCustomAttribute<ExportCategoryAttribute>();
-
-			if (exportCategoryAttribute != null)
-			{
-				return exportCategoryAttribute.Name;
-			}
-
-			// If the property does not have ExportCategory attribute, return empty string
-			return "";
-		}
-		
-		private void ClearCurrentChildren()
+		/// <summary>
+		/// Clears the current children of the inspector.
+		/// </summary>
+		private void _ClearCurrentChildren()
 		{
 			foreach( Node child in _InnerContainer.GetChildren() ) 
 			{
@@ -452,13 +533,53 @@ namespace AssetSnap.Debug
 				}
 			}
 
-			Categories = new();
+			_Categories = new();
 		}
 		
-		private void _OnUpdate()
+		/// <summary>
+		/// Callback method invoked when the inspector needs to be updated.
+		/// </summary>
+		/// <param name="data">The data array containing information about the update.</param>
+		private void _OnUpdate( Godot.Collections.Array data )
 		{
-			ClearCurrentChildren();
-			_BuildChildList();
+			string key = data[0].As<string>();
+			if( _InspectorOptionInstances.ContainsKey(key) ) 
+			{
+				GodotObject _object = _InspectorOptionInstances[key];
+				
+				if( _object is SpinBox spinbox ) 
+				{
+					spinbox.Value = data[1].As<double>();
+				}
+				
+				if( _object is CheckBox checkbox ) 
+				{
+					checkbox.ButtonPressed = data[1].As<bool>();
+				}
+				
+				if( _object is Label label ) 
+				{
+					if( data[1].As<GodotObject>() is Library.Instance libraryValue )
+					{
+						label.Text = libraryValue.GetName();
+					}
+					else if( data[1].As<GodotObject>() is Node NodeValue )
+					{
+						if( EditorPlugin.IsInstanceValid( NodeValue ) ) 
+						{
+							label.Text = NodeValue.Name;
+						}
+					}
+					else if( "" != data[1].As<string>() )
+					{
+						label.Text = data[1].As<string>();
+					}
+					else 
+					{
+						label.Text = "N/A";
+					}
+				}
+			}
 		}
 	}
 }

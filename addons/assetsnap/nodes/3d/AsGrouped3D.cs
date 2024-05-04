@@ -21,340 +21,342 @@
 // SOFTWARE.
 
 using System.Collections.Generic;
-using AssetSnap;
-using AssetSnap.Front.Nodes;
+using AssetSnap.Explorer;
+using AssetSnap.Nodes;
+using AssetSnap.States;
+using AssetSnap.Static;
 using Godot;
 
-[Tool]
-public partial class AsGrouped3D : AsGroup3D
+namespace AssetSnap.Front.Nodes
 {
-
-	private List<GroupedConnection> Connections = new();
-
-
-	[Export]
-	public string GroupPath { get; set; } = "";
-
-	[Export]
-	public int SnapLayer { get; set; } = 0;
-	
-	[Export]
-	public float ObjectOffsetX { get; set; } = 0.0f;
-	
-	[Export]
-	public float ObjectOffsetZ { get; set; } = 0.0f;
-	
-	[Export]
-	public float SnapHeightValue { get; set; } = 0.0f;
-	
-	[Export]
-	public float SnapXValue { get; set; } = 0.0f;
-	
-	[Export]
-	public float SnapZValue { get; set; } = 0.0f;
-
-	[Export]
-	public bool OptimizedSpawn { get; set; } = false;
-	
-	[Export]
-	public bool SphereCollision { get; set; } = false;
-	
-	[Export]
-	public bool ConvexCollision { get; set; } = false;
-	
-	[Export]
-	public bool ConvexClean { get; set; } = false;
-	
-	[Export]
-	public bool ConvexSimplify { get; set; } = false;
-	
-	[Export]
-	public bool ConcaveCollision { get; set; } = false;
-	
-	[Export]
-	public bool SnapToObject { get; set; } = false;
-	
-	[Export]
-	public bool SnapToHeight { get; set; } = false;
-	
-	[Export]
-	public bool SnapToX { get; set; } = false;
-	
-	[Export]
-	public bool SnapToZ { get; set; } = false;
-
-	[Export]
-	public float DistanceToTop { get; set; } = 0;
-	
-	[Export]
-	public float DistanceToBottom { get; set; } = 0;
-	
-	[Export]
-	public float DistanceToLeft { get; set; } = 0;
-	
-	[Export]
-	public float DistanceToRight { get; set; } = 0;
-	
-	[Export]
-	public Godot.Collections.Array<Godot.Collections.Dictionary<string, Variant>> ChildOptions = new();
-
-	public override void _EnterTree()
+	/// <summary>
+	/// Represents a 3D grouped node with additional functionality for managing connections and updating group data.
+	/// </summary>
+	[Tool]
+	public partial class AsGrouped3D : AsGroup3D
 	{
-		GroupResource resource = GD.Load<Resource>(GroupPath) as GroupResource;
-		GlobalExplorer explorer = GlobalExplorer.GetInstance();
+/// <summary>
+		/// The path of the group.
+		/// </summary>
+		[Export]
+		public string GroupPath { get => _GroupPath; set { _GroupPath = value; } }
+
+		/// <summary>
+		/// The layer to snap to.
+		/// </summary>
+		[Export]
+		public int SnapLayer { get => _SnapLayer; set { _SnapLayer = value; Update(); } }
+
+		/// <summary>
+		/// The offset in the X-axis.
+		/// </summary>
+		[Export]
+		public float ObjectOffsetX { get => _ObjectOffsetX; set { _ObjectOffsetX = value; } }
+
+		/// <summary>
+		/// The offset in the Z-axis.
+		/// </summary>
+		[Export]
+		public float ObjectOffsetZ { get => _ObjectOffsetZ; set { _ObjectOffsetZ = value; } }
+
+		/// <summary>
+		/// The value to snap height to.
+		/// </summary>
+		[Export]
+		public float SnapHeightValue { get => _SnapHeightValue; set { _SnapHeightValue = value; } }
+
+		/// <summary>
+		/// The value to snap in the X-axis.
+		/// </summary>
+		[Export]
+		public float SnapXValue { get => _SnapXValue; set { _SnapXValue = value; } }
+
+		/// <summary>
+		/// The value to snap in the Z-axis.
+		/// </summary>
+		[Export]
+		public float SnapZValue { get => _SnapZValue; set { _SnapZValue = value; } }
 		
-		if( explorer.States.GroupedObjects.ContainsKey(GroupPath) ) 
-		{
-			GlobalExplorer.GetInstance().States.GroupedObjects[GroupPath].Add(this);
-		}
-		else 
-		{
-			GlobalExplorer.GetInstance().States.GroupedObjects.Add(GroupPath, new() { this });	
-		}
+		/// <summary>
+		/// The value to snap in the Z-axis.
+		/// </summary>
+		[Export]
+		public float DistanceToTop { get => _DistanceToTop; set { _DistanceToTop = value; } }
+
+		/// <summary>
+		/// The distance to the bottom.
+		/// </summary>
+		[Export]
+		public float DistanceToBottom { get => _DistanceToBottom; set { _DistanceToBottom = value; } }
+
+		/// <summary>
+		/// The distance to the left.
+		/// </summary>
+		[Export]
+		public float DistanceToLeft { get => _DistanceToLeft; set { _DistanceToLeft = value; } }
+
+		/// <summary>
+		/// The distance to the right.
+		/// </summary>
+		[Export]
+		public float DistanceToRight { get => _DistanceToRight; set { _DistanceToRight = value; } }
+
+		/// <summary>
+		/// Indicates if spawn is optimized.
+		/// </summary>
+		[Export]
+		public bool OptimizedSpawn { get => _OptimizedSpawn; set { _OptimizedSpawn = value; } }
+
+		/// <summary>
+		/// Indicates if sphere collision is enabled.
+		/// </summary>
+		[Export]
+		public bool SphereCollision { get => _SphereCollision; set { _SphereCollision = value; Update(); } }
+
+		/// <summary>
+		/// Indicates if convex collision is enabled.
+		/// </summary>
+		[Export]
+		public bool ConvexCollision { get => _ConvexCollision; set { _ConvexCollision = value; Update(); } }
+
+		/// <summary>
+		/// Indicates if convex cleaning is enabled.
+		/// </summary>
+		[Export]
+		public bool ConvexClean { get => _ConvexClean; set { _ConvexClean = value; Update(); } }
+
+		/// <summary>
+		/// Indicates if convex simplification is enabled.
+		/// </summary>
+		[Export]
+		public bool ConvexSimplify { get => _ConvexSimplify; set { _ConvexSimplify = value; Update(); } }
+
+		/// <summary>
+		/// Indicates if concave collision is enabled.
+		/// </summary>
+		[Export]
+		public bool ConcaveCollision { get => _ConcaveCollision; set { _ConcaveCollision = value; Update(); } }
+
+		/// <summary>
+		/// Indicates if snapping to object is enabled.
+		/// </summary>
+		[Export]
+		public bool SnapToObject { get => _SnapToObject; set { _SnapToObject = value; } }
+
+		/// <summary>
+		/// Indicates if snapping to height is enabled.
+		/// </summary>
+		[Export]
+		public bool SnapToHeight { get => _SnapToHeight; set { _SnapToHeight = value; } }
+
+		/// <summary>
+		/// Indicates if snapping to the X-axis is enabled.
+		/// </summary>
+		[Export]
+		public bool SnapToX { get => _SnapToX; set { _SnapToX = value; } }
+
+		/// <summary>
+		/// Indicates if snapping to the Z-axis is enabled.
+		/// </summary>
+		[Export]
+		public bool SnapToZ { get => _SnapToZ; set { _SnapToZ = value; } }
+
+		/// <summary>
+		/// Options for child nodes.
+		/// </summary>
+		[Export]
+		public Godot.Collections.Array<Godot.Collections.Dictionary<string, Variant>> ChildOptions { get => _ChildOptions; set { _ChildOptions = value; } }
 		
-		if( OptimizedSpawn ) 
+		private string _GroupPath = "";
+		private int _SnapLayer = 0;
+		private float _ObjectOffsetX = 0.0f;
+		private float _ObjectOffsetZ = 0.0f;	
+		private float _SnapHeightValue = 0.0f;	
+		private float _SnapXValue = 0.0f;
+		private float _SnapZValue = 0.0f;
+		private float _DistanceToTop = 0.0f;
+		private float _DistanceToBottom = 0.0f;
+		private float _DistanceToLeft = 0.0f;
+		private float _DistanceToRight = 0.0f;
+		private bool _OptimizedSpawn = false;
+		private bool _SphereCollision = false;
+		private bool _ConvexCollision = false;
+		private bool _ConvexClean = false;
+		private bool _ConvexSimplify = false;
+		private bool _ConcaveCollision = false;
+		private bool _SnapToObject = false;
+		private bool _SnapToHeight = false;
+		private bool _SnapToX = false;
+		private bool _SnapToZ = false;
+		private List<GroupedConnection> _Connections = new();
+		private Godot.Collections.Array<Godot.Collections.Dictionary<string, Variant>> _ChildOptions = new();
+
+		/// <summary>
+		/// Called when the node enters the scene tree.
+		/// </summary>
+		public override void _EnterTree()
 		{
-			// Since we dont have AsMeshInstances to provide the usual snapping. We will have to use
-			// position data from our paths.
-			for( int i = 0; i < resource._Origins.Count; i++ ) 
+			GroupResource resource = GD.Load<Resource>(GroupPath) as GroupResource;
+			if (StatesUtils.Get().GroupedObjects.ContainsKey(GroupPath))
 			{
-				GlobalExplorer.GetInstance().Waypoints.Register(this, resource._Origins[i], resource._Rotations[i], resource._Scales[i]);
-			}
-		}
-		
-		base._EnterTree();
-	}
-	
-	public Aabb GetAabb()
-	{
-		GroupResource resource = GD.Load<Resource>(GroupPath) as GroupResource;
-
-		Godot.Collections.Array<string> meshPaths = resource._Paths;
-		Godot.Collections.Dictionary<int, Vector3> OgOrigins = resource._Origins;
-		Godot.Collections.Array<Mesh> meshes = new();
-		Godot.Collections.Array<Vector3> origins = new();
-		
-		for( int i = 0; i < meshPaths.Count; i++ ) 
-		{
-			meshes.Add(GD.Load<Mesh>(meshPaths[i]));
-			origins.Add(OgOrigins[i]);
-		}
-
-		Aabb aabb = AabbUtils.CalculateCombinedAABB(origins, meshes);
-		
-		return aabb;
-	}
-	
-	/*
-	** Will reload the group data and re draw the local space of the node 
-	**
-	** @returns void
-	*/ 
-	public void Update()
-	{
-		GroupResource resource = GD.Load<Resource>(GroupPath) as GroupResource;
-
-		if( false == OptimizedSpawn ) 
-		{
-			ClearCurrentChildren();
-			
-			if( ShouldAddCollision() ) 
-			{
-				resource.AddCollidingChildren(this, ChildOptions);
+				StatesUtils.Get().GroupedObjects[GroupPath].Add(this);
 			}
 			else
 			{
+				StatesUtils.Get().GroupedObjects.Add(GroupPath, new() { this });
+			}
+
+			if (OptimizedSpawn)
+			{
+				// Since we dont have AsMeshInstances to provide the usual snapping. We will have to use
+				// position data from our paths.
+				for (int i = 0; i < resource._Origins.Count; i++)
+				{
+					ExplorerUtils.Get().Waypoints.Register(this, resource._Origins[i], resource._Rotations[i], resource._Scales[i]);
+				}
+			}
+
+			base._EnterTree();
+		}
+		
+		/// <summary>
+		/// Updates the group, reloading group data and redrawing the local space of the node.
+		/// </summary>
+		public void Update()
+		{
+			if( null == GetParent() || GetParent().Name == "Decal") 
+			{
+				return;
+			}
+
+			GroupResource resource = GD.Load<Resource>(GroupPath) as GroupResource;
+
+			if (false == OptimizedSpawn)
+			{
+				ClearCurrentChildren();
 				resource.AddChildren(this, ChildOptions);
 			}
+			else
+			{
+				ClearCurrentChildren();
+				int Instanced = 0;
+				for (int i = 0; i < _Connections.Count; i++)
+				{
+					GroupedConnection connection = _Connections[i];
+					int index = 0;
+					
+					foreach( string path in resource._Paths )
+					{
+						if( path == connection.InstanceMesh.ResourcePath ) 
+						{
+							break;
+						}
+						else 
+						{
+							index += 1;
+						}
+					}
+
+					if( connection.InstanceId != 0 ) 
+					{
+						Instanced += 1;
+					}
+
+					Transform3D transform = new Transform3D(Basis.Identity, Vector3.Zero);
+					transform.Scaled(resource._Scales[index]);
+					// Convert the rotation from degrees to radians
+					float rotationRadiansX = Mathf.DegToRad(resource._Rotations[index].X);
+					float rotationRadiansY = Mathf.DegToRad(resource._Rotations[index].Y);
+					float rotationRadiansZ = Mathf.DegToRad(resource._Rotations[index].Z);
+
+					// Create a rotation basis around each axis
+					Basis rotationBasisX = Basis.Identity.Rotated(Vector3.Right, rotationRadiansX);
+					Basis rotationBasisY = Basis.Identity.Rotated(Vector3.Up, rotationRadiansY);
+					Basis rotationBasisZ = Basis.Identity.Rotated(Vector3.Forward, rotationRadiansZ);
+
+					// Combine the rotation around each axis
+					Basis finalRotation = rotationBasisX * rotationBasisY * rotationBasisZ;
+
+					// Assuming you have a transform called transform
+					transform.Basis = finalRotation;
+					transform.Origin = Transform.Origin + new Vector3(resource._Origins[index].X, resource._Origins[index].Y, resource._Origins[index].Z);
+
+					connection.Update(transform);
+					connection.UpdateUsing(transform, ChildOptions[index]);
+				}
+			}
 		}
-		else 
+
+		/// <summary>
+		/// Adds a connection to the group.
+		/// </summary>
+		/// <param name="id">The ID of the connection.</param>
+		/// <param name="optimizedMeshGroup">The optimized mesh group associated with the connection.</param>
+		/// <param name="mesh">The mesh of the connection.</param>
+		public void AddConnection(int id, AsOptimizedMultiMeshGroup3D optimizedMeshGroup, Mesh mesh)
+		{
+			_Connections.Add(
+				new OptimizedMultiMeshConnection()
+				{
+					InstanceId = id,
+					InstanceMesh = mesh,
+					OptimizedMultiMesh = optimizedMeshGroup,
+					Source = this,
+				}
+			);
+		}
+
+		/// <summary>
+		/// Clears the group by removing all children nodes.
+		/// </summary>
+		public void Clear()
 		{
 			ClearCurrentChildren();
-
-			List<Vector3> origins = new();
-			List<Vector3> rotations = new();
-			List<Vector3> scales = new();
-			Godot.Collections.Array<Mesh> meshes = new();
-
-			for (int i = 0; i < Connections.Count; i++)
-			{
-				GroupedConnection connection = Connections[i];
-
-				Transform3D transform = Transform3D.Identity;
-				transform.Scaled(resource._Scales[i]);
-				// Convert the rotation from degrees to radians
-				float rotationRadiansX = Mathf.DegToRad(resource._Rotations[i].X);
-				float rotationRadiansY = Mathf.DegToRad(resource._Rotations[i].Y);
-				float rotationRadiansZ = Mathf.DegToRad(resource._Rotations[i].Z);
-
-				// Create a rotation basis around each axis
-				Basis rotationBasisX = Basis.Identity.Rotated(Vector3.Right, rotationRadiansX);
-				Basis rotationBasisY = Basis.Identity.Rotated(Vector3.Up, rotationRadiansY);
-				Basis rotationBasisZ = Basis.Identity.Rotated(Vector3.Forward, rotationRadiansZ);
-
-				// Combine the rotation around each axis
-				Basis finalRotation = rotationBasisX * rotationBasisY * rotationBasisZ;
-
-				// Assuming you have a transform called transform
-				transform.Basis = finalRotation;
-				transform.Origin = Transform.Origin + new Vector3(resource._Origins[i].X, resource._Origins[i].Y, resource._Origins[i].Z);
-				
-				connection.Update( transform );
-				connection.UpdateUsing( transform, ChildOptions[i] );
-				meshes.Add(connection.InstanceMesh);
-				origins.Add(resource._Origins[i]);
-				rotations.Add(resource._Rotations[i]);
-				scales.Add(resource._Scales[i]);
-			}
-
-			AddMultiCollisions(origins, scales, rotations, meshes, this, ChildOptions);
 		}
-	}
-	
-	public void AddConnection( int id, AsOptimizedMultiMeshGroup3D optimizedMeshGroup, Mesh mesh )
-	{
-		Connections.Add(
-			new OptimizedMultiMeshConnection()
-			{
-				InstanceId = id,
-				InstanceMesh = mesh,
-				OptimizedMultiMesh = optimizedMeshGroup,
-				Source = this,
-			}
-		);
-	}
-
-	public void AddMultiCollisions(List<Vector3> _Positions, List<Vector3> _Scales, List<Vector3> _Rotations, Godot.Collections.Array<Mesh> _Meshes, AsGrouped3D grouped3D, Godot.Collections.Array<Godot.Collections.Dictionary<string, Variant>> ChildOptions )
-	{
-		Node _SceneRoot = GlobalExplorer.GetInstance()._Plugin.GetTree().EditedSceneRoot;
-
-		for (int i = 0; i < _Positions.Count; i++)
-		{
-			Vector3 _Pos = _Positions[i];
-			Transform3D _Trans = Transform3D.Identity;
-			_Trans.Origin = new Vector3(_Pos.X, _Pos.Y, _Pos.Z);
-			AsStaticBody3D _Body = new()
-			{
-				Transform = _Trans,
-				UsingMultiMesh = true,
-				Mesh = _Meshes[i],
-				MeshName = _Meshes[i].ResourceName,
-				InstanceTransform = _Trans,
-				InstanceScale = _Scales[i],
-				InstanceRotation = _Rotations[i],
-			};
-
-			grouped3D.AddChild(_Body);
-			_Body.Owner = _SceneRoot;
-
-			int typeState = 0;
-			int argState = 0;
-
-			bool IsChildConvex = ChildOptions[i].ContainsKey("ConvexCollision") ? ChildOptions[i]["ConvexCollision"].As<bool>() : false;
-			bool IsChildConvexClean = ChildOptions[i].ContainsKey("ConvexClean") ? ChildOptions[i]["ConvexClean"].As<bool>() : false;
-			bool IsChildConvexSimplify = ChildOptions[i].ContainsKey("ConvexSimplify") ? ChildOptions[i]["ConvexSimplify"].As<bool>() : false;
-			bool IsChildConcave = ChildOptions[i].ContainsKey("ConcaveCollision") ? ChildOptions[i]["ConcaveCollision"].As<bool>() : false;
-			bool IsChildSphere = ChildOptions[i].ContainsKey("SphereCollision") ? ChildOptions[i]["SphereCollision"].As<bool>() : false;
-
-			if (
-				true == grouped3D.ConvexCollision &&
-				false == IsChildConvex &&
-				false == IsChildConcave &&
-				false == IsChildSphere ||
-				true == IsChildConvex	
-			) 
-			{
-				typeState = 1;
-				
-				if(
-					true == grouped3D.ConvexClean &&
-					false == grouped3D.ConvexSimplify &&
-					false == IsChildConvex ||
-					true == IsChildConvexClean &&
-					true == IsChildConvexSimplify
-				) 
-				{
-					argState = 1;	
-				}
-				else if( 
-					false == grouped3D.ConvexClean &&
-					true == grouped3D.ConvexSimplify &&
-					false == IsChildConvex ||
-					false == IsChildConvexClean &&
-					true == IsChildConvexSimplify
-				) 
-				{
-					argState = 2;	
-				}
-				else if( 
-					true == grouped3D.ConvexClean &&
-					true == grouped3D.ConvexSimplify &&
-					false == IsChildConvex ||
-					true == IsChildConvexClean &&
-					true == IsChildConvexSimplify
-				) 
-				{
-					argState = 3;	
-				}
-			}
-			else if( 
-				true == grouped3D.ConcaveCollision &&
-				false == IsChildConvex &&
-				false == IsChildConcave &&
-				false == IsChildSphere ||
-				true == IsChildConcave	
-			) 
-			{
-				typeState = 2;
-			}
-			else if(
-				true == grouped3D.SphereCollision &&
-				false == IsChildConvex &&
-				false == IsChildConcave &&
-				false == IsChildSphere ||
-				true == IsChildSphere	
-			) 
-			{
-				typeState = 3;
-			}
-
-			_Body.Initialize(typeState, argState);
-		}
-	}
-	
-	public void Clear()
-	{
-		ClearCurrentChildren();
-	}
-	
-	public bool IsPlaced()
-	{
-		return GetParent() != null && GetParent().Name != "AsDecal";
-	}
-	
-	private bool ShouldAddCollision()
-	{
-		GlobalExplorer _GlobalExplorer = GlobalExplorer.GetInstance();
-		bool AddCollisions = _GlobalExplorer.Settings.GetKey("add_collisions").As<bool>();
-
-		return AddCollisions;
-	}
-	
-	public override void _ExitTree()
-	{
-		GlobalExplorer explorer = GlobalExplorer.GetInstance();
 		
-		if( explorer.States.GroupedObjects.ContainsKey(GroupPath) ) 
+		/// <summary>
+		/// Called when the node exits the scene tree.
+		/// </summary>
+		public override void _ExitTree()
 		{
-			GlobalExplorer.GetInstance().States.GroupedObjects[GroupPath].Remove(this);
-			
-			if( GlobalExplorer.GetInstance().States.GroupedObjects[GroupPath].Count == 0 ) 
+			if (StatesUtils.Get().GroupedObjects.ContainsKey(GroupPath))
 			{
-				GlobalExplorer.GetInstance().States.GroupedObjects.Remove(GroupPath);
+				StatesUtils.Get().GroupedObjects[GroupPath].Remove(this);
+
+				if (StatesUtils.Get().GroupedObjects[GroupPath].Count == 0)
+				{
+					StatesUtils.Get().GroupedObjects.Remove(GroupPath);
+				}
 			}
+
+			base._EnterTree();
 		}
 
-		base._EnterTree();
+		/// <summary>
+		/// Returns the Axis-Aligned Bounding Box (AABB) of the node.
+		/// </summary>
+		/// <returns>The AABB of the node.</returns>
+		public Aabb GetAabb()
+		{
+			return NodeUtils.CalculateNodeAabb(this);
+		}
+
+		/// <summary>
+		/// Checks if the node is placed in the scene.
+		/// </summary>
+		/// <returns>True if the node is placed, otherwise false.</returns>
+		public bool IsPlaced()
+		{
+			return GetParent() != null && GetParent().Name != "AsDecal";
+		}
+
+		/// <summary>
+		/// Checks if collision should be added to the group.
+		/// </summary>
+		/// <returns>True if collision should be added, otherwise false.</returns>
+		private bool ShouldAddCollision()
+		{
+			return SettingsStatic.ShouldAddCollision();
+		}
 	}
-	
 }

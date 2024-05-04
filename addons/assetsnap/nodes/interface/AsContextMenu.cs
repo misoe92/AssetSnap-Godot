@@ -20,11 +20,15 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using System;
+using AssetSnap.Explorer;
+using Godot;
+
 namespace AssetSnap.Front.Nodes
 {
-	using System;
-	using Godot;
-
+	/// <summary>
+	/// Represents a context menu control for handling quick actions, rotations, and scaling.
+	/// </summary>
 	[Tool]
 	public partial class AsContextMenu : Control
 	{
@@ -36,56 +40,50 @@ namespace AssetSnap.Front.Nodes
 		
 		public bool Active = false;
 		
-		private float ScaleValueX = 1.0f;
-		private float ScaleValueY = 1.0f;
-		private float ScaleValueZ = 1.0f;
-		private float RotValueX = 0.0f;
-		private float RotValueY = 0.0f;
-		private float RotValueZ = 0.0f;
-		
-		/** Responsive Params **/
-		private int largeScreenOffsetX = 135;
-		private int mediumScreenOffsetX = 140;
-		private int smallScreenOffsetX = 145;
-
-		private int screenOffsetY = 123;
-
-		private string BelongsToSceneName = "";
-
+		private string _BelongsToSceneName = "";
+		private float _ScaleValueX = 1.0f;
+		private float _ScaleValueY = 1.0f;
+		private float _ScaleValueZ = 1.0f;
+		private float _RotValueX = 0.0f;
+		private float _RotValueY = 0.0f;
+		private float _RotValueZ = 0.0f;
+		private int _LargeScreenOffsetX = 135;
+		private int _MediumScreenOffsetX = 140;
+		private int _SmallScreenOffsetX = 145;
+		private int _ScreenOffsetY = 123;
+	
+		/// <summary>
+		/// Called when the node enters the scene tree.
+		/// </summary>
 		public override void _EnterTree()
 		{
 			Name = "AsContextMenu";
-			
 			base._EnterTree();
 		}
 		
+		/// <summary>
+		/// Called when the node is ready.
+		/// </summary>
 		public override void _Ready() 
 		{
-			 // block unloading with a strong handle
-			var handle = System.Runtime.InteropServices.GCHandle.Alloc(this); 
-			
 			Action ResizeAction = () => { _OnResize(); };
 			
 			EditorInterface.Singleton.GetBaseControl().Connect(Control.SignalName.Resized, Callable.From(ResizeAction));
-			EditorInterface.Singleton.GetBaseControl().GetNode<Control>("@VBoxContainer@14/@HSplitContainer@17/@HSplitContainer@25/@VSplitContainer@27").Connect(Control.SignalName.Resized, Callable.From(ResizeAction));
+			EditorInterface.Singleton.GetFileSystemDock().GetParent().Connect(Control.SignalName.Resized, Callable.From(ResizeAction));
 
-			// register cleanup code to prevent unloading issues
-			System.Runtime.Loader.AssemblyLoadContext.GetLoadContext(System.Reflection.Assembly.GetExecutingAssembly()).Unloading += alc =>
+			if( null != ExplorerUtils.Get().ContextMenu.GetInstance() ) 
 			{
-				GD.Print("Cleaning Context"); 
-				if( null != EditorInterface.Singleton.GetBaseControl() && EditorInterface.Singleton.GetBaseControl().IsConnected(Control.SignalName.Resized, Callable.From(ResizeAction)))
-				{
-					EditorInterface.Singleton.GetBaseControl().Disconnect(Control.SignalName.Resized, Callable.From(ResizeAction));
-				}
-				if( null != EditorInterface.Singleton.GetBaseControl() && EditorInterface.Singleton.GetBaseControl().GetNode<Control>("@VBoxContainer@14/@HSplitContainer@17/@HSplitContainer@25/@VSplitContainer@27").IsConnected(Control.SignalName.Resized, Callable.From(ResizeAction)))
-				{
-					EditorInterface.Singleton.GetBaseControl().GetNode<Control>("@VBoxContainer@14/@HSplitContainer@17/@HSplitContainer@25/@VSplitContainer@27").Disconnect(Control.SignalName.Resized, Callable.From(ResizeAction));
-				}
-
-				handle.Free();
-			};
+				ExplorerUtils.Get().ContextMenu.GetInstance().Connect(
+					SignalName.VectorsChanged,
+					new Callable(this, "_OnUpdateVectors")
+				);
+			}
 		}
 		
+		/// <summary>
+		/// Called when the node receives input events.
+		/// </summary>
+		/// <param name="event">The input event received by the node.</param>
 		public override void _Input(InputEvent @Event) 
 		{
 			if( @Event is InputEventMouseMotion motionEvent ) 
@@ -100,17 +98,17 @@ namespace AssetSnap.Front.Nodes
 					Visible = true;
 				}
 			}
-
+			
 			if( Input.IsKeyPressed(Key.Shift) && Input.IsKeyPressed(Key.Alt) ) 
 			{
 				GlobalExplorer.GetInstance().AllowScroll = Abstracts.AbstractExplorerBase.ScrollState.SCROLL_DISABLED;	
 			}
 			
-			if( @Event is InputEventKey KeyEvent && HasNode("HBoxContainer/QuickAction/ModifiersList")) 
+			if( @Event is InputEventKey KeyEvent && HasNode("HBoxContainer/QuickAction/SelectList")) 
 			{
 				if ( Input.IsKeyPressed(Key.Shift) && Input.IsKeyPressed(Key.Alt) && KeyEvent.Keycode == Key.Q) 
 				{
-					AsSelectList List = GetNode<AsSelectList>("HBoxContainer/QuickAction/ModifiersList");
+					AsSelectList List = GetNode<AsSelectList>("HBoxContainer/QuickAction/SelectList");
 					Control _Control = List.GetNode<MarginContainer>("None");
 					
 					List.SetActive( _Control );
@@ -118,7 +116,7 @@ namespace AssetSnap.Front.Nodes
 				
 				if ( Input.IsKeyPressed(Key.Shift) && Input.IsKeyPressed(Key.Alt) && KeyEvent.Keycode == Key.R) 
 				{
-					AsSelectList List = GetNode<AsSelectList>("HBoxContainer/QuickAction/ModifiersList");
+					AsSelectList List = GetNode<AsSelectList>("HBoxContainer/QuickAction/SelectList");
 					Control _Control = List.GetNode<MarginContainer>("Rotate");
 					
 					List.SetActive(_Control); 
@@ -126,7 +124,7 @@ namespace AssetSnap.Front.Nodes
 				
 				if ( Input.IsKeyPressed(Key.Shift) && Input.IsKeyPressed(Key.Alt) && KeyEvent.Keycode == Key.S) 
 				{
-					AsSelectList List = GetNode<AsSelectList>("HBoxContainer/QuickAction/ModifiersList");
+					AsSelectList List = GetNode<AsSelectList>("HBoxContainer/QuickAction/SelectList");
 					Control _Control = List.GetNode<MarginContainer>("Scale");
 
 					List.SetActive(_Control);
@@ -134,200 +132,349 @@ namespace AssetSnap.Front.Nodes
 			}
 		}
 		
+		/// <summary>
+		/// Emits the QuickActionsChanged signal with the specified action.
+		/// </summary>
+		/// <param name="which">The action to be emitted.</param>
 		public void _OnQuickActionChange(string which)
 		{
 			EmitSignal(SignalName.QuickActionsChanged, new Variant[] { which });
 		}
 		
+		/// <summary>
+		/// Sets the rotation value around the X-axis.
+		/// </summary>
+		/// <param name="Rot">The rotation value to set.</param>
 		public void SetRotationX( float Rot ) 
 		{
-			RotValueX = Rot;
-			UpdateRotate();
+			_RotValueX = Rot;
+			_UpdateRotate();
 		}
+		
+		/// <summary>
+		/// Sets the rotation value around the Y-axis.
+		/// </summary>
+		/// <param name="Rot">The rotation value to set.</param>
 		public void SetRotationY( float Rot ) 
 		{
-			RotValueY = Rot;
-			UpdateRotate();
+			_RotValueY = Rot;
+			_UpdateRotate();
 		}
+		
+		/// <summary>
+		/// Sets the rotation value around the Z-axis.
+		/// </summary>
+		/// <param name="Rot">The rotation value to set.</param>
 		public void SetRotationZ( float Rot ) 
 		{
-			RotValueZ = Rot;
-			UpdateRotate();
+			_RotValueZ = Rot;
+			_UpdateRotate();
 		}
+		
+		/// <summary>
+		/// Sets the scaling value along the X-axis.
+		/// </summary>
+		/// <param name="value">The scaling value to set.</param>
 		public void SetScaleX( float value ) 
 		{
-			ScaleValueX = value;
-			UpdateScale();
+			_ScaleValueX = value;
+			_UpdateScale();
 		}
+		
+		/// <summary>
+		/// Sets the scaling value along the Y-axis.
+		/// </summary>
+		/// <param name="value">The scaling value to set.</param>
 		public void SetScaleY( float value ) 
 		{
-			ScaleValueY = value;
-			UpdateScale();
+			_ScaleValueY = value;
+			_UpdateScale();
 		}
+		
+		/// <summary>
+		/// Sets the scaling value along the Z-axis.
+		/// </summary>
+		/// <param name="value">The scaling value to set.</param>
 		public void SetScaleZ( float value ) 
 		{
-			ScaleValueZ = value;
-			UpdateScale();
+			_ScaleValueZ = value;
+			_UpdateScale();
 		}
+		
+		/// <summary>
+		/// Retrieves the rotation value around the X-axis.
+		/// </summary>
+		/// <returns>The rotation value around the X-axis.</returns>
 		public float GetRotationX() 
 		{
-			return RotValueX;
+			return _RotValueX;
 		}
+		
+		/// <summary>
+		/// Retrieves the rotation value around the Y-axis.
+		/// </summary>
+		/// <returns>The rotation value around the Y-axis.</returns>
 		public float GetRotationY() 
 		{
-			return RotValueY;
+			return _RotValueY;
 		}
+		
+		/// <summary>
+		/// Retrieves the rotation value around the Z-axis.
+		/// </summary>
+		/// <returns>The rotation value around the Z-axis.</returns>
 		public float GetRotationZ() 
 		{
-			return RotValueZ;
+			return _RotValueZ;
 		}
+		
+		/// <summary>
+		/// Retrieves the scaling value along the X-axis.
+		/// </summary>
+		/// <returns>The scaling value along the X-axis.</returns>
 		public float GetScaleX() 
 		{
-			return ScaleValueX;
+			return _ScaleValueX;
 		}
+		
+		/// <summary>
+		/// Retrieves the scaling value along the Y-axis.
+		/// </summary>
+		/// <returns>The scaling value along the Y-axis.</returns>
 		public float GetScaleY() 
 		{
-			return ScaleValueY;
+			return _ScaleValueY;
 		}
+		
+		/// <summary>
+		/// Retrieves the scaling value along the Z-axis.
+		/// </summary>
+		/// <returns>The scaling value along the Z-axis.</returns>
 		public float GetScaleZ() 
 		{
-			return ScaleValueZ;
+			return _ScaleValueZ;
 		}
+		
+		/// <summary>
+		/// Retrieves the index of the angle.
+		/// </summary>
+		/// <returns>The index of the angle.</returns>
 		public int GetAngleIndex()
 		{
-			return GetAngles()._ActiveIndex;
-		}
-		public void _OnRotateXChanged( float value )
-		{
-			if( RotValueX == value ) 
-			{
-				return;
-			}
-			
-			RotValueX = value;
-		}
-		public void _OnRotateYChanged( float value )
-		{
-			if( RotValueY == value ) 
-			{
-				return;
-			}
-			
-			RotValueY = value;
-		}
-		public void _OnRotateZChanged( float value )
-		{
-			if( RotValueZ == value ) 
-			{
-				return;
-			}
-			
-			RotValueZ = value;
-		}
-		public void _OnScaleXChanged( float value )
-		{
-			if( ScaleValueX == value ) 
-			{
-				return;
-			}
-			
-			ScaleValueX = value;
-		}
-		public void _OnScaleYChanged( float value )
-		{
-			if( ScaleValueY == value ) 
-			{
-				return;
-			}
-			
-			ScaleValueY = value;
+			return GetAngles().ActiveIndex;
 		}
 		
-		public void _OnScaleZChanged( float value )
+		/// <summary>
+		/// Retrieves the list of quick actions.
+		/// </summary>
+		/// <returns>The list of quick actions.</returns>
+		public AsSelectList GetQuickActions()
 		{
-			if( ScaleValueZ == value ) 
+			return GetNode<AsSelectList>("HBoxContainer/QuickAction/SelectList");
+		}
+		
+		/// <summary>
+		/// Retrieves the list of angle options.
+		/// </summary>
+		/// <returns>The list of angle options.</returns>
+		public AsSelectList GetAngles()
+		{
+			return GetNode<AsSelectList>("HBoxContainer/Angle/SelectList");
+		}
+		
+		/// <summary>
+		/// Called when the X-axis rotation value is changed.
+		/// </summary>
+		/// <param name="value">The new X-axis rotation value.</param>
+		private void _OnRotateXChanged( float value )
+		{
+			if( _RotValueX == value ) 
 			{
 				return;
 			}
 			
-			ScaleValueZ = value;
+			_RotValueX = value;
 		}
 		
+		/// <summary>
+		/// Called when the Y-axis rotation value is changed.
+		/// </summary>
+		/// <param name="value">The new Y-axis rotation value.</param>
+		private void _OnRotateYChanged( float value )
+		{
+			if( _RotValueY == value ) 
+			{
+				return;
+			}
+			
+			_RotValueY = value;
+		}
+		
+		/// <summary>
+		/// Called when the node receives a change in rotation around the X-axis.
+		/// </summary>
+		/// <param name="value">The new rotation value around the X-axis.</param>
+		private void _OnRotateZChanged( float value )
+		{
+			if( _RotValueZ == value ) 
+			{
+				return;
+			}
+			
+			_RotValueZ = value;
+		}
+		
+		/// <summary>
+		/// Called when the X-axis scaling value is changed.
+		/// </summary>
+		/// <param name="value">The new X-axis scaling value.</param>
+		private void _OnScaleXChanged( float value )
+		{
+			if( _ScaleValueX == value ) 
+			{
+				return;
+			}
+			
+			_ScaleValueX = value;
+		}
+		
+		/// <summary>
+		/// Called when the Y-axis scaling value is changed.
+		/// </summary>
+		/// <param name="value">The new Y-axis scaling value.</param>
+		private void _OnScaleYChanged( float value )
+		{
+			if( _ScaleValueY == value ) 
+			{
+				return;
+			}
+			
+			_ScaleValueY = value;
+		}
+		
+		/// <summary>
+		/// Called when the Z-axis scaling value is changed.
+		/// </summary>
+		/// <param name="value">The new Z-axis scaling value.</param>
+		private void _OnScaleZChanged( float value )
+		{
+			if( _ScaleValueZ == value ) 
+			{
+				return;
+			}
+			
+			_ScaleValueZ = value;
+		}
+		
+		/// <summary>
+		/// Adjusts the position of the context menu based on the current window size.
+		/// </summary>
 		private void _OnResize()
 		{
 			Vector2 WindowSize = EditorInterface.Singleton.GetBaseControl().Size;
-			Control DockOne = EditorInterface.Singleton.GetBaseControl().GetNode<Control>("@VBoxContainer@14/@HSplitContainer@17/@HSplitContainer@25/@VSplitContainer@27");
+			Control DockOne = EditorInterface.Singleton.GetFileSystemDock().GetParent<Control>();
 			Vector2 CurrentPosition = Position;
 			
 			if( WindowSize.X < 1300.0f ) 
 			{
-				CurrentPosition.X = DockOne.Size.X + smallScreenOffsetX;
+				CurrentPosition.X = DockOne.Size.X + _SmallScreenOffsetX;
 			}
 			else if( WindowSize.X < 1600.0f ) 
 			{
-				CurrentPosition.X = DockOne.Size.X + mediumScreenOffsetX;
+				CurrentPosition.X = DockOne.Size.X + _MediumScreenOffsetX;
 			}
 			else 
 			{
-				CurrentPosition.X = DockOne.Size.X + largeScreenOffsetX;
+				CurrentPosition.X = DockOne.Size.X + _LargeScreenOffsetX;
 			}
 			
-			CurrentPosition.Y = screenOffsetY;
+			CurrentPosition.Y = _ScreenOffsetY;
 			Position = CurrentPosition;
 		}
 
-		private void UpdateScale()
+		/// <summary>
+		/// Updates the scale values displayed in the UI.
+		/// </summary>
+		private void _UpdateScale()
 		{
-			ScaleNodeX().Value = GetScaleX();
-			ScaleNodeY().Value = GetScaleY();
-			ScaleNodeZ().Value = GetScaleZ();
-		}
-		private void UpdateRotate()
-		{
-			RotationNodeX().Value = GetRotationX();
-			RotationNodeY().Value = GetRotationY();
-			RotationNodeZ().Value = GetRotationZ();
-		}
-		public AsSelectList GetQuickActions()
-		{
-			return GetNode<AsSelectList>("HBoxContainer/QuickAction/ModifiersList");
-		}
-		public AsSelectList GetAngles()
-		{
-			return GetNode<AsSelectList>("HBoxContainer/Angle/ModifiersList");
+			_ScaleNodeX().Value = GetScaleX();
+			_ScaleNodeY().Value = GetScaleY();
+			_ScaleNodeZ().Value = GetScaleZ();
 		}
 		
-		private SpinBox RotationNodeX()
+		/// <summary>
+		/// Updates the rotation values displayed in the UI.
+		/// </summary>
+		private void _UpdateRotate()
+		{
+			_RotationNodeX().Value = GetRotationX();
+			_RotationNodeY().Value = GetRotationY();
+			_RotationNodeZ().Value = GetRotationZ();
+		}
+		
+		/// <summary>
+		/// Retrieves the SpinBox node for X-axis rotation.
+		/// </summary>
+		/// <returns>The SpinBox node for X-axis rotation.</returns>
+		private SpinBox _RotationNodeX()
 		{
 			return GetNode<SpinBox>("HBoxContainer/RotateValues/RotateAngleX/SpinBox");
 		}
-		private SpinBox RotationNodeY()
+		
+		/// <summary>
+		/// Retrieves the SpinBox node for Y-axis rotation.
+		/// </summary>
+		/// <returns>The SpinBox node for Y-axis rotation.</returns>
+		private SpinBox _RotationNodeY()
 		{
 			return GetNode<SpinBox>("HBoxContainer/RotateValues/RotateAngleY/SpinBox");
 		}
-		private SpinBox RotationNodeZ()
+		
+		/// <summary>
+		/// Retrieves the SpinBox node for Z-axis rotation.
+		/// </summary>
+		/// <returns>The SpinBox node for Z-axis rotation.</returns>
+		private SpinBox _RotationNodeZ()
 		{
 			return GetNode<SpinBox>("HBoxContainer/RotateValues/RotateAngleZ/SpinBox");
 		}
 		
-		private SpinBox ScaleNodeX()
+		/// <summary>
+		/// Retrieves the SpinBox node for X-axis scaling.
+		/// </summary>
+		/// <returns>The SpinBox node for X-axis scaling.</returns>
+		private SpinBox _ScaleNodeX()
 		{
 			return GetNode<SpinBox>("HBoxContainer/ScaleValues/ScaleAngleX/SpinBox");
 		}
-		private SpinBox ScaleNodeY()
+		
+		/// <summary>
+		/// Retrieves the SpinBox node for Y-axis scaling.
+		/// </summary>
+		/// <returns>The SpinBox node for Y-axis scaling.</returns>
+		private SpinBox _ScaleNodeY()
 		{
 			return GetNode<SpinBox>("HBoxContainer/ScaleValues/ScaleAngleY/SpinBox");
 		}
-		private SpinBox ScaleNodeZ()
+		
+		/// <summary>
+		/// Retrieves the SpinBox node for Z-axis scaling.
+		/// </summary>
+		/// <returns>The SpinBox node for Z-axis scaling.</returns>
+		private SpinBox _ScaleNodeZ()
 		{
 			return GetNode<SpinBox>("HBoxContainer/ScaleValues/ScaleAngleZ/SpinBox");
 		}
 		
-	
-
-		public override void _ExitTree()
+		/// <summary>
+		/// Updates rotation and scale values on the current handle when a change is received from the context menu.
+		/// </summary>
+		/// <param name="package">The dictionary package containing rotation and scale values.</param>
+		private void _OnUpdateVectors(Godot.Collections.Dictionary package)
 		{
-			base._ExitTree();
+			Node3D Handle = ExplorerUtils.Get().GetHandle();
+			Handle.RotationDegrees = package["Rotation"].As<Vector3>();
+			Handle.Scale = package["Scale"].As<Vector3>();
 		}
 	}
 }

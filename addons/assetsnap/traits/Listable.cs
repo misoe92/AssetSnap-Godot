@@ -21,96 +21,147 @@
 // SOFTWARE.
 
 #if TOOLS
+
 using System;
 using System.Collections.Generic;
+using AssetSnap.Explorer;
 using Godot;
 
 namespace AssetSnap.Component
 {
+	/// <summary>
+	/// A trait for managing lists of components within a container.
+	/// </summary>
 	[Tool]
 	public partial class Listable : Trait.Base
 	{
-		public new Godot.Collections.Dictionary<string, int> Margin = new()
+		private string _ComponentName = "";
+		private int _Count = 0;
+		private Action<int, GodotObject> _OnIterationAction;
+		
+		/// <summary>
+		/// Default constructor for Listable.
+		/// </summary>
+		public Listable()
 		{
-			{"left", 20},
-			{"right", 20},
-			{"top", 0},
-			{"bottom", 25},
-		};
+			Name = "Listable";
+			TypeString = GetType().ToString();
+
+			_Margin = new()
+			{
+				{"left", 20},
+				{"right", 20},
+				{"top", 0},
+				{"bottom", 25},
+			};
+		}
 		
-		public string ComponentName = "";
+		/// <summary>
+		/// Adds the currently chosen list to a specified container.
+		/// </summary>
+		/// <param name="Container">The container to add the list to.</param>
+		public void AddToContainer( Node Container ) 
+		{
+			if( false == Dependencies.ContainsKey(TraitName + "_WorkingNode") ) 
+			{
+				return;
+			}
+			
+			base._AddToContainer(Container, Dependencies[TraitName + "_WorkingNode"].As<VBoxContainer>());
+		}
 		
-		public int Count = 0;
-		
-		private Control.SizeFlags SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
-		private Control.SizeFlags SizeFlagsVertical = Control.SizeFlags.ShrinkBegin;
-		
-		private Vector2 CustomMinimumSize;
-		private Vector2 Size;
-		
-		public Action<int, BaseComponent> OnIterationAction;
-		
+		/// <summary>
+		/// Instantiate an instance of the trait.
+		/// </summary>
+		/// <returns>Returns the instantiated Listable.</returns>
 		public Listable Instantiate()
 		{
-			try
+			base._Instantiate();
+			
+			VBoxContainer _WorkingNode = new()
 			{
-				base._Instantiate( GetType().ToString() );
+				Name = "Listable-Container",
+				CustomMinimumSize = _CustomMinimumSize,
+				Size = _Size,
+			};
+			
+			Godot.Collections.Array _components = new();
+			
+			for( int i = 0; i < _Count; i++) 
+			{
+				string[] ComponentSingleArr = _ComponentName.Split(".");
+				string ComponentSingleName = ComponentSingleArr[ComponentSingleArr.Length - 1];
 				
-				VBoxContainer _WorkingNode = new()
+				List<string> Components = new()
 				{
-					CustomMinimumSize = CustomMinimumSize,
-					Size = Size,
+					ComponentSingleName,
 				};
 				
-				for( int i = 0; i < Count; i++) 
+				if (GlobalExplorer.GetInstance().Components.HasAll( Components.ToArray() )) 
 				{
-					string[] ComponentSingleArr = ComponentName.Split(".");
-					string ComponentSingleName = ComponentSingleArr[ComponentSingleArr.Length - 1];
+					GodotObject component = GlobalExplorer.GetInstance().Components.Single(_ComponentName, true);
 					
-					List<string> Components = new()
+					if( null != component && EditorPlugin.IsInstanceValid( component ) && component is BaseComponent baseComponent ) 
 					{
-						ComponentSingleName,
-					};
-					
-					if (GlobalExplorer.GetInstance().Components.HasAll( Components.ToArray() )) 
-					{
-						BaseComponent component = GlobalExplorer.GetInstance().Components.Single(ComponentName, true);
-						
-						if( null != component && IsInstanceValid( component ) ) 
+						if( null != _OnIterationAction ) 
 						{
-							component.Container = _WorkingNode;
-							OnIterationAction(i, component);
+							_OnIterationAction(i, component);
 						}
+						else 
+						{
+							GD.Print("Iteration action invalid");
+						}
+						
+						_components.Add(component);
+						_WorkingNode.AddChild(baseComponent);
 					}
 				}
+			}
+			
+			Dependencies[TraitName + "_Components"] = _components;
+			Dependencies[TraitName + "_WorkingNode"] = _WorkingNode;
 
-				Nodes.Add(_WorkingNode);
-				WorkingNode = _WorkingNode;
-				Reset();
-			}
-			catch( Exception e) 
-			{
-				throw;
-			}
+			Plugin.Singleton.TraitGlobal.AddInstance(Iteration, _WorkingNode, OwnerName, TypeString, Dependencies);
+			Plugin.Singleton.TraitGlobal.AddName(Iteration, TraitName, OwnerName, TypeString);
+			
+			Reset();
+			Iteration += 1;
+			Dependencies = new();
 			
 			return this;
 		}
 		
-		public Listable Select( int index ) 
+		/// <summary>
+		/// Selects a placed list in the nodes array by index.
+		/// </summary>
+		/// <param name="index">The index of the list to select.</param>
+		/// <param name="debug">Whether to output debug information.</param>
+		/// <returns>Returns the selected Listable.</returns>
+		public override Listable Select( int index, bool debug = false ) 
 		{
-			base._Select(index);
+			base._Select(index, debug);
 
+			if( false != Dependencies.ContainsKey(TraitName + "_WorkingNode")) 
+			{
+				Godot.Collections.Dictionary<string, Variant> dependencies = Plugin.Singleton.TraitGlobal.GetDependencies(index, TypeString, OwnerName);
+				Dependencies = dependencies;
+			}
+			else
+			{
+				if( debug ) 
+				{
+					GD.PushError("No dependencies found for panel", index, TraitName);
+				}
+			}
+ 
 			return this;
 		}	
 		
-		public Listable SetDimensions( int width, int height )
-		{
-			CustomMinimumSize = new Vector2( width, height);
-			Size = new Vector2( width, height);
-
-			return this;
-		}
-		
+		/// <summary>
+		/// Selects a placed list in the nodes array by name.
+		/// </summary>
+		/// <param name="name">The name of the list to select.</param>
+		/// <returns>Returns the selected Listable.</returns>
 		public Listable SelectByName( string name ) 
 		{
 			base._SelectByName(name);
@@ -118,73 +169,168 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		public Listable SetName( string text ) 
+		/// <summary>
+		/// Adds a callback to be run on each entry of the list.
+		/// </summary>
+		/// <param name="OnIteration">The callback to be executed.</param>
+		/// <returns>Returns the modified Listable.</returns>
+		public Listable Each( Action<int, GodotObject> OnIteration ) 
 		{
-			Name = text;
-
-			return this;
-		}
-		
-		public Listable SetCount( int count ) 
-		{
-			Count = count;
-
-			return this;
-		}
-		
-		public Listable SetComponent( string componentName ) 
-		{
-			ComponentName = componentName;
-
-			return this;
-		}
-		
-		public Listable SetHorizontalSizeFlags(Control.SizeFlags flag)
-		{
-			SizeFlagsHorizontal = flag;
-
-			return this;
-		}
-		
-		public Listable SetVerticalSizeFlags(Control.SizeFlags flag)
-		{
-			SizeFlagsVertical = flag;
-
-			return this;
-		}
-		
-		public Listable Each( Action<int, BaseComponent> OnIteration ) 
-		{
-			OnIterationAction = OnIteration;
+			_OnIterationAction = OnIteration;
 			
 			return this;
 		}
 		
-		public void AddToContainer( Node Container ) 
+		/// <summary>
+		/// Sets the name of the current list.
+		/// </summary>
+		/// <param name="text">The name to set.</param>
+		/// <returns>Returns the modified Listable.</returns>
+		public Listable SetName( string text ) 
 		{
-			try 
-			{
-				base._AddToContainer(Container, WorkingNode);
-			}
-			catch( Exception e ) 
-			{
-				throw;
-			}
+			Name = text;
+			TraitName = text;
+
+			return this;
 		}
 		
-		private void Reset()
+		/// <summary>
+		/// Sets the dimensions of the list.
+		/// </summary>
+		/// <param name="width">The width to set.</param>
+		/// <param name="height">The height to set.</param>
+		/// <returns>Returns the modified Listable.</returns>
+		public override Listable SetDimensions( int width, int height )
 		{
-			WorkingNode = null;
-			Count = 0;
+			base.SetDimensions(width, height);
+
+			return this;
+		}
+		
+		/// <summary>
+		/// Sets the total count for the list.
+		/// </summary>
+		/// <param name="_count">The count to set.</param>
+		/// <returns>Returns the modified Listable.</returns>
+		public Listable SetCount( int _count ) 
+		{
+			_Count = _count;
+
+			return this;
+		}
+		
+		/// <summary>
+		/// Sets the component to be used.
+		/// </summary>
+		/// <param name="componentName">The name of the component to set.</param>
+		/// <returns>Returns the modified Listable.</returns>
+		public Listable SetComponent( string componentName ) 
+		{
+			_ComponentName = componentName;
+
+			return this;
+		}
+		
+		/// <summary>
+		/// Sets the horizontal size flag, which controls the x axis.
+		/// </summary>
+		/// <param name="flag">The size flag to set.</param>
+		/// <returns>Returns the modified Listable.</returns>
+		public override Listable SetHorizontalSizeFlags(Control.SizeFlags flag)
+		{
+			base.SetHorizontalSizeFlags(flag);
+
+			return this;
+		}
+		
+		/// <summary>
+		/// Sets the horizontal size flag, which controls the y axis.
+		/// </summary>
+		/// <param name="flag">The size flag to set.</param>
+		/// <returns>Returns the modified Listable.</returns>
+		public override Listable SetVerticalSizeFlags(Control.SizeFlags flag)
+		{
+			base.SetVerticalSizeFlags(flag);
+
+			return this;
 		}
 
-		public override void _ExitTree()
+		/// <summary>
+		/// Clears the list at the specified index.
+		/// </summary>
+		/// <param name="index">The index of the list to clear.</param>
+		/// <param name="debug">Whether to output debug information.</param>
+		public override void Clear(int index = 0, bool debug = false)
 		{
-			if( EditorPlugin.IsInstanceValid(WorkingNode) ) 
+			if( null == TypeString || null == OwnerName || null == Plugin.Singleton || null == Plugin.Singleton.TraitGlobal ) 
 			{
-				WorkingNode.QueueFree();
+				Dependencies = new();
+				return;
 			}
+
+			if( -1 != index ) 
+			{
+				if( false == Plugin.Singleton.TraitGlobal.HasInstance( index, TypeString, OwnerName ) ) 
+				{
+					if( debug ) 
+					{
+						GD.Print("Instance not found, or not valid");
+					}
+					
+					return;
+				}
+				
+				if( debug ) 
+				{
+					GD.Print("Index::", index, TypeString, OwnerName);
+				}
+				Select(index);
+				Godot.Collections.Array<BaseComponent> compArray = Dependencies[TraitName + "_Components"].AsGodotArray<BaseComponent>();
+				
+				foreach( BaseComponent component in compArray ) 
+				{
+					ExplorerUtils.Get().Components.Remove(component);
+				}
+			}
+			else 
+			{
+				Godot.Collections.Dictionary<int, GodotObject> instances = Plugin.Singleton.TraitGlobal.AllInstances(TypeString, OwnerName);
+	
+				if( null == instances || instances.Count == 0 ) 
+				{
+					Dependencies = new();
+					return;
+				}
+	
+				foreach( (int idx, GodotObject node) in instances )
+				{
+					if( debug ) 
+					{
+						GD.Print("Index::", idx, TypeString, OwnerName);
+					}
+					Select(idx);
+					Godot.Collections.Array<BaseComponent> compArray = Dependencies[TraitName + "_Components"].AsGodotArray<BaseComponent>();
+					
+					foreach( BaseComponent component in compArray ) 
+					{
+						ExplorerUtils.Get().Components.Remove(component);
+					}
+				}
+			}
+			
+			base.Clear(index, debug);
+		}
+
+		/// <summary>
+		/// Resets the trait
+		/// </summary>
+		private void Reset()
+		{
+			_Count = 0;
+			_ComponentName = "";
+			_OnIterationAction = null;
 		}
 	}
 }
+
 #endif

@@ -21,83 +21,105 @@
 // SOFTWARE.
 
 #if TOOLS
+
+using System.Collections.Generic;
+using AssetSnap.Explorer;
+using AssetSnap.Front.Components.Library;
+using AssetSnap.Front.Nodes;
+using AssetSnap.Static;
+using Godot;
+
 namespace AssetSnap.ContextMenu
 {
-	using System.Collections.Generic;
-	using AssetSnap.Front.Components;
-	using AssetSnap.Front.Nodes;
-	using Godot;
-	
-	public partial class Base : Node
+	/// <summary>
+	/// Base class for managing the context menu in the AssetSnap addon.
+	/// </summary>
+	public partial class Base : Node, ISerializationListener
 	{
+		public static Base Singleton
+		{
+			get
+			{
+				return _Instance;
+			}
+		}
+		
+		private static Base _Instance;
+		
 		private readonly PackedScene _Scene = GD.Load<PackedScene>("res://addons/assetsnap/scenes/ContextMenu.tscn");
-		private bool Shown = false;
-		private AsContextMenu _Instance;
-		PopupMenu dropdownMenu;
-		private List<string> Components = new()
+		private List<string> _Components = new()
 		{
 			"LibrarySnapRotate",
 			"LibrarySnapScale",
 		}; 
 		
+		/// <summary>
+		/// Constructor for the Base class.
+		/// </summary>
+		/// <remarks>
+		/// This constructor initializes the Base class.
+		/// It sets the name of the context menu node to "AssetSnapContextMenu" and assigns the current instance to the static <see cref="_Instance"/> property.
+		/// </remarks>
+		/// <returns>Void.</returns>
 		public Base()
 		{
 			Name = "AssetSnapContextMenu";
+			_Instance = this;
 		}
-	
-		/*
-		** Initializes the context handler
-		*/ 
+		
+		/// <summary>
+		/// Method called before serialization.
+		/// </summary>
+		public void OnBeforeSerialize()
+		{
+			//
+		}
+
+		/// <summary>
+		/// Method called after deserialization.
+		/// </summary>
+		public void OnAfterDeserialize()
+		{
+			_Instance = this;
+		}
+		
+		/// <summary>
+		/// Initializes the context handler.
+		/// </summary>
 		public void Initialize()
 		{
-			if( false == _ShouldUseOverlay()) 
+			if( false == _ShouldUseOverlay())
 			{
 				return;
 			}
-
-			Shown = true;
-
-			if ( HasComponents() ) 
+			
+			if(	null != Plugin.Singleton && false == HasNode("AsContextMenu") ) 
 			{
-				InitializeComponents();
-			}  
+				AsContextMenu _NodeInstance = _Scene.Instantiate<AsContextMenu>();
+				AddChild(_NodeInstance);
+			}
+
+			if ( _HasComponents() )
+			{
+				_InitializeComponents();
+			}
 		}
 		
+		/// <summary>
+		/// This method is called when the node and its children are ready.
+		/// </summary>
+		/// <remarks>
+		/// It calls the <see cref="_Initialize"/> method to initialize the context menu.
+		/// </remarks>
+		/// <returns>Void.</returns>
 		public override void _Ready()
 		{
-			
 			_Initialize();
 		}
-		
-		/*
-		** Handles viewability of the contextmenu based
-		** on certain parameters.
-		**
-		** @param double delta
-		** @return void
-		*/
-		public override void _Process(double delta)
-		{
-			if( false == Shown && _ShouldUseOverlay()) 
-			{
-				Shown = true;
- 
-				if( GlobalExplorer.GetInstance().HandleIsModel() ) 
-				{
-					SetVisible(true);
-				}
-			}
-			else if( true == Shown && false == _ShouldUseOverlay() ) 
-			{
-				ClearOverlay();
-			}
-		} 
-		
-		/*
-		** Shows the context menu
-		**
-		** @return void
-		*/
+	
+		/// <summary>
+		/// Shows the context menu.
+		/// </summary>
 		public void Show()
 		{
 			if( false == IsContextMenuValid() )
@@ -107,11 +129,11 @@ namespace AssetSnap.ContextMenu
 			
 			SetVisible(true);
 			
-			if( _Instance is AsContextMenu ContextMenu ) 
+			if( GetInstance() is AsContextMenu ContextMenu ) 
 			{
 				Node3D Handle = GlobalExplorer.GetInstance().GetHandle();
 				
-				if( IsInstanceValid( Handle ) ) 
+				if( EditorPlugin.IsInstanceValid( Handle ) ) 
 				{
 					ContextMenu.SetRotationX(Handle.RotationDegrees.X);
 					ContextMenu.SetRotationY(Handle.RotationDegrees.Y);
@@ -124,11 +146,9 @@ namespace AssetSnap.ContextMenu
 			}
 		}
 		
-		/*
-		** Hides the context menu
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Hides the context menu.
+		/// </summary>
 		public void Hide() 
 		{
 			if( false == IsContextMenuValid() )
@@ -139,13 +159,10 @@ namespace AssetSnap.ContextMenu
 			SetVisible(false);
 		}
 		
-		/*
-		** Sets the current rotation values based on a given vector3
-		** parameter
-		**
-		** @param Vector3 Rotation
-		** @return void
-		*/
+		/// <summary>
+		/// Sets the current rotation values based on a given vector3 parameter.
+		/// </summary>
+		/// <param name="Rotation">The rotation vector.</param>
 		public void SetRotationValues( Vector3 Rotation ) 
 		{
 			if(false == _ShouldUseOverlay() ||  false == IsContextMenuValid() ) 
@@ -153,31 +170,21 @@ namespace AssetSnap.ContextMenu
 				return;
 			}
 			
-			if( _Instance is AsContextMenu ContextMenu ) 
+			if( GetInstance() is AsContextMenu ContextMenu ) 
 			{
 				ContextMenu.SetRotationX(Rotation.X);
 				ContextMenu.SetRotationY(Rotation.Y);
 				ContextMenu.SetRotationZ(Rotation.Z);
 			}
-
-			if( false == IsParentBody() ) 
-			{
-				Node3D Handle = GlobalExplorer.GetInstance().GetHandle();
-				Handle.RotationDegrees = Rotation;
-			}
-			else if( GlobalExplorer.GetInstance().HandleIsModel() && IsParentBody() )
-			{
-				UpdateModelBody("Rotation", Rotation);
-			}
+			
+			Node3D Handle = GlobalExplorer.GetInstance().GetHandle();
+			Handle.RotationDegrees = Rotation;
 		}
 		
-		/*
-		** Sets the current scale values based on a given vector3
-		** parameter
-		**
-		** @param Vector3 Scale
-		** @return void
-		*/
+		/// <summary>
+		/// Sets the current scale values based on a given vector3 parameter.
+		/// </summary>
+		/// <param name="Scale">The scale vector.</param>
 		public void SetScaleValues( Vector3 Scale ) 
 		{
 			if(false == _ShouldUseOverlay() || false == IsContextMenuValid() ) 
@@ -185,47 +192,50 @@ namespace AssetSnap.ContextMenu
 				return;
 			}
 			
-			if( _Instance is AsContextMenu ContextMenu ) 
+			if( GetInstance() is AsContextMenu ContextMenu ) 
 			{
 				ContextMenu.SetScaleX(Scale.X);
 				ContextMenu.SetScaleY(Scale.Y);
 				ContextMenu.SetScaleZ(Scale.Z);
 			}
 			
-			if( false == IsParentBody() ) 
-			{
-				Node3D Handle = GlobalExplorer.GetInstance().GetHandle();
-				Handle.Scale = Scale;
-			}
-			else if( GlobalExplorer.GetInstance().HandleIsModel() && IsParentBody() )
-			{
-				UpdateModelBody("Scale", Scale);
-			}
+			Node3D Handle = GlobalExplorer.GetInstance().GetHandle();
+			Handle.Scale = Scale;
 		}
 		
-		/*
-		** If certain conditions are met it
-		** will query a collision update
-		** on the body
-		**
-		** @return void
-		*/
-		public void UpdateModelBody( string Type, Vector3 Value ) 
+		/// <summary>
+		/// Sets the visibility state of the context menu.
+		/// </summary>
+		/// <param name="state">The visibility state.</param>
+		public void SetVisible(bool state)
 		{
-			AsStaticBody3D _body = GetParentBody();
-			_body.Update( Type, Value );
+			if( false == HasInstance() ) 
+			{
+				return;
+			}
+			
+			GetInstance().Visible = state;
+			GetInstance().Active = state;
 		}
 		
-		public Control GetInstance()
-		{
-			return _Instance;
+		/// <summary>
+		/// Gets the instance of the context menu.
+		/// </summary>
+		/// <returns>The instance of the context menu.</returns>
+		public AsContextMenu GetInstance()
+		{	
+			if( false == HasInstance() )
+			{
+				return null;
+			}
+
+			return GetNode("AsContextMenu") as AsContextMenu;
 		}
 		
-		/*
-		** Fetches the current rotation values
-		**
-		** @return Vector3
-		*/
+		/// <summary>
+		/// Fetches the current rotation values.
+		/// </summary>
+		/// <returns>The rotation values as a Vector3.</returns>
 		public Vector3 GetRotateValues()
 		{
 			if(false == _ShouldUseOverlay() || false == IsContextMenuValid() ) 
@@ -233,7 +243,7 @@ namespace AssetSnap.ContextMenu
 				return Vector3.Zero;
 			}
 			
-			if( _Instance is AsContextMenu ContextMenu ) 
+			if( GetInstance() is AsContextMenu ContextMenu ) 
 			{
 				return new Vector3(ContextMenu.GetRotationX(), ContextMenu.GetRotationY(), ContextMenu.GetRotationZ());
 			}
@@ -241,11 +251,10 @@ namespace AssetSnap.ContextMenu
 			return Vector3.Zero;
 		}
 		
-		/*
-		** Fetches the current scale values
-		**
-		** @return Vector3
-		*/
+		/// <summary>
+		/// Fetches the current scale values.
+		/// </summary>
+		/// <returns>The scale values as a Vector3.</returns>
 		public Vector3 GetScaleValues()
 		{
 			if(false == _ShouldUseOverlay() || false == IsContextMenuValid() ) 
@@ -253,7 +262,7 @@ namespace AssetSnap.ContextMenu
 				return Vector3.Zero;
 			}
 			
-			if( _Instance is AsContextMenu ContextMenu ) 
+			if( GetInstance() is AsContextMenu ContextMenu ) 
 			{
 				return new Vector3(ContextMenu.GetScaleX(), ContextMenu.GetScaleY(), ContextMenu.GetScaleZ());
 			}
@@ -261,11 +270,10 @@ namespace AssetSnap.ContextMenu
 			return Vector3.Zero;
 		}
 		
-		/*
-		** Fetches the current angle value
-		**
-		** @return int
-		*/
+		/// <summary>
+		/// Fetches the current angle value.
+		/// </summary>
+		/// <returns>The current angle as an integer.</returns>
 		public int GetCurrentAngle()
 		{
 			if(false == _ShouldUseOverlay() || false == IsContextMenuValid() ) 
@@ -273,7 +281,7 @@ namespace AssetSnap.ContextMenu
 				return 0;
 			}
 			
-			if( _Instance is AsContextMenu ContextMenu ) 
+			if( GetInstance() is AsContextMenu ContextMenu ) 
 			{
 				return ContextMenu.GetAngleIndex();
 			}
@@ -281,21 +289,10 @@ namespace AssetSnap.ContextMenu
 			return 0;
 		}
 		
-		/*
-		** Defines the visibility state of
-		** the context menu
-		*/
-		public void SetVisible(bool state)
-		{
-			_Instance.Visible = state;
-			_Instance.Active = state;
-		}
-		
-		/*
-		** Checks if context menu is hidden
-		**
-		** @return bool
-		*/
+		/// <summary>
+		/// Checks if the context menu is hidden.
+		/// </summary>
+		/// <returns>True if the context menu is hidden, false otherwise.</returns>
 		public bool IsHidden() 
 		{
 			if( false == IsContextMenuValid() || false == _ShouldUseOverlay()) 
@@ -303,174 +300,100 @@ namespace AssetSnap.ContextMenu
 				return true;
 			}
 			
-			return _Instance.Visible == false;
+			return GetInstance().Visible == false;
 		}
 		
-		/*
-		** Checks if the instance of ContextMenu is valid or not
-		**
-		** @return bool
-		*/
+		
+		/// <summary>
+		/// Checks if an instance of the context menu exists.
+		/// </summary>
+		/// <returns>True if an instance exists, false otherwise.</returns>
+		public bool HasInstance()
+		{
+			if( false == HasNode("AsContextMenu") || false == EditorPlugin.IsInstanceValid( GetNode("AsContextMenu") ) ) 
+			{
+				return false;
+			}
+
+			return true;
+		}
+		
+		/// <summary>
+		/// Checks if the instance of the context menu is valid.
+		/// </summary>
+		/// <returns>True if the instance is valid, false otherwise.</returns>
 		public bool IsContextMenuValid()
 		{
-			return IsInstanceValid(_Instance) && null != _Instance.GetParent();
+			return
+				EditorPlugin.IsInstanceValid(Plugin.Singleton) && 
+				Plugin.Singleton.HasInternalContainer() &&
+				null != GetInstance() &&
+				EditorPlugin.IsInstanceValid(GetInstance()) &&
+				null != GetInstance().GetParent();
 		}
 		
-		/*
-		** Checks if the instance of ContextMenu is valid or not
-		**
-		** @return bool
-		*/
-		public bool IsParentBody()
-		{
-			AsMeshInstance3D MeshInstance = GlobalExplorer.GetInstance().GetHandle() as AssetSnap.Front.Nodes.AsMeshInstance3D;
-			Node3D parent = MeshInstance.GetParent() as Node3D;
-			
-			return parent is AsStaticBody3D;
-		}
-		/*
-		** Checks if the instance of ContextMenu is valid or not
-		**
-		** @return bool
-		*/
-		public AsStaticBody3D GetParentBody()
-		{
-			AsMeshInstance3D MeshInstance = GlobalExplorer.GetInstance().GetHandle() as AssetSnap.Front.Nodes.AsMeshInstance3D;
-			AsStaticBody3D parent = MeshInstance.GetParent() as AsStaticBody3D;
-			
-			return parent;
-		}
-		/*
-		** Initialies the scene and adds
-		** it to the tree
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Initializes the scene and adds it to the tree.
+		/// </summary>
+		/// <remarks>
+		/// This method initializes the scene for the context menu and adds it to the tree.
+		/// It sets the visibility of the context menu to false by default.
+		/// </remarks>
+		/// <returns>Void.</returns>
 		private void _Initialize() 
 		{
-			_Instance = _Scene.Instantiate<AsContextMenu>();
-			SetVisible(false);
-			EditorInterface.Singleton.GetBaseControl().AddChild( _Instance );
-			
-			GlobalExplorer.GetInstance().ContextMenu.GetInstance().Connect(AsContextMenu.SignalName.VectorsChanged, new Callable(this, "_OnUpdateVectors"));
+			SetVisible(false);			
 		}
 
-		/*
-		** Initialies the components needed
-		** for the context menu
-		**
-		** @return void
-		*/
-		public void InitializeComponents()
+		/// <summary>
+		/// Initializes the components needed for the context menu.
+		/// </summary>
+		private void _InitializeComponents()
 		{
-			LibrarySnapRotate _LibrarySnapRotate = GlobalExplorer.GetInstance().Components.Single<LibrarySnapRotate>();
-			LibrarySnapScale _LibrarySnapScale = GlobalExplorer.GetInstance().Components.Single<LibrarySnapScale>();
-			LibrarySnapGrab _LibrarySnapGrab = GlobalExplorer.GetInstance().Components.Single<LibrarySnapGrab>();
+			if( false == Plugin.Singleton.HasInternalContainer() ) 
+			{
+				return;
+			}
+			
+			SnapRotate _LibrarySnapRotate = ExplorerUtils.Get().Components.Single<AssetSnap.Front.Components.Library.SnapRotate>();
+			SnapScale _LibrarySnapScale = ExplorerUtils.Get().Components.Single<AssetSnap.Front.Components.Library.SnapScale>();
+			SnapGrab _LibrarySnapGrab = ExplorerUtils.Get().Components.Single<AssetSnap.Front.Components.Library.SnapGrab>();
 			
 			if( null != _LibrarySnapRotate ) 
 			{
-				_LibrarySnapRotate.Library = GlobalExplorer.GetInstance().CurrentLibrary;
 				_LibrarySnapRotate.Initialize();
+				AddChild(_LibrarySnapRotate);
 			}
 			
 			if( null != _LibrarySnapScale ) 
 			{
-				_LibrarySnapScale.Library = GlobalExplorer.GetInstance().CurrentLibrary;
 				_LibrarySnapScale.Initialize();
+				AddChild(_LibrarySnapScale);
 			}
 			
 			if( null != _LibrarySnapGrab ) 
 			{
-				_LibrarySnapGrab.Library = GlobalExplorer.GetInstance().CurrentLibrary;
 				_LibrarySnapGrab.Initialize();
+				AddChild(_LibrarySnapGrab);
 			}
 		}
-		
-		/*
-		** Updates rotation and scale valus on the current handle
-		** when a change is received from the context menu
-		**
-		** @param Godot.Collections.Dictionary package
-		** @return void
-		*/
-		private void _OnUpdateVectors(Godot.Collections.Dictionary package)
+	
+		/// <summary>
+		/// Checks if the components needed for the context menu are available.
+		/// </summary>
+		/// <returns>True if all components are available, false otherwise.</returns>
+		private bool _HasComponents() 
 		{
-			Node3D Handle = GlobalExplorer.GetInstance().GetHandle();
-			Handle.RotationDegrees = package["Rotation"].As<Vector3>();
-			Handle.Scale = package["Scale"].As<Vector3>();
+			return ExplorerUtils.Get().Components.HasAll(_Components.ToArray());
 		}
 		
-		/*
-		** Clears the instance and set's it's shown state to false
-		**
-		** @return void
-		*/
-		private void ClearOverlay()
-		{
-			_Instance.QueueFree();
-			Shown = false;
-		}
-		
-		/*
-		** Checks if the message bus is connected
-		**
-		** @return bool
-		*/
-		private bool Is_GlobalExplorerConnected()
-		{
-			return null != GlobalExplorer.GetInstance() && null != GlobalExplorer.GetInstance().Settings;
-		}
-		
-		/*
-		** Checks if the components needed are available
-		** 
-		** @return bool
-		*/
-		public bool HasComponents() 
-		{
-			return GlobalExplorer.GetInstance().Components.HasAll(Components.ToArray());
-		}
-		
-		/*
-		** Checks if context menu should be used or not
-		**
-		** @return bool
-		*/
+		/// <summary>
+		/// Checks if the context menu should be used or not.
+		/// </summary>
+		/// <returns>True if the context menu should be used, false otherwise.</returns>
 		private bool _ShouldUseOverlay()
 		{
-			if( null == GlobalExplorer.GetInstance() || null ==  GlobalExplorer.GetInstance().Settings ) 
-			{ 
-				return false;
-			}
-
-			bool UseAsOverlay = GlobalExplorer.GetInstance().Settings.GetKey("use_as_overlay").As<bool>();
-			return UseAsOverlay;
-		}
-		 
-		/* 
-		** Cleaning of fields, references and more.
-		**
-		** @return void
-		*/
-		public override void _ExitTree()
-		{
-			Components = null;
-			
-			if( IsInstanceValid(_Instance) )  
-			{ 
-				if( _Instance is AsContextMenu ContextMenu )  
-				{
-					if(ContextMenu.IsConnected(AsContextMenu.SignalName.VectorsChanged, new Callable(this, "_OnUpdateVectors")))
-					{
-						ContextMenu.Disconnect(AsContextMenu.SignalName.VectorsChanged, new Callable(this, "_OnUpdateVectors"));
-					} 
-				}
-			
-				_Instance.QueueFree();
-			}
-
-			_Instance = null; 
-			base._ExitTree();
+			return SettingsStatic.ShouldUseASOverlay();
 		}
 	}
 }

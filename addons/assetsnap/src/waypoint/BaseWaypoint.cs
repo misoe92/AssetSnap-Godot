@@ -21,124 +21,121 @@
 // SOFTWARE.
 
 #if TOOLS
+
+using AssetSnap.Front.Nodes;
+using Godot;
+
 namespace AssetSnap.Waypoint
 {
-	using AssetSnap.Front.Nodes;
-	using Godot;
-
 	public partial class BaseWaypoint
 	{
-		private Vector3 Origin;
-		private Vector3 Rotation;
-		private Vector3 Scale; 
-		private Node3D Model;
-		private AsGroup3D Group;
-		private bool IsModel = false;
-		private bool IsGroup = false;
+		private Vector3 _Origin;
+		private Vector3 _Rotation;
+		private Vector3 _Scale; 
+		private Node3D _Model;
+		private AsGroup3D _Group;
+		private bool _IsModel = false;
+		private bool _IsGroup = false;
 		
-		/*
-		** Waypoint constructor
-		**
-		** @param Vector3 _Origin
-		** @param Vector3 _Rotation
-		** @param Vector3 _Scale
-		** @param Node3D _Model
-		** @return void
-		*/
-		public BaseWaypoint( Vector3 _Origin, Vector3 _Rotation, Vector3 _Scale, Node3D _Model ) 
+		/// <summary>
+		/// Constructor for a waypoint associated with a model.
+		/// </summary>
+		/// <param name="Origin">The origin position of the waypoint.</param>
+		/// <param name="Rotation">The rotation of the waypoint.</param>
+		/// <param name="Scale">The scale of the waypoint.</param>
+		/// <param name="Model">The associated 3D model node.</param>
+		public BaseWaypoint( Vector3 Origin, Vector3 Rotation, Vector3 Scale, Node3D Model ) 
 		{
-			Origin = _Origin;
-			Rotation = _Rotation;
-			Scale = _Scale;
-			Model = _Model;
+			_Origin = Origin;
+			_Rotation = Rotation;
+			_Scale = Scale;
+			_Model = Model;
 			
 			if( _Model.HasMeta("AsModel")) 
 			{
-				IsModel = true;			
-				IsGroup = false;			
+				_IsModel = true;			
+				_IsGroup = false;			
 			}
 			else if( _Model.HasMeta("AsGroup") ) 
 			{
-				IsModel = false;			
-				IsGroup = true;			
+				_IsModel = false;			
+				_IsGroup = true;			
 			}
 		}
 		
-		/*
-		** Waypoint constructor
-		**
-		** @param Vector3 _Origin
-		** @param AsGroup3D _Group
-		** @return void
-		*/
-		public BaseWaypoint( Vector3 _Origin, AsGroup3D _Group ) 
+		/// <summary>
+		/// Constructor for a waypoint associated with a group.
+		/// </summary>
+		/// <param name="_Origin">The origin position of the waypoint.</param>
+		/// <param name="_Group">The associated 3D group node.</param>
+		public BaseWaypoint( Vector3 Origin, AsGroup3D Group ) 
 		{
-			Origin = _Origin;
-			Group = _Group;
-			IsGroup = true;
+			_Origin = Origin;
+			_Group = Group;
+			_IsGroup = true;
 		}
 		
-		/*
-		** Set's the scale of the waypoint model
-		**
-		** @param Vector3 scale
-		** @return void
-		*/
+		/// <summary>
+		/// Sets the scale of the waypoint model.
+		/// </summary>
+		/// <param name="scale">The new scale to set.</param>
 		public void SetScale( Vector3 scale ) 
 		{
-			Scale = scale;
+			_Scale = scale;
 		}
 			
-		/*
-		** Fetches the aabb of the model
-		**
-		** @return Aabb
-		*/
+		/// <summary>
+		/// Retrieves the axis-aligned bounding box (AABB) of the associated model.
+		/// </summary>
+		/// <returns>The AABB of the model.</returns>
 		public Aabb GetAabb()
 		{
-			if( EditorPlugin.IsInstanceValid( Model ) && Model is AsGrouped3D ) 
+			if( EditorPlugin.IsInstanceValid( _Model ) && _Model is AsGrouped3D ) 
 			{
-				AsGrouped3D _Model = Model as AsGrouped3D;
-				return _Model.GetAabb();
+				AsGrouped3D Model = _Model as AsGrouped3D;
+				return Model.GetAabb();
 			}
 			
-			if( IsModel && EditorPlugin.IsInstanceValid( Model ) ) 
+			if( _IsGroup && EditorPlugin.IsInstanceValid( _Model ) ) 
 			{
-				AsMeshInstance3D _Model = Model as AssetSnap.Front.Nodes.AsMeshInstance3D; 
-				return _Model.GetAabb();
+				AsGroup3D Model = _Model as AsGroup3D; 
+				return new Aabb();
+			}
+			
+			if( _IsModel && EditorPlugin.IsInstanceValid( _Model ) ) 
+			{
+				AsMeshInstance3D Model = _Model as AssetSnap.Front.Nodes.AsMeshInstance3D; 
+				return Model.GetAabb();
 			}
 			
 			return new Aabb();
 		}
 		
-		/*
-		** Fetches the model
-		**
-		** @return Node3D
-		*/
+		/// <summary>
+		/// Retrieves the associated model node.
+		/// </summary>
+		/// <returns>The associated model node.</returns>
 		public Node3D GetModel()
 		{
-			return Model;
+			return _Model;
 		}
 		
-		/*
-		** Fetches the model's origin position
-		**
-		** @return Vector3
-		*/
+		/// <summary>
+		/// Retrieves the origin position of the model.
+		/// </summary>
+		/// <returns>The origin position of the model.</returns>
 		public Vector3 GetOrigin()
 		{
-			return Origin;
+			return _Origin;
 		}
 		
-		/*
-		** Fetches the model's scale
-		**
-		** @return Vector3
-		*/
+		/// <summary>
+		/// Retrieves the scale of the model.
+		/// </summary>
+		/// <returns>The scale of the model.</returns>
 		public Vector3 GetScale()
 		{
-			return Scale;
+			return _Scale;
 		}
 	}
 }

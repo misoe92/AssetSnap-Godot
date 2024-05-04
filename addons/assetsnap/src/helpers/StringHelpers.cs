@@ -24,14 +24,26 @@ using Godot;
 
 namespace AssetSnap.Helpers
 {
+	/// <summary>
+	/// A static helper class for string manipulation.
+	/// </summary>
 	public static class StringHelper
 	{
-
+		/// <summary>
+		/// Converts a file name to a title format.
+		/// </summary>
+		/// <param name="filename">The file name to convert.</param>
+		/// <returns>The file name converted to title format.</returns>
 		public static string FileNameToTitle( string filename )
 		{
 			return filename.Split(".")[0].ToCamelCase();
 		}
 		
+		/// <summary>
+        /// Extracts the file name from a file path.
+        /// </summary>
+        /// <param name="path">The file path.</param>
+        /// <returns>The extracted file name.</returns>
 		public static string FilePathToFileName( string path )
 		{
 			string delimiter = "/";

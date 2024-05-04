@@ -20,19 +20,21 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using Godot;
+
 namespace AssetSnap.Front.Nodes
 {
-	using Godot;
-
+	/// <summary>
+    /// Represents a search input field for entering search queries.
+    /// </summary>
 	public partial class AsSearchInput : LineEdit
 	{
-		/*
-		** Configuration of the search input
-		** 
-		** @return void
-		*/
+		/// <summary>
+        /// Configures the search input when entering the scene tree.
+        /// </summary>
 		public override void _EnterTree()
 		{
+			Name = "AsSearchInput";
 			CustomMinimumSize = new Vector2(140, 15);
 		}
 	}

@@ -21,214 +21,301 @@
 // SOFTWARE.
 
 #if TOOLS
-using System;
+
 using Godot;
+
 namespace AssetSnap.Component
 {
+	/// <summary>
+	/// A partial class representing a panel container trait, derived from Base.
+	/// </summary>
 	[Tool]
 	public partial class Panelable : Trait.Base
 	{
+		/// <summary>
+		/// Enumeration of panel types.
+		/// </summary>
 		public enum PanelType
 		{
 			DefaultPanelContainer,
 			RoundedPanelContainer,
 			LightPanelContainer
 		}
-		public new Godot.Collections.Dictionary<string, int> Margin = new()
-		{
-			{"left", 0},
-			{"right", 0},
-			{"top", 5},
-			{"bottom", 5},
-		};
-		
-		public new Godot.Collections.Dictionary<string, int> Padding = new()
-		{
-			{"left", 10},
-			{"right", 10},
-			{"top", 5},
-			{"bottom", 5},
-		};
-		
-		private Control.SizeFlags SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
-		private Control.SizeFlags SizeFlagsVertical = Control.SizeFlags.ShrinkBegin;
-		
-		private PanelType Type = PanelType.DefaultPanelContainer;
+
+		private PanelType _Type = PanelType.DefaultPanelContainer;
 		private MarginContainer _MarginContainer;
-		
 		private MarginContainer _PaddingContainer;
 
+		/// <summary>
+		/// Default constructor for Panelable.
+		/// </summary>
+		public Panelable()
+		{
+			Name = "Panelable";
+			TypeString = GetType().ToString();
+
+			_Margin = new()
+			{
+				{"left", 0},
+				{"right", 0},
+				{"top", 5},
+				{"bottom", 5},
+			};
+
+			_Padding = new()
+			{
+				{"left", 10},
+				{"right", 10},
+				{"top", 5},
+				{"bottom", 5},
+			};
+		}
+		
+		/// <summary>
+		/// Adds the currently chosen panel container to a specified container.
+		/// </summary>
+		/// <param name="Container">The container to which to add the panel container.</param>
+		public void AddToContainer(Node Container)
+		{
+			if (false == Dependencies.ContainsKey(TraitName + "_MarginContainer"))
+			{
+				GD.PushError("Container was not found @ AddToContainer");
+				GD.PushError("AddToContainer::Keys-> ", Dependencies.Keys);
+				GD.PushError("AddToContainer::ADDTO-> ", TraitName + "_MarginContainer");
+				return;
+			}
+
+			base._AddToContainer(Container, Dependencies[TraitName + "_MarginContainer"].As<MarginContainer>());
+		}
+
+		/// <summary>
+		/// Instantiate an instance of the trait.
+		/// </summary>
+		/// <returns>Returns the instantiated Panelable.</returns>
 		public Panelable Instantiate()
 		{
-			base._Instantiate( GetType().ToString() );
+			base._Instantiate();
 
+			// Create MarginContainer
 			_MarginContainer = new()
 			{
-				Name="PanelMarginContainer",
-				SizeFlagsHorizontal = SizeFlagsHorizontal,
-				SizeFlagsVertical = SizeFlagsVertical,
-				Visible = Visible,
+				Name = "PanelMarginContainer",
+				SizeFlagsHorizontal = _SizeFlagsHorizontal,
+				SizeFlagsVertical = _SizeFlagsVertical,
+				Visible = _Visible,
 			};
-			
-			foreach( (string side, int value ) in Margin ) 
+
+			// Apply margin to MarginContainer
+			foreach ((string side, int value) in _Margin)
 			{
 				_MarginContainer.AddThemeConstantOverride("margin_" + side, value);
 			}
-			
+
+			// Create PanelContainer
 			PanelContainer WorkingPanel = new()
 			{
-				Name = Name,
-				ThemeTypeVariation = Type.ToString(),
-				SizeFlagsHorizontal = SizeFlagsHorizontal,
-				SizeFlagsVertical = SizeFlagsVertical,
-			};
-		
-			_PaddingContainer = new()
-			{
-				Name="PanelPaddingContainer",
-				SizeFlagsHorizontal = SizeFlagsHorizontal,
-				SizeFlagsVertical = SizeFlagsVertical,
+				Name = TraitName,
+				ThemeTypeVariation = _Type.ToString(),
+				SizeFlagsHorizontal = _SizeFlagsHorizontal,
+				SizeFlagsVertical = _SizeFlagsVertical,
 			};
 			
-			foreach( (string side, int value ) in Padding ) 
+			// Create PaddingContainer
+			_PaddingContainer = new()
+			{
+				Name = "PanelPaddingContainer",
+				SizeFlagsHorizontal = _SizeFlagsHorizontal,
+				SizeFlagsVertical = _SizeFlagsVertical,
+			};
+
+			// Apply padding to PaddingContainer
+			foreach ((string side, int value) in _Padding)
 			{
 				_PaddingContainer.AddThemeConstantOverride("margin_" + side, value);
 			}
 
+			// Add children to appropriate parents
 			WorkingPanel.AddChild(_PaddingContainer);
 			_MarginContainer.AddChild(WorkingPanel);
 
-			Nodes.Add(WorkingPanel);
-			WorkingNode = WorkingPanel;
+			// Update dependencies and instances
+			Dependencies[TraitName + "_WorkingNode"] = WorkingPanel;
+			Dependencies[TraitName + "_PanelPaddingContainer"] = _PaddingContainer;
+			Dependencies[TraitName + "_MarginContainer"] = _MarginContainer;
 
+			Plugin.Singleton.TraitGlobal.AddInstance(Iteration, WorkingPanel, OwnerName, TypeString, Dependencies);
+			Plugin.Singleton.TraitGlobal.AddName(Iteration, TraitName, OwnerName, TypeString);
+
+			// Reset and update iteration
 			Reset();
-			
+			Iteration += 1;
+			Dependencies = new();
+
 			return this;
 		}
-		
+
+		/// <summary>
+		/// Selects a placed panel container in the nodes array by index.
+		/// </summary>
+		/// <param name="index">The index of the panel container.</param>
+		/// <returns>Returns the modified Panelable.</returns>
 		public Panelable Select(int index)
 		{
 			base._Select(index);
 
+			if (false != Dependencies.ContainsKey(TraitName + "_WorkingNode"))
+			{
+				Godot.Collections.Dictionary<string, Variant> dependencies = Plugin.Singleton.TraitGlobal.GetDependencies(index, TypeString, OwnerName);
+				Dependencies = dependencies;
+			}
+
 			return this;
 		}
-		
-		public Panelable SelectByName( string name ) 
+
+		/// <summary>
+		/// Selects a placed panel container in the nodes array by name.
+		/// </summary>
+		/// <param name="name">The name of the panel container.</param>
+		/// <returns>Returns the modified Panelable.</returns>
+		public Panelable SelectByName(string name)
 		{
-			foreach( Button button in Nodes ) 
+			foreach (Button button in Nodes)
 			{
-				if( button.Name == name ) 
+				if (button.Name == name)
 				{
-					WorkingNode = button;
+					Dependencies["WorkingNode"] = button;
 					break;
 				}
 			}
 
 			return this;
 		}
-		
-		public Panelable SetName( string text ) 
+
+		/// <summary>
+		/// Sets the name of the current panel container.
+		/// </summary>
+		/// <param name="text">The name to set.</param>
+		/// <returns>Returns the modified Panelable.</returns>
+		public Panelable SetName(string text)
 		{
 			base._SetName(text);
-			
+
 			return this;
 		}
-		public Panelable SetVisible( bool state ) 
+
+		/// <summary>
+		/// Sets the theme type of the panel container.
+		/// </summary>
+		/// <param name="type">The type of panel container to set.</param>
+		/// <returns>Returns the modified Panelable.</returns>
+		public Panelable SetType(PanelType type)
+		{
+			_Type = type;
+			return this;
+		}
+
+		/// <summary>
+		/// Sets the visible state of the current panel container.
+		/// </summary>
+		/// <param name="state">The visibility state to set.</param>
+		/// <returns>Returns the modified Panelable.</returns>
+		public Panelable SetVisible(bool state)
 		{
 			base._SetVisible(state);
-			
-			if( null != WorkingNode && WorkingNode is PanelContainer panel ) 
+
+			if (
+				null != Dependencies &&
+				false != Dependencies.ContainsKey(TraitName + "_WorkingNode")
+			)
 			{
-				_MarginContainer.Visible = state;
+				Dependencies[TraitName + "_MarginContainer"].As<MarginContainer>().Visible = state;
 			}
-			
+
 			return this;
 		}
-		public Panelable SetPadding( int value, string side ) 
+
+		/// <summary>
+		/// Sets the horizontal size flag of the panel container.
+		/// </summary>
+		/// <param name="flag">The size flag to set.</param>
+		/// <returns>Returns the modified Panelable.</returns>
+		public override Panelable SetHorizontalSizeFlags(Control.SizeFlags flag)
+		{
+			base.SetHorizontalSizeFlags(flag);
+
+			return this;
+		}
+
+		/// <summary>
+		/// Sets the vertical size flag of the panel container.
+		/// </summary>
+		/// <param name="flag">The size flag to set.</param>
+		/// <returns>Returns the modified Panelable.</returns>
+		public override Panelable SetVerticalSizeFlags(Control.SizeFlags flag)
+		{
+			base.SetVerticalSizeFlags(flag);
+
+			return this;
+		}
+
+		/// <summary>
+		/// Sets margin values for the currently chosen panel container.
+		/// </summary>
+		/// <param name="value">The margin value to set.</param>
+		/// <param name="side">The side for which to set the margin.</param>
+		/// <returns>Returns the modified Panelable.</returns>
+		public Panelable SetMargin(int value, string side = "")
+		{
+			if (side == "")
+			{
+				_Margin["top"] = value;
+				_Margin["bottom"] = value;
+				_Margin["left"] = value;
+				_Margin["right"] = value;
+			}
+			else
+			{
+				_Margin[side] = value;
+			}
+
+			return this;
+		}
+
+		/// <summary>
+		/// Sets padding values for the currently chosen panel container.
+		/// </summary>
+		/// <param name="value">The padding value to set.</param>
+		/// <param name="side">The side for which to set the padding.</param>
+		/// <returns>Returns the modified Panelable.</returns>
+		public Panelable SetPadding(int value, string side)
 		{
 			base._SetPadding(value, side);
-			
-			return this;
-		}
-			
-		public Panelable SetType( PanelType type ) 
-		{
-			Type = type;
-			return this;
-		}
-		
-		public Panelable SetHorizontalSizeFlags(Control.SizeFlags flag)
-		{
-			SizeFlagsHorizontal = flag;
 
 			return this;
 		}
-		
-		public Panelable SetVerticalSizeFlags(Control.SizeFlags flag)
-		{
-			SizeFlagsVertical = flag;
 
-			return this;
-		}
-		
-		public Panelable SetMargin( int value, string side = "" ) 
+		/// <summary>
+		/// Returns the inner container of the panel container.
+		/// </summary>
+		/// <returns>Returns the inner container.</returns>
+		public MarginContainer GetContainer()
 		{
-			if( side == "" ) 
+			if (false == Dependencies.ContainsKey(TraitName + "_PanelPaddingContainer"))
 			{
-				Margin["top"] = value;
-				Margin["bottom"] = value;
-				Margin["left"] = value;
-				Margin["right"] = value;
+				return null;
 			}
-			else 
-			{
-				Margin[side] = value;
-			}
-			
-			return this;
+
+			return Dependencies[TraitName + "_PanelPaddingContainer"].As<MarginContainer>();
 		}
-		
-		public void AddToContainer( Node Container )
-		{
-			if( null != WorkingNode ) 
-			{
-				// Single placement
-				Container.AddChild(WorkingNode.GetParent());
-			}
-			else 
-			{
-				// Multi placement
-				foreach( Node node in Nodes ) 
-				{
-					base._AddToContainer(Container, node);
-				}
-			}
-		}
-		
+
+		/// <summary>
+		/// Resets the trait to a cleared state.
+		/// </summary>
 		private void Reset()
 		{
-			WorkingNode = null;
-		}
-		
-		public override void _ExitTree()
-		{
-			Reset();
-			
-			// for( int i = 0; i < Nodes.Count; i++)
-			// {
-			// 	if( EditorPlugin.IsInstanceValid( Nodes[i] ) ) 
-			// 	{
-			// 		PanelContainer panel = Nodes[i] as PanelContainer;
-			// 		Node container = panel.GetParent();
-			// 		panel.QueueFree();
-
-			// 		if( EditorPlugin.IsInstanceValid( container ) ) 
-			// 		{
-			// 			container.QueueFree();
-			// 		}
-			// 	}
-				
-			// }
+			_MarginContainer = null;
+			_PaddingContainer = null;
+			_Type = PanelType.DefaultPanelContainer;
 		}
 	}
 }

@@ -21,24 +21,24 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using Godot;
+
 namespace AssetSnap.ASNode.Types
 {
-	using Godot;
-	
+	/// <summary>
+	/// Represents a custom node type for static bodies.
+	/// </summary>
 	[Tool]
 	public class AsStaticBodyType : NodeType
 	{
-		/*
-		** Construction of the custom node type.
-		*/
+		/// <summary>
+        /// Constructs a new instance of the custom node type for static bodies.
+        /// </summary>
 		public AsStaticBodyType()
 		{
 			Name = "AsStaticBody3D";
-
 			Inherits = "StaticBody3D";
-
 			ScriptPath = "res://addons/assetsnap/nodes/3d/AsStaticBody3D.cs"; 
-
 			IconPath = "res://addons/assetsnap/assets/icons/StaticBody3D.svg";
 		}
 	}

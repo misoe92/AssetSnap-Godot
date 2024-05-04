@@ -21,32 +21,47 @@
 // SOFTWARE.
 
 #if TOOLS
+
+using AssetSnap.Front.Modifiers;
+
 namespace AssetSnap.Modifier
 {
-	using Godot;
-	using AssetSnap.Front.Modifiers;
-	
-	public partial class Base : Node
+	/// <summary>
+	/// Base class for modifiers.
+	/// </summary>
+	public partial class Base
 	{
-		/** Modifiers **/
+		/// <summary>
+		/// Gets the singleton instance of the Base class.
+		/// </summary>
+		public static Base Singleton 
+		{
+			get
+			{
+				if( null == _Instance ) 
+				{
+					_Instance = new();
+				}
+				
+				return _Instance;
+			}
+		}
+		
+		/// <summary>
+		/// The array modifier instance.
+		/// </summary>
 		public AsArrayModifier ArrayModifier = new();
+		
+		/// <summary>
+		/// The scatter modifier instance.
+		/// </summary>
 		public AsScatterModifier ScatterModifier = new();
 		
 		private static Base _Instance;
 		
-		public static Base GetInstance()
-		{
-			if( null == _Instance ) 
-			{
-				_Instance = new()
-				{
-					Name = "AssetSnapModifier",
-				};
-			}
-
-			return _Instance;
-		}
-		
+		/// <summary>
+		/// Called when the Base instance is exiting.
+		/// </summary>
 		public void _Exit()
 		{
 			ArrayModifier = null;
@@ -54,4 +69,5 @@ namespace AssetSnap.Modifier
 		}
 	}
 }
+
 #endif

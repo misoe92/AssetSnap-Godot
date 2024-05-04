@@ -20,37 +20,60 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using Godot;
+
 namespace AssetSnap.Component
 {
-	using Godot;
-
+	/// <summary>
+	/// Base class for components related to Library Object Snap.
+	/// </summary>
 	public partial class LSObjectComponent : LibraryComponent
 	{
 		protected MarginContainer _MarginContainer;
 		protected VBoxContainer _InnerContainer;
 		protected Label _Label;
 		
+		/// <summary>
+		/// Initializes a new instance of the <see cref="LSObjectComponent"/> class.
+		/// </summary>
 		public LSObjectComponent()
 		{
 			Name = "LSObjectComponent";
 			//_include = false;
 		}
 		
+		/// <summary>
+		/// Sets the visibility state of the component.
+		/// </summary>
+		/// <param name="state">The visibility state to set.</param>
 		public virtual void SetVisible( bool state ) 
 		{
 			_MarginContainer.Visible = state;
 		}
 		
+		/// <summary>
+		/// Checks if the component is currently visible.
+		/// </summary>
+		/// <returns><c>true</c> if the component is visible; otherwise, <c>false</c>.</returns>
 		public virtual bool IsVisible() 
 		{
 			return true == _MarginContainer.Visible;
 		}
 		
+		/// <summary>
+		/// Checks if Library Object Snap is enabled.
+		/// </summary>
+		/// <returns><c>true</c> if Library Object Snap is enabled; otherwise, <c>false</c>.</returns>
 		public bool IsSnapToObject()
 		{
 			return _GlobalExplorer.States.SnapToObject == GlobalStates.LibraryStateEnum.Enabled;
 		}
 
+		/// <summary>
+        /// Called when the node is about to be removed from the scene tree.
+        /// </summary>
 		public override void _ExitTree()
 		{
 			if( IsInstanceValid(_Label) ) 
@@ -75,3 +98,5 @@ namespace AssetSnap.Component
 		}
 	}
 }
+
+#endif

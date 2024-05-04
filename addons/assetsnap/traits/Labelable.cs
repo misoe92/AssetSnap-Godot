@@ -21,258 +21,405 @@
 // SOFTWARE.
 
 #if TOOLS
-using System.Drawing;
+
+using AssetSnap.Trait;
 using Godot;
 
 namespace AssetSnap.Component
 {
+	/// <summary>
+	/// A trait for creating and managing labeled UI elements.
+	/// </summary>
 	[Tool]
-	public partial class Labelable : Trait.Base
+	public partial class Labelable : ContainerTrait
 	{
-		public new Godot.Collections.Dictionary<string, int> Margin = new()
-		{
-			{"left", 15},
-			{"right", 15},
-			{"top", 10},
-			{"bottom", 10},
-		};
-		
-		public enum TitleType 
+		public enum TitleType
 		{
 			HeaderSmall,
 			HeaderMedium,
 			HeaderLarge,
+			TextSmall,
+			TextMedium,
+			TextTinyDiffused,
 		};
-		
-		public string Title = "";
-		public TitleType Type = TitleType.HeaderMedium;
-		public MarginContainer _MarginContainer;
-		public HBoxContainer _BoxContainer;
 
-		private Control.SizeFlags SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
-		private Control.SizeFlags SizeFlagsVertical = Control.SizeFlags.ShrinkBegin;
-		private TextServer.AutowrapMode AutowrapMode = TextServer.AutowrapMode.Off;
+		/*
+		** Protected
+		*/
+		protected string _Title = "";
+		protected string _Suffix = "";
+		protected TitleType _Type = TitleType.HeaderMedium;
+		protected TextServer.AutowrapMode _AutowrapMode = TextServer.AutowrapMode.Off;
+		protected HorizontalAlignment _HorizontalAlignment;
 
-		private Vector2 CustomMinimumSize;
-		private Vector2 Size;
-
-		private HorizontalAlignment _HorizontalAlignment;
-		
-		public Labelable Instantiate()
+		/// <summary>
+		/// Default constructor for Labelable.
+		/// </summary>
+		public Labelable()
 		{
-			base._Instantiate( GetType().ToString() );
+			Name = "Labelable";
 			
-			if( Title == "" ) 
+			_Margin = new()
+			{
+				{"left", 15},
+				{"right", 15},
+				{"top", 10},
+				{"bottom", 10},
+			};
+
+			TypeString = GetType().ToString();
+			_SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+			_SizeFlagsVertical = Control.SizeFlags.ShrinkBegin;
+		}
+		
+		/// <summary>
+		/// Adds the currently chosen button to a specified container.
+		/// </summary>
+		/// <param name="Container">The container to add the button to.</param>
+		/// <param name="index">The optional index at which to add the button.</param>
+		public void AddToContainer(Node Container, int? index = null)
+		{
+			if (null == Dependencies)
+			{
+				GD.PushError("Dependencies not set @ AddToContainer");
+				return;
+			}
+
+			if (false == Dependencies.ContainsKey(TraitName + "_MarginContainer"))
+			{
+				GD.PushError("Container was not found @ AddToContainer");
+				GD.PushError("AddToContainer::Keys-> ", Dependencies.Keys);
+				GD.PushError("AddToContainer::ADDTO-> ", TraitName + "_MarginContainer");
+				return;
+			}
+
+			base._AddToContainer(Container, Dependencies[TraitName + "_MarginContainer"].As<MarginContainer>(), index);
+			Reset();
+		}
+
+		/// <summary>
+		/// Instantiate an instance of the trait.
+		/// </summary>
+		/// <returns>Returns the instantiated Labelable.</returns>
+		public override Labelable Instantiate()
+		{
+			base._Instantiate();
+
+			if ("" != _Suffix)
+			{
+				_Orientation = ContainerOrientation.Horizontal;
+				_InnerOrientation = ContainerOrientation.Vertical;
+				_SizeFlagsHorizontal = Control.SizeFlags.ShrinkBegin;
+			}
+
+			base.Instantiate();
+			if (_Title == "")
 			{
 				GD.PushWarning("Title not found");
 				return this;
 			}
 
-			_MarginContainer = new()
+			Label Label = new()
 			{
-				Name = "LabelMargin",
-				SizeFlagsHorizontal = SizeFlagsHorizontal,
-				SizeFlagsVertical = SizeFlagsVertical,
-			};
-			_BoxContainer = new()
-			{
-				Name = "LabelBox",
-				SizeFlagsHorizontal = SizeFlagsHorizontal,
-				SizeFlagsVertical = SizeFlagsVertical,
-			};
-			
-			foreach( (string side, int value ) in Margin ) 
-			{
-				_MarginContainer.AddThemeConstantOverride("margin_" + side, value);
-			}
-			
-			Label _WorkingNode = new() 
-			{
-				Name = Name,	
-				Text = Title,
-				CustomMinimumSize = CustomMinimumSize,
-				Size = Size,
-				ThemeTypeVariation = Type.ToString(),
-				SizeFlagsHorizontal = SizeFlagsHorizontal,
-				SizeFlagsVertical = SizeFlagsVertical,
-				AutowrapMode = AutowrapMode,
+				Name = TraitName,
+				Text = _Title,
+				CustomMinimumSize = _CustomMinimumSize,
+				Size = _Size,
+				ThemeTypeVariation = _Type.ToString(),
+				SizeFlagsHorizontal = _SizeFlagsHorizontal,
+				SizeFlagsVertical = _SizeFlagsVertical,
+				AutowrapMode = _AutowrapMode,
 				HorizontalAlignment = _HorizontalAlignment
 			};
-			
-			_BoxContainer.AddChild(_WorkingNode);	
-			_MarginContainer.AddChild(_BoxContainer);
 
-			Nodes.Add(_WorkingNode);
-			WorkingNode = _WorkingNode;
+			GetInnerContainer(0)
+				.AddChild(Label);
+
+			if ("" != _Suffix)
+			{
+				Label suffix = new()
+				{
+					Name = TraitName + "-suffix",
+					Text = _Suffix,
+					ThemeTypeVariation = "TextExtraSmall",
+					SizeFlagsHorizontal = Control.SizeFlags.ShrinkCenter,
+					SizeFlagsVertical = Control.SizeFlags.ShrinkBegin,
+					HorizontalAlignment = HorizontalAlignment.Right
+				};
+
+				GetInnerContainer(0)
+					.AddChild(suffix);
+
+				Dependencies.Add(TraitName + "_Suffix", suffix);
+			}
+
+			Dependencies[TraitName + "_WorkingNode"] = Label;
+
+			Plugin.Singleton.TraitGlobal.AddInstance(Iteration, Label, OwnerName, TypeString, Dependencies);
+			Plugin.Singleton.TraitGlobal.AddName(Iteration, TraitName, OwnerName, TypeString);
+
 
 			Reset();
-			
+			Iteration += 1;
+			Dependencies = new();
+
 			return this;
 		}
-		
-		public Labelable Select(int index)
+
+		/// <summary>
+		/// Selects a placed label in the nodes array by index.
+		/// </summary>
+		/// <param name="index">The index of the label to select.</param>
+		/// <param name="debug">Whether to output debug information.</param>
+		/// <returns>Returns the selected Labelable.</returns>
+		public override Labelable Select(int index, bool debug = false)
 		{
 			base._Select(index);
 
-			if( null != WorkingNode ) 
+			if (debug)
 			{
-				_BoxContainer = WorkingNode.GetParent() as HBoxContainer;
-				if( EditorPlugin.IsInstanceValid(_BoxContainer) )
+				GD.Print("Selected", index, TraitName);
+			}
+
+			if (false != Dependencies.ContainsKey(TraitName + "_WorkingNode"))
+			{
+				Godot.Collections.Dictionary<string, Variant> dependencies = Plugin.Singleton.TraitGlobal.GetDependencies(index, TypeString, OwnerName);
+				Dependencies = dependencies;
+				if (debug)
 				{
-					_MarginContainer = _BoxContainer.GetParent() as MarginContainer;		
+					GD.Print("Dependencies", Dependencies);
+				}
+			}
+			else
+			{
+				if (debug)
+				{
+					GD.Print("NO DEPENDENCIES");
 				}
 			}
 
 			return this;
 		}
-		
-		public Labelable SelectByName(string name)
+
+		/// <summary>
+		/// Selects a placed label in the nodes array by name.
+		/// </summary>
+		/// <param name="name">The name of the label to select.</param>
+		/// <returns>Returns the selected Labelable.</returns>
+		public override Labelable SelectByName(string name)
 		{
 			base._SelectByName(name);
 
 			return this;
 		}
-		
-		public Labelable SetName( string text ) 
+
+		/// <summary>
+		/// Sets the name of the current label.
+		/// </summary>
+		/// <param name="text">The name to set.</param>
+		/// <returns>Returns the modified Labelable.</returns>
+		public Labelable SetName(string text)
 		{
 			base._SetName(text);
-			
+
 			return this;
 		}
-		
-		public Labelable SetAlignment( HorizontalAlignment alignment ) 
+
+		/// <summary>
+		/// Sets the text of the current label.
+		/// </summary>
+		/// <param name="text">The text to set.</param>
+		/// <returns>Returns the modified Labelable.</returns>
+		public Labelable SetText(string text)
+		{
+			_Title = text;
+
+			if (
+				false != Dependencies.ContainsKey(TraitName + "_WorkingNode") &&
+				Dependencies[TraitName + "_WorkingNode"].As<GodotObject>() is Label labelNode
+			)
+			{
+				labelNode.Text = text;
+			}
+
+			return this;
+		}
+
+		/// <summary>
+		/// Sets the suffix of the current label.
+		/// </summary>
+		/// <param name="text">The suffix to set.</param>
+		/// <returns>Returns the modified Labelable.</returns>
+		public Labelable SetSuffix(string text)
+		{
+			_Suffix = text;
+
+			return this;
+		}
+
+		/// <summary>
+		/// Sets the theme type of the label.
+		/// </summary>
+		/// <param name="type">The type of the label.</param>
+		/// <returns>Returns the modified Labelable.</returns>
+		public Labelable SetType(TitleType type)
+		{
+			_Type = type;
+
+			return this;
+		}
+
+		/// <summary>
+		/// Sets the horizontal size flag for the container, controlling the behavior of the x-axis.
+		/// </summary>
+		/// <param name="flag">The size flag to set.</param>
+		/// <returns>The updated <see cref="Labelable"/> instance.</returns>
+		public override Labelable SetContainerHorizontalSizeFlag(Control.SizeFlags flag)
+		{
+			base.SetContainerHorizontalSizeFlag(flag);
+
+			return this;
+		}
+
+		/// <summary>
+		/// Sets the alignment for the text of the current label.
+		/// </summary>
+		/// <param name="alignment">The alignment to set.</param>
+		/// <returns>Returns the modified Labelable.</returns>
+		public Labelable SetAlignment(HorizontalAlignment alignment)
 		{
 			_HorizontalAlignment = alignment;
 
 			return this;
 		}
-		
-		public Labelable SetDimensions( int width, int height )
+
+		/// <summary>
+		/// Sets the dimensions for the current label.
+		/// </summary>
+		/// <param name="width">The width of the label.</param>
+		/// <param name="height">The height of the label.</param>
+		/// <returns>Returns the modified Labelable.</returns>
+		public override Labelable SetDimensions(int width, int height)
 		{
-			CustomMinimumSize = new Vector2( width, height);
-			Size = new Vector2( width, height);
+			base.SetDimensions(width, height);
 
 			return this;
 		}
-		
-		public Labelable SetHorizontalSizeFlags(Control.SizeFlags flag)
+
+		/// <summary>
+		/// Sets the horizontal size flag, which controls the x axis, and how it should act.
+		/// </summary>
+		/// <param name="flag">The size flag to set.</param>
+		/// <returns>Returns the modified Labelable.</returns>
+		public override Labelable SetHorizontalSizeFlags(Control.SizeFlags flag)
 		{
-			SizeFlagsHorizontal = flag;
+			base.SetHorizontalSizeFlags(flag);
 
 			return this;
 		}
-		
-		public Labelable SetVerticalSizeFlags(Control.SizeFlags flag)
+
+		/// <summary>
+		/// Sets the vertical size flag, which controls the y axis, and how it should act.
+		/// </summary>
+		/// <param name="flag">The size flag to set.</param>
+		/// <returns>Returns the modified Labelable.</returns>
+		public override Labelable SetVerticalSizeFlags(Control.SizeFlags flag)
 		{
-			SizeFlagsVertical = flag;
+			base.SetVerticalSizeFlags(flag);
 
 			return this;
 		}
-		
-		public Labelable SetAutoWrap( TextServer.AutowrapMode mode )
+
+		/// <summary>
+		/// Sets the auto wrap of the label, allowing it to break lines based on rules.
+		/// </summary>
+		/// <param name="mode">The auto wrap mode to set.</param>
+		/// <returns>Returns the modified Labelable.</returns>
+		public Labelable SetAutoWrap(TextServer.AutowrapMode mode)
 		{
-			AutowrapMode = mode;
+			_AutowrapMode = mode;
 
 			return this;
 		}
-		
-		public Labelable SetText( string text ) 
+
+		/// <summary>
+		/// Sets margin values for the currently chosen label.
+		/// </summary>
+		/// <param name="value">The margin value to set.</param>
+		/// <param name="side">The side for which to set the margin.</param>
+		/// <returns>Returns the modified Labelable.</returns>
+		public override Labelable SetMargin(int value, string side = "")
 		{
-			Title = text;
-			
-			if( EditorPlugin.IsInstanceValid(WorkingNode) && WorkingNode is Label labelNode ) 
+			base.SetMargin(value, side);
+
+			return this;
+		}
+
+		/// <summary>
+		/// Fetches the text from the label.
+		/// </summary>
+		/// <returns>Returns the text of the label.</returns>
+		public string GetTitle()
+		{
+			return _Title;
+		}
+
+		/// <summary>
+		/// Fetches the inner container of the label.
+		/// </summary>
+		/// <returns>Returns the inner container of the label.</returns>
+		public Container GetInnerContainer()
+		{
+			return base.GetInnerContainer(0);
+		}
+
+		/// <summary>
+		/// Checks if the label is valid.
+		/// </summary>
+		/// <param name="debug">Whether to output debug information.</param>
+		/// <returns>Returns true if the label is valid, otherwise false.</returns>
+		public override bool IsValid(bool debug = false)
+		{
+			if (base.IsValid(debug))
 			{
-				labelNode.Text =text;
-			}
-			
-			return this;
-		}
-		
-		public Labelable SetType(TitleType type) 
-		{
-			Type = type;
-
-			return this;
-		}
-		
-		public Labelable SetMargin( int value, string side = "" ) 
-		{
-			if( side == "" ) 
-			{
-				Margin["top"] = value;
-				Margin["bottom"] = value;
-				Margin["left"] = value;
-				Margin["right"] = value;
-				
-				if( null != WorkingNode ) 
+				if (
+					false != Dependencies.ContainsKey(TraitName + "_MarginContainer")
+				)
 				{
-					foreach( (string marginSide, int marginValue ) in Margin ) 
+					return true;
+				}
+				else
+				{
+					if (debug)
 					{
-						_MarginContainer.AddThemeConstantOverride("margin_" + marginSide, marginValue);
+						GD.PushError("No outer container was found", Dependencies);
 					}
 				}
 			}
-			else 
+
+			return false;
+		}
+
+		/// <summary>
+		/// Resets the trait to a cleared state.
+		/// </summary>
+		protected override void Reset()
+		{
+			_Title = "";
+			_Suffix = "";
+
+			base.Reset();
+
+			_SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+			_SizeFlagsVertical = Control.SizeFlags.ShrinkBegin;
+
+			_Margin = new()
 			{
-				Margin[side] = value;
-				
-				if( null != WorkingNode ) 
-				{
-					_MarginContainer.AddThemeConstantOverride("margin_" + side, value);
-				}
-			}
-			
-			return this;
-		}
-		
-		public string GetTitle()
-		{
-			return Title;
-		}
-		
-		public HBoxContainer GetInnerContainer()
-		{
-			return _BoxContainer;
-		}
-		
-		public override bool IsValid()
-		{
-			if( Nodes.Count > 0 && EditorPlugin.IsInstanceValid(_MarginContainer) ) 
-			{
-				return true;
-			}
-			
-			return base.IsValid();
-		}
-			
-		private void Reset()
-		{
-			WorkingNode = null;
-			_BoxContainer = null;
-			_MarginContainer = null;
-		}
-		
-		public void AddToContainer( Node Container, int? index = null ) 
-		{
-			base._AddToContainer(Container, _MarginContainer, index);
-		}
-		
-		public override void _ExitTree()
-		{
-			if( EditorPlugin.IsInstanceValid(WorkingNode) ) 
-			{
-				WorkingNode.QueueFree();
-			}
-			
-			if( EditorPlugin.IsInstanceValid(_BoxContainer) ) 
-			{
-				_BoxContainer.QueueFree();
-			}
-			
-			if( EditorPlugin.IsInstanceValid(_MarginContainer) ) 
-			{
-				_MarginContainer.QueueFree();
-			}
+				{"left", 15},
+				{"right", 15},
+				{"top", 10},
+				{"bottom", 10},
+			};
 		}
 	}
 }

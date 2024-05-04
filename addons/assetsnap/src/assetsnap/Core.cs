@@ -23,9 +23,14 @@
 
 namespace AssetSnap.Core 
 {
+	/// <summary>
+    /// Provides a base class for other core functionalities in AssetSnap.
+    /// </summary>
 	public class Core  
 	{
-		// Reference to the global class
+		/// <summary>
+        /// Gets the instance of the GlobalExplorer class.
+        /// </summary>
 		public GlobalExplorer _GlobalExplorer {
 			get => GlobalExplorer.GetInstance();
 		}

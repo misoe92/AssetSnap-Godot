@@ -20,45 +20,53 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#if TOOLS
-using AssetSnap.Library;
 using Godot;
 
 namespace AssetSnap.Static
 {
+	/// <summary>
+	/// Utility class for handling input events.
+	/// </summary>
 	public static class InputsStatic
 	{
+		/// <summary>
+		/// Checks if the Shift key is pressed.
+		/// </summary>
+		/// <param name="_MouseButtonEvent">The mouse button input event.</param>
+		/// <returns>True if the Shift key is pressed; otherwise, false.</returns>
 		public static bool ShiftInputPressed(InputEventMouseButton _MouseButtonEvent)
 		{
 			return _MouseButtonEvent.ShiftPressed;
 		}
 		
+		/// <summary>
+        /// Checks if the Alt key is pressed.
+        /// </summary>
+        /// <param name="_MouseButtonEvent">The mouse button input event.</param>
+        /// <returns>True if the Alt key is pressed; otherwise, false.</returns>
 		public static bool AltInputPressed(InputEventMouseButton _MouseButtonEvent)
 		{
 			return _MouseButtonEvent.AltPressed;
 		}
 		
-		/*
-		** Checks if left mouse button has been pressed
-		**
-		** @param InputEventMouseButton _MouseButtonEvent
-		** @return bool
-		*/
+		/// <summary>
+        /// Checks if the left mouse button is pressed.
+        /// </summary>
+        /// <param name="_MouseButtonEvent">The mouse button input event.</param>
+        /// <returns>True if the left mouse button is pressed; otherwise, false.</returns>
 		public static bool HasMouseLeftPressed(InputEventMouseButton _MouseButtonEvent)
 		{
 			return _MouseButtonEvent.ButtonIndex == MouseButton.Left && false == _MouseButtonEvent.Pressed;
 		}
 		
-		/*
-		** Checks if right mouse button has been pressed
-		**
-		** @param InputEventMouseButton _MouseButtonEvent
-		** @return bool
-		*/
+		/// <summary>
+        /// Checks if the right mouse button is pressed.
+        /// </summary>
+        /// <param name="_MouseButtonEvent">The mouse button input event.</param>
+        /// <returns>True if the right mouse button is pressed; otherwise, false.</returns>
 		public static bool HasMouseRightPressed(InputEventMouseButton _MouseButtonEvent)
 		{
 			return _MouseButtonEvent.ButtonIndex == MouseButton.Right && false == _MouseButtonEvent.Pressed;
 		}
 	}
 }
-#endif

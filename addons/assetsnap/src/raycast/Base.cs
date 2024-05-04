@@ -21,25 +21,43 @@
 // SOFTWARE.
 
 #if TOOLS
+
+using Godot;
+
 namespace AssetSnap.Raycast
 {
-	using Godot;
-
-	public partial class Base : Node
+	/// <summary>
+	/// Partial class for handling raycast functionality.
+	/// </summary>
+	public partial class Base
 	{
-		private RayCast3D _Node;
-		private Vector3 _TargetPosition;
-		private GodotObject _Collider;
-		
-		public RayCast3D Node 
+		/// <summary>
+		/// Gets the singleton instance of the Base class.
+		/// </summary>
+		public static Base Singleton 
 		{
-			get => _Node;
-			set
+			get
 			{
-				_Node = value;
+				if( null == _Instance ) 
+				{
+					_Instance = new(){};
+				}
+				
+				return _Instance;
 			}
 		}
 		
+		/// <summary>
+		/// Gets the RayCast3D node instance.
+		/// </summary>
+		public RayCast3D Node 
+		{
+			get => GetNode();
+		}
+		
+		/// <summary>
+		/// Gets or sets the target position of the raycast.
+		/// </summary>
 		public Vector3 TargetPosition 
 		{
 			get => _TargetPosition;
@@ -55,47 +73,29 @@ namespace AssetSnap.Raycast
 		}
 		
 		private static Base _Instance;
+		private Vector3 _TargetPosition;
+		private GodotObject _Collider;
 		
-		public static Base GetInstance()
-		{
-			if( null == _Instance ) 
-			{
-				_Instance = new()
-				{
-					Name = "AssetSnapRaycast",
-				};
-			}
-
-			return _Instance;
-		}
-		
-		/*
-		** Initializes the raycast handler
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Initializes the raycast handler.
+		/// </summary>
 		public void Initialize()
 		{
-			InitializeNode();
-			AddNodeTo(GlobalExplorer.GetInstance()._Plugin);
+			_InitializeNode();
 			Hide();
 		}
 		
-		/*
-		** Exits the raycast handler
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Exits the raycast handler.
+		/// </summary>
 		public void Exit()
 		{
-			ClearNode();
+			_ClearNode();
 		}
 		
-		/*
-		** Shows the raycast
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Shows the raycast.
+		/// </summary>
 		public void Show()
 		{	
 			/** Only show if we have an actual model to show **/
@@ -107,11 +107,9 @@ namespace AssetSnap.Raycast
 			GetNode().Visible = true;
 		}
 		
-		/*
-		** Hides the raycast
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Hides the raycast.
+		/// </summary>
 		public void Hide()
 		{
 			if( IsHidden() )
@@ -122,12 +120,9 @@ namespace AssetSnap.Raycast
 			GetNode().Visible = false;
 		}
 		
-		/*
-		** Forces the raycast to update
-		** and fetches it's collider reading
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Forces the raycast to update and fetches its collider reading.
+		/// </summary>
 		public void Update()
 		{
 			if( GetNode() == null ) 
@@ -139,11 +134,10 @@ namespace AssetSnap.Raycast
 			_Collider = GetNode().GetCollider();
 		}
 		
-		/*
-		** Sets the collision transform
-		**
-		** @return Transform3D
-		*/
+		/// <summary>
+		/// Sets the collision transform.
+		/// </summary>
+		/// <param name="GlobalTrans">The global transform to set.</param>
 		public void SetTransform(Transform3D GlobalTrans)
 		{
 			if( GetNode() == null ) 
@@ -154,20 +148,18 @@ namespace AssetSnap.Raycast
 			GetNode().GlobalTransform = GlobalTrans;
 		}
 			
-		/*
-		** Resets the current collider
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Resets the current collider.
+		/// </summary>
 		public void ResetCollider()
 		{
 			_Collider = null;
 		}
-		/*
-		** Fetches the collision transform
-		**
-		** @return Transform3D
-		*/
+		
+		/// <summary>
+		/// Fetches the collision transform.
+		/// </summary>
+		/// <returns>The collision transform.</returns>
 		public Transform3D GetTransform()
 		{
 			if( GetNode() == null ) 
@@ -178,100 +170,82 @@ namespace AssetSnap.Raycast
 			return GetNode().GlobalTransform;
 		}
 		
-		/*
-		** Fetches a instance of the raycast
-		**
-		** @return RayCast3D
-		*/
+		/// <summary>
+		/// Fetches an instance of the raycast.
+		/// </summary>
+		/// <returns>The RayCast3D instance.</returns>
 		public RayCast3D GetNode()
 		{
-			if( false == EditorPlugin.IsInstanceValid( Node ) ) 
+			if(
+				false == GlobalExplorer.GetInstance()._Plugin.GetInternalContainer().HasNode( "RayCast" ) ||
+				false == EditorPlugin.IsInstanceValid(GlobalExplorer.GetInstance()._Plugin.GetInternalContainer().GetNode("RayCast"))
+			) 
 			{
-				return null;
+				if( false == GlobalExplorer.GetInstance()._Plugin.GetInternalContainer().HasNode( "RayCast" ) )
+				{
+					_InitializeNode();
+				}
+				else 
+				{
+					return null;
+				}
 			}
 			
-			return Node;
+			return GlobalExplorer.GetInstance()._Plugin.GetInternalContainer().GetNode("RayCast") as RayCast3D;
 		}
 		
-		/*
-		** Fetches the collision instance
-		**
-		** @return GodotObject
-		*/
+		/// <summary>
+		/// Fetches the collision instance.
+		/// </summary>
+		/// <returns>The collision instance.</returns>
 		public GodotObject GetCollider()
 		{
 			return _Collider;
 		}
 		
-		/*
-		** Checks if any collision is available
-		**
-		** @return bool
-		*/
+		/// <summary>
+		/// Checks if any collision is available.
+		/// </summary>
+		/// <returns>True if a collision is available, false otherwise.</returns>
 		public bool HasCollision()
 		{
 			return _Collider != null;
 		}
 			
-		/*
-		** Checks if the raycast is hidden
-		**
-		** @return bool
-		*/
+		/// <summary>
+		/// Checks if the raycast is hidden.
+		/// </summary>
+		/// <returns>True if the raycast is hidden, false otherwise.</returns>
 		public bool IsHidden()
 		{
 			return GetNode() != null && GetNode().Visible == false;
 		}
 		
-		/*
-		** Initializes the raycast node
-		**
-		** @return void
-		*/
-		private void InitializeNode()
+		/// <summary>
+		/// Initializes the raycast node.
+		/// </summary>
+		private void _InitializeNode()
 		{
-			Node = new() 
+			RayCast3D Node = new() 
 			{
-				Name = "Raycast"
+				Name = "RayCast",
+				CollisionMask = 100,
 			};
+			
+			GlobalExplorer.GetInstance()
+				._Plugin
+				.GetInternalContainer()
+				.AddChild(Node);
 		}
 		
-		/*
-		** Adds the raycast to a given node
-		**
-		** @return void
-		*/	
-		private void AddNodeTo( Node To )
-		{
-			To.AddChild(Node);
-		}
-		
-		/*
-		** Clears the raycast node
-		**
-		** @return void
-		*/	
-		private void ClearNode()
+		/// <summary>
+		/// Clears the raycast node.
+		/// </summary>	
+		private void _ClearNode()
 		{
 			// Node.GetParent().RemoveChild(Node);
-			Node.QueueFree();
+			GetNode().QueueFree();
 		}
-
-		public override void _ExitTree()
-		{
-			if( IsInstanceValid(Node) )
-			{ 
-				Node.QueueFree();
-			}
-			
-			// if( IsInstanceValid(_Collider)) 
-			// {
-			// 	_Collider.Free();
-			// }
-			
-			base._ExitTree();
-		}
-		
 	}
 }
 #endif

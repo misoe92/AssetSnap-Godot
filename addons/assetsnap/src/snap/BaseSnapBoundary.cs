@@ -21,11 +21,19 @@
 // SOFTWARE.
 
 #if TOOLS
+
+using AssetSnap.Front.Nodes;
+
 namespace AssetSnap.Snap
 {
-	using Godot;
+	/// <summary>
+	/// Defines the base class for snap boundaries.
+	/// </summary>
 	public class BaseSnapBoundary
 	{
+		/// <summary>
+		/// Gets or sets the snap boundary node.
+		/// </summary>
 		public AsSnapBoundary Node 
 		{
 			get => _Node;
@@ -34,8 +42,19 @@ namespace AssetSnap.Snap
 				_Node = value;
 			}
 		}
-		private AsSnapBoundary _Node;
+		
+		/// <summary>
+		/// Gets the snap boundary.
+		/// </summary>
+		/// <returns>The snap boundary.</returns>
+		public AsSnapBoundary GetBoundary()
+		{
+			return Node;
+		}
 
+		/// <summary>
+		/// Gets or sets the visibility of the snap boundary.
+		/// </summary>
 		public bool Visible 
 		{
 			get => _Node.Visible;
@@ -45,16 +64,16 @@ namespace AssetSnap.Snap
 			}
 		}
 		
-		/** Public **/
+		/// <summary>
+		/// Determines whether the snap boundary is active.
+		/// </summary>
+		/// <returns>True if the snap boundary is active, otherwise false.</returns>
 		public virtual bool IsActive()
 		{
 			return false;	
 		}
 		
-		public AsSnapBoundary GetBoundary()
-		{
-			return Node;
-		}
+		private AsSnapBoundary _Node;
 	}
 }
 

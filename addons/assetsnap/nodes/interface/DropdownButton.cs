@@ -19,21 +19,31 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+
 #if TOOLS
-namespace AssetSnap.Front.Nodes
-{
-using System;
+
 using Godot;
 
+namespace AssetSnap.Front.Nodes
+{
+	/// <summary>
+	/// Represents a dropdown button with toggleable visibility.
+	/// </summary>
 	[Tool] 
 	public partial class DropdownButton : Button
 	{
-		private static readonly Texture2D OpenIcon = GD.Load<Texture2D>("res://addons/assetsnap/assets/icons/chevron-down.svg");	
-		private static readonly Texture2D CloseIcon = GD.Load<Texture2D>("res://addons/assetsnap/assets/icons/chevron-up.svg");
-		
+		/// <summary>
+		/// The margins of the dropdown button.
+		/// </summary>
 		[Export]
 		public Godot.Collections.Dictionary<string, int> Margin = new();
-	
+		
+		private static readonly Texture2D _OpenIcon = GD.Load<Texture2D>("res://addons/assetsnap/assets/icons/chevron-down.svg");	
+		private static readonly Texture2D _CloseIcon = GD.Load<Texture2D>("res://addons/assetsnap/assets/icons/chevron-up.svg");
+		
+		/// <summary>
+		/// Called when entering the scene tree.
+		/// </summary>
 		public override void _EnterTree()
 		{
 			Connect(SignalName.Pressed, Callable.From( () => { _OnToggleVisibility(); } ) );
@@ -41,27 +51,33 @@ using Godot;
 			base._EnterTree();
 		}
 		
+		/// <summary>
+		/// Toggles the visibility of the dropdown container.
+		/// </summary>
 		private void _OnToggleVisibility()
 		{
 			VBoxContainer InnerContainer = GetParent() as VBoxContainer;
 			MarginContainer container = InnerContainer.GetChild(1) as MarginContainer;
 			PanelContainer panel = InnerContainer.GetParent() as PanelContainer;
-			MarginContainer _MarginContainer = panel.GetParent() as MarginContainer;
+			MarginContainer _MarginContainer = panel.GetParent().GetParent().GetParent().GetParent().GetParent() as MarginContainer;
 
 			container.Visible = !container.Visible;
 			
 			if( container.Visible ) 
 			{
-				Icon = CloseIcon;				
+				Icon = _CloseIcon;				
 				_MarginContainer.AddThemeConstantOverride("margin_bottom", 10);
 			}
 			else 
 			{
-				Icon = OpenIcon;
+				Icon = _OpenIcon;
 				_MarginContainer.AddThemeConstantOverride("margin_bottom", Margin["bottom"]);
 			}
 		}
 		
+		/// <summary>
+		/// Called when exiting the scene tree.
+		/// </summary>
 		public override void _ExitTree()
 		{
 			if( IsConnected( SignalName.Pressed, Callable.From( () => { _OnToggleVisibility(); } ) ) ) 
@@ -73,4 +89,5 @@ using Godot;
 		}
 	}
 }
+
 #endif

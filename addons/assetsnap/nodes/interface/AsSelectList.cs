@@ -20,55 +20,83 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using Godot;
+
 namespace AssetSnap.Front.Nodes
 {
-	using Godot;
-
+	/// <summary>
+	/// Represents a selectable list with an associated button for toggling visibility.
+	/// </summary>
 	[Tool]
 	public partial class AsSelectList : VBoxContainer
-	{
-		private Node3D _Handle { get; set; }
-	
-		[Export]
-		public int _ActiveIndex { get; set; }
-		[Export]
-		public string _Label { get; set; }
-		[Export]
-		public Control _ActiveItem { get; set; }
-		[Export]
-		public Button _Button { get; set; }
-		[Export]
-		public Godot.Collections.Array<Control> _Items { get; set; }
-		[Export]
-		public bool ListVisible { get; set; }
-		
+	{	
+		/// <summary>
+		/// Signals that the state of the list has changed.
+		/// </summary>
 		[Signal]
 		public delegate void StateChangedEventHandler(string which);
 		
-		/*
-		** Configuration of the select list
-		** 
-		** @return void
-		*/
+		/// <summary>
+		/// The index of the active item in the list.
+		/// </summary>
+		[Export]
+		public int ActiveIndex { get; set; }
+		
+		/// <summary>
+		/// The label associated with the list.
+		/// </summary>
+		[Export]
+		public string Label { get; set; }
+		
+		/// <summary>
+		/// The currently active item in the list.
+		/// </summary>
+		[Export]
+		public Control ActiveItem { get; set; }
+		
+		/// <summary>
+		/// The button associated with the list.
+		/// </summary>
+		[Export]
+		public Button SelectButton { get; set; }
+		
+		/// <summary>
+		/// The items contained within the list.
+		/// </summary>
+		[Export]
+		public Godot.Collections.Array<Control> Items { get; set; }
+		
+		/// <summary>
+		/// Indicates whether the list is currently visible.
+		/// </summary>
+		[Export]
+		public bool ListVisible { get; set; }
+		
+		private Node3D _Handle { get; set; }
+		
+		/// <summary>
+		/// Configures the select list when entering the scene tree.
+		/// </summary>
 		public override void _EnterTree()
 		{
+			Name = "SelectList";
 			ListVisible = false;
-			_Items = new();
+			Items = new();
 			
-			if( _Button == null && HasNode("ButtonContainer/Button") ) 
+			if( SelectButton == null && HasNode("ButtonContainer/Button") ) 
 			{
-				_Button = GetNode<Button>("ButtonContainer/Button");
+				SelectButton = GetNode<Button>("ButtonContainer/Button");
 			}
 			
 			for( int i = 2; i < GetChildCount(); i++) 
 			{
 				Control item = GetChild<Control>(i);
-				_Items.Add(item);
+				Items.Add(item);
 			}
 
-			if( false == _Button.IsConnected(Button.SignalName.Pressed, new Callable(this, "_OnButtonPressed")) ) 
+			if( false == SelectButton.IsConnected(Button.SignalName.Pressed, new Callable(this, "_OnButtonPressed")) ) 
 			{
-				_Button.Connect(Button.SignalName.Pressed, new Callable(this, "_OnButtonPressed"));
+				SelectButton.Connect(Button.SignalName.Pressed, new Callable(this, "_OnButtonPressed"));
 			}
 			
 			GlobalExplorer.GetInstance().SelectLists.Add( this );
@@ -76,54 +104,122 @@ namespace AssetSnap.Front.Nodes
 			base._EnterTree();
 		}
 		
-		/*
-		** Handles visibility changes of the list
-		** 
-		** @param double delta
-		** @return void
-		*/
+		/// <summary>
+		/// Handles processing logic for the select list.
+		/// </summary>
+		/// <param name="delta">The time elapsed since the last frame.</param>
 		public override void _Process(double delta)
 		{
-			if( _Label == null || _Label == "" || _Items == null || _Items.Count == 0) 
+			if( Label == null || Label == "" || Items == null || Items.Count == 0) 
 			{
 				return;
 			}
 			
-			if( _Button == null && HasNode("ButtonContainer/Button") ) 
+			if( SelectButton == null && HasNode("ButtonContainer/Button") ) 
 			{
-				_Button = GetNode<Button>("ButtonContainer/Button");
+				SelectButton = GetNode<Button>("ButtonContainer/Button");
 			}
 			
-			if( _ActiveItem == null ) 
+			if( ActiveItem == null ) 
 			{
-				if( _Button.Text != _Label ) 
+				if( SelectButton.Text != Label ) 
 				{
-					_Button.Text = _Label;
+					SelectButton.Text = Label;
 					ResetListVisibility();
 				}
 				
 				return;
 			}
 			
-			if( _Button.Text != _ActiveItem.Name ) 
+			if( SelectButton.Text != ActiveItem.Name ) 
 			{
-				_Button.Text = _ActiveItem.Name;
+				SelectButton.Text = ActiveItem.Name;
 				ResetListVisibility();
 			}
 
 			return;
 		}
+		
+		/// <summary>
+		/// Sets the active item in the list.
+		/// </summary>
+		/// <param name="which">The item to set as active.</param>
+		public void SetActive( Control which ) 
+		{
+			if( null == which || "none" == which.Name.ToString().ToLower() ) 
+			{
+				ActiveItem = null;
+				ActiveIndex = 0;
+				EmitSignal(SignalName.StateChanged, "None");
+				return;
+			}
 
-		/*
-		** Creates the main button of the list
-		** 
-		** @return void
-		*/
-		public void CreateButton()
+			ActiveIndex = which.GetIndex() - 2;
+			ActiveItem = which;
+			EmitSignal(SignalName.StateChanged, which.Name);
+		}
+				
+		/// <summary>
+		/// Sets the handle for the list.
+		/// </summary>
+		/// <param name="Handle">The handle to set.</param>
+		public void SetHandle( Node3D Handle ) 
+		{
+			_Handle = Handle; 
+		}
+		
+		/// <summary>
+		/// Resets the visibility of the list.
+		/// </summary>
+		public void ResetListVisibility()
+		{
+			ListVisible = false;
+			for( int i = 1; i < GetChildCount(); i++) 
+			{
+				Control item = GetChild<Control>(i);
+				
+				if( item.Visible == true ) 
+				{
+					item.Visible = false;
+				}
+				
+			}
+		}
+		
+		/// <summary>
+		/// Cleans up references and fields when exiting the scene tree.
+		/// </summary>	
+		public override void _ExitTree()
+		{
+			if( SelectButton.IsConnected(Button.SignalName.Pressed, new Callable(this, "_OnButtonPressed")) ) 
+			{
+				SelectButton.Disconnect(Button.SignalName.Pressed, new Callable(this, "_OnButtonPressed"));
+			}
+			
+			ListVisible = false;
+			SelectButton = null;
+			ActiveItem = null;
+			_Handle = null;
+			Items = null;
+		}
+		
+		/// <summary>
+		/// Retrieves the currently active item in the list.
+		/// </summary>
+		/// <returns>The currently active item.</returns>
+		public Control GetActive()
+		{
+			return ActiveItem;
+		}
+		
+		/// <summary>
+		/// Creates the main button for the list.
+		/// </summary>
+		protected void _CreateButton()
 		{
 			Button _button = new()
 			{
-				Text = _Label,
+				Text = Label,
 				Flat = true,
 				CustomMinimumSize = new Vector2(80, 0),
 				TooltipText = "View actions available",
@@ -131,56 +227,12 @@ namespace AssetSnap.Front.Nodes
 			
 			GetNode("ButtonContainer").AddChild(_button);
 
-			_Button = _button;
+			SelectButton = _button;
 		}
 		
-		/*
-		** Sets the active list item
-		** 
-		** @param Control which
-		** @return void
-		*/
-		public void SetActive( Control which ) 
-		{
-			if( null == which || "none" == which.Name.ToString().ToLower() ) 
-			{
-				_ActiveItem = null;
-				_ActiveIndex = 0;
-				EmitSignal(SignalName.StateChanged, "None");
-				return;
-			}
-
-			_ActiveIndex = which.GetIndex() - 2;
-			_ActiveItem = which;
-			EmitSignal(SignalName.StateChanged, which.Name);
-		}
-				
-		/*
-		** Sets the handle
-		** 
-		** @param Node3D Handle
-		** @return void
-		*/
-		public void SetHandle( Node3D Handle ) 
-		{
-			_Handle = Handle; 
-		}
-		
-		/*
-		** Fetches the active item
-		** 
-		** @return Control
-		*/
-		public Control GetActive()
-		{
-			return _ActiveItem;
-		}
-					
-		/*
-		** Handles toggling of the select menu
-		** 
-		** @return void
-		*/
+		/// <summary>
+		/// Handles toggling of the select menu.
+		/// </summary>
 		private void _OnButtonPressed() 
 		{
 			if( false == ListVisible ) 
@@ -227,45 +279,6 @@ namespace AssetSnap.Front.Nodes
 				}
 			}
 			ListVisible = !ListVisible;
-		}
-
-		/*
-		** Resets the list visibility
-		** 
-		** @return void
-		*/
-		public void ResetListVisibility()
-		{
-			ListVisible = false;
-			for( int i = 1; i < GetChildCount(); i++) 
-			{
-				Control item = GetChild<Control>(i);
-				
-				if( item.Visible == true ) 
-				{
-					item.Visible = false;
-				}
-				
-			}
-		}
-
-		/*
-		** Cleans up references, parameters and fields
-		** 
-		** @return void
-		*/	
-		public override void _ExitTree()
-		{
-			if( _Button.IsConnected(Button.SignalName.Pressed, new Callable(this, "_OnButtonPressed")) ) 
-			{
-				_Button.Disconnect(Button.SignalName.Pressed, new Callable(this, "_OnButtonPressed"));
-			}
-			
-			ListVisible = false;
-			_Button = null;
-			_ActiveItem = null;
-			_Handle = null;
-			_Items = null;
 		}
 	}
 }

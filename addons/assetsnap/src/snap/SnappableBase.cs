@@ -21,6 +21,7 @@
 // SOFTWARE.
 
 #if TOOLS
+
 using AssetSnap.Front.Nodes;
 using AssetSnap.Static;
 using AssetSnap.Waypoint;
@@ -28,18 +29,41 @@ using Godot;
 
 namespace AssetSnap.Snap
 {
+	/// <summary>
+	/// Defines a base class for snapping functionality.
+	/// </summary>
 	public class SnappableBase
 	{
+		/// <summary>
+		/// Gets the singleton instance of the <see cref="SnappableBase"/> class.
+		/// </summary>
+		public static SnappableBase Singleton
+		{
+			get
+			{
+				if( null == _Instance ) 
+				{
+					_Instance = new();
+				}
+
+				return _Instance;
+			}
+		}
+		
+		/// <summary>
+		/// The default snap distance.
+		/// </summary>
 		public float SnapDistance = 1.0f;
 		
-		/*
-		** Returns snap coordinates based on a given
-		** vector 3 coordinate set and a snap layer.
-		**
-		** @param Vector3 Coordinates
-		** @param int Layer
-		** @return Vector3
-		*/
+		private static SnappableBase _Instance;
+		
+		/// <summary>
+		/// Snaps the given coordinates to nearby waypoints.
+		/// </summary>
+		/// <param name="Coordinates">The coordinates to snap.</param>
+		/// <param name="aabb">The axis-aligned bounding box.</param>
+		/// <param name="Layer">The snap layer.</param>
+		/// <returns>The snapped coordinates.</returns>
 		public Vector3 Snap(Vector3 Coordinates, Aabb aabb, int Layer = 0)
 		{
 			if( false == GlobalExplorer.GetInstance().Waypoints.HasAnyWaypoints() ) 
@@ -171,15 +195,12 @@ namespace AssetSnap.Snap
 			return snappedCoordinates;
 		}
 		
-		/*
-		** Checks whether or not the model can
-		** snap to another model
-		**
-		** @param Vector3 Coordinates
-		** @param Aabb aabb
-		** @param int Layer
-		** @return bool
-		*/
+		/// <summary>
+		/// Checks if snapping is possible with the given coordinates and layer.
+		/// </summary>
+		/// <param name="Coordinates">The coordinates to check.</param>
+		/// <param name="Layer">The snap layer.</param>
+		/// <returns>True if snapping is possible, false otherwise.</returns>
 		public bool CanSnap(Vector3 Coordinates, int Layer = 0)
 		{
 			if( false == WaypointsStatic.HasAnyWaypoints() ) 
@@ -238,6 +259,12 @@ namespace AssetSnap.Snap
 			return Snapping;
 		}
 		
+		/// <summary>
+		/// Checks if the snap layer of the model is valid.
+		/// </summary>
+		/// <param name="model">The 3D model node.</param>
+		/// <param name="Layer">The snap layer to check.</param>
+		/// <returns>True if the snap layer is valid, false otherwise.</returns>
 		private bool IsSnapLayerValid( Node3D model, int Layer = 0)
 		{
 			if( model is AsMeshInstance3D asMeshInstance3D ) 

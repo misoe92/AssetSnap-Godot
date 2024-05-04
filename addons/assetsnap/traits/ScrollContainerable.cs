@@ -21,180 +21,142 @@
 // SOFTWARE.
 
 #if TOOLS
-using System;
+using AssetSnap.Trait;
 using Godot;
 
 namespace AssetSnap.Component
 {
+	/// <summary>
+	/// A partial class representing a scrollable container, derived from ContainerTrait.
+	/// </summary>
 	[Tool]
-	public partial class ScrollContainerable : Trait.Base
+	public partial class ScrollContainerable : ContainerTrait
 	{
+		/// <summary>
+		/// The inner VBoxContainer of the scroll container.
+		/// </summary>
+		public VBoxContainer ScrollInnerContainer;
 		
-		public enum ContainerOrientation 
+		/// <summary>
+		/// The scroll container padding container.
+		/// </summary>
+		public MarginContainer ScrollPaddingContainer;
+		
+		/// <summary>
+		/// Default constructor for ScrollContainerable.
+		/// </summary>
+		public ScrollContainerable()
 		{
-			Horizontal,
-			Vertical,
-		};
+			Name = "ScrollContainerable";
+			TypeString = GetType().ToString();
+		}
 		
-		private Control.SizeFlags SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
-		private Control.SizeFlags SizeFlagsVertical = Control.SizeFlags.ShrinkBegin;
-		
-		public ContainerOrientation Orientation = ContainerOrientation.Vertical;
-		
-		private HBoxContainer _InnerContainer;
-		
-		private MarginContainer _PaddingContainer;
-		
-		public ScrollContainerable Instantiate()
+		/// <summary>
+        /// Adds the currently chosen scroll container to a specified container.
+        /// </summary>
+        /// <param name="Container">The container to which to add the scroll container.</param>
+		public void AddToContainer( Node Container ) 
 		{
-			try 
+			if( false == Dependencies.ContainsKey(TraitName + "_MarginContainer") ) 
 			{
-				base._Instantiate( GetType().ToString() );
-	
-				// Margin Container 
-				// VBox
-				// Padding(Margin) Container
-				// HBox
-				// Inner HBox / VBox
-				
-				ScrollContainer _WorkingNode = new()
-				{
-					Name="Scroll",
-					SizeFlagsVertical = Control.SizeFlags.ExpandFill,
-					SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
-				};
-				
-				_PaddingContainer = new()
-				{
-					Name="ScrollPadding",
-					SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
-					SizeFlagsVertical = Control.SizeFlags.ExpandFill,
-				};
-
-				_InnerContainer = new()
-				{
-					Name="ScrollInner",
-					SizeFlagsVertical = Control.SizeFlags.ExpandFill,
-					SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
-				};
-				
-				foreach( (string side, int value ) in Padding ) 
-				{
-					_PaddingContainer.AddThemeConstantOverride("margin_" + side, value);
-				}
-
-				_PaddingContainer.AddChild(_InnerContainer);
-				_WorkingNode.AddChild(_PaddingContainer);
-
-				Nodes.Add(_WorkingNode);
-				WorkingNode = _WorkingNode;
-
-				Reset();
+				GD.PushError("Container was not found @ AddToContainer");
+				GD.PushError("AddToContainer::Keys-> ", Dependencies.Keys);
+				GD.PushError("AddToContainer::ADDTO-> ", TraitName + "_MarginContainer");
+				return;
 			}
-			catch(Exception e) 
+			
+			base._AddToContainer(Container, Dependencies[TraitName + "_MarginContainer"].As<MarginContainer>());
+		}
+		
+		/// <summary>
+		/// Instantiate an instance of the trait.
+		/// </summary>
+		/// <returns>Returns the instantiated ScrollContainerable.</returns>
+		public override ScrollContainerable Instantiate()
+		{
+			_UsePaddingContainer = false;
+			base._Instantiate();
+			base.Instantiate();
+			
+			// Create ScrollContainer and its inner containers
+			ScrollContainer _WorkingNode = new()
 			{
-				GD.PushError(e.Message);
+				Name="Scroll",
+				SizeFlagsVertical = Control.SizeFlags.ExpandFill,
+				SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
+			};
+			
+			ScrollPaddingContainer = new()
+			{
+				Name="ScrollPadding",
+				SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
+				SizeFlagsVertical = Control.SizeFlags.ExpandFill,
+			};
+
+			ScrollInnerContainer = new()
+			{
+				Name="ScrollInner",
+				SizeFlagsVertical = Control.SizeFlags.ExpandFill,
+				SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
+			};
+			
+			// Apply padding to the ScrollPaddingContainer
+			foreach( (string side, int value ) in _Padding ) 
+			{
+				ScrollPaddingContainer.AddThemeConstantOverride("margin_" + side, value);
+			}
+
+			// Add inner containers to appropriate parent nodes
+			ScrollPaddingContainer.AddChild(ScrollInnerContainer);
+			_WorkingNode.AddChild(ScrollPaddingContainer);
+			GetInnerContainer(0).AddChild(_WorkingNode);
+
+			// Update dependencies and instances
+			Dependencies[TraitName + "_WorkingNode"] = _WorkingNode;
+			Dependencies[TraitName + "_ScrollPaddingContainer"] = ScrollPaddingContainer;
+			Dependencies[TraitName + "_ScrollInnerContainer"] = ScrollInnerContainer;
+			
+			Plugin.Singleton.TraitGlobal.AddInstance(Iteration, _WorkingNode, OwnerName, TypeString, Dependencies);
+			Plugin.Singleton.TraitGlobal.AddName(Iteration, TraitName, OwnerName, TypeString);
+
+			Reset();
+			Iteration += 1;
+			Dependencies = new();
+			
+			return this;
+		}
+		
+		/// <summary>
+		/// Selects a placed scroll container in the nodes array by index.
+		/// </summary>
+		/// <param name="index">The index of the scroll container.</param>
+		/// <param name="debug">Whether to print debug information.</param>
+		/// <returns>Returns the modified ScrollContainerable.</returns>
+		public override ScrollContainerable Select(int index, bool debug = false)
+		{
+			base._Select(index, debug);
+					
+			if( false != Dependencies.ContainsKey(TraitName + "_WorkingNode") ) 
+			{
+				Godot.Collections.Dictionary<string, Variant> dependencies = Plugin.Singleton.TraitGlobal.GetDependencies(index, TypeString, OwnerName);
+				Dependencies = dependencies;
 			}
 			
 			return this;
 		}
 		
-		public void Show()
-		{
-			if( WorkingNode is Control ControlNode ) 
-			{
-				ControlNode.Visible = true;
-			}
-		}
-		
-		public void Hide()
-		{
-			if( WorkingNode is Control ControlNode ) 
-			{
-				ControlNode.Visible = false;
-			}
-		}
-		
-		public ScrollContainerable SetMargin( int value, string side = "" ) 
-		{
-			_SetMargin(value, side);
-			
-			return this;
-		}
-		
-		public ScrollContainerable SetName( string text ) 
-		{
-			base._SetName(text);
-			
-			return this;
-		}
-		
-		public ScrollContainerable SetHorizontalSizeFlags(Control.SizeFlags flag)
-		{
-			SizeFlagsHorizontal = flag;
-
-			return this;
-		}
-		
-		public ScrollContainerable SetVerticalSizeFlags(Control.SizeFlags flag)
-		{
-			SizeFlagsVertical = flag;
-
-			return this;
-		}
-		
-		public ScrollContainerable SetOrientation(ContainerOrientation orientation) 
-		{
-			Orientation = orientation;
-			return this;
-		}
-		
-		public ScrollContainerable SetVisible( bool state ) 
-		{
-			if( EditorPlugin.IsInstanceValid(WorkingNode) && WorkingNode is Control controlNode)  
-			{
-				controlNode.Visible = state;
-			}
-			else 
-			{
-				GD.PushError("MarginContainer is invalid");
-			}
-
-			return this;
-		}
-		
-		public ScrollContainerable Select(int index)
-		{
-			base._Select(index);
-			
-			if( EditorPlugin.IsInstanceValid(WorkingNode) && EditorPlugin.IsInstanceValid(WorkingNode.GetChild(0)) ) 
-			{
-				_PaddingContainer = WorkingNode.GetChild(0) as MarginContainer;
-			}
-			else 
-			{
-				GD.PushError("PaddingContainer is invalid");
-			}
-			
-			if( EditorPlugin.IsInstanceValid(_PaddingContainer) && EditorPlugin.IsInstanceValid(_PaddingContainer.GetChild(0)) ) 
-			{
-				_InnerContainer = _PaddingContainer.GetChild(0) as HBoxContainer;
-			}
-			else 
-			{
-				GD.PushError("InnerContainer is invalid");
-			}
-			
-			return this;
-		}
-		
-		public ScrollContainerable SelectByName( string name ) 
+		/// <summary>
+		/// Selects a placed scroll container in the nodes array by name.
+		/// </summary>
+		/// <param name="name">The name of the scroll container.</param>
+		/// <returns>Returns the modified ScrollContainerable.</returns>
+		public override ScrollContainerable SelectByName( string name ) 
 		{
 			foreach( Container container in Nodes ) 
 			{
 				if( container.Name == name ) 
 				{
-					WorkingNode = container;
+					Dependencies[TraitName + "_WorkingNode"] = container;
 					break;
 				}
 			}
@@ -202,40 +164,139 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		public Container GetInnerContainer( int index = 0)
+		/// <summary>
+		/// Sets the name of the current scroll container.
+		/// </summary>
+		/// <param name="text">The name to set.</param>
+		/// <returns>Returns the modified ScrollContainerable.</returns>
+		public ScrollContainerable SetName( string text ) 
 		{
-			if( null != WorkingNode ) 
+			base._SetName(text);
+			
+			return this;
+		}
+		
+		/// <summary>
+		/// Sets the visibility state of the currently chosen scroll container.
+		/// </summary>
+		/// <param name="state">The visibility state to set.</param>
+		/// <returns>Returns the modified ScrollContainerable.</returns>
+		public override ScrollContainerable SetVisible( bool state ) 
+		{
+			base.SetVisible(state);
+
+			return this;
+		}
+		
+		/// <summary>
+		/// Sets the dimensions of the currently chosen scroll container.
+		/// </summary>
+		/// <param name="width">The width of the container.</param>
+		/// <param name="height">The height of the container.</param>
+		/// <returns>Returns the modified ScrollContainerable.</returns>
+		public override ScrollContainerable SetDimensions( int width, int height ) 
+		{
+			base.SetDimensions(width,height);
+
+			return this;
+		}
+		
+		/// <summary>
+		/// Sets the minimum dimensions of the currently chosen scroll container.
+		/// </summary>
+		/// <param name="width">The minimum width of the container.</param>
+		/// <param name="height">The minimum height of the container.</param>
+		/// <returns>Returns the modified ScrollContainerable.</returns>
+		public override ScrollContainerable SetMinimumDimension( int width, int height ) 
+		{
+			base.SetMinimumDimension(width,height);
+
+			return this;
+		}
+		
+		/// <summary>
+		/// Sets the horizontal size flag for the container.
+		/// </summary>
+		/// <param name="flag">The horizontal size flag to set.</param>
+		/// <returns>Returns the modified ScrollContainerable.</returns>
+		public override ScrollContainerable SetHorizontalSizeFlags(Control.SizeFlags flag)
+		{
+			base.SetHorizontalSizeFlags(flag);
+
+			return this;
+		}
+		
+		/// <summary>
+		/// Sets the vertical size flag for the container.
+		/// </summary>
+		/// <param name="flag">The vertical size flag to set.</param>
+		/// <returns>Returns the modified ScrollContainerable.</returns>
+		public override ScrollContainerable SetVerticalSizeFlags(Control.SizeFlags flag)
+		{
+			base.SetVerticalSizeFlags(flag);
+
+			return this;
+		}
+		
+		/// <summary>
+		/// Sets the orientation of the scroll container.
+		/// </summary>
+		/// <param name="orientation">The orientation to set.</param>
+		/// <returns>Returns the modified ScrollContainerable.</returns>
+		public override ScrollContainerable SetOrientation(ContainerOrientation orientation) 
+		{
+			base.SetOrientation(orientation);
+
+			return this;
+		}
+		
+		/// <summary>
+		/// Sets margin values for the currently chosen scroll container.
+		/// </summary>
+		/// <param name="value">The margin value to set.</param>
+		/// <param name="side">The side for which to set the margin.</param>
+		/// <returns>Returns the modified ScrollContainerable.</returns>
+		public override ScrollContainerable SetMargin( int value, string side = "" ) 
+		{
+			base.SetMargin(value, side);
+			
+			return this;
+		}
+		
+		/// <summary>
+		/// Returns the inner container of the scroll container.
+		/// </summary>
+		/// <returns>Returns the inner container.</returns>
+		public Container GetScrollContainer()
+		{
+			if( null != Dependencies && false != Dependencies.ContainsKey(TraitName + "_ScrollInnerContainer") ) 
 			{
 				// Single placement
-				return _InnerContainer as Container;
+				return Dependencies[TraitName + "_ScrollInnerContainer"].As<Container>();
 			}
-			else 
+			
+			if( null == Dependencies ) 
 			{
-				GD.PushWarning("Invalid inner container");
+				GD.PushError("No dependencies set");
+				return null;
+			}
+			
+			if( false == Dependencies.ContainsKey(TraitName + "_ScrollInnerContainer") ) 
+			{
+				GD.PushError("No scroll inner container set");
+				return null;
 			}
 
 			return null;
 		}
 		
-		private void Reset()
+		/// <summary>
+		/// Resets the trait to a cleared state.
+		/// </summary>
+		protected override void Reset()
 		{
-			WorkingNode = null;
-			_InnerContainer = null;
-			_PaddingContainer = null;
-			Orientation = ContainerOrientation.Vertical;
-		}
-
-		public void AddToContainer( Node Container ) 
-		{
-			base._AddToContainer(Container, WorkingNode);
-		}
-		
-		public override void _ExitTree()
-		{
-			if( EditorPlugin.IsInstanceValid(WorkingNode) ) 
-			{
-				WorkingNode.QueueFree();
-			}
+			_Orientation = ContainerOrientation.Vertical;
+			base.Reset();
 		}
 	}
 }

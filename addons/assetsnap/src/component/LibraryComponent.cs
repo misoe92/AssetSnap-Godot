@@ -21,44 +21,48 @@
 // SOFTWARE.
 
 #if TOOLS
+
+using AssetSnap.Explorer;
+using Godot;
+
 namespace AssetSnap.Component
 {
-	using Godot;
-
+	/// <summary>
+	/// Base class for components related to library management.
+	/// </summary>
 	[Tool]
 	public partial class LibraryComponent : TraitableComponent
 	{
-		protected Library.Instance _Library;
-		
+		/// <summary>
+		/// Gets the library instance associated with this component.
+		/// </summary>
 		public Library.Instance Library 
 		{
-			get => _Library;
-			set
-			{
-				_Library = value;
-				_OnLibraryChange();
+			get {
+				return ExplorerUtils.Get().GetLibraryByName(LibraryName);
 			}
 		}
+
+		/// <summary>
+		/// Gets or sets the name of the library.
+		/// </summary>
+		public string LibraryName { get; set; }
 		
-		/*
-		** Virtual method which are called each time
-		** a library change is happening.
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Virtual method called each time a library change occurs.
+		/// </summary>
 		public virtual void _OnLibraryChange(){}
 		
+		/// <summary>
+		/// Synchronizes the component.
+		/// </summary>
 		public virtual void Sync(){}
 		
-		/*
-		** Updates the current handle's spawn settings
-		** This can be data like the collision type used
-		** and more
-		**
-		** @param string key
-		** @param Variant value
-		** @return void
-		*/
+		/// <summary>
+		/// Updates the spawn settings of the current handle.
+		/// </summary>
+		/// <param name="key">The key of the setting to update.</param>
+		/// <param name="value">The value to set for the setting.</param>
 		public void UpdateSpawnSettings(string key, Variant value) 
 		{
 			Node3D _handle = GetHandle();
@@ -72,13 +76,7 @@ namespace AssetSnap.Component
 				asMeshInstance3D.AddSetting(key, value);
 			}
 		}
-
-		public override void _ExitTree()
-		{
-			Library = null;
-			
-			base._ExitTree();
-		}
 	}
 }
+
 #endif

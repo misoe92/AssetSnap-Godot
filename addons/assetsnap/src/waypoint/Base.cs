@@ -21,48 +21,62 @@
 // SOFTWARE.
 
 #if TOOLS
+
+using System;
+using AssetSnap.Front.Nodes;
+using AssetSnap.States;
+using AssetSnap.Static;
+using Godot;
+
 namespace AssetSnap.Waypoint
 {
-	using System;
-	using System.Collections.Generic;
-	using AssetSnap.Front.Nodes;
-	using AssetSnap.Static;
-	using Godot;
-	
-	public partial class Base : Node
+	/// <summary>
+	/// Provides functionality for managing waypoints in the scene.
+	/// </summary>
+	public partial class Base
 	{
-		private GlobalExplorer _GlobalExplorer;
-		private Node _ParentContainer;
-		public WaypointList WaypointList;
-		public float SnapDistance = 1.0f;
-		
-		public Node3D WorkingNode;
-		
-		public Base()
+		/// <summary>
+		/// Gets the singleton instance of the waypoint system.
+		/// </summary>
+		public static Base Singleton
 		{
-			Name = "AssetSnapWaypoint";
+			get
+			{
+				if (null == _Instance)
+				{
+					_Instance = new();
+				}
+
+				return _Instance;
+			}
 		}
 		
+		public float SnapDistance = 1.0f;
+		public Node3D WorkingNode;
+		public WaypointList WaypointList;
+		
+		private static Base _Instance;
+		private Node _ParentContainer;
+
+		/// <summary>
+		/// Initializes the waypoint system.
+		/// </summary>
 		public void Initialize()
 		{
 			WaypointList = new();
-			_GlobalExplorer = GlobalExplorer.GetInstance();
 		}
 
-		/*
-		** Spawns a model and also creates the collisions for said model
-		** if defined in settings
-		**
-		** @param Node3D ModelInstance
-		** @param Vector3 Origin
-		** @param Vector3 Rotation
-		** @param Vector3 Scale
-		** @return Node3D
-		*/
+		/// <summary>
+		/// Spawns a model and creates the collisions for said model if defined in settings.
+		/// </summary>
+		/// <param name="ModelInstance">The model instance to spawn.</param>
+		/// <param name="Origin">The origin position of the model.</param>
+		/// <param name="Rotation">The rotation of the model.</param>
+		/// <param name="Scale">The scale of the model.</param>
 		public void Spawn(Node3D ModelInstance, Vector3 Origin, Vector3 Rotation, Vector3 Scale)
 		{
-			Node3D _model = new();
-			Node3D model = new();
+			Node3D _model = null;
+			Node3D model = null;
 			try
 			{
 				if (ModelInstance is AsMeshInstance3D _meshInstance)
@@ -73,13 +87,15 @@ namespace AssetSnap.Waypoint
 				}
 				else if (ModelInstance is AsGrouped3D)
 				{
-					_model.QueueFree();
 					_model = ModelInstance as AsGrouped3D;
 				}
 				else if (ModelInstance is AsGroup3D)
 				{
-					_model.QueueFree();
 					_model = ModelInstance as AsGroup3D;
+				}
+				else if (ModelInstance is AsNode3D)
+				{
+					_model = ModelInstance as AsNode3D;
 				}
 
 				if (null == _model)
@@ -89,20 +105,24 @@ namespace AssetSnap.Waypoint
 
 				if (_model is AssetSnap.Front.Nodes.AsMeshInstance3D meshInstance3D)
 				{
-					meshInstance3D.SetLibraryName(GlobalExplorer.GetInstance().CurrentLibrary.GetName());
+					meshInstance3D.SetLibraryName(StatesUtils.Get().CurrentLibrary.GetName());
 				}
 
+				if (_model is AsNode3D node3d)
+				{
+					node3d.SetLibraryName(StatesUtils.Get().CurrentLibrary.GetName());
+				}
+				
 				model = _model.Duplicate() as Node3D;
 
-				if( IsSimpleMode() )
+				if (IsSimpleMode())
 				{
 					SimpleSpawn(model, Origin, Rotation, Scale);
 				}
-				else if( IsOptimizedMode() ) 
+				else if (IsOptimizedMode())
 				{
 					OptimizedSpawn(model, Origin, Rotation, Scale);
 				}
-
 			}
 			catch (Exception e)
 			{
@@ -110,9 +130,9 @@ namespace AssetSnap.Waypoint
 			}
 
 			WorkingNode = model;
-			if (IsInstanceValid(_model))
+			if (EditorPlugin.IsInstanceValid(_model))
 			{
-				if (IsInstanceValid(_model.GetParent()))
+				if (EditorPlugin.IsInstanceValid(_model.GetParent()))
 				{
 					_model.GetParent().RemoveChild(_model);
 				}
@@ -120,220 +140,162 @@ namespace AssetSnap.Waypoint
 				_model.QueueFree();
 			}
 		}
+
 		
-		private bool IsSimpleMode()
-		{
-			return GlobalExplorer.GetInstance().States.PlacingType == GlobalStates.PlacingTypeEnum.Simple;
-		}
-		
-		private bool IsOptimizedMode()
-		{
-			return GlobalExplorer.GetInstance().States.PlacingType == GlobalStates.PlacingTypeEnum.Optimized;
-		}
-		
+
+		/// <summary>
+		/// Spawns a model using the simple placement method.
+		/// </summary>
+		/// <param name="model">The model to spawn.</param>
+		/// <param name="Origin">The origin position of the model.</param>
+		/// <param name="Rotation">The rotation of the model.</param>
+		/// <param name="Scale">The scale of the model.</param>
 		private void SimpleSpawn(Node3D model, Vector3 Origin, Vector3 Rotation, Vector3 Scale)
 		{
-			_SpawnNode( model );
-			_ConfigureNode( model, Origin, Rotation, Scale );
-			
-			if( SettingsStatic.ShouldAddCollision() && model is AssetSnap.Front.Nodes.AsMeshInstance3D ) 
-			{
-				model = _AddCollisions(model);
-			}
-			else if ( SettingsStatic.ShouldAddCollision() && model is AsGrouped3D asGrouped3D )
-			{
-				asGrouped3D.Update();
-			}
-			
-			// Focus the selected node in the editor
-			// EditorInterface.Singleton.GetSelection().Clear();
-			if( SettingsStatic.ShouldFocusAsset() && false == _GlobalExplorer.InputDriver.IsMulti ) 
-			{
-				_GlobalExplorer.Model = null;
-				_GlobalExplorer.HandleNode = null;
-				_GlobalExplorer.States.EditingObject = null;
-				_GlobalExplorer.States.GroupedObject = null;
-				_GlobalExplorer.InputDriver.FocusAsset(model);	
-			}	
+			_SpawnNode(model);
+			_ConfigureNode(model, Origin, Rotation, Scale);
 		}
-		
+
+		/// <summary>
+		/// Spawns a model using the optimized placement method.
+		/// </summary>
+		/// <param name="model">The model to spawn.</param>
+		/// <param name="Origin">The origin position of the model.</param>
+		/// <param name="Rotation">The rotation of the model.</param>
+		/// <param name="Scale">The scale of the model.</param>
 		private void OptimizedSpawn(Node3D model, Vector3 Origin, Vector3 Rotation, Vector3 Scale)
 		{
-			if( model is AsMeshInstance3D meshInstance3D ) 
+			if (model is AsMeshInstance3D meshInstance3D)
 			{
 				int InstanceId = _OptimizedSpawn(meshInstance3D, Origin, Rotation, Scale);
-
-				GlobalExplorer.GetInstance().States.EditingObject = null;
-				AddMultiCollisions(
-					new List<Vector3>() { Origin },
-					new List<Vector3>() { Scale },
-					new List<Vector3>() { Rotation },
-					new Godot.Collections.Array<Mesh>() { meshInstance3D.Mesh },
-					meshInstance3D
-				);
-				// GlobalExplorer.GetInstance().States. = null;
+				StatesUtils.Get().EditingObject = null;
 				meshInstance3D.Free();
+			}
+
+			if (model is AsNode3D node3D)
+			{
+				foreach (AsMeshInstance3D child in node3D.GetChildren())
+				{
+					int InstanceId = _OptimizedSpawn(child, Origin, Rotation, Scale);
+					StatesUtils.Get().EditingObject = null;
+				}
+				node3D.Free();
 			}
 
 			if (model is AsGrouped3D grouped3D)
 			{
-				Godot.Collections.Array<Godot.Collections.Dictionary<string, Variant>> ChildOptions = grouped3D.ChildOptions;
-				Node InitialChild = grouped3D.GetChild(0);
+				_SpawnNode(grouped3D);
+				_ConfigureNode(grouped3D, Origin, Rotation, Scale);
 				grouped3D.OptimizedSpawn = true;
-				List<Vector3> positions = new List<Vector3>();
-				List<Vector3> rotations = new List<Vector3>();
-				List<Vector3> scales = new List<Vector3>();
-				Godot.Collections.Array<Mesh> meshes = new Godot.Collections.Array<Mesh>();
-				
-				foreach( Node3D child in grouped3D.GetChildren() )
+				foreach (Node3D child in grouped3D.GetChildren())
 				{
-					if( InitialChild is AsStaticBody3D )
+					if (child is AsNode3D)
 					{
-						// With collisions
-						AsMeshInstance3D asMeshInstance3D = child.GetChild(0) as AsMeshInstance3D;
-						int InstanceId = _OptimizedSpawn(asMeshInstance3D, Origin + child.Transform.Origin, asMeshInstance3D.RotationDegrees, asMeshInstance3D.Scale);
-						positions.Add(child.Transform.Origin);
-						meshes.Add(asMeshInstance3D.Mesh);
-						rotations.Add(asMeshInstance3D.RotationDegrees);
-						scales.Add(asMeshInstance3D.Scale);
+						foreach( AsMeshInstance3D asMeshInstance3D in child.GetChildren())
+						{
+							int InstanceId = _OptimizedSpawn(asMeshInstance3D, Origin + child.Transform.Origin, asMeshInstance3D.RotationDegrees, asMeshInstance3D.Scale);
+							grouped3D.AddConnection(InstanceId, StatesUtils.Get().OptimizedGroups[asMeshInstance3D.Mesh][InstanceId], asMeshInstance3D.Mesh);
+						}
 					}
-					else if( InitialChild is AsMeshInstance3D) 
+					else if (child is AsMeshInstance3D)
 					{
 						AsMeshInstance3D asMeshInstance3D = child as AsMeshInstance3D;
-						// Without collisions
 						int InstanceId = _OptimizedSpawn(asMeshInstance3D, Origin + asMeshInstance3D.Transform.Origin, asMeshInstance3D.RotationDegrees, asMeshInstance3D.Scale);
-						
-						positions.Add(asMeshInstance3D.Transform.Origin);
-						meshes.Add(asMeshInstance3D.Mesh);
-						rotations.Add(asMeshInstance3D.RotationDegrees);
-						scales.Add(asMeshInstance3D.Scale);
-
-						grouped3D.AddConnection(InstanceId, GlobalExplorer.GetInstance().States.OptimizedGroups[asMeshInstance3D.Mesh], asMeshInstance3D.Mesh );
+						grouped3D.AddConnection(InstanceId, StatesUtils.Get().OptimizedGroups[asMeshInstance3D.Mesh][InstanceId], asMeshInstance3D.Mesh);
 					}
 				}
-				
+
 				grouped3D.Clear();
-				_SpawnNode(grouped3D);
-				_ConfigureNode( grouped3D, Origin, Rotation, Scale );
-								
-				if( SettingsStatic.ShouldAddCollision() ) 
-				{
-					grouped3D.AddMultiCollisions( positions, scales, rotations, meshes, grouped3D, ChildOptions );	
-				}
-				
-				// Focus the selected node in the editor
-				// EditorInterface.Singleton.GetSelection().Clear();
-				if( SettingsStatic.ShouldFocusAsset() && false == _GlobalExplorer.InputDriver.IsMulti ) 
-				{
-					_GlobalExplorer.Model = null;
-					_GlobalExplorer.HandleNode = null;
-					_GlobalExplorer.States.EditingObject = null;
-					_GlobalExplorer.States.GroupedObject = null;
-					_GlobalExplorer.InputDriver.FocusAsset(model);	
-				}		
+				grouped3D.Update();
 			}
 		}
-		
-		public void AddMultiCollisions(List<Vector3> _Positions, List<Vector3> _Scales, List<Vector3> _Rotations, Godot.Collections.Array<Mesh> _Meshes, AsMeshInstance3D meshInstance3D )
-		{
-			Node _SceneRoot = GlobalExplorer.GetInstance()._Plugin.GetTree().EditedSceneRoot;
 
-			for (int i = 0; i < _Positions.Count; i++)
+		/// <summary>
+		/// Removes a waypoint given its ModelInstance and its origin point.
+		/// </summary>
+		/// <param name="ModelInstance">The model instance to remove.</param>
+		/// <param name="Origin">The origin position of the waypoint.</param>
+		public void Remove(Node ModelInstance, Vector3 Origin)
+		{
+			if (null == WaypointList)
 			{
-				Vector3 _Pos = _Positions[i];
-				Transform3D _Trans = Transform3D.Identity;
-				_Trans.Origin = new Vector3(_Pos.X, _Pos.Y, _Pos.Z);
-				AsStaticBody3D _Body = new()
-				{
-					Transform = _Trans,
-					UsingMultiMesh = true,
-					Mesh = _Meshes[i],
-					MeshName = _Meshes[i].ResourceName,
-					InstanceTransform = _Trans,
-					InstanceScale = _Scales[i],
-					InstanceRotation = _Rotations[i],
-				};
+				return;
+			}
 
-				_SpawnNode(_Body);
-				_Body.Owner = _SceneRoot;
-
-				int typeState = 0;
-				int argState = 0;
-
-				bool IsChildConvex = meshInstance3D.HasSetting("ConvexCollision") ? meshInstance3D.GetSetting("ConvexCollision").As<bool>() : false;
-				bool IsChildConvexClean = meshInstance3D.HasSetting("ConvexClean") ? meshInstance3D.GetSetting("ConvexClean").As<bool>() : false;
-				bool IsChildConvexSimplify = meshInstance3D.HasSetting("ConvexSimplify") ? meshInstance3D.GetSetting("ConvexSimplify").As<bool>() : false;
-				bool IsChildConcave = meshInstance3D.HasSetting("ConcaveCollision") ? meshInstance3D.GetSetting("ConcaveCollision").As<bool>() : false;
-				bool IsChildSphere = meshInstance3D.HasSetting("SphereCollision") ? meshInstance3D.GetSetting("SphereCollision").As<bool>() : false;
-
-				if (
-					GlobalStates.LibraryStateEnum.Enabled == GlobalExplorer.GetInstance().States.ConvexCollision &&
-					false == IsChildConvex &&
-					false == IsChildConcave &&
-					false == IsChildSphere ||
-					true == IsChildConvex	
-				) 
-				{
-					typeState = 1;
-					
-					if(
-						GlobalStates.LibraryStateEnum.Enabled == GlobalExplorer.GetInstance().States.ConvexClean &&
-						GlobalStates.LibraryStateEnum.Disabled == GlobalExplorer.GetInstance().States.ConvexSimplify &&
-						false == IsChildConvex ||
-						true == IsChildConvexClean &&
-						true == IsChildConvexSimplify
-					) 
-					{
-						argState = 1;	
-					}
-					else if( 
-						GlobalStates.LibraryStateEnum.Disabled == GlobalExplorer.GetInstance().States.ConvexClean &&
-						GlobalStates.LibraryStateEnum.Enabled == GlobalExplorer.GetInstance().States.ConvexSimplify &&
-						false == IsChildConvex ||
-						false == IsChildConvexClean &&
-						true == IsChildConvexSimplify
-					) 
-					{
-						argState = 2;	
-					}
-					else if( 
-						GlobalStates.LibraryStateEnum.Enabled == GlobalExplorer.GetInstance().States.ConvexClean &&
-						GlobalStates.LibraryStateEnum.Enabled == GlobalExplorer.GetInstance().States.ConvexSimplify &&
-						false == IsChildConvex ||
-						true == IsChildConvexClean &&
-						true == IsChildConvexSimplify
-					) 
-					{
-						argState = 3;	
-					}
-				}
-				else if( 
-					GlobalStates.LibraryStateEnum.Enabled == GlobalExplorer.GetInstance().States.ConcaveCollision &&
-					false == IsChildConvex &&
-					false == IsChildConcave &&
-					false == IsChildSphere ||
-					true == IsChildConcave	
-				) 
-				{
-					typeState = 2;
-				}
-				else if(
-					GlobalStates.LibraryStateEnum.Enabled == GlobalExplorer.GetInstance().States.SphereCollision &&
-					false == IsChildConvex &&
-					false == IsChildConcave &&
-					false == IsChildSphere ||
-					true == IsChildSphere	
-				) 
-				{
-					typeState = 3;
-				}
-
-				_Body.Initialize(typeState, argState);
+			if (EditorPlugin.IsInstanceValid(ModelInstance))
+			{
+				WaypointList.Remove(ModelInstance, Origin);
 			}
 		}
-		
-		private int _OptimizedSpawn( AsMeshInstance3D meshInstance3D, Vector3 Origin, Vector3 Rotation, Vector3 Scale)
+
+		/// <summary>
+		/// Registers a new waypoint.
+		/// </summary>
+		/// <param name="node">The node to register.</param>
+		/// <param name="Origin">The origin position of the node.</param>
+		/// <param name="Rot">The rotation of the node.</param>
+		/// <param name="Scale">The scale of the node.</param>
+		public void Register(Node3D node, Vector3 Origin, Vector3 Rot, Vector3 Scale)
 		{
+			if (null == WaypointList)
+			{
+				return;
+			}
+
+			WaypointList.Add(node, Origin, Rot, Scale);
+		}
+		
+		/// <summary>
+		/// Updates the scale value on a waypoint positioned on a given origin point.
+		/// </summary>
+		/// <param name="Origin">The origin position of the waypoint.</param>
+		/// <param name="Scale">The new scale value.</param>
+		public void UpdateScaleOnPoint(Vector3 Origin, Vector3 Scale)
+		{
+			if (null == WaypointList)
+			{
+				return;
+			}
+
+			WaypointList.Update("Scale", Scale, Origin);
+		}
+		
+		/// <summary>
+		/// Sets the parent container for spawning nodes.
+		/// </summary>
+		/// <param name="Container">The parent container node.</param>
+		public void SetParentContainer(Node Container)
+		{
+			_ParentContainer = Container;
+		}
+		
+		/// <summary>
+		/// Handles the optimized spawning of a single mesh instance.
+		/// </summary>
+		/// <param name="meshInstance3D">The mesh instance to spawn.</param>
+		/// <param name="Origin">The origin position of the mesh instance.</param>
+		/// <param name="Rotation">The rotation of the mesh instance.</param>
+		/// <param name="Scale">The scale of the mesh instance.</param>
+		/// <returns>The instance ID of the spawned mesh instance.</returns>
+		private int _OptimizedSpawn(AsMeshInstance3D meshInstance3D, Vector3 Origin, Vector3 Rotation, Vector3 Scale)
+		{
+			Node3D AsChunks = null;
+			
+			if( false == Plugin.Singleton.GetTree().EditedSceneRoot.HasNode("AsChunks") ) 
+			{
+				AsChunks = new()
+				{
+					Name = "AsChunks"
+				};
+				Plugin.Singleton.GetTree().EditedSceneRoot.AddChild(AsChunks);
+				AsChunks.Owner = Plugin.Singleton.GetTree().EditedSceneRoot;
+				Plugin.Singleton.GetTree().EditedSceneRoot.MoveChild(AsChunks, 0);
+			}
+			else 
+			{
+				AsChunks = Plugin.Singleton.GetTree().EditedSceneRoot.GetNode("AsChunks") as Node3D;
+			}
+			
 			int InstanceId = 0;
 			Transform3D transform = meshInstance3D.GlobalTransform;
 			Mesh mesh = meshInstance3D.Mesh;
@@ -355,301 +317,343 @@ namespace AssetSnap.Waypoint
 			transform.Basis = finalRotation;
 			transform.Origin = Origin;
 			
-			if( GlobalExplorer.GetInstance().States.OptimizedGroups.ContainsKey( mesh ) ) 
+			/*
+			** Add rules
+			*/
+			Godot.Collections.Dictionary<string, Variant> rules = new();
+			
+			if( StatesUtils.Get().LevelOfDetailsState == GlobalStates.LibraryStateEnum.Enabled ) 
 			{
+				rules.Add("LevelOfDetails", StatesUtils.Get().LevelOfDetails);
+			}
+			
+			if( StatesUtils.Get().VisibilityRangeBegin != 0 ) 
+			{
+				rules.Add("VisibilityRangeBegin", StatesUtils.Get().VisibilityRangeBegin);
+			}
+			
+			if( StatesUtils.Get().VisibilityRangeBeginMargin != 0 ) 
+			{
+				rules.Add("VisibilityRangeBeginMargin", StatesUtils.Get().VisibilityRangeBeginMargin);
+			}
+			
+			if( StatesUtils.Get().VisibilityRangeEnd != 0 ) 
+			{
+				rules.Add("VisibilityRangeEnd", StatesUtils.Get().VisibilityRangeEnd);
+			}
+			
+			if( StatesUtils.Get().VisibilityRangeEndMargin != 0 ) 
+			{
+				rules.Add("VisibilityRangeEndMargin", StatesUtils.Get().VisibilityRangeEndMargin);
+			}
+			
+			if( StatesUtils.Get().VisibilityFadeMode != "Use project default" ) 
+			{
+				rules.Add("VisibilityFadeMode", StatesUtils.Get().VisibilityFadeMode);
+			}
+			
+			if (StatesUtils.Get().OptimizedGroups.ContainsKey(mesh))
+			{
+				bool found = false;
+				int index = 0;
 				// Already has a group
-				InstanceId = GlobalExplorer.GetInstance().States.OptimizedGroups[mesh].AddToBuffer(transform);
-				GlobalExplorer.GetInstance().States.OptimizedGroups[mesh].Update();
-			}
-			else 
-			{
-				// Create our optimized multi mesh group
-				AsOptimizedMultiMeshGroup3D group = new()
+				foreach( AsOptimizedMultiMeshGroup3D multiMeshGroup in StatesUtils.Get().OptimizedGroups[mesh] ) 
 				{
-					Name = "AsMultimesh-" + meshInstance3D.Name,
-					Object = mesh,
-				};
+					if( multiMeshGroup.RulesEqual( rules ) ) 
+					{
+						InstanceId = multiMeshGroup.AddToBuffer(transform);
+						multiMeshGroup.Update();
+						found = true;
+						break;
+					}
+					
+					index += 1;
+				}
 				
-				_SpawnNode( group );
-				InstanceId = group.AddToBuffer(transform);
-				GlobalExplorer.GetInstance().States.OptimizedGroups[mesh].Update();
-			}
+				if( found == false ) 
+				{
+					// None found that have the same rules as we are working with, as such we should
+					// create a new one.
+					
+					// Create our optimized multi mesh group
+					AsOptimizedMultiMeshGroup3D newGroup = new()
+					{
+						Name = "AsMultimesh-" + meshInstance3D.Name,
+						Object = mesh,
+					};
 
-			return InstanceId;
-		}
-		
-		/*
-		** Removes a waypoint given it's ModelInstance
-		** and it's origin x,y,z point
-		**
-		** @param MeshInstance3D ModelInstance
-		** @param Vector3 Origin
-		** @return void
-		*/
-		public void Remove(MeshInstance3D ModelInstance, Vector3 Origin)
-		{
-			if( null == WaypointList ) 
-			{
-				return;
-			}
-			
-			if( IsInstanceValid( ModelInstance ) ) 
-			{
-				WaypointList.Remove(ModelInstance, Origin);
-			}
-		}
-		
-		/*
-		** Registers a new waypoint
-		**
-		** @param Node3D node
-		** @param Vector3 Origin
-		** @param Vector3 Rot
-		** @param Vector3 Scale
-		** @return void
-		*/
-		public void Register( Node3D node, Vector3 Origin, Vector3 Rot, Vector3 Scale ) 
-		{
-			if( null == WaypointList ) 
-			{
-				return;
-			}
-			
-			WaypointList.Add(node, Origin, Rot, Scale);
-		}
+					_ParentContainer = AsChunks;
+					_SpawnNode(newGroup);
+					_ParentContainer = null;
+					InstanceId = newGroup.AddToBuffer(transform);
+					newGroup.SetRules(rules);
+					
+					StatesUtils.Get().OptimizedGroups[mesh][ StatesUtils.Get().OptimizedGroups[mesh].Count - 1 ].Update();
 
-		/*
-		** Checks if a node is already registered
-		**
-		** @param Node3D node
-		** @return bool
-		*/
-		public bool Has( Node3D node ) 
-		{
-			if( null == WaypointList ) 
-			{
-				return false;
+					return StatesUtils.Get().OptimizedGroups[mesh].Count - 1;
+				}
+
+				return index;
 			}
-			
-			return WaypointList.Has(node);
-		}
-		/*
-		** Updates the scale value on a waypoint
-		** positioned on a given origin x,y,z point
-		**
-		** @param Vector3 Origin
-		** @param Vector3 Scale
-		** @return void
-		*/
-		public void UpdateScaleOnPoint(Vector3 Origin, Vector3 Scale)
-		{
-			if( null == WaypointList ) 
+		
+			// Create our optimized multi mesh group
+			AsOptimizedMultiMeshGroup3D group = new()
 			{
-				return;
-			}
+				Name = "AsMultimesh-" + meshInstance3D.Name,
+				Object = mesh,
+			};
+
+			_ParentContainer = AsChunks;
+			_SpawnNode(group);
+			_ParentContainer = null;
+			InstanceId = group.AddToBuffer(transform);
 			
-			WaypointList.Update("Scale", Scale, Origin);
+			group.SetRules(rules);
+			
+			StatesUtils.Get().OptimizedGroups[mesh][0].Update();
+
+			return 0;
 		}
 		
-		/*
-		** Fetches the node that is currently
-		** being worked on
-		**
-		** @return Node3D
-		*/
+		/// <summary>
+		/// Retrieves the node that is currently being worked on.
+		/// </summary>
+		/// <returns>The working node.</returns>
 		public Node3D GetWorkingNode()
 		{
 			return WorkingNode;
 		}
+
+		/// <summary>
+		/// Checks if a node is already registered as a waypoint.
+		/// </summary>
+		/// <param name="node">The node to check.</param>
+		/// <returns>True if the node is registered, otherwise false.</returns>
+		public bool Has(Node3D node)
+		{
+			if (null == WaypointList)
+			{
+				return false;
+			}
+
+			return WaypointList.Has(node);
+		}
 		
-		/*
-		** Spawns the node
-		**
-		** @param Node3D _model
-		** @return void
-		*/
-		private void _SpawnNode( Node3D _model)
-		{						
-			if( _model.GetParent() != null ) 
+		/// <summary>
+		/// Checks if any waypoints are available.
+		/// </summary>
+		/// <returns>True if there are any waypoints, otherwise false.</returns>
+		public bool HasAnyWaypoints()
+		{
+			return false == WaypointList.IsEmpty();
+		}
+
+		/// <summary>
+		/// Spawns the specified Node3D and sets its owner and parent container if necessary.
+		/// </summary>
+		/// <param name="_model">The Node3D to spawn.</param>
+		private void _SpawnNode(Node3D _model)
+		{
+			if (_model.GetParent() != null)
 			{
 				_model.GetParent().RemoveChild(_model);
 			}
-			
-			SceneTree Tree = _GlobalExplorer._Plugin.GetTree();
+
+			SceneTree Tree = Plugin.Singleton.GetTree();
 			if (SettingsStatic.ShouldPushToScene())
 			{
-				if( _ParentContainer != null ) 
-				{ 
+				if (_ParentContainer != null)
+				{
 					Tree = _ParentContainer.GetTree();
-					if( Tree != null ) 
+					if (Tree != null)
 					{
 						_ParentContainer.AddChild(_model, true);
 						_model.Owner = Tree.EditedSceneRoot;
 					}
 				}
-				else 
+				else
 				{
-					if( Tree != null ) 
+					if (Tree != null)
 					{
 						Tree.EditedSceneRoot.AddChild(_model, true);
 						_model.Owner = Tree.EditedSceneRoot;
 					}
-					else 
+					else
 					{
 						GD.PushWarning("Tree not found");
 					}
 				}
 
-				if( 0 != _model.GetChildCount() ) 
+				if (0 != _model.GetChildCount())
 				{
-					for( int i = 0; i < _model.GetChildCount(); i++ ) 
+					for (int i = 0; i < _model.GetChildCount(); i++)
 					{
 						_model.GetChild(i).Owner = Tree.EditedSceneRoot;
+						
+						if( 
+							_model.GetChild(i) is Node3D node3d &&
+							_model.GetChild(i).GetChildCount() > 0 && 
+							EditorPlugin.IsInstanceValid(_model.GetChild(i).GetChild(0))
+						) 
+						{
+							_model.GetChild(i).GetChild(0).Owner = Tree.EditedSceneRoot;
+						}
 					}
 				}
 			}
-			else 
+			else
 			{
-				if( _ParentContainer != null ) 
+				if (_ParentContainer != null)
 				{
 					_ParentContainer.AddChild(_model);
 				}
-				else 
+				else
 				{
-					_GlobalExplorer._Plugin.AddChild(_model);
+					Plugin.Singleton.AddChild(_model);
 				}
 			}
 
-			if( _model is AssetSnap.Front.Nodes.AsMeshInstance3D asMeshInstance3D && true == asMeshInstance3D.Floating && false == SettingsStatic.ShouldAddCollision() ) 
+			if (_model is AssetSnap.Front.Nodes.AsMeshInstance3D asMeshInstance3D && true == asMeshInstance3D.Floating && false == SettingsStatic.ShouldAddCollision())
 			{
 				// AssetSnap.ASNode.MeshInstance.SpawnSettings SpawnSettings = asMeshInstance3D.SpawnSettings;
 				// SpawnSettings.Update();
 				asMeshInstance3D.SetIsFloating(false);
 			}
-			
+
 			_model.NotifyPropertyListChanged();
 		}
-		
-		/*
-		** Configures the node and it's
-		** Transform, scale etc.
-		**
-		** @param Node3D _model
-		** @param Vector3 Origin
-		** @param Vector3 Rotation
-		** @param Vector3 Scale
-		** @return void
-		*/
-		private void _ConfigureNode( Node3D _model, Vector3 Origin, Vector3 Rotation, Vector3 Scale )
+
+		/// <summary>
+		/// Configures the node's transform, scale, etc.
+		/// </summary>
+		/// <param name="_model">The node to configure.</param>
+		/// <param name="Origin">The origin position of the node.</param>
+		/// <param name="Rotation">The rotation of the node.</param>
+		/// <param name="Scale">The scale of the node.</param>
+		private void _ConfigureNode(Node3D _model, Vector3 Origin, Vector3 Rotation, Vector3 Scale)
 		{
 			Transform3D _Trans = _model.Transform;
 			_Trans.Origin = Origin;
-
 			_model.Transform = _Trans;
 			_model.RotationDegrees = Rotation;
 			_model.Scale = Scale;
-		}
 			
-		/*
-		** Adds collisions to a given model
-		**
-		** @param Node3D _model
-		** @return void
-		*/
-		private Node3D _AddCollisions(Node3D _model, Node3D _ParentContainer = null)
-		{
-			try 
+			if( _model is AsMeshInstance3D asMeshInstance3D ) 
 			{
-				// Only add collisions to models
-				if( _model.HasMeta("AsModel") == false ) 
+				if( StatesUtils.Get().LevelOfDetailsState == GlobalStates.LibraryStateEnum.Enabled ) 
 				{
-					return _model;
-				}
-				
-				if( null == _GlobalExplorer ) 
-				{
-					return _model;
+					asMeshInstance3D.LodBias = StatesUtils.Get().LevelOfDetails; 
 				}
 
-				SceneTree Tree = _GlobalExplorer._Plugin.GetTree();
-				
-				if( Tree == null ) 
+				if (StatesUtils.Get().VisibilityRangeBegin != 0)
 				{
-					GD.PushWarning("Tree is not set");
+					asMeshInstance3D.VisibilityRangeBegin = StatesUtils.Get().VisibilityRangeBegin;
 				}
 				
-				AssetSnap.Front.Nodes.AsMeshInstance3D model = _model as AssetSnap.Front.Nodes.AsMeshInstance3D;
+				if (StatesUtils.Get().VisibilityRangeBeginMargin != 0)
+				{
+					asMeshInstance3D.VisibilityRangeBeginMargin = StatesUtils.Get().VisibilityRangeBeginMargin;
+				}
 				
-				AsStaticBody3D _Body = new()
+				if (StatesUtils.Get().VisibilityRangeEnd != 0)
 				{
-					MeshName = model.Name,
-					Mesh = model.Mesh,
-					Transform = model.Transform,
-					InstanceTransform = model.Transform,
-					InstanceScale = new Vector3(1, 1, 1),
-					InstanceRotation = new Vector3(0, 0, 0),
-					InstanceLibrary = model.GetLibraryName(),
-					InstanceSpawnSettings = model.SpawnSettings,
-				};
-
-				if (SettingsStatic.ShouldPushToScene())
+					asMeshInstance3D.VisibilityRangeEnd = StatesUtils.Get().VisibilityRangeEnd;
+				}
+				
+				if (StatesUtils.Get().VisibilityRangeEndMargin != 0)
 				{
-					if( _ParentContainer != null ) 
+					asMeshInstance3D.VisibilityRangeEndMargin = StatesUtils.Get().VisibilityRangeEndMargin;
+				}
+				
+				if (StatesUtils.Get().VisibilityFadeMode != "Use project default")
+				{
+					switch( StatesUtils.Get().VisibilityFadeMode ) 
 					{
-						Tree = _ParentContainer.GetTree();
-						if( Tree != null ) 
-						{
-							_ParentContainer.AddChild(_Body, true);
-							_Body.Owner = Tree.EditedSceneRoot;
-						}
-					}
-					else 
-					{
-						if( Tree != null ) 
-						{
-							Tree.EditedSceneRoot.AddChild(_Body, true);
-							_Body.Owner = Tree.EditedSceneRoot;
-						}
-						else 
-						{
-							GD.PushWarning("Tree not found");
-						}
+						case "Disabled":
+							asMeshInstance3D.VisibilityRangeFadeMode = GeometryInstance3D.VisibilityRangeFadeModeEnum.Disabled;
+							break;
+							
+						case "Self":
+							asMeshInstance3D.VisibilityRangeFadeMode = GeometryInstance3D.VisibilityRangeFadeModeEnum.Self;
+							break;
+							
+							
+						case "Dependencies":
+							asMeshInstance3D.VisibilityRangeFadeMode = GeometryInstance3D.VisibilityRangeFadeModeEnum.Dependencies;
+							break;
 					}
 				}
-				else 
-				{
-					if( _ParentContainer != null ) 
-					{
-						_ParentContainer.AddChild(_Body);
-					}
-					else 
-					{
-						_GlobalExplorer._Plugin.AddChild(_Body);
-					}
-				}
-
-				_Body.Initialize();
-				model.QueueFree();
-			
-				return _Body.GetInstance();
-			}
-			catch(Exception e ) 
-			{
-				GD.PushWarning(e.Message);
 			}
 			
-			return _model;
+			if( _model is AsNode3D asNode3D)
+			{
+				foreach( MeshInstance3D meshInstance3D in asNode3D.GetChildren() )
+				{
+					if( StatesUtils.Get().LevelOfDetailsState == GlobalStates.LibraryStateEnum.Enabled ) 
+					{
+						meshInstance3D.LodBias = StatesUtils.Get().LevelOfDetails;
+					}
+
+					if (StatesUtils.Get().VisibilityRangeBegin != 0)
+					{
+						meshInstance3D.VisibilityRangeBegin = StatesUtils.Get().VisibilityRangeBegin;
+					}
+					
+					if (StatesUtils.Get().VisibilityRangeBeginMargin != 0)
+					{
+						meshInstance3D.VisibilityRangeBeginMargin = StatesUtils.Get().VisibilityRangeBeginMargin;
+					}
+					
+					if (StatesUtils.Get().VisibilityRangeEnd != 0)
+					{
+						meshInstance3D.VisibilityRangeEnd = StatesUtils.Get().VisibilityRangeEnd;
+					}
+					
+					if (StatesUtils.Get().VisibilityRangeEndMargin != 0)
+					{
+						meshInstance3D.VisibilityRangeEndMargin = StatesUtils.Get().VisibilityRangeEndMargin;
+					}
+					
+					if (StatesUtils.Get().VisibilityFadeMode != "Use project default")
+					{
+						switch( StatesUtils.Get().VisibilityFadeMode ) 
+						{
+							case "Disabled":
+								meshInstance3D.VisibilityRangeFadeMode = GeometryInstance3D.VisibilityRangeFadeModeEnum.Disabled;
+								break;
+								
+							case "Self":
+								meshInstance3D.VisibilityRangeFadeMode = GeometryInstance3D.VisibilityRangeFadeModeEnum.Self;
+								break;
+								
+								
+							case "Dependencies":
+								meshInstance3D.VisibilityRangeFadeMode = GeometryInstance3D.VisibilityRangeFadeModeEnum.Dependencies;
+								break;
+						}
+					}
+				}
+			}
 		}
 		
-		/*
-		** Checks if any waypoints is available
-		**
-		** @return bool
-		*/
-		public bool HasAnyWaypoints() 
+		/// <summary>
+		/// Checks if the current placing mode is set to Simple.
+		/// </summary>
+		/// <returns>True if the placing mode is Simple, otherwise false.</returns>
+		private bool IsSimpleMode()
 		{
-			return false == WaypointList.IsEmpty();
+			return StatesUtils.Get().PlacingType == GlobalStates.PlacingTypeEnum.Simple;
+		}
+
+		/// <summary>
+		/// Checks if the current placing mode is set to Optimized.
+		/// </summary>
+		/// <returns>True if the placing mode is Optimized, otherwise false.</returns>
+		private bool IsOptimizedMode()
+		{
+			return StatesUtils.Get().PlacingType == GlobalStates.PlacingTypeEnum.Optimized;
 		}
 	}
 }
+
 #endif

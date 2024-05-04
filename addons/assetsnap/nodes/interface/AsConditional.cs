@@ -21,49 +21,58 @@
 // SOFTWARE.
 
 #if TOOLS
+
+using Godot;
+
 namespace AssetSnap.Front.Nodes
 {
-	using Godot;
-
+	/// <summary>
+	/// Represents a control for conditional visibility based on the presence of certain values in a list.
+	/// </summary>
 	[Tool]
 	public partial class AsConditional : Control
 	{
-		private Control Control_;
-		private Callable _Callable;
-		
+		/// <summary>
+		/// Gets or sets the control to be observed for conditional visibility.
+		/// </summary>
 		[Export]
-		public Control _Control 
+		public Control ConditionalControl 
 		{
-			get => Control_;
+			get => _Control;
 			set 
 			{
-				Control_ = value;
+				_Control = value;
 			}
 		}
 
+		/// <summary>
+		/// Gets or sets an array of values to check for in the associated control.
+		/// </summary>
 		[Export]
 		public string[] values;
 
-		/*
-		** Handles visibility state of the node
-		**
-		** @param double delta
-		** @return void
-		*/
+		private Control _Control;
+		private Callable _Callable;
+
+		/// <summary>
+		/// Handles the visibility state of the node based on the presence of certain values in the associated control.
+		/// </summary>
+		/// <param name="delta">The time elapsed since the last frame, in seconds.</param>
+		/// <returns>void</returns>
 		public override void _Process(double delta)
 		{
-			if(Control_ == null || _Control.GetParent() == null || GetParent<Control>().Visible == false) 
+			if(ConditionalControl == null || ConditionalControl.GetParent() == null || GetParent<Control>().Visible == false) 
 			{
 				return;
 			}
 
-			if( Control_ is AsSelectList _List && _List._Button != null) 
+			if( ConditionalControl is AsSelectList _List && _List.SelectButton != null) 
 			{
 				bool found = false;
 				for( int i = 0; i < values.Length; i++ ) 
 				{
 					var value = values[i];
-					if (_List._Button.Text.Contains(value) )
+					if (_List.SelectButton.Text.Contains(value) )
 					{
 						Visible = true;
 						found = true;
@@ -79,4 +88,5 @@ namespace AssetSnap.Front.Nodes
 		}
 	} 
 }
+
 #endif

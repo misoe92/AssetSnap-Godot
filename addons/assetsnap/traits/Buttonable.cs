@@ -21,18 +21,21 @@
 // SOFTWARE.
 
 #if TOOLS
+
 using System;
-using System.Collections.Generic;
 using Godot;
+
 namespace AssetSnap.Component
 {
-	
+	/// <summary>
+	/// A tool class for creating customizable buttons with various functionalities.
+	/// </summary>	
 	[Tool]
 	public partial class Buttonable : Trait.Base
 	{
-		[Export]
-		public Godot.Collections.Array<Callable> _Actions = new Godot.Collections.Array<Callable>();
-
+		/// <summary>
+		/// Enumeration of different button types.
+		/// </summary>
 		public enum ButtonType
 		{
 			DefaultButton,
@@ -49,87 +52,128 @@ namespace AssetSnap.Component
 			SmallDisabledButton,
 		}
 		
-		public new Godot.Collections.Dictionary<string, int> Margin = new()
-		{
-			{"left", 20},
-			{"right", 20},
-			{"top", 0},
-			{"bottom", 25},
-		};
+		[Export]
+		public Godot.Collections.Array<Callable> Actions = new Godot.Collections.Array<Callable>();
 		
-		private Control.SizeFlags SizeFlagsHorizontal = Control.SizeFlags.ShrinkBegin;
-		private Control.SizeFlags SizeFlagsVertical = Control.SizeFlags.ShrinkCenter;
-		
-		public string Text = "";
-		public string TooltipText = "";
-		public int index = 0;
+		/*
+		** Private fields
+		*/
+		private string _Text = "";
+		private string _TooltipText = "";
+		private ButtonType _WorkingButtonType = ButtonType.DefaultButton;
+		private Control.CursorShape _DefaultCursorShape = Control.CursorShape.PointingHand;
+		private Control.MouseFilterEnum _MouseFilter = Control.MouseFilterEnum.Pass;
+		private Texture2D _Icon;
+		private Theme _Theme;
+		private HorizontalAlignment _IconAlignment;
 
-		public ButtonType WorkingButtonType = ButtonType.DefaultButton;
-		public Godot.Control.CursorShape DefaultCursorShape = Godot.Control.CursorShape.PointingHand;
-
-		public Texture2D Icon;
-		public HorizontalAlignment IconAlignment;
-		
+		/// <summary>
+		/// Constructor for the Buttonable class.
+		/// </summary>
 		public Buttonable()
 		{
-			// _Actions += () => { GD.Print("Change found")};
-		}
-		
-		public Buttonable Instantiate()
-		{
-			base._Instantiate( GetType().ToString() );
-			
-			Button WorkingButton = new()
+			Name = "Buttonable";
+			TypeString = GetType().ToString();
+
+			_Margin = new()
 			{
-				Name = Name,
-				Text = Text,
-				TooltipText = TooltipText,
-				ThemeTypeVariation = WorkingButtonType.ToString(),
-				MouseDefaultCursorShape = DefaultCursorShape,
-				SizeFlagsHorizontal = SizeFlagsHorizontal,
-				SizeFlagsVertical = SizeFlagsVertical,
-				Visible = Visible
+				{"left", 20},
+				{"right", 20},
+				{"top", 0},
+				{"bottom", 25},
 			};
 			
-			if( null != Icon ) 
-			{
-				WorkingButton.Icon = Icon;
-				WorkingButton.IconAlignment = IconAlignment;
-			}
-
-			WorkingButton.SetMeta("index", index);
+			_SizeFlagsHorizontal = Control.SizeFlags.ShrinkBegin;
+			_SizeFlagsVertical = Control.SizeFlags.ShrinkCenter;
+		}
 		
-			Callable actionCallable = _Actions[index];
-			Godot.Error error = WorkingButton.Connect( Button.SignalName.Pressed, actionCallable);
+		/// <summary>
+		/// Instantiate an instance of the trait.
+		/// </summary>
+		/// <returns>Returns the instantiated Buttonable instance.</returns>	
+		public Buttonable Instantiate()
+		{
+			base._Instantiate();
 			
-			if( error != Godot.Error.Ok)
+			// Setup the button
+			Button WorkingButton = new()
 			{
-				GD.Print("Error connecting signal: " + error.ToString());
-			}
+				Name = TraitName,
+				Text = _Text,
+				TooltipText = _TooltipText,
+				ThemeTypeVariation = _WorkingButtonType.ToString(),
+				MouseDefaultCursorShape = _DefaultCursorShape,
+				SizeFlagsHorizontal = _SizeFlagsHorizontal,
+				SizeFlagsVertical = _SizeFlagsVertical,
+				Visible = _Visible,
+				MouseFilter = _MouseFilter,
+				Theme = _Theme,
+			};
 			
-			Nodes.Add(WorkingButton);
-			WorkingNode = WorkingButton;
+			if( null != _Icon ) 
+			{
+				WorkingButton.Icon = _Icon;
+				WorkingButton.IconAlignment = _IconAlignment;
+			}
 
-			index += 1;
+			WorkingButton.SetMeta("index", Iteration);
+
+			// Connect the button to it's action
+			if( Actions.Count > Iteration ) 
+			{
+				Callable actionCallable = Actions[Iteration];
+				Godot.Error error = WorkingButton.Connect( Button.SignalName.Pressed, actionCallable);
+				if( error != Godot.Error.Ok)
+				{
+					GD.Print("Error connecting signal: " + error.ToString());
+				}
+			}
+
+			Dependencies[TraitName + "_WorkingNode"] = WorkingButton;
+			
+			// Add the button to the nodes array			
+			Plugin.Singleton.TraitGlobal.AddInstance(Iteration, WorkingButton, OwnerName, TypeString, Dependencies);
+			Plugin.Singleton.TraitGlobal.AddName(Iteration, TraitName, OwnerName, TypeString);
+
+			// Increase Iteration and clear the trait
+			Iteration += 1;
 			Reset();
 		
-			return this;
-		}
-		
-		public Buttonable Select(int index)
-		{
-			base._Select(index);
+			Dependencies = new();
 			
 			return this;
 		}
 		
+		/// <summary>
+		/// Selects a placed button in the nodes array by Iteration.
+		/// </summary>
+		/// <param name="index">The index of the button to select.</param>
+		/// <returns>Returns the updated Buttonable instance.</returns>
+		public Buttonable Select(int index)
+		{			
+			base._Select(index);
+			
+			if( false != Dependencies.ContainsKey(TraitName + "_WorkingNode")) 
+			{
+				Godot.Collections.Dictionary<string, Variant> dependencies = Plugin.Singleton.TraitGlobal.GetDependencies(index, TypeString, OwnerName);
+				Dependencies = dependencies;
+			}
+			
+			return this;
+		}
+		
+		/// <summary>
+		/// Selects a placed button in the nodes array by name.
+		/// </summary>
+		/// <param name="name">The name of the button to select.</param>
+		/// <returns>Returns the updated Buttonable instance.</returns>
 		public Buttonable SelectByName( string name ) 
 		{
 			foreach( Button button in Nodes ) 
 			{
 				if( button.Name == name ) 
 				{
-					WorkingNode = button;
+					Dependencies[TraitName + "_WorkingNode"] = button;
 					break;
 				}
 			}
@@ -137,6 +181,25 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
+		/// <summary>
+		/// Adds the currently chosen button to a specified container.
+		/// </summary>
+		/// <param name="Container">The container to which the chosen button will be added.</param>
+		public void AddToContainer( Node Container )
+		{
+			if( false == Dependencies.ContainsKey(TraitName + "_WorkingNode")) 
+			{
+				return;
+			}
+			
+			_AddToContainer(Container, Dependencies[TraitName + "_WorkingNode"].As<Button>());
+		}
+		
+		/// <summary>
+		/// Sets the name of the current button.
+		/// </summary>
+		/// <param name="text">The name to set.</param>
+		/// <returns>Returns the updated Buttonable instance.</returns>
 		public Buttonable SetName( string text ) 
 		{
 			base._SetName(text);
@@ -144,25 +207,70 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
+		/// <summary>
+		/// Sets the text of the current button.
+		/// </summary>
+		/// <param name="text">The text to set.</param>
+		/// <returns>Returns the updated Buttonable instance.</returns>
 		public Buttonable SetText( string text ) 
 		{
-			Text = text;
+			if( text == "" ) 
+			{
+				TraitName = "ButtonableIcon-" + Iteration;
+				return this;
+			}
+			
+			_Text = text;
+			TraitName = text;
 			
 			return this;
 		}
 		
+		/// <summary>
+		/// Sets the tooltip text of the current button.
+		/// </summary>
+		/// <param name="text">The tooltip text to set.</param>
+		/// <returns>Returns the updated Buttonable instance.</returns>
 		public Buttonable SetTooltipText( string text ) 
 		{
-			TooltipText = text;
+			_TooltipText = text;
 			
 			return this;
 		}
 		
+		/// <summary>
+		/// Sets the theme of the current button.
+		/// </summary>
+		/// <param name="theme">The theme to set.</param>
+		/// <returns>Returns the updated Buttonable instance.</returns>
+		public Buttonable SetTheme( Theme theme ) 
+		{
+			_Theme = theme;
+				
+			return this;
+		}
+		
+		/// <summary>
+		/// Sets the mouse filter for the current button.
+		/// </summary>
+		/// <param name="filter">The mouse filter to set.</param>
+		/// <returns>Returns the updated Buttonable instance.</returns>
+		public Buttonable SetMouseFilter(Control.MouseFilterEnum filter)
+		{
+			_MouseFilter = filter;
+			return this;
+		}
+		
+		/// <summary>
+		/// Sets the visibility state of the currently chosen button.
+		/// </summary>
+		/// <param name="state">The visibility state to set.</param>
+		/// <returns>Returns the updated Buttonable instance.</returns>
 		public Buttonable SetVisible( bool state ) 
 		{
 			base._SetVisible(state);
 			
-			if( null != WorkingNode && WorkingNode is Button button) 
+			if( false != Dependencies.ContainsKey(TraitName + "_WorkingNode") && Dependencies[TraitName + "_WorkingNode"].As<GodotObject>() is Button button) 
 			{
 				button.Visible = state;
 			}
@@ -170,130 +278,138 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		public Buttonable SetHorizontalSizeFlags(Control.SizeFlags flag)
+		/// <summary>
+		/// Sets the horizontal size flag, which controls the x axis, and how it should act.
+		/// </summary>
+		/// <param name="flag">The Control.SizeFlags flag to set.</param>
+		/// <returns>Returns the updated Buttonable instance.</returns>
+		public override Buttonable SetHorizontalSizeFlags(Control.SizeFlags flag)
 		{
-			SizeFlagsHorizontal = flag;
+			base.SetHorizontalSizeFlags(flag);
 
 			return this;
 		}
 		
-		public Buttonable SetVerticalSizeFlags(Control.SizeFlags flag)
+		/// <summary>
+		/// Sets the vertical size flag, which controls the y axis, and how it should act.
+		/// </summary>
+		/// <param name="flag">The Control.SizeFlags flag to set.</param>
+		/// <returns>Returns the updated Buttonable instance.</returns>
+		public override Buttonable SetVerticalSizeFlags(Control.SizeFlags flag)
 		{
-			SizeFlagsVertical = flag;
+			base.SetVerticalSizeFlags(flag);
 
 			return this;
 		}
 		
+		/// <summary>
+		/// Sets the theme type of the button.
+		/// </summary>
+		/// <param name="type">The button type to set.</param>
+		/// <returns>Returns the updated Buttonable instance.</returns>
 		public Buttonable SetType( ButtonType type ) 
 		{
-			WorkingButtonType = type;
+			_WorkingButtonType = type;
 			
 			return this;
 		}
 		
-		public Buttonable SetCursorShape( Godot.Control.CursorShape shape ) 
+		/// <summary>
+		/// Sets the cursor shape of the currently chosen button.
+		/// </summary>
+		/// <param name="shape">The cursor shape to set.</param>
+		/// <returns>Returns the updated Buttonable instance.</returns>
+		public Buttonable SetCursorShape( Control.CursorShape shape ) 
 		{
-			DefaultCursorShape = shape;
+			_DefaultCursorShape = shape;
 			
 			return this;
 		}
 		
+		/// <summary>
+		/// Sets the icon of the currently chosen button.
+		/// </summary>
+		/// <param name="icon">The icon to set.</param>
+		/// <returns>Returns the updated Buttonable instance.</returns>
 		public Buttonable SetIcon( Texture2D icon )
 		{
-			Icon = icon;
+			_Icon = icon;
+			
+			if( false != Dependencies.ContainsKey(TraitName + "_WorkingNode") && Dependencies[TraitName + "_WorkingNode"].As<GodotObject>() is Button button) 
+			{
+				button.Icon = icon;
+			}
 
 			return this;
 		}
 		
+		/// <summary>
+		/// Sets the icon alignment of the currently chosen button.
+		/// </summary>
+		/// <param name="alignment">The icon alignment to set.</param>
+		/// <returns>Returns the updated Buttonable instance.</returns>
 		public Buttonable SetIconAlignment( HorizontalAlignment alignment )
 		{
-			IconAlignment = alignment;
+			_IconAlignment = alignment;
 			
 			return this;
 		}
 		
+		/// <summary>
+		/// Sets the action for the currently chosen button.
+		/// </summary>
+		/// <param name="action">The action to set.</param>
+		/// <returns>Returns the updated Buttonable instance.</returns>
 		public Buttonable SetAction( Action action ) 
 		{
-			_Actions.Add(Callable.From(action));
+			Actions.Add(Callable.From(action));
 			
 			return this;
 		}
 		
+		/// <summary>
+		/// Sets margin values for the currently chosen button.
+		/// </summary>
+		/// <param name="value">The margin value.</param>
+		/// <param name="side">The side for which to set the margin.</param>
+		/// <returns>Returns the updated Buttonable instance.</returns>
 		public Buttonable SetMargin( int value, string side = "" ) 
 		{
 			if( side == "" ) 
 			{
-				Margin["top"] = value;
-				Margin["bottom"] = value;
-				Margin["left"] = value;
-				Margin["right"] = value;
+				_Margin["top"] = value;
+				_Margin["bottom"] = value;
+				_Margin["left"] = value;
+				_Margin["right"] = value;
 			}
 			else 
 			{
-				Margin[side] = value;
+				_Margin[side] = value;
 			}
 			
 			return this;
 		}
 		
+		/// <summary>
+		/// Checks if the currently chosen button is visible.
+		/// </summary>
+		/// <returns>Returns true if the button is visible; otherwise, false.</returns>
 		public bool IsVisible()
 		{
-			return Visible;
+			return _Visible;
 		}
 		
-		public void AddToContainer( Node Container )
-		{
-			if( null != WorkingNode ) 
-			{
-				// Single placement
-				Container.AddChild(WorkingNode);
-			}
-			else 
-			{
-				MarginContainer _Container = new()
-				{
-					SizeFlagsVertical = Control.SizeFlags.ShrinkCenter,
-					SizeFlagsHorizontal = Control.SizeFlags.ShrinkBegin,
-				};
-				
-				foreach( (string side, int value ) in Margin ) 
-				{
-					_Container.AddThemeConstantOverride("margin_" + side, value);
-				}
-				 
-				// Multi placement
-				foreach( Button button in Nodes ) 
-				{
-					_Container.AddChild(button);
-				}
-
-				base._AddToContainer(Container, _Container);
-			}
-		}
-		
+		/// <summary>
+		/// Resets the trait to a cleared state.
+		/// </summary>
 		private void Reset()
 		{
-			Text = "";
-			TooltipText = "";
-			WorkingNode = null;
-			WorkingButtonType = ButtonType.DefaultButton;
-			DefaultCursorShape = Godot.Control.CursorShape.PointingHand;
-		}
-		
-		private void _ClearNodes()
-		{
-			for( int i = 0; i < Nodes.Count; i++ ) 
-			{
-				Select(i); 
-				WorkingNode.QueueFree();
-			}
-		}
-
-		public override void _ExitTree()
-		{
-			base._ExitTree(); 
-			// Reset();
+			_Text = "";
+			_TooltipText = "";
+			_WorkingButtonType = ButtonType.DefaultButton;
+			_DefaultCursorShape = Godot.Control.CursorShape.PointingHand;
 		}
 	}
 }
+
 #endif

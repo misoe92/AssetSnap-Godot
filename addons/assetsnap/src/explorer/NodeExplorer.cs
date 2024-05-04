@@ -21,29 +21,28 @@
 // SOFTWARE.
 
 #if TOOLS
+
+using AssetSnap.Explorer;
+using AssetSnap.Front.Nodes;
+using AssetSnap.States;
+using Godot;
+
 namespace AssetSnap
 {
-	using AssetSnap.Front.Nodes;
-	using Godot;
-
+	/// <summary>
+	/// Partial class representing a node explorer for navigating scenes and objects.
+	/// </summary>
 	[Tool]
 	public partial class NodeExplorer : CameraExplorer
 	{
-		protected AssetSnap.Front.Nodes.AsMeshInstance3D _Model;
-		protected Node _HandleNode;
-		protected GroupResource _Group;
-		protected AsGrouped3D _GroupedObject;
-		protected Library.Instance _CurrentLibrary;
-		protected Callable? UpdateHandleCallable;
-		
-		/*
-		** Defines whether or not a forced focus is active
-		*/
+		/// <summary>
+		/// Defines whether or not a forced focus is active.
+		/// </summary>
 		public int _Forced = 0;
 		
-		/*
-		** The current node being handled
-		*/
+		/// <summary>
+		/// The current node being handled.
+		/// </summary>
 		public Node HandleNode
 		{
 			get => _HandleNode;
@@ -52,92 +51,45 @@ namespace AssetSnap
 			}
 		}
 		
-
-		/*
-		** The node to force focus to
-		*/
+		/// <summary>
+		/// The node to force focus to.
+		/// </summary>
 		public Node3D _ForceFocus;
 		
-		/*
-		** Whether or not a library is active
-		*/
-		public bool HasLibrary
-		{
-			get => CurrentLibrary != null;
-		}
+		protected AsMeshInstance3D _Model;
+		protected Node _HandleNode;
+		protected GroupResource _Group;
+		protected AsGrouped3D _GroupedObject;
+		protected Library.Instance _CurrentLibrary;
+		protected Callable? _UpdateHandleCallable;
 		
-		/*
-		** The active library
-		*/
-		public Library.Instance CurrentLibrary 
-		{
-			get => _CurrentLibrary;
-			set
-			{
-				_CurrentLibrary = value;
-			}
-		}
-		
-		/*
-		** Current selected model from the asset library
-		*/
-		public AssetSnap.Front.Nodes.AsMeshInstance3D Model 
-		{
-			get => _Model;
-			set
-			{
-				_Model = value;
-			}
-		}
-		
-		/*
-		** Whether or not a model is active
-		*/
+		/// <summary>
+		/// Whether or not a model is active.
+		/// </summary>
 		public bool HasModel
 		{
-			get => Model != null;
+			get => StatesUtils.Get().EditingObject != null;
 		}
 				
-		/*
-		** Whether or not current model is placed.
-		*/
+		/// <summary>
+		/// Whether or not current model is placed.
+		/// </summary>
 		public bool IsModelPlaced
 		{
-			get => Model.IsPlaced();
-		}
-		
-		/*
-		** Current selected group from the group builder
-		*/
-		public GroupResource Group 
-		{
-			get => _Group;
-			set
+			get
 			{
-				_Group = value;
+				if( StatesUtils.Get().EditingObject is AsMeshInstance3D meshInstance3D ) 
+				{
+					return meshInstance3D.IsPlaced();				
+				}
+
+				return false;
 			}
 		}
 		
-		/*
-		** Current selected group from the group builder
-		*/
-		public AsGrouped3D GroupedObject 
-		{
-			get => _GroupedObject;
-			set
-			{
-				_GroupedObject = value;
-			}
-		}
-		
-		/*
-		** Whether or not a group is active
-		*/
-		public bool HasGroup
-		{
-			get => Group != null;
-		}
-				
+		/// <summary>
+		/// Default constructor for the NodeExplorer class.
+		/// </summary>	
 		public NodeExplorer()
 		{
 			// UpdateHandleCallable = new(this, "UpdateHandle");
@@ -148,19 +100,17 @@ namespace AssetSnap
 			// }
 		}
 		
-		/*
-		** Used to check whether or not HandleNode is in focus,
-		** and if not perform an action
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Used to check whether or not HandleNode is in focus,
+		/// and if not perform an action.
+		/// </summary>
 		protected void UpdateHandle()
 		{
-			if( EditorInterface.Singleton.GetInspector().GetEditedObject() == null && Model == null) 
+			if( EditorInterface.Singleton.GetInspector().GetEditedObject() == null && StatesUtils.Get().EditingObject == null) 
 			{
 				HandleNode = null;
 				
-				if( false == EditorPlugin.IsInstanceValid( ContextMenu ))
+				if( null == ExplorerUtils.Get().ContextMenu ) 
 				{
 					return;	
 				}
@@ -169,43 +119,27 @@ namespace AssetSnap
 			}
 		}
 		
-		/*
-		** Clears the current handle
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Clears the current handle.
+		/// </summary>
 		public void ClearHandle()
 		{
-			Model = null;
 			HandleNode = null;
 		}
 		
+		/// <summary>
+		/// Returns the update callable.
+		/// </summary>
+		/// <returns>The update callable.</returns>
 		public Callable UpdateCallable()
 		{
-			return (Callable)UpdateHandleCallable;
+			return (Callable)_UpdateHandleCallable;
 		}
 		
-		/*
-		** Checks if the update handle method is connected
-		**
-		** @return void
-		*/
-		protected bool IsUpdateHandleConnected() 
-		{
-			if (UpdateHandleCallable is Callable callable)
-			{
-				EditorInspector Inspector = EditorInterface.Singleton.GetInspector();
-				return Inspector.IsConnected(EditorInspector.SignalName.EditedObjectChanged, callable);
-			}
-			
-			return false;
-		}
-		
-		/*
-		** Fetches the current handle
-		**
-		** @return Node3D
-		*/
+		/// <summary>
+		/// Fetches the current handle.
+		/// </summary>
+		/// <returns>The current handle.</returns>
 		public Node3D GetHandle()
 		{
 			if( States.PlacingMode == GlobalStates.PlacingModeEnum.Model ) 
@@ -218,21 +152,14 @@ namespace AssetSnap
 			return States.GroupedObject;
 		}
 		
-		/*
-		** Checks if the current handle is
-		** that of a Model
-		**
-		** @return bool
-		*/
+		/// <summary>
+		/// Checks if the current handle is that of a Model.
+		/// </summary>
+		/// <returns>True if the current handle is a Model, false otherwise.</returns>
 		public bool HandleIsModel()
 		{
-			Node3D Handle = Model;
+			Node3D Handle = StatesUtils.Get().EditingObject;
 
-			if (Handle == null)
-			{
-				Handle = HandleNode as Node3D;
-			}
-			
 			if (Handle == null)
 			{
 				return false;
@@ -241,6 +168,20 @@ namespace AssetSnap
 			return Handle is AssetSnap.Front.Nodes.AsMeshInstance3D;
 		}
 		
+		/// <summary>
+		/// Checks if the update handle method is connected.
+		/// </summary>
+		/// <returns>True if the update handle method is connected, false otherwise.</returns>
+		protected bool _IsUpdateHandleConnected() 
+		{
+			if (_UpdateHandleCallable is Callable callable)
+			{
+				EditorInspector Inspector = EditorInterface.Singleton.GetInspector();
+				return Inspector.IsConnected(EditorInspector.SignalName.EditedObjectChanged, callable);
+			}
+			
+			return false;
+		}
 	}
 }
 #endif

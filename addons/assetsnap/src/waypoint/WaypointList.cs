@@ -21,68 +21,68 @@
 // SOFTWARE.
 
 #if TOOLS
+
+using System;
+using System.Collections.Generic;
+using AssetSnap.Front.Nodes;
+using Godot;
+
 namespace AssetSnap.Waypoint
 {
-	using System;
-	using System.Collections.Generic;
-	using AssetSnap.Front.Nodes;
-	using Godot;
-	
+	/// <summary>
+	/// Represents a list of waypoints.
+	/// </summary>
 	public class WaypointList
 	{
-		private BaseWaypoint[] Waypoints;
 		public delegate void CallableMethod(BaseWaypoint waypoint);
+		
+		private BaseWaypoint[] _Waypoints;
 
 		public WaypointList()
 		{
-			Waypoints = Array.Empty<BaseWaypoint>();
-		}
-		/*
-		** Adds a single waypoint
-		**
-		** @param Node3D _model
-		** @param Vector3 Origin
-		** @param Vector3 Rotation
-		** @param Vector3 Scale
-		** @return void
-		*/
-		public void Add(Node3D _model, Vector3 Origin, Vector3 Rotation, Vector3 Scale )
-		{
-			List<BaseWaypoint> _WaypointList = new List<BaseWaypoint>(Waypoints);
-			BaseWaypoint Waypoint = new( Origin, Rotation, Scale, _model );
-			_WaypointList.Add(Waypoint);
-			Waypoints = _WaypointList.ToArray();
+			_Waypoints = Array.Empty<BaseWaypoint>();
 		}
 		
-		/*
-		** Removes a single waypoint
-		**
-		** @param Node3D _model
-		** @param Vector3 Origin
-		** @param Vector3 Rotation
-		** @param Vector3 Scale
-		** @return void
-		*/
-		public void Remove(MeshInstance3D ModelInstance, Vector3 Origin)
+		/// <summary>
+		/// Adds a single waypoint to the list.
+		/// </summary>
+		/// <param name="_model">The 3D node representing the model associated with the waypoint.</param>
+		/// <param name="Origin">The origin of the waypoint.</param>
+		/// <param name="Rotation">The rotation of the waypoint.</param>
+		/// <param name="Scale">The scale of the waypoint.</param>
+		public void Add(Node3D _model, Vector3 Origin, Vector3 Rotation, Vector3 Scale)
 		{
-			for (int i = 0; i < Waypoints.Length; i++) 
+			List<BaseWaypoint> _WaypointList = new List<BaseWaypoint>(_Waypoints);
+			BaseWaypoint Waypoint = new(Origin, Rotation, Scale, _model);
+			_WaypointList.Add(Waypoint);
+			_Waypoints = _WaypointList.ToArray();
+		}
+
+		/// <summary>
+		/// Removes a single waypoint from the list.
+		/// </summary>
+		/// <param name="ModelInstance">The model instance associated with the waypoint to remove.</param>
+		/// <param name="Origin">The origin of the waypoint to remove.</param>
+		public void Remove(Node ModelInstance, Vector3 Origin)
+		{
+			for (int i = 0; i < _Waypoints.Length; i++)
 			{
 				bool state = true;
-				BaseWaypoint Point = Waypoints[i];
-				
-				if( EditorPlugin.IsInstanceValid(Point.GetModel()) && Point.GetModel().HasMeta("AsModel") ) 
+				BaseWaypoint Point = _Waypoints[i];
+
+				if (EditorPlugin.IsInstanceValid(Point.GetModel()) && Point.GetModel().HasMeta("AsModel"))
 				{
 					AsMeshInstance3D Model = Point.GetModel() as AssetSnap.Front.Nodes.AsMeshInstance3D;
-					
-					if( ModelInstance.HasMeta("AsModel")) 
+
+					if (ModelInstance.HasMeta("AsModel") && ModelInstance is AssetSnap.Front.Nodes.AsMeshInstance3D && null != Model)
 					{
 						AsMeshInstance3D _Model = ModelInstance as AssetSnap.Front.Nodes.AsMeshInstance3D;
-						if (Model.Mesh == _Model.Mesh) 
+						if (Model.Mesh != _Model.Mesh)
 						{
 							state = false;
 						}
 					}
-					else 
+					else if (ModelInstance is AssetSnap.Front.Nodes.AsMeshInstance3D && null != Model)
 					{
 						state = false;
 					}
@@ -91,43 +91,46 @@ namespace AssetSnap.Waypoint
 				{
 					state = false;
 				}
-				
-				if( false == EditorPlugin.IsInstanceValid(Point.GetModel()) || Point.GetOrigin() == Origin && state ) 
+
+				if (false == EditorPlugin.IsInstanceValid(Point.GetModel()) || Point.GetOrigin() == Origin && state)
 				{
-					List<BaseWaypoint> _SpawnPointsList = new List<BaseWaypoint>(Waypoints);
+					List<BaseWaypoint> _SpawnPointsList = new List<BaseWaypoint>(_Waypoints);
 					_SpawnPointsList.Remove(Point);
-					Waypoints = _SpawnPointsList.ToArray();
+					_Waypoints = _SpawnPointsList.ToArray();
 				}
 			}
 		}
-		
-		/*
-		** Updates a waypoint by it's origin
-		**
-		** @param string Type
-		** @param Variant Value
-		** @param Vector3 Where
-		** @return void
-		*/
-		public void Update(string Type, Variant Value, Vector3 Where ) 
+
+		/// <summary>
+		/// Updates a waypoint by its origin.
+		/// </summary>
+		/// <param name="Type">The type of update (e.g., "Scale").</param>
+		/// <param name="Value">The value of the update.</param>
+		/// <param name="Where">The origin of the waypoint to update.</param>
+		public void Update(string Type, Variant Value, Vector3 Where)
 		{
-			if( "Scale" == Type ) 
+			if ("Scale" == Type)
 			{
-				foreach( BaseWaypoint Waypoint in Waypoints ) 
+				foreach (BaseWaypoint Waypoint in _Waypoints)
 				{
-					if( Waypoint.GetOrigin() == Where ) 
+					if (Waypoint.GetOrigin() == Where)
 					{
 						Waypoint.SetScale((Vector3)Value);
 					}
 				}
 			}
 		}
-		
-		public bool Has( Node3D node ) 
+
+		/// <summary>
+		/// Checks if a given node is contained within any waypoint in the list.
+		/// </summary>
+		/// <param name="node">The node to check for.</param>
+		/// <returns>True if the node is contained within any waypoint; otherwise, false.</returns>
+		public bool Has(Node3D node)
 		{
-			foreach( BaseWaypoint Waypoint in Waypoints ) 
+			foreach (BaseWaypoint Waypoint in _Waypoints)
 			{
-				if( Waypoint.GetModel() == node ) 
+				if (Waypoint.GetModel() == node)
 				{
 					return true;
 				}
@@ -135,40 +138,45 @@ namespace AssetSnap.Waypoint
 
 			return false;
 		}
-		
-		public void Each( CallableMethod callback ) 
+
+		/// <summary>
+		/// Executes a callback method for each waypoint in the list.
+		/// </summary>
+		/// <param name="callback">The callback method to execute for each waypoint.</param>
+		public void Each(CallableMethod callback)
 		{
-			foreach( BaseWaypoint Waypoint in Waypoints ) 
+			foreach (BaseWaypoint Waypoint in _Waypoints)
 			{
-				if( EditorPlugin.IsInstanceValid( Waypoint.GetModel() ) ) 
+				if (EditorPlugin.IsInstanceValid(Waypoint.GetModel()))
 				{
-					callback(Waypoint);					
+					callback(Waypoint);
 				}
 				else
 				{
-					List<BaseWaypoint> _SpawnPointsList = new List<BaseWaypoint>(Waypoints);
+					List<BaseWaypoint> _SpawnPointsList = new List<BaseWaypoint>(_Waypoints);
 					_SpawnPointsList.Remove(Waypoint);
-					Waypoints = _SpawnPointsList.ToArray();
+					_Waypoints = _SpawnPointsList.ToArray();
 				}
-			} 
+			}
 		}
-		
-		/*
-		** Checks if any waypoints is available
-		**
-		** @return bool
-		*/
-		public bool IsEmpty() 
+
+		/// <summary>
+		/// Checks if the waypoint list is empty.
+		/// </summary>
+		/// <returns>True if the waypoint list is empty; otherwise, false.</returns>
+		public bool IsEmpty()
 		{
-			return Waypoints.Length == 0;
+			return _Waypoints.Length == 0;
 		}
-		
-		
+
+		/// <summary>
+		/// Clears the list of waypoints.
+		/// </summary>
 		public void _Exit()
 		{
-			if( Waypoints.Length != 0 ) 
+			if (_Waypoints.Length != 0)
 			{
-				Waypoints = Array.Empty<BaseWaypoint>();
+				_Waypoints = Array.Empty<BaseWaypoint>();
 			}
 		}
 	}

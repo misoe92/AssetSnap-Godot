@@ -20,233 +20,312 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace AssetSnap.Core 
+#if TOOLS
+
+using AssetSnap.Explorer;
+using AssetSnap.Front.Nodes;
+using AssetSnap.Instance.Input;
+using AssetSnap.States;
+using Godot;
+
+namespace AssetSnap.Core
 {
-	using AssetSnap.Front.Components;
-	using AssetSnap.Front.Nodes;
-	using AssetSnap.Instance.Input;
-	using AssetSnap.Library;
-	using Godot;
-	
-	public class CoreHandles : Core 
+	/// <summary>
+	/// Handles communication with the scene tree and performs actions depending on the current node in focus.
+	/// </summary>
+	public class CoreHandles : Core
 	{
-		/*
-		** Handles communication with the scene tree,
-		** Performs actions depending on the current node in focus
-		**
-		** @param GodotObject _object
-		** @return bool
-		*/
-		public bool Handle( GodotObject _object )
+		/// <summary>
+		/// Resets the current handle.
+		/// </summary>
+		public void ResetHandle()
 		{
-			if( null == _GlobalExplorer || null == _GlobalExplorer._Plugin || false == EditorPlugin.IsInstanceValid(_GlobalExplorer.ContextMenu) || null == _object ) 
+			StatesUtils.Get().EditingTitle = null;
+			StatesUtils.Get().EditingObject = null;
+			StatesUtils.Get().Group = null;
+			StatesUtils.Get().GroupedObject = null;
+		}
+		
+		/// <summary>
+		/// Handles communication with the scene tree and performs actions depending on the current node in focus.
+		/// </summary>
+		/// <param name="_object">The object in focus.</param>
+		/// <returns>True if handling was successful, otherwise false.</returns>
+		public bool Handle(GodotObject _object)
+		{
+			if (
+				null == ExplorerUtils.Get() ||
+				null == Plugin.Singleton ||
+				null == ExplorerUtils.Get().ContextMenu ||
+				null == _object
+			)
 			{
 				return true;
 			}
 			
-			// Check if context menu is shown
-			// if( false == _GlobalExplorer.ContextMenu.IsHidden() ) 
-			// {
-			// 	// If so, hide
-			// 	_GlobalExplorer.ContextMenu.Hide();
-			// }
-
-			if( _ShouldHandleModel(_object) ) 
+			if (_ShouldHandleModel(_object))
 			{
-				AssetSnap.Front.Nodes.AsMeshInstance3D AsMeshInstance = _ObjectToModel(_object);
-				// Handle the model we are working with
-				_HandleModel(AsMeshInstance);
+				if (_object is AsNode3D node3d)
+				{
+					_HandleNode(node3d);
+				}
+				else
+				{
+					AssetSnap.Front.Nodes.AsMeshInstance3D AsMeshInstance = _ObjectToModel(_object);
+					// Handle the model we are working with
+					_HandleModel(AsMeshInstance);
+				}
 			}
-			else if(_ShouldHandleGroup(_object) ) 
+			else if (_ShouldHandleGroup(_object))
 			{
 				AsGrouped3D AsGrouped = _ObjectToGrouped(_object);
 				// Handle the grouped node we are working with
 				_HandleGroup(AsGrouped);
 			}
-			else 
+			else
 			{
-				if( null != _GlobalExplorer.CurrentLibrary ) 
+				if (null != StatesUtils.Get().CurrentLibrary)
 				{
-					_GlobalExplorer.CurrentLibrary._LibrarySettings._LSEditing.SetText("None");
+					StatesUtils.Get().CurrentLibrary._LibrarySettings.Editing.SetText("None");
 				}
-				
-				if( null != _GlobalExplorer.Library && null != _GlobalExplorer.Library.Libraries ) 
+
+				if (null != ExplorerUtils.Get().Library && null != ExplorerUtils.Get().Library.Libraries)
 				{
 					// Goes through all libraries and resets it's data
-					foreach( Instance _Library in _GlobalExplorer.Library.Libraries ) 
+					foreach (Library.Instance _Library in ExplorerUtils.Get().Library.Libraries)
 					{
-						if( EditorPlugin.IsInstanceValid(_Library) && null != _Library._LibrarySettings ) 
+						if (EditorPlugin.IsInstanceValid(_Library) && null != _Library._LibrarySettings)
 						{
-							_Library._LibrarySettings.ClearAll();							
-							_Library._LibrarySettings._LSEditing.SetText("None");
+							_Library._LibrarySettings.ClearAll();
+							_Library._LibrarySettings.Editing.SetText("None");
 						}
 					}
 				}
-				
+
 				// Clear the node that is being handled
 				ResetHandle();
 			}
-			
+
 			return true;
 		}
-		
-		/*
-		** Handles the interaction with the model node
-		**
-		** @param AssetSnap.Front.Nodes.AsMeshInstance3D Node
-		** @return void
-		*/
-		private void _HandleModel( AssetSnap.Front.Nodes.AsMeshInstance3D _Node ) 
-		{
-			_GlobalExplorer.States.PlacingMode = GlobalStates.PlacingModeEnum.Model;
 
-			if( _GlobalExplorer.ContextMenu.IsHidden() ) 
+		/// <summary>
+		/// Handles the interaction with the model node.
+		/// </summary>
+		/// <param name="_Node">The 3D node.</param>
+		private void _HandleNode(AsNode3D _Node)
+		{
+			StatesUtils.Get().PlacingMode = GlobalStates.PlacingModeEnum.Model;
+
+			if (ExplorerUtils.Get().ContextMenu.IsHidden())
 			{
-				_GlobalExplorer.ContextMenu.Show();
+				ExplorerUtils.Get().ContextMenu.Show();
 			}
-			
-			if( _Node.IsPlaced() ) 
+
+			if (_Node.IsPlaced())
 			{
-				if( null != _GlobalExplorer.Library ) 
+				if (null != ExplorerUtils.Get().Library)
 				{
-					Library.Base LibraryBase = _GlobalExplorer.Library;
-					foreach( Library.Instance instance in LibraryBase.Libraries ) 
+					Library.Base LibraryBase = ExplorerUtils.Get().Library;
+					foreach (Library.Instance instance in LibraryBase.Libraries)
 					{
 						instance.ClearAllPanelState();
-						instance._LibrarySettings.ClearAll();							
-						instance._LibrarySettings._LSEditing.SetText("None");
+						instance._LibrarySettings.ClearAll();
+						instance._LibrarySettings.Editing.SetText("None");
 					}
-
-					_GlobalExplorer.Model = null;
 				}
-				_GlobalExplorer.States.EditingObject = _Node;
-				
-				if( false == _Node.HasLibraryName() ) 
+				StatesUtils.Get().EditingObject = _Node;
+
+				if (false == _Node.HasLibraryName())
 				{
 					return;
 				}
 
-				Library.Instance Library = _GlobalExplorer.GetLibraryByName(_Node.GetLibraryName());
-				
-				if( null == Library ) 
+				Library.Instance Library = ExplorerUtils.Get().GetLibraryByName(_Node.GetLibraryName());
+
+				if (null == Library)
 				{
 					GD.Print("Library was not found: ", _Node.GetLibraryName());
 				}
-				
-				_GlobalExplorer.BottomDock.SetTab(Library);
-				Library._LibrarySettings._LSEditing.SetText(_Node.Name);
-				
+
+				ExplorerUtils.Get().BottomDock.SetTab(Library);
+				Library._LibrarySettings.Editing.SetText(_Node.Name);
+
 				/** Update library settings **/
-				if( _Node.HasLibrarySettings() ) 
+				if (_Node.HasLibrarySettings())
 				{
-					HandleNodeLibrarySettings(_Node);
+					_HandleNodeLibrarySettings(_Node);
 				}
-				
+
 				// Check if drag add is currently active
-				if( _GlobalExplorer.InputDriver is DragAddInputDriver DraggableInputDriver ) 
+				if (ExplorerUtils.Get().InputDriver is DragAddInputDriver DraggableInputDriver)
 				{
 					DraggableInputDriver.CalculateObjectSize();
 				}
 			}
 		}
-		
-		/*
-		** Handles the interaction with the model node
-		**
-		** @param AssetSnap.Front.Nodes.AsMeshInstance3D Node
-		** @return void
-		*/
-		private void _HandleGroup( AsGrouped3D _Node ) 
-		{
-			_GlobalExplorer.States.PlacingMode = GlobalStates.PlacingModeEnum.Group;
-	
-			if( _GlobalExplorer.ContextMenu.IsHidden() ) 
-			{
-				_GlobalExplorer.ContextMenu.Show();
-			}
-			
-			if( _Node.IsPlaced() ) 
-			{
-				_GlobalExplorer.States.EditingObject = _Node;
-				_GlobalExplorer.States.GroupedObject = _Node;
-				_GlobalExplorer.States.Group = GD.Load<Resource>(_Node.GroupPath) as GroupResource;
-				_GlobalExplorer.BottomDock.SetTabByIndex(1);
 
-				_GlobalExplorer.GroupBuilder._Editor.GroupPath = _Node.GroupPath;
+		/// <summary>
+		/// Handles the interaction with the model node.
+		/// </summary>
+		/// <param name="_Node">The mesh instance node.</param>
+		private void _HandleModel(AssetSnap.Front.Nodes.AsMeshInstance3D _Node)
+		{
+			StatesUtils.Get().PlacingMode = GlobalStates.PlacingModeEnum.Model;
+
+			if (ExplorerUtils.Get().ContextMenu.IsHidden())
+			{
+				ExplorerUtils.Get().ContextMenu.Show();
+			}
+
+			if (_Node.IsPlaced())
+			{
+				if (null != ExplorerUtils.Get().Library)
+				{
+					Library.Base LibraryBase = ExplorerUtils.Get().Library;
+					foreach (Library.Instance instance in LibraryBase.Libraries)
+					{
+						instance.ClearAllPanelState();
+						instance._LibrarySettings.ClearAll();
+						instance._LibrarySettings.Editing.SetText("None");
+					}
+				}
+				StatesUtils.Get().EditingObject = _Node;
+
+				if (false == _Node.HasLibraryName())
+				{
+					return;
+				}
+
+				Library.Instance Library = ExplorerUtils.Get().GetLibraryByName(_Node.GetLibraryName());
+
+				if (null == Library)
+				{
+					GD.Print("Library was not found: ", _Node.GetLibraryName());
+				}
+
+				ExplorerUtils.Get().BottomDock.SetTab(Library);
+				Library._LibrarySettings.Editing.SetText(_Node.Name);
+
+				/** Update library settings **/
+				if (_Node.HasLibrarySettings())
+				{
+					_HandleNodeLibrarySettings(_Node);
+				}
+
+				// Check if drag add is currently active
+				if (ExplorerUtils.Get().InputDriver is DragAddInputDriver DraggableInputDriver)
+				{
+					DraggableInputDriver.CalculateObjectSize();
+				}
+			}
+			else
+			{
+				GD.PushWarning("Node is not placed");
+			}
+		}
+
+		/// <summary>
+		/// Handles the interaction with the grouped node.
+		/// </summary>
+		/// <param name="_Node">The grouped 3D node.</param>
+		private void _HandleGroup(AsGrouped3D _Node)
+		{
+			StatesUtils.Get().PlacingMode = GlobalStates.PlacingModeEnum.Group;
+
+			if (ExplorerUtils.Get().ContextMenu.IsHidden())
+			{
+				ExplorerUtils.Get().ContextMenu.Show();
+			}
+
+			if (_Node.IsPlaced())
+			{
+				StatesUtils.Get().EditingObject = _Node;
+				StatesUtils.Get().GroupedObject = _Node;
+				StatesUtils.Get().Group = GD.Load<Resource>(_Node.GroupPath) as GroupResource;
+				ExplorerUtils.Get().BottomDock.SetTabByIndex(1);
+
+				ExplorerUtils.Get().GroupBuilder._Editor.GroupPath = _Node.GroupPath;
+				ExplorerUtils.Get().GroupBuilder._Editor.GroupOptions._UpdateGroupOptions();
+				ExplorerUtils.Get().GroupBuilder._Sidebar.DoHide();
 				// _GlobalExplorer.GroupBuilder._Editor	
 				// Check if drag add is currently active
-				if( _GlobalExplorer.InputDriver is DragAddInputDriver DraggableInputDriver ) 
+				if (_GlobalExplorer.InputDriver is DragAddInputDriver DraggableInputDriver)
 				{
 					DraggableInputDriver.CalculateObjectSize();
 				}
 			}
 		}
-		
-		/*
-		** Updates the library settings of the current node being
-		** worked on.
-		**
-		** @param AssetSnap.Front.Nodes.AsMeshInstance3D _Node
-		** @return void
-		*/
-		private void HandleNodeLibrarySettings(AssetSnap.Front.Nodes.AsMeshInstance3D _Node)
+
+		/// <summary>
+		/// Updates the library settings of the current node being worked on.
+		/// </summary>
+		/// <param name="_Node">The node whose library settings need to be updated.</param>
+		private void _HandleNodeLibrarySettings(Node _Node)
 		{
-			foreach( ( string key, Variant value ) in _Node.GetSettings() ) 
+			if (_Node is AsNode3D node3d)
 			{
-				if( _GlobalExplorer.States.Has( key ) )
+				foreach ((string key, Variant value) in node3d.GetSettings())
 				{
-					_GlobalExplorer.States.Set(key, value);
+					if (StatesUtils.Get().Has(key))
+					{
+						StatesUtils.Get().Set(key, value);
+					}
+				}
+			}
+
+			if (_Node is AsMeshInstance3D meshInstance3D)
+			{
+				foreach ((string key, Variant value) in meshInstance3D.GetSettings())
+				{
+					if (StatesUtils.Get().Has(key))
+					{
+						StatesUtils.Get().Set(key, value);
+					}
 				}
 			}
 		}
-		
-		/*
-		** Checks if the given object is an model
-		**
-		** @param GodotObject _object
-		** @return bool
-		*/
+
+		/// <summary>
+		/// Checks if the given object is a model.
+		/// </summary>
+		/// <param name="_object">The object to check.</param>
+		/// <returns>True if the object is a model, otherwise false.</returns>
 		private bool _ShouldHandleModel(GodotObject _object)
 		{
-			return EditorPlugin.IsInstanceValid(_object) && _object is AsMeshInstance3D;
+			return EditorPlugin.IsInstanceValid(_object) && (_object is AsMeshInstance3D || _object is AsNode3D);
 		}
-			
-		/*
-		** Checks if the given object is an model
-		**
-		** @param GodotObject _object
-		** @return bool
-		*/
+
+		/// <summary>
+		/// Checks if the given object is a grouped node.
+		/// </summary>
+		/// <param name="_object">The object to check.</param>
+		/// <returns>True if the object is a grouped node, otherwise false.</returns>
 		private bool _ShouldHandleGroup(GodotObject _object)
 		{
-			return EditorPlugin.IsInstanceValid( _object ) && _object is AsGrouped3D;
+			return EditorPlugin.IsInstanceValid(_object) && _object is AsGrouped3D;
 		}
-		
-		/*
-		** Converts the given object to an model type
-		**
-		** @param GodotObject _object
-		** @return AssetSnap.Front.Nodes.AsMeshInstance3D
-		*/
+
+		/// <summary>
+		/// Converts the given object to a model type.
+		/// </summary>
+		/// <param name="_object">The object to convert.</param>
+		/// <returns>The converted model instance.</returns>
 		private AssetSnap.Front.Nodes.AsMeshInstance3D _ObjectToModel(GodotObject _object)
 		{
 			return _object as AssetSnap.Front.Nodes.AsMeshInstance3D;
 		}
-		
-		private AsGrouped3D _ObjectToGrouped(GodotObject _object) 
+
+		/// <summary>
+		/// Converts the given object to a grouped node.
+		/// </summary>
+		/// <param name="_object">The object to convert.</param>
+		/// <returns>The converted grouped instance.</returns>
+		private AsGrouped3D _ObjectToGrouped(GodotObject _object)
 		{
 			return _object as AsGrouped3D;
 		}
-		
-		/*
-		** Resets the current handle
-		*/
-		public void ResetHandle()
-		{
-			_GlobalExplorer.HandleNode = null;
-			_GlobalExplorer.States.EditingObject = null;
-			_GlobalExplorer.States.Group = null;
-			_GlobalExplorer.States.GroupedObject = null;
-		}
 	}
 }
+
+#endif

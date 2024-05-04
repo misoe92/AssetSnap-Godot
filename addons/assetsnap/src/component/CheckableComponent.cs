@@ -21,39 +21,44 @@
 // SOFTWARE.
 
 #if TOOLS
+
+using AssetSnap.Explorer;
+using AssetSnap.States;
+using Godot;
+
 namespace AssetSnap.Component
 {
-	using Godot;
-
+	/// <summary>
+	/// A component that provides functionality for checking the validity of certain conditions.
+	/// </summary>
 	[Tool]
 	public partial class CheckableComponent : LibraryComponent
 	{
+		/// <summary>
+        /// Checks if the component is currently valid.
+        /// </summary>
+        /// <returns>True if the component is valid, false otherwise.</returns>
 		public bool IsValid()
 		{
-			if(
-				null == GlobalExplorer.GetInstance() ||
-				null == GlobalExplorer.GetInstance().States
+			if (
+				null == ExplorerUtils.Get() ||
+				null == StatesUtils.Get()
 			)
 			{
 				return false;
 			}
-			
-			if( false == Initiated ) 
+
+			if (false == _Initiated)
 			{
 				return false;
 			}
-			
-			if( false == Trait<Checkable>().HasNodes() ) 
-			{
-				return false;
-			}
-			
-			if(
+
+			if (
 				null == Trait<Checkable>() ||
 				false == IsInstanceValid(Trait<Checkable>()) ||
 				false == HasTrait<Checkable>() ||
 				Trait<Checkable>().IsDisposed()
-			) 
+			)
 			{
 				return false;
 			}
@@ -62,4 +67,5 @@ namespace AssetSnap.Component
 		}
 	}
 }
+
 #endif

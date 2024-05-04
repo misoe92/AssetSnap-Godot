@@ -20,239 +20,255 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using AssetSnap.Explorer;
+using AssetSnap.Front.Components;
+using Godot;
+
 namespace AssetSnap.Library
 {
-	using System;
-	using System.Collections.Generic;
-	using AssetSnap.Front.Components;
-	using Godot;
-	
+ 	/// <summary>
+	/// Base class for managing libraries.
+	/// </summary>
 	[Tool]
-	public partial class Base : Node
+	public partial class Base : Node, ISerializationListener
 	{
-		private GlobalExplorer _GlobalExplorer;
+		[Export]
+		public Godot.Collections.Array<GodotObject> _Libraries = new();
 		
-		private Instance[] _Libraries = Array.Empty<Instance>();
-
-		private static Base _Instance;
-		
-		public static Base GetInstance()
+		/// <summary>
+		/// Gets the singleton instance of the Base class.
+		/// </summary>
+		public static Base Singleton
 		{
-			if( null == _Instance ) 
+			get
 			{
-				_Instance = new()
-				{
-					Name = "AssetSnapLibraries",
-				};
-			}
+				// if (_Instance == null)
+				// {
+				// 	_Instance = new();
+				// }
 
-			return _Instance;
+				return _Instance;
+			}
 		}
 		
-		public Instance[] Libraries 
+		/// <summary>
+		/// Gets the array of libraries.
+		/// </summary>
+		public Godot.Collections.Array<GodotObject> Libraries
 		{
 			get => _Libraries;
 		}
 		
+		private static Base _Instance;
+
+		/// <summary>
+		/// Constructor for the Base class.
+		/// </summary>
+		public Base()
+		{
+			Name = "LibraryBase";
+			_Instance = this;
+		}
+		
+		/// <summary>
+		/// This method is called before the object is serialized.
+		/// </summary>
+		public void OnBeforeSerialize()
+		{
+			//
+		}
+
+		/// <summary>
+		/// This method is called after the object has been deserialized.
+		/// </summary>
+		public void OnAfterDeserialize()
+		{
+			_Instance = this;
+		}
+
+		/// <summary>
+		/// Initializes the libraries.
+		/// </summary>
 		public void Initialize()
 		{
-			_GlobalExplorer = GlobalExplorer.GetInstance();
-			
-			/** Initialize libraries **/
-			if( _GlobalExplorer.Settings.FolderCount != 0 ) 
+			if (Libraries.Count > 0)
 			{
-				string[] Folders = _GlobalExplorer.Settings.Folders; 
-				
-				for( int i = 0; i < _GlobalExplorer.Settings.FolderCount; i++)  
+				int MaxCount = Libraries.Count;
+				for (int i = MaxCount - 1; i >= 0; i--)
+				{
+					if (Libraries.Count > i)
+					{
+						GodotObject instance = Libraries[i];
+						if (IsInstanceValid(instance) && instance is Instance finalInstance)
+						{
+							RemoveLibrary(finalInstance);
+						}
+
+						_Libraries.Remove(instance);
+					}
+				}
+			}
+
+			/** Initialize libraries **/
+			if (ExplorerUtils.Get().Settings.FolderCount != 0)
+			{
+				string[] Folders = ExplorerUtils.Get().Settings.Folders;
+
+				for (int i = 0; i < ExplorerUtils.Get().Settings.FolderCount; i++)
 				{
 					string Folder = Folders[i];
-					_GlobalExplorer.Library.New(_GlobalExplorer.BottomDock, Folder, i); 
+					New(ExplorerUtils.Get()._Plugin.GetTabContainer(), Folder, i);
 				}
-			} 
+			}
 		}
-		
-		/*
-		** Creates a new instance of Library
-		**
-		** @param TabContainer _Container
-		** @param string _Folder
-		** @return void
-		*/
-		public void New( BottomDock.Base Dock,  string _Folder, int index )
+
+		/// <summary>
+		/// Creates a new instance of Library.
+		/// </summary>
+		/// <param name="Dock">The tab container to dock.</param>
+		/// <param name="_Folder">The folder path.</param>
+		/// <param name="index">The index.</param>
+		public void New(TabContainer Dock, string _Folder, int index)
 		{
-			if( false == Is_GlobalExplorerValid() ) 
+			if (false == _IsGlobalExplorerValid())
 			{
 				return;
 			}
-			
+
 			Instance _Base = new()
 			{
-				Container = Dock.Container,
 				Folder = _Folder,
 				Index = index,
+				Dock = Dock,
 			};
-
-			AddChild(_Base);
- 
-			_Base.Initialize(); 
 			
-			List<Instance> _LibrariesList = new(_Libraries)
-			{
-				_Base
-			};
+			_Libraries.Add(_Base);
 
-			_Libraries = _LibrariesList.ToArray();
+			_Base.Name = _Base.FileName.Capitalize();
+
+			_Base.Initialize();
 		}
 		
-		/*
-		** Refreshes current libraries
-		**
-		** @param TabContainer _Container
-		*/
-		public void Refresh(BottomDock.Base Dock)
+		/// <summary>
+		/// Removes the specified library from the collection.
+		/// </summary>
+		/// <param name="library">The library instance to remove.</param>
+		public void RemoveLibrary(Instance library)
 		{
-			if( false == Is_GlobalExplorerValid() ) 
+			if (_Libraries.Count != 0)
 			{
-				return;
-			}
-			
-			// Resets current settings
-			_GlobalExplorer.Settings.Reset();
-
-			if( HasFolders() ) 
-			{
-				string[] Folders = _GlobalExplorer.Settings.Folders;
-				
-				for( int i = 0; i < _GlobalExplorer.Settings.FolderCount; i++) 
-				{
-					string Folder = Folders[i];
-					bool exist = false;
-					 
-					foreach(Instance Library in _Libraries ) 
-					{ 
-						if( Library.Folder == Folder ) 
-						{
-							exist = true;
-						}  
-					}
-					 
-					if( false == exist ) 
-					{
-						New(Dock, Folder, i);
-					}
-				}
-			} 
-			
-			if( HasLibraryListing() ) 
-			{
-				LibrariesListing _LibrariesListing = GetLibraryListing();
-				_LibrariesListing.ForceUpdate();
-			}
-			
-			RebindSettingsContainer();
-		}
-		
-		/*
-		** Rebinds the settings container to the bottom dock
-		**
-		** @return LibrariesListing
-		*/  
-		private void RebindSettingsContainer()
-		{
-			_GlobalExplorer.Settings.InitializeContainer();
-			_GlobalExplorer.Settings.Container.Name = "Settings";
-			_GlobalExplorer.BottomDock.Add(_GlobalExplorer.Settings.Container);
-		}
-		
-		public void RemoveLibrary( string FolderPath )
-		{
-			List<Library.Instance> list = new(_Libraries);
-			
-			foreach(Instance Library in _Libraries ) 
-			{
-				if( Library.Folder == FolderPath ) 
-				{
-					list.Remove(Library);
-					
-					if( null != Library.GetParent() && IsInstanceValid(Library.GetParent()) ) 
-					{
-						Library.GetParent().RemoveChild(Library);
-					}
-					Library.QueueFree();
-				}
+				library.Clear();
+				library.GetParent().RemoveChild(library);
+				library.QueueFree();
 			}
 		}
-		
+
+		/// <summary>
+		/// Resets all libraries in the collection.
+		/// </summary>
 		public void Reset()
 		{
-			foreach(Instance Library in _Libraries ) 
+			foreach (Instance Library in _Libraries)
 			{
 				Library.ClearAllPanelState();
 				Library._LibrarySettings.ClearAll();
 			}
 		}
-		
-		/*
-		** Get library listing
-		**
-		** @return LibrariesListing
-		*/
-		private LibrariesListing GetLibraryListing()
+
+		/// <summary>
+		/// Checks if there is already a library with the specified folder path.
+		/// </summary>
+		/// <param name="Folder">The folder path to check.</param>
+		/// <returns>True if a library with the specified folder path exists; otherwise, false.</returns>
+		private bool _AlreadyHaveFolder(string Folder)
 		{
-			LibrariesListing _LibrariesListing = _GlobalExplorer.Components.Single<LibrariesListing>();
+			foreach (Library.Instance instance in _Libraries)
+			{
+				if (Folder == instance.Folder)
+				{
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		/// <summary>
+		/// Cleans up an old library with the specified folder path.
+		/// </summary>
+		/// <param name="Folder">The folder path of the library to clean up.</param>
+		/// <returns>True if an old library was cleaned up; otherwise, false.</returns>
+		private bool _CleanOldLibrary(string Folder)
+		{
+			foreach (Library.Instance instance in _Libraries)
+			{
+				if (Folder == instance.Folder)
+				{
+					instance.Clear();
+
+					instance.GetParent().RemoveChild(instance);
+					instance.QueueFree();
+
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		/// <summary>
+		/// Rebinds the settings container to the bottom dock.
+		/// </summary>
+		private void _RebindSettingsContainer()
+		{
+			ExplorerUtils.Get().Settings.InitializeContainer();
+			if (EditorPlugin.IsInstanceValid(ExplorerUtils.Get().Settings.Container))
+			{
+				ExplorerUtils.Get().Settings.Container.Name = "Settings";
+				ExplorerUtils.Get().BottomDock.Add(ExplorerUtils.Get().Settings.Container);
+			}
+		}
+
+		/// <summary>
+		/// Gets the library listing component.
+		/// </summary>
+		/// <returns>The library listing component.</returns>
+		private LibrariesListing _GetLibraryListing()
+		{
+			LibrariesListing _LibrariesListing = ExplorerUtils.Get().Components.Single<LibrariesListing>();
 			return _LibrariesListing;
 		}
-		
-		/*
-		** Checks if there are ny folders founds
-		*/
-		private bool HasFolders()
+
+		/// <summary>
+		/// Checks if there are any folders found.
+		/// </summary>
+		/// <returns>True if folders are found; otherwise, false.</returns>
+		private bool _HasFolders()
 		{
-			return _GlobalExplorer.Settings.FolderCount != 0;
+			return ExplorerUtils.Get().Settings.FolderCount != 0;
 		}
-						
-		/*
-		** Checks if the library listing exists
-		**
-		** @return bool
-		*/
-		private bool HasLibraryListing()
+
+		/// <summary>
+		/// Checks if the library listing exists.
+		/// </summary>
+		/// <returns>True if the library listing exists; otherwise, false.</returns>
+		private bool _HasLibraryListing()
 		{
-			LibrariesListing _LibrariesListing = _GlobalExplorer.Components.Single<LibrariesListing>();
+			LibrariesListing _LibrariesListing = ExplorerUtils.Get().Components.Single<LibrariesListing>();
 			return null != _LibrariesListing;
 		}
-		
-		/*
-		** Checks if the global class GlobalExplorer reference is
-		** available
-		**
-		** @return bool
-		*/
-		private bool Is_GlobalExplorerValid()
-		{
-			return null != _GlobalExplorer && null != _GlobalExplorer.Settings;
-		}
 
-		public override void _ExitTree()
+		/// <summary>
+		/// Checks if the global class GlobalExplorer reference is available.
+		/// </summary>
+		/// <returns>True if GlobalExplorer is valid; otherwise, false.</returns>
+		private bool _IsGlobalExplorerValid()
 		{
-			for( int i = 0; i < _Libraries.Length; i++ ) 
-			{
-				if( null != _Libraries[i] && IsInstanceValid( _Libraries[i] ) )
-				{
-					if( null != _Libraries[i].GetParent() && IsInstanceValid(_Libraries[i].GetParent())) 
-					{
-						_Libraries[i].GetParent().RemoveChild(_Libraries[i]);
-					}
-					
-					_Libraries[i].QueueFree();
-				} 
-			}
-			
-			_Libraries = Array.Empty<Instance>();
-			_GlobalExplorer = null;
-			_Instance = null; 
-
-			base._ExitTree();
+			return ExplorerUtils.IsValid();
 		}
 	}
 }
+
+#endif
