@@ -20,19 +20,22 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using AssetSnap.Component;
+using Godot;
+	
 namespace AssetSnap.Front.Components.Library
 {
-	using AssetSnap.Component;
-	using Godot;
-
+	/// <summary>
+    /// Represents the body component of the library.
+    /// </summary>
 	[Tool]
 	public partial class Body : LibraryComponent
 	{
-		/*
-		** Constructor of component
-		** 
-		** @return void
-		*/
+		/// <summary>
+        /// Constructor of the Body component.
+        /// </summary>
 		public Body()
 		{
 			Name = "LibraryBody";
@@ -45,11 +48,9 @@ namespace AssetSnap.Front.Components.Library
 			//_include = false;
 		}
 		
-		/*
-		** Initialization of component
-		** 
-		** @return void
-		*/
+		/// <summary>
+        /// Initializes the Body component.
+        /// </summary>
 		public override void Initialize()
 		{
 			base.Initialize();
@@ -85,11 +86,10 @@ namespace AssetSnap.Front.Components.Library
 			// containerTwo.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
 		}
 			
-		/*
-		** Fetches the left inner container
-		**
-		** @return VBoxContainer
-		*/
+		/// <summary>
+        /// Fetches the left inner container.
+        /// </summary>
+        /// <returns>The left inner container as a VBoxContainer.</returns>
 		public Container GetLeftInnerContainer() 
 		{
 			return Trait<Containerable>()
@@ -97,11 +97,10 @@ namespace AssetSnap.Front.Components.Library
 					.GetInnerContainer(0) as Container;
 		}
 		
-		/*
-		** Fetches the right inner container
-		**
-		** @return VBoxContainer
-		*/
+		/// <summary>
+        /// Fetches the right inner container.
+        /// </summary>
+        /// <returns>The right inner container as a VBoxContainer.</returns>
 		public Container GetRightInnerContainer() 
 		{
 			return Trait<Containerable>()
@@ -110,3 +109,5 @@ namespace AssetSnap.Front.Components.Library
 		} 
 	}
 }
+
+#endif

@@ -20,11 +20,16 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using AssetSnap.Component;
+using Godot;
+
 namespace AssetSnap.Front.Components.Library.Sidebar
 {
-	using AssetSnap.Component;
-	using Godot;
-
+	/// <summary>
+    /// Represents the title component for collision shapes in the library sidebar.
+    /// </summary>
 	public partial class CollisionTitle : LibraryComponent
 	{
 		private readonly string _MainTitle = "Collision shapes";
@@ -34,22 +39,18 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		private VBoxContainer _InnerContainer;
 		private Label _Label;
 
-		/*
-		** Constructor of component
-		**
-		** @return void
-		*/
+		/// <summary>
+        /// Constructor for the CollisionTitle component.
+        /// </summary>
 		public CollisionTitle()
 		{
 			Name = "LSCollisionTitle";
 			// _include = false;
 		}
 		
-		/*
-		** Initialization of component
-		**
-		** @return void
-		*/
+		/// <summary>
+        /// Initializes the CollisionTitle component.
+        /// </summary>
 		public override void Initialize()
 		{
 			base.Initialize();
@@ -75,3 +76,5 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		}
 	}
 }
+
+#endif

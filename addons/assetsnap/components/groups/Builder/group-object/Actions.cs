@@ -20,14 +20,22 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using AssetSnap.Component;
+using Godot;
+
 namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 {
-	using AssetSnap.Component;
-	using Godot;
-
+	/// <summary>
+	/// Component handling actions for group objects in the Groups Builder.
+	/// </summary>
 	[Tool]
 	public partial class Actions : GroupObjectComponent
 	{
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Actions"/> class.
+		/// </summary>
 		public Actions()
 		{
 			Name = "GroupsBuilderGroupObjectActions";
@@ -43,6 +51,9 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 			SizeFlagsVertical = Control.SizeFlags.ExpandFill;
 		}
 
+		/// <summary>
+		/// Initializes fields required for the Actions component.
+		/// </summary>
 		protected override void _InitializeFields()
 		{
 			Trait<Containerable>()
@@ -83,6 +94,9 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 				.Instantiate();
 		}
 
+		/// <summary>
+		/// Finalizes the initialization of fields for the Actions component.
+		/// </summary>
 		protected override void _FinalizeFields()
 		{
 			Trait<Buttonable>()
@@ -117,14 +131,22 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 				);
 		}
 
+		/// <summary>
+		/// Handles the action when an object entry is removed.
+		/// </summary>
 		private void _OnRemoveObjectEntry()
 		{
 			GlobalExplorer.GetInstance().GroupBuilder._Editor.RemoveMeshInGroup(Index, Path);
 		}
 
+		/// <summary>
+        /// Handles the action when an object entry is duplicated.
+        /// </summary>
 		private void _OnDuplicateObjectEntry()
 		{
 			GlobalExplorer.GetInstance().GroupBuilder._Editor.DuplicateMeshInGroup(Index);
 		}
 	}
 }
+
+#endif

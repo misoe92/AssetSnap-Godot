@@ -58,37 +58,28 @@ namespace AssetSnap.Trait
 
 		protected bool UsePaddingContainer = true;
 
-		/*
-		** Public Methods
-		*/
-
-		/*
-		** Shows the current container
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Shows the current container.
+		/// </summary>
 		public void Show()
 		{
 			Dependencies[TraitName + "_MarginContainer"].As<MarginContainer>().Visible = true;
 		}
 
-		/*
-		** Hides the current container
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Hides the current container.
+		/// </summary>
 		public void Hide()
 		{
 			Dependencies[TraitName + "_MarginContainer"].As<MarginContainer>().Visible = false;
 		}
 
-		/*
-		** Selects an placed container in the
-		** nodes array by index
-		**
-		** @param int index
-		** @return Containerable
-		*/
+		/// <summary>
+		/// Selects a placed container in the nodes array by index.
+		/// </summary>
+		/// <param name="index">The index of the container.</param>
+		/// <param name="debug">Optional parameter to enable debugging.</param>
+		/// <returns>The selected container.</returns>
 		public override ContainerTrait Select(int index, bool debug = false)
 		{
 			base._Select(index, debug);
@@ -110,13 +101,11 @@ namespace AssetSnap.Trait
 			return this;
 		}
 
-		/*
-		** Selects an placed container in the
-		** nodes array by name
-		**
-		** @param string name
-		** @return Containerable
-		*/
+		/// <summary>
+		/// Selects a placed container in the nodes array by name.
+		/// </summary>
+		/// <param name="name">The name of the container to select.</param>
+		/// <returns>The selected container.</returns>
 		public virtual ContainerTrait SelectByName(string name)
 		{
 			foreach (Container container in Nodes)
@@ -130,12 +119,11 @@ namespace AssetSnap.Trait
 			return this;
 		}
 
-		/*
-		** Sets the layout of the container
-		**
-		** @param ContainerLayout layout
-		** @return Containerable
-		*/
+		/// <summary>
+		/// Sets the layout of the container.
+		/// </summary>
+		/// <param name="layout">The layout to set.</param>
+		/// <returns>The container with the updated layout.</returns>
 		public virtual ContainerTrait SetLayout(ContainerLayout layout)
 		{
 			Layout = layout;
@@ -143,6 +131,11 @@ namespace AssetSnap.Trait
 			return this;
 		}
 
+		/// <summary>
+		/// Sets the horizontal size flag of the container.
+		/// </summary>
+		/// <param name="flag">The size flag to set.</param>
+		/// <returns>The container with the updated size flag.</returns>
 		public virtual ContainerTrait SetContainerHorizontalSizeFlag(Control.SizeFlags flag)
 		{
 			ContainerHorizontalSizeFlag = flag;
@@ -150,13 +143,11 @@ namespace AssetSnap.Trait
 			return this;
 		}
 
-		/*
-		** Sets the visibility state of the
-		** currently chosen container
-		**
-		** @param bool state
-		** @return Containerable
-		*/
+		/// <summary>
+		/// Sets the visibility state of the currently chosen container.
+		/// </summary>
+		/// <param name="state">The visibility state to set.</param>
+		/// <returns>The container with the updated visibility state.</returns>
 		public virtual ContainerTrait SetVisible(bool state)
 		{
 			Visible = state;
@@ -172,12 +163,11 @@ namespace AssetSnap.Trait
 			return this;
 		}
 
-		/*
-		** Toggles the visibility state of the
-		** currently chosen container
-		**
-		** @return Containerable
-		*/
+		/// <summary>
+		/// Toggles the visibility state of the currently chosen container.
+		/// </summary>
+		/// <param name="debug">Optional parameter to enable debugging.</param>
+		/// <returns>The container with the toggled visibility state.</returns>
 		public virtual ContainerTrait ToggleVisible( bool debug = false)
 		{
 			Visible = !Visible;
@@ -204,30 +194,33 @@ namespace AssetSnap.Trait
 			return this;
 		}
 
-		/*
-		** Sets the orientation of the container
-		**
-		** @param ContainerOrientation orientation
-		** @return Containerable
-		*/
+		/// <summary>
+		/// Sets the orientation of the container.
+		/// </summary>
+		/// <param name="orientation">The orientation to set.</param>
+		/// <returns>The container with the updated orientation.</returns>
 		public virtual ContainerTrait SetOrientation(ContainerOrientation orientation)
 		{
 			Orientation = orientation;
 			return this;
 		}
 
+		/// <summary>
+		/// Sets the separation of the containers.
+		/// </summary>
+		/// <param name="seperation">The separation value to set.</param>
+		/// <returns>The container with the updated separation.</returns>
 		public virtual ContainerTrait SetSeparation(int seperation)
 		{
 			Seperation = seperation;
 			return this;
 		}
 
-		/*
-		** Sets the inner orientation of the container
-		**
-		** @param ContainerOrientation orientation
-		** @return Containerable
-		*/
+		/// <summary>
+		/// Sets the inner orientation of the container.
+		/// </summary>
+		/// <param name="orientation">The inner orientation to set.</param>
+		/// <returns>The container with the updated inner orientation.</returns>
 		public virtual ContainerTrait SetInnerOrientation(ContainerOrientation orientation)
 		{
 			InnerOrientation = orientation;
@@ -235,14 +228,12 @@ namespace AssetSnap.Trait
 		}
 
 
-		/*
-		** Sets margin values for 
-		** the currently chosen container
-		**
-		** @param int value
-		** @param string side
-		** @return Containerable
-		*/
+		/// <summary>
+		/// Sets margin values for the currently chosen container.
+		/// </summary>
+		/// <param name="value">The value of the margin.</param>
+		/// <param name="side">The side of the margin (optional).</param>
+		/// <returns>The container with the updated margin values.</returns>
 		public virtual ContainerTrait SetMargin(int value, string side = "")
 		{
 			_SetMargin(value, side);
@@ -268,14 +259,12 @@ namespace AssetSnap.Trait
 			return this;
 		}
 
-		/*
-		** Sets padding values for 
-		** the currently chosen container
-		**
-		** @param int value
-		** @param string side
-		** @return Containerable
-		*/
+		/// <summary>
+		/// Sets padding values for the currently chosen container.
+		/// </summary>
+		/// <param name="value">The value of the padding.</param>
+		/// <param name="side">The side of the padding (optional).</param>
+		/// <returns>The container with the updated padding values.</returns>
 		public virtual ContainerTrait SetPadding(int value, string side = "")
 		{
 			_SetPadding(value, side);
@@ -301,10 +290,10 @@ namespace AssetSnap.Trait
 			return this;
 		}
 
-		/*
-		** Getter Methods
-		*/
-
+		/// <summary>
+		/// Gets the parent container of the currently chosen container.
+		/// </summary>
+		/// <returns>The parent container.</returns>
 		public virtual Node GetParentContainer()
 		{
 			if (false != Dependencies.ContainsKey(TraitName + "_MarginContainer"))
@@ -316,12 +305,10 @@ namespace AssetSnap.Trait
 			return null;
 		}
 
-		/*
-		** Returns the outer container
-		** of the container layout
-		**
-		** @return Container
-		*/
+		/// <summary>
+		/// Returns the outer container of the container layout.
+		/// </summary>
+		/// <returns>The outer container.</returns>
 		public virtual Container GetOuterContainer()
 		{
 			if (false != Dependencies.ContainsKey(TraitName + "_InnerContainer"))
@@ -333,13 +320,11 @@ namespace AssetSnap.Trait
 			return null;
 		}
 
-		/*
-		** Returns a inner container
-		** depending on a specified index
-		**
-		** @param int(0) index
-		** @return Container
-		*/
+		/// <summary>
+		/// Returns an inner container depending on a specified index.
+		/// </summary>
+		/// <param name="index">The index of the inner container.</param>
+		/// <returns>The inner container.</returns>
 		public virtual Container GetInnerContainer(int index)
 		{
 			if (null == Dependencies || Dependencies.Count == 0)
@@ -364,15 +349,11 @@ namespace AssetSnap.Trait
 			return null;
 		}
 
-		/*
-		** Booleans
-		*/
-
-		/*
-		** Checks if the container is visible
-		**
-		** @return bool
-		*/
+		/// <summary>
+		/// Checks if the container is visible.
+		/// </summary>
+		/// <param name="debug">Optional parameter to enable debugging.</param>
+		/// <returns>True if the container is visible; otherwise, false.</returns>
 		public virtual bool IsVisible( bool debug = false )
 		{
 			if (false != Dependencies.ContainsKey(TraitName + "_MarginContainer"))
@@ -392,9 +373,10 @@ namespace AssetSnap.Trait
 			return false;
 		}
 
-		/*
-		** Protected
-		*/
+		/// <summary>
+		/// Instantiates the container trait.
+		/// </summary>
+		/// <returns>The instantiated container trait.</returns>
 		public virtual ContainerTrait Instantiate()
 		{
 			int ColumnCount = (int)Layout + 1;
@@ -500,12 +482,9 @@ namespace AssetSnap.Trait
 			return this;
 		}
 
-		/*
-		** Resets the trait to
-		** a cleared state
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Resets the trait to a cleared state.
+		/// </summary>
 		protected virtual void Reset()
 		{
 			Layout = ContainerLayout.OneColumn;

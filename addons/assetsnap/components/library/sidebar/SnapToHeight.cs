@@ -20,12 +20,17 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using AssetSnap.Component;
+using AssetSnap.States;
+using Godot;
+
 namespace AssetSnap.Front.Components.Library.Sidebar
 {
-	using AssetSnap.Component;
-	using AssetSnap.States;
-	using Godot;
-
+	/// <summary>
+	/// Partial class representing the SnapToHeight component.
+	/// </summary>
 	[Tool]
 	public partial class SnapToHeight : LSSnapComponent
 	{
@@ -39,11 +44,9 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		private readonly string _NormalsTooltip = "Will align the object with the normals of the snap point, rotating it to match the target rotation";
 		private readonly string _SpinBoxTooltip = "Sets the value on the Y axis that the object will snap to";
 
-		/*
-		** Constructor of the component
-		** 
-		** @return void
-		*/
+		/// <summary>
+		/// Constructor of the SnapToHeight component.
+		/// </summary>
 		public SnapToHeight()
 		{
 			Name = "LSSnapToHeight";
@@ -58,11 +61,9 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			//_include = false;
 		}
 
-		/*
-		** Initializes the component
-		** 
-		** @return void
-		*/
+		/// <summary>
+		/// Initializes the SnapToHeight component.
+		/// </summary>
 		public override void Initialize()
 		{
 			base.Initialize();
@@ -76,6 +77,10 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			Plugin.GetInstance().StatesChanged += (Godot.Collections.Array data) => { MaybeUpdateValue(data); };
 		}
 
+		/// <summary>
+        /// Handles updates to the component based on external changes.
+        /// </summary>
+        /// <param name="data">Data related to the update.</param>
 		public override void MaybeUpdateValue(Godot.Collections.Array data)
 		{
 			if (data[0].As<string>() == "SnapToHeight" || data[0].As<string>() == "SnapToHeightValue")
@@ -99,13 +104,10 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			}
 		}
 
-		/*
-		** Initializes the Checkbox that
-		** holds the Enabled/Disabled
-		** state of the component
-		** 
-		** @return void
-		*/
+		/// <summary>
+        /// Initializes the checkbox UI element for SnapToHeight.
+        /// </summary>
+        /// <param name="BoxContainer">Container where the checkbox will be added.</param>
 		private void _InitializeCheckBox(VBoxContainer BoxContainer)
 		{
 			Callable _callable = Callable.From(() => { _OnCheckboxPressed(); });
@@ -125,12 +127,10 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 				.AddToContainer(BoxContainer);
 		}
 
-		/*
-		** Initializes the Checkbox that
-		** holds the state of using glue
-		** 
-		** @return void
-		*/
+		/// <summary>
+        /// Initializes the glue checkbox UI element for SnapToHeight.
+        /// </summary>
+        /// <param name="BoxContainer">Container where the checkbox will be added.</param>
 		private void _InitializeGlue(VBoxContainer BoxContainer)
 		{
 			Callable _callable = Callable.From(() => { _OnGlueCheckboxPressed(); });
@@ -150,12 +150,10 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 				.AddToContainer(BoxContainer);
 		}
 
-		/*
-		** Initializes SpinBox that
-		** holds the current SnapHeight
-		** 
-		** @return void
-		*/
+		/// <summary>
+        /// Initializes the spin box UI element for SnapToHeight.
+        /// </summary>
+        /// <param name="BoxContainer">Container where the spin box will be added.</param>
 		private void _InitializeSpinBox(VBoxContainer BoxContainer)
 		{
 			Callable _callable = Callable.From((double value) => { _OnSpinBoxValueChange((float)value); });
@@ -177,14 +175,9 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 				.AddToContainer(BoxContainer);
 		}
 
-
-
-		/*
-		** Updates spawn settings and the internal
-		** value for snapping to the Y Axis
-		** 
-		** @return void
-		*/
+		/// <summary>
+        /// Handles the action when the main checkbox is pressed.
+        /// </summary>
 		private void _OnCheckboxPressed()
 		{
 			bool state = false;
@@ -204,12 +197,9 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			UpdateSpawnSettings("SnapToHeightGlue", state);
 		}
 
-		/*
-		** Updates spawn settings and the internal
-		** value for using glue
-		** 
-		** @return void
-		*/
+		/// <summary>
+        /// Handles the action when the glue checkbox is pressed.
+        /// </summary>
 		private void _OnGlueCheckboxPressed()
 		{
 			bool state = false;
@@ -227,12 +217,10 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			UpdateSpawnSettings("SnapToHeightGlue", state);
 		}
 
-		/*
-		** Updates SpawnSettings on the model
-		** when component value is changed
-		** 
-		** @return void
-		*/
+		/// <summary>
+        /// Handles the action when the value of the spin box changes.
+        /// </summary>
+        /// <param name="value">The new value of the spin box.</param>
 		private void _OnSpinBoxValueChange(float value)
 		{
 			_value = value;
@@ -241,13 +229,9 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			UpdateSpawnSettings("SnapToHeightValue", state);
 		}
 
-
-		/*
-		** Syncronizes it's value to a global
-		** central state controller
-		**
-		** @return void
-		*/
+		/// <summary>
+        /// Synchronizes the state of the SnapToHeight component with the global state controller.
+        /// </summary>
 		public override void Sync()
 		{
 			if (false == IsValid())
@@ -261,3 +245,5 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		}
 	}
 }
+
+#endif

@@ -20,15 +20,23 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using AssetSnap.Component;
+using AssetSnap.Static;
+using Godot;
+
 namespace AssetSnap.Front.Components.Groups.Builder.GroupObject.AdvancedContainers
 {
-	using AssetSnap.Component;
-	using AssetSnap.Static;
-	using Godot;
-
+	/// <summary>
+	/// Represents a component for managing the level of details in an advanced group object.
+	/// </summary>
 	[Tool]
 	public partial class LevelOfDetails : AdvancedGroupComponent
 	{
+		/// <summary>
+		/// Constructor for the LevelOfDetails class.
+		/// </summary>
 		public LevelOfDetails()
 		{
 			Text = "Level of details";
@@ -41,6 +49,9 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject.AdvancedContaine
 			};
 		}
 		
+		/// <summary>
+		/// Registers traits specific to the level of details component.
+		/// </summary>
 		protected override void _RegisterTraits()
 		{
 			base._RegisterTraits();
@@ -61,9 +72,12 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject.AdvancedContaine
 				.Instantiate();
 		}
 
+		/// <summary>
+		/// Initializes the fields for the level of details component.
+		/// </summary>
 		protected override void _FinalizeFields()
 		{
-			Container InnerContainer = Trait<Containerable>()
+			Godot.Container InnerContainer = Trait<Containerable>()
 				.Select(0)
 				.GetInnerContainer();
 
@@ -76,6 +90,9 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject.AdvancedContaine
 			base._FinalizeFields();
 		}
 
+		/// <summary>
+        /// Finalizes the fields initialization by adding them to the container.
+        /// </summary>
 		private void _OnChanged( int value )
 		{
 			GlobalExplorer.GetInstance().GroupBuilder._Editor.SetOption(Index, "LevelOfDetails", value);
@@ -83,3 +100,5 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject.AdvancedContaine
 		}
 	}
 }
+
+#endif

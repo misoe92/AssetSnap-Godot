@@ -20,14 +20,22 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using AssetSnap.Component;
+using Godot;
+
 namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 {
-	using AssetSnap.Component;
-	using Godot;
-
+	/// <summary>
+	/// Component for snapping an object's offset on the Z-axis within a group.
+	/// </summary>
 	[Tool]
 	public partial class SnapToObjectOffsetZ : GroupOptionSpinboxableComponent
 	{
+		/// <summary>
+		/// Constructor for SnapToObjectOffsetZ class.
+		/// </summary>
 		public SnapToObjectOffsetZ()
 		{
 			Name = "GroupsBuilderGroupOptionsSnapToObjectOffsetZ";
@@ -38,6 +46,9 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 			};
 		}
 
+		/// <summary>
+		/// Initializes fields for the SnapToObjectOffsetZ component.
+		/// </summary>
 		protected override void _InitializeFields()
 		{
 			Trait<Spinboxable>()
@@ -57,6 +68,10 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 				.GetLineEdit().AddThemeConstantOverride("minimum_character_width", 24);
 		}
 
+		/// <summary>
+        /// Event handler for value changes in the SpinBox.
+        /// </summary>
+        /// <param name="value">The new value of the SpinBox.</param>
 		private void _OnValueChanged(float value)
 		{
 			_GlobalExplorer.GroupBuilder._Editor.Group.SnapToObjectOffsetZValue = value;
@@ -73,3 +88,5 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 		}
 	}
 }
+
+#endif

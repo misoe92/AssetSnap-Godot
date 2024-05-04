@@ -20,14 +20,22 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using AssetSnap.Component;
+using Godot;
+
 namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 {
-	using AssetSnap.Component;
-	using Godot;
-
+	/// <summary>
+	/// Represents a group option component for optimized placement.
+	/// </summary>
 	[Tool]
 	public partial class PlacementOptimized : GroupOptionCheckableComponent
 	{
+		/// <summary>
+		/// Constructs a new instance of the PlacementOptimized class.
+		/// </summary>
 		public PlacementOptimized()
 		{
 			Name = "GroupsBuilderGroupOptionsPlacementOptimized";
@@ -38,6 +46,9 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 			};
 		}
 		
+		/// <summary>
+		/// Initializes fields of the PlacementOptimized component.
+		/// </summary>
 		protected override void _InitializeFields()
 		{
 			Trait<Checkable>()
@@ -48,6 +59,9 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 				.Instantiate();
 		}
 
+		/// <summary>
+        /// Handles the check event for the optimized placement.
+        /// </summary>
 		private void _OnCheck()
 		{
 			_GlobalExplorer.States.PlacingType = GlobalStates.PlacingTypeEnum.Optimized;
@@ -58,3 +72,5 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 		}
 	}
 }
+
+#endif

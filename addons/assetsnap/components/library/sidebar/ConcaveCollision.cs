@@ -20,23 +20,26 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using AssetSnap.Component;
+using AssetSnap.Front.Nodes;
+using Godot;
+
 namespace AssetSnap.Front.Components.Library.Sidebar
 {
-	using AssetSnap.Component;
-	using AssetSnap.Front.Nodes;
-	using Godot;
-
+	/// <summary>
+	/// A component representing a concave collision shape.
+	/// </summary>
 	[Tool]
 	public partial class ConcaveCollision : LSCollisionComponent
 	{
 		private readonly string _Title = "Concave Polygon";
 		private readonly string _CheckboxTooltip = "Use with caution, since this method is more expensive than a simple collision shape.";
 
-		/*
-		** Constructor of component
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Constructor of the ConcaveCollision component.
+		/// </summary>
 		public ConcaveCollision()
 		{
 			Name = "LSConcaveCollision";
@@ -49,11 +52,9 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			//_include = false;
 		}
 		
-		/*
-		** Initialization of component
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Initializes the ConcaveCollision component.
+		/// </summary>
 		public override void Initialize()
 		{
 			base.Initialize();
@@ -77,12 +78,10 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			Plugin.GetInstance().StatesChanged += (Godot.Collections.Array data) => { MaybeUpdateValue(data); };
 		}
 
-		/*
-		** Synchronizes the state of various checkboxes with
-		** their internal state.
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Synchronizes the state of various checkboxes with their internal state.
+		/// </summary>
+		/// <param name="data">An array containing data related to the state change.</param>
 		public override void MaybeUpdateValue(Godot.Collections.Array data)
 		{
 			if (data[0].As<string>() == "ConcaveCollision")
@@ -91,12 +90,9 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			}
 		}
 				
-		/*
-		** Updates spawn settings, collisions
-		** and more on checkbox pressed event
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Updates spawn settings, collisions, and more on checkbox pressed event.
+		/// </summary>
 		private void _OnCheckboxPressed()
 		{
 			Node3D handle = _GlobalExplorer.GetHandle();
@@ -130,33 +126,26 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			}
 		}
 				
-		/*
-		** Checks if the component state
-		** is active
-		** 
-		** @return bool
-		*/
+		/// <summary>
+		/// Checks if the component state is active.
+		/// </summary>
+		/// <returns>True if the component is active, otherwise false.</returns>
 		public override bool IsActive() 
 		{
 			return _GlobalExplorer.States.ConcaveCollision == GlobalStates.LibraryStateEnum.Enabled;
 		}
 				
-		/*
-		** Resets the state back to disabled
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Resets the state back to disabled.
+		/// </summary>
 		public void Reset()
 		{
 			_GlobalExplorer.States.ConcaveCollision = GlobalStates.LibraryStateEnum.Disabled;
 		}
 		
-		/*
-		** Syncronizes it's value to a global
-		** central state controller
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Synchronizes its value to a global central state controller.
+		/// </summary>
 		public override void Sync() 
 		{
 			if( false == IsValid() )
@@ -167,6 +156,9 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			_GlobalExplorer.States.ConcaveCollision = Trait<Checkable>().Select(0).GetValue() ? GlobalStates.LibraryStateEnum.Enabled : GlobalStates.LibraryStateEnum.Disabled;
 		}
 		
+		/// <summary>
+		/// Overrides the _ExitTree method of the parent class.
+		/// </summary>
 		public override void _ExitTree()
 		{
 			Initiated = false;
@@ -175,3 +167,5 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		}
 	}
 }
+
+#endif

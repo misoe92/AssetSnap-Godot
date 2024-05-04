@@ -20,24 +20,24 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using Godot;
+
 namespace AssetSnap.ASNode.Types
 {
-	using Godot;
-
+	/// <summary>
+	/// Represents a custom multi-mesh instance node type.
+	/// </summary>
 	[Tool]
 	public class AsMultiMeshInstanceType : NodeType
 	{
-		/*
-		** Construction of the custom node type.
-		*/
+		/// <summary>
+        /// Constructs a new instance of the custom multi-mesh instance node type.
+        /// </summary>
 		public AsMultiMeshInstanceType()
 		{
 			Name = "AsMultiMeshInstance3D";
-
 			Inherits = "MultiMeshInstance3D";
-
 			ScriptPath = "res://addons/assetsnap/nodes/3d/AsMultiMeshInstance3D.cs";
-
 			IconPath = "res://addons/assetsnap/assets/icons/MultiMeshInstance3D.svg";
 		}
 	}

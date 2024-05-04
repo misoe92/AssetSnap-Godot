@@ -20,18 +20,23 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using AssetSnap.Explorer;
+using AssetSnap.Front.Nodes;
+using Godot;
+
 namespace AssetSnap.BottomDock
 {
-	using AssetSnap.Explorer;
-	using AssetSnap.Front.Nodes;
-	using Godot;
-
+	/// <summary>
+	/// Base class for the bottom dock functionality.
+	/// </summary>
 	[Tool]
 	public partial class Base
 	{	
-		/*
-		** Public
-		*/
+		/// <summary>
+		/// Singleton instance of the Base class.
+		/// </summary>
 		public static Base Singleton
 		{
 			get
@@ -50,6 +55,9 @@ namespace AssetSnap.BottomDock
 			}
 		}
 		
+		/// <summary>
+		/// The container for the bottom dock.
+		/// </summary>
 		public AsBottomDock Container
 		{
 			get => _Container;
@@ -59,37 +67,44 @@ namespace AssetSnap.BottomDock
 			}
 		}
 		
+		/// <summary>
+		/// Name of the Base instance.
+		/// </summary>
 		public string Name = "";
 
-		/*
-		** Private
-		*/
 		private AsBottomDock _Container;
 		private static Base _Instance = null;
 		
-		/*
-		** Initializes the bottom dock tab
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Initializes the bottom dock tab.
+		/// </summary>
 		public void Initialize()
 		{
+			//
 		}
 		
+		/// <summary>
+		/// Sets the tab in the bottom dock.
+		/// </summary>
+		/// <param name="library">The library instance to set.</param>
 		public void SetTab( Library.Instance library ) 
 		{
 			// ExplorerUtils.Get()._Plugin.GetTabContainer().CurrentTab = library.Index + 2;
 		}
+		
+		/// <summary>
+		/// Sets the tab in the bottom dock by index.
+		/// </summary>
+		/// <param name="index">The index of the tab to set.</param>
 		public void SetTabByIndex( int index ) 
 		{
 			// ExplorerUtils.Get()._Plugin.GetTabContainer().CurrentTab = index;
 		} 
 		
-		/* 
-		** Adds a child to our tab container
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Adds a child to the tab container.
+		/// </summary>
+		/// <param name="container">The container to add.</param>
 		public void Add( Container container )
 		{
 			if( false == IsValid(container) || null == ExplorerUtils.Get()._Plugin ) 
@@ -105,11 +120,11 @@ namespace AssetSnap.BottomDock
 			ExplorerUtils.Get()._Plugin.GetTabContainer().AddChild(container, true);
 		}
 		
-		/*
-		** Check if a child exists in our tab container 
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Checks if a child exists in the tab container.
+		/// </summary>
+		/// <param name="container">The container to check.</param>
+		/// <returns>True if the container exists, otherwise false.</returns>
 		public bool Has( Container container )
 		{
 			if( null == ExplorerUtils.Get()._Plugin.GetTabContainer() || false == EditorPlugin.IsInstanceValid(ExplorerUtils.Get()._Plugin.GetTabContainer()) ) 
@@ -129,6 +144,10 @@ namespace AssetSnap.BottomDock
 			return false;
 		}
 
+		/// <summary>
+		/// Removes a child from the tab container.
+		/// </summary>
+		/// <param name="container">The container to remove.</param>
 		public void Remove( Container container ) 
 		{
 			foreach( Node child in _Container.GetChildren() ) 
@@ -141,6 +160,10 @@ namespace AssetSnap.BottomDock
 			}
 		}
 		
+		/// <summary>
+		/// Removes a child from the tab container by name.
+		/// </summary>
+		/// <param name="name">The name of the child to remove.</param>
 		public void RemoveByName( string name ) 
 		{
 			foreach( Node child in _Container.GetChildren() ) 
@@ -153,9 +176,16 @@ namespace AssetSnap.BottomDock
 			}
 		}
 		
+		/// <summary>
+        /// Checks if a container is valid.
+        /// </summary>
+        /// <param name="_Container">The container to check.</param>
+        /// <returns>True if the container is valid, otherwise false.</returns>
 		private bool IsValid( Container _Container )
 		{
 			return null != _Container && true == EditorPlugin.IsInstanceValid(_Container); 
 		}
 	}
-} 
+}
+
+#endif

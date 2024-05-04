@@ -20,12 +20,15 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using System;
+using AssetSnap.Explorer;
+using Godot;
+
 namespace AssetSnap.Front.Nodes
 {
-	using System;
-	using AssetSnap.Explorer;
-	using Godot;
-
+	/// <summary>
+	/// Represents a context menu control for handling quick actions, rotations, and scaling.
+	/// </summary>
 	[Tool]
 	public partial class AsContextMenu : Control
 	{
@@ -53,6 +56,9 @@ namespace AssetSnap.Front.Nodes
 
 		private string BelongsToSceneName = "";
 
+		/// <summary>
+		/// Called when the node enters the scene tree.
+		/// </summary>
 		public override void _EnterTree()
 		{
 			Name = "AsContextMenu";
@@ -60,6 +66,9 @@ namespace AssetSnap.Front.Nodes
 			base._EnterTree();
 		}
 		
+		/// <summary>
+		/// Called when the node is ready.
+		/// </summary>
 		public override void _Ready() 
 		{
 			Action ResizeAction = () => { _OnResize(); };
@@ -73,6 +82,10 @@ namespace AssetSnap.Front.Nodes
 			);
 		}
 		
+		/// <summary>
+		/// Called when the node receives input events.
+		/// </summary>
+		/// <param name="event">The input event received by the node.</param>
 		public override void _Input(InputEvent @Event) 
 		{
 			if( @Event is InputEventMouseMotion motionEvent ) 
@@ -121,69 +134,142 @@ namespace AssetSnap.Front.Nodes
 			}
 		}
 		
+		/// <summary>
+		/// Emits the QuickActionsChanged signal with the specified action.
+		/// </summary>
+		/// <param name="which">The action to be emitted.</param>
 		public void _OnQuickActionChange(string which)
 		{
 			EmitSignal(SignalName.QuickActionsChanged, new Variant[] { which });
 		}
 		
+		/// <summary>
+		/// Sets the rotation value around the X-axis.
+		/// </summary>
+		/// <param name="Rot">The rotation value to set.</param>
 		public void SetRotationX( float Rot ) 
 		{
 			RotValueX = Rot;
 			UpdateRotate();
 		}
+		
+		/// <summary>
+		/// Sets the rotation value around the Y-axis.
+		/// </summary>
+		/// <param name="Rot">The rotation value to set.</param>
 		public void SetRotationY( float Rot ) 
 		{
 			RotValueY = Rot;
 			UpdateRotate();
 		}
+		
+		/// <summary>
+		/// Sets the rotation value around the Z-axis.
+		/// </summary>
+		/// <param name="Rot">The rotation value to set.</param>
 		public void SetRotationZ( float Rot ) 
 		{
 			RotValueZ = Rot;
 			UpdateRotate();
 		}
+		
+		/// <summary>
+		/// Sets the scaling value along the X-axis.
+		/// </summary>
+		/// <param name="value">The scaling value to set.</param>
 		public void SetScaleX( float value ) 
 		{
 			ScaleValueX = value;
 			UpdateScale();
 		}
+		
+		/// <summary>
+		/// Sets the scaling value along the Y-axis.
+		/// </summary>
+		/// <param name="value">The scaling value to set.</param>
 		public void SetScaleY( float value ) 
 		{
 			ScaleValueY = value;
 			UpdateScale();
 		}
+		
+		/// <summary>
+		/// Sets the scaling value along the Z-axis.
+		/// </summary>
+		/// <param name="value">The scaling value to set.</param>
 		public void SetScaleZ( float value ) 
 		{
 			ScaleValueZ = value;
 			UpdateScale();
 		}
+		
+		/// <summary>
+		/// Retrieves the rotation value around the X-axis.
+		/// </summary>
+		/// <returns>The rotation value around the X-axis.</returns>
 		public float GetRotationX() 
 		{
 			return RotValueX;
 		}
+		
+		/// <summary>
+		/// Retrieves the rotation value around the Y-axis.
+		/// </summary>
+		/// <returns>The rotation value around the Y-axis.</returns>
 		public float GetRotationY() 
 		{
 			return RotValueY;
 		}
+		
+		/// <summary>
+		/// Retrieves the rotation value around the Z-axis.
+		/// </summary>
+		/// <returns>The rotation value around the Z-axis.</returns>
 		public float GetRotationZ() 
 		{
 			return RotValueZ;
 		}
+		
+		/// <summary>
+		/// Retrieves the scaling value along the X-axis.
+		/// </summary>
+		/// <returns>The scaling value along the X-axis.</returns>
 		public float GetScaleX() 
 		{
 			return ScaleValueX;
 		}
+		
+		/// <summary>
+		/// Retrieves the scaling value along the Y-axis.
+		/// </summary>
+		/// <returns>The scaling value along the Y-axis.</returns>
 		public float GetScaleY() 
 		{
 			return ScaleValueY;
 		}
+		
+		/// <summary>
+		/// Retrieves the scaling value along the Z-axis.
+		/// </summary>
+		/// <returns>The scaling value along the Z-axis.</returns>
 		public float GetScaleZ() 
 		{
 			return ScaleValueZ;
 		}
+		
+		/// <summary>
+		/// Retrieves the index of the angle.
+		/// </summary>
+		/// <returns>The index of the angle.</returns>
 		public int GetAngleIndex()
 		{
 			return GetAngles()._ActiveIndex;
 		}
+		
+		/// <summary>
+		/// Called when the X-axis rotation value is changed.
+		/// </summary>
+		/// <param name="value">The new X-axis rotation value.</param>
 		public void _OnRotateXChanged( float value )
 		{
 			if( RotValueX == value ) 
@@ -193,6 +279,11 @@ namespace AssetSnap.Front.Nodes
 			
 			RotValueX = value;
 		}
+		
+		/// <summary>
+		/// Called when the Y-axis rotation value is changed.
+		/// </summary>
+		/// <param name="value">The new Y-axis rotation value.</param>
 		public void _OnRotateYChanged( float value )
 		{
 			if( RotValueY == value ) 
@@ -202,6 +293,11 @@ namespace AssetSnap.Front.Nodes
 			
 			RotValueY = value;
 		}
+		
+		/// <summary>
+		/// Called when the node receives a change in rotation around the X-axis.
+		/// </summary>
+		/// <param name="value">The new rotation value around the X-axis.</param>
 		public void _OnRotateZChanged( float value )
 		{
 			if( RotValueZ == value ) 
@@ -211,6 +307,11 @@ namespace AssetSnap.Front.Nodes
 			
 			RotValueZ = value;
 		}
+		
+		/// <summary>
+		/// Called when the X-axis scaling value is changed.
+		/// </summary>
+		/// <param name="value">The new X-axis scaling value.</param>
 		public void _OnScaleXChanged( float value )
 		{
 			if( ScaleValueX == value ) 
@@ -220,6 +321,11 @@ namespace AssetSnap.Front.Nodes
 			
 			ScaleValueX = value;
 		}
+		
+		/// <summary>
+		/// Called when the Y-axis scaling value is changed.
+		/// </summary>
+		/// <param name="value">The new Y-axis scaling value.</param>
 		public void _OnScaleYChanged( float value )
 		{
 			if( ScaleValueY == value ) 
@@ -230,6 +336,10 @@ namespace AssetSnap.Front.Nodes
 			ScaleValueY = value;
 		}
 		
+		/// <summary>
+		/// Called when the Z-axis scaling value is changed.
+		/// </summary>
+		/// <param name="value">The new Z-axis scaling value.</param>
 		public void _OnScaleZChanged( float value )
 		{
 			if( ScaleValueZ == value ) 
@@ -240,6 +350,9 @@ namespace AssetSnap.Front.Nodes
 			ScaleValueZ = value;
 		}
 		
+		/// <summary>
+		/// Adjusts the position of the context menu based on the current window size.
+		/// </summary>
 		private void _OnResize()
 		{
 			Vector2 WindowSize = EditorInterface.Singleton.GetBaseControl().Size;
@@ -263,59 +376,102 @@ namespace AssetSnap.Front.Nodes
 			Position = CurrentPosition;
 		}
 
+		/// <summary>
+		/// Updates the scale values displayed in the UI.
+		/// </summary>
 		private void UpdateScale()
 		{
 			ScaleNodeX().Value = GetScaleX();
 			ScaleNodeY().Value = GetScaleY();
 			ScaleNodeZ().Value = GetScaleZ();
 		}
+		
+		/// <summary>
+		/// Updates the rotation values displayed in the UI.
+		/// </summary>
 		private void UpdateRotate()
 		{
 			RotationNodeX().Value = GetRotationX();
 			RotationNodeY().Value = GetRotationY();
 			RotationNodeZ().Value = GetRotationZ();
 		}
+		
+		/// <summary>
+		/// Retrieves the list of quick actions.
+		/// </summary>
+		/// <returns>The list of quick actions.</returns>
 		public AsSelectList GetQuickActions()
 		{
 			return GetNode<AsSelectList>("HBoxContainer/QuickAction/SelectList");
 		}
+		
+		/// <summary>
+		/// Retrieves the list of angle options.
+		/// </summary>
+		/// <returns>The list of angle options.</returns>
 		public AsSelectList GetAngles()
 		{
 			return GetNode<AsSelectList>("HBoxContainer/Angle/SelectList");
 		}
+		
+		/// <summary>
+		/// Retrieves the SpinBox node for X-axis rotation.
+		/// </summary>
+		/// <returns>The SpinBox node for X-axis rotation.</returns>
 		private SpinBox RotationNodeX()
 		{
 			return GetNode<SpinBox>("HBoxContainer/RotateValues/RotateAngleX/SpinBox");
 		}
+		
+		/// <summary>
+		/// Retrieves the SpinBox node for Y-axis rotation.
+		/// </summary>
+		/// <returns>The SpinBox node for Y-axis rotation.</returns>
 		private SpinBox RotationNodeY()
 		{
 			return GetNode<SpinBox>("HBoxContainer/RotateValues/RotateAngleY/SpinBox");
 		}
+		
+		/// <summary>
+		/// Retrieves the SpinBox node for Z-axis rotation.
+		/// </summary>
+		/// <returns>The SpinBox node for Z-axis rotation.</returns>
 		private SpinBox RotationNodeZ()
 		{
 			return GetNode<SpinBox>("HBoxContainer/RotateValues/RotateAngleZ/SpinBox");
 		}
 		
+		/// <summary>
+		/// Retrieves the SpinBox node for X-axis scaling.
+		/// </summary>
+		/// <returns>The SpinBox node for X-axis scaling.</returns>
 		private SpinBox ScaleNodeX()
 		{
 			return GetNode<SpinBox>("HBoxContainer/ScaleValues/ScaleAngleX/SpinBox");
 		}
+		
+		/// <summary>
+		/// Retrieves the SpinBox node for Y-axis scaling.
+		/// </summary>
+		/// <returns>The SpinBox node for Y-axis scaling.</returns>
 		private SpinBox ScaleNodeY()
 		{
 			return GetNode<SpinBox>("HBoxContainer/ScaleValues/ScaleAngleY/SpinBox");
 		}
+		
+		/// <summary>
+        /// Retrieves the SpinBox node for Z-axis scaling.
+        /// </summary>
+        /// <returns>The SpinBox node for Z-axis scaling.</returns>
 		private SpinBox ScaleNodeZ()
 		{
 			return GetNode<SpinBox>("HBoxContainer/ScaleValues/ScaleAngleZ/SpinBox");
 		}
 		
-		/*
-		** Updates rotation and scale valus on the current handle
-		** when a change is received from the context menu
-		**
-		** @param Godot.Collections.Dictionary package
-		** @return void
-		*/
+		/// <summary>
+		/// Updates rotation and scale values on the current handle when a change is received from the context menu.
+		/// </summary>
+		/// <param name="package">The dictionary package containing rotation and scale values.</param>
 		private void _OnUpdateVectors(Godot.Collections.Dictionary package)
 		{
 			Node3D Handle = ExplorerUtils.Get().GetHandle();

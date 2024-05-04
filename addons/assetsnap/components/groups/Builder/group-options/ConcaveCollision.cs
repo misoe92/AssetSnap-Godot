@@ -20,14 +20,22 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using AssetSnap.Component;
+using Godot;
+
 namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 {
-	using AssetSnap.Component;
-	using Godot;
-
+	/// <summary>
+	/// Represents a component responsible for handling concave collision options for group objects.
+	/// </summary>
 	[Tool]
 	public partial class ConcaveCollision : GroupOptionCheckableComponent
 	{
+		/// <summary>
+		/// Constructor for the ConcaveCollision class.
+		/// </summary>
 		public ConcaveCollision()
 		{
 			Name = "GroupsBuilderGroupOptionsConcaveCollision";
@@ -38,6 +46,9 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 			};
 		}
 		
+		/// <summary>
+		/// Initializes the fields of the ConcaveCollision component.
+		/// </summary>
 		protected override void _InitializeFields()
 		{
 			Trait<Checkable>()
@@ -47,7 +58,10 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 				.SetAction( Callable.From( () => { _OnCheck(); }) )
 				.Instantiate();
 		}
-	
+		
+		/// <summary>
+        /// Handles the event when the concave collision option is checked.
+        /// </summary>
 		private void _OnCheck()
 		{
 			_GlobalExplorer.GroupBuilder._Editor.Group.ConcaveCollision = !_GlobalExplorer.GroupBuilder._Editor.Group.ConcaveCollision;
@@ -81,3 +95,5 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 		}
 	}
 }
+
+#endif

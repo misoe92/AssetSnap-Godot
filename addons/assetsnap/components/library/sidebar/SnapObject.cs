@@ -20,14 +20,23 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using AssetSnap.Component;
+using Godot;
+
 namespace AssetSnap.Front.Components.Library.Sidebar
 {
-	using AssetSnap.Component;
-	using Godot;
-
+	/// <summary>
+	/// Partial class representing a SnapObject component, used in the sidebar of the library.
+	/// </summary>
 	[Tool]
 	public partial class SnapObject : LSObjectComponent
 	{
+		/// <summary>
+		/// Gets or sets the state of the SnapObject.
+		/// </summary>
+		/// <value>The state of the SnapObject.</value>
 		public bool state 
 		{
 			get => GetState();
@@ -46,11 +55,9 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		private readonly string _CheckboxTitle = "Snap to objects";
 		private readonly string _CheckboxTooltip = "When enabled the object you spawn will snap to other objects close by";
 
-		/*
-		** Constructor for the component
-		** 
-		** @return void
-		*/	
+		/// <summary>
+		/// Constructor for the SnapObject component.
+		/// </summary>
 		public SnapObject()
 		{
 			Name = "LSSnapObject";
@@ -63,6 +70,10 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			//_include = false;
 		}
 		
+		/// <summary>
+		/// Gets the state of the SnapObject.
+		/// </summary>
+		/// <returns>The state of the SnapObject.</returns>
 		public bool GetState()
 		{
 			if(
@@ -75,11 +86,9 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			return HasTrait<Checkable>() && false != Trait<Checkable>().IsValid() && false != Trait<Checkable>().Select(0).IsValid() ? Trait<Checkable>().Select(0).GetValue() : false;	
 		}
 		
-		/*
-		** Initializes the component
-		** 
-		** @return void
-		*/	
+		/// <summary>
+		/// Initializes the SnapObject component.
+		/// </summary>
 		public override void Initialize()
 		{
 			base.Initialize();
@@ -105,12 +114,9 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			Plugin.GetInstance().StatesChanged += (Godot.Collections.Array data) => { MaybeUpdateValue(); };
 		}
 		
-		/*
-		** Handles synchronization of the checkboxes
-		** so it matches the state of the model
-		** 
-		** @return void
-		*/	
+		/// <summary>
+		/// Handles synchronization of the checkboxes to match the state of the model.
+		/// </summary>	
 		public void MaybeUpdateValue()
 		{
 			if( 
@@ -130,12 +136,9 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			}
 		}
 		
-		/*
-		** Updates spawn settings values on
-		** change
-		** 
-		** @return void
-		*/	
+		/// <summary>
+		/// Updates spawn settings values on change.
+		/// </summary>
 		private void _OnCheckboxPressed()
 		{
 			bool state = false;
@@ -162,22 +165,28 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			UpdateSpawnSettings("SnapToObject", state);
 		}
 		
+		/// <summary>
+		/// Checks if the SnapObject's checkbox is checked.
+		/// </summary>
+		/// <returns>True if the checkbox is checked, otherwise false.</returns>
 		private bool IsCheckboxChecked()
 		{
 			return state == true;
 		}
 		
-		/*
-		** Resets the component
-		** 
-		** @return void
-		*/	
+		/// <summary>
+		/// Resets the SnapObject component.
+		/// </summary>
 		public void Reset()
 		{
 			_GlobalExplorer.States.SnapToObject = GlobalStates.LibraryStateEnum.Disabled;
 			state = false;
 		}
 		
+		/// <summary>
+		/// Checks if the SnapObject component is valid.
+		/// </summary>
+		/// <returns>True if the SnapObject component is valid, otherwise false.</returns>
 		public bool IsValid()
 		{
 			return
@@ -188,15 +197,14 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 				false != HasTrait<Checkable>();
 		}
 		
-		/*
-		** Syncronizes it's value to a global
-		** central state controller
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Synchronizes the SnapObject's value to a global central state controller.
+		/// </summary>
 		public override void Sync() 
 		{
 			_GlobalExplorer.States.SnapToObject = state ? GlobalStates.LibraryStateEnum.Enabled : GlobalStates.LibraryStateEnum.Disabled;
 		}
 	}
 }
+
+#endif

@@ -20,16 +20,25 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using AssetSnap.Component;
+using AssetSnap.States;
+using Godot;
+
 namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 {
-	using AssetSnap.Component;
-	using AssetSnap.States;
-	using Godot;
-
+	/// <summary>
+	/// Represents a component for managing the level of details state in the group options of a builder.
+	/// </summary>
 	[Tool]
 	public partial class LevelOfDetailsState : GroupOptionCheckableComponent
 	{
 		private readonly string _Tooltip = "When enabled you will be able to choose a Level of details level that all models in the group will default to, if none is set models will default to Project settings";
+		
+		/// <summary>
+		/// Initializes a new instance of the <see cref="LevelOfDetailsState"/> class.
+		/// </summary>
 		public LevelOfDetailsState()
 		{
 			Name = "GroupsBuilderGroupOptionsLevelOfDetailsState";
@@ -40,6 +49,9 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 			};
 		}
 		
+		/// <summary>
+		/// Initializes the fields of the level of details state component.
+		/// </summary>
 		protected override void _InitializeFields()
 		{
 				
@@ -52,6 +64,9 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 				.Instantiate();
 		}
 
+		/// <summary>
+        /// Handles the value changed event of the level of details state component.
+        /// </summary>
 		private void _OnValueChanged()
 		{
 			if( StatesUtils.Get().PlacingMode == GlobalStates.PlacingModeEnum.Group ) 
@@ -71,3 +86,5 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 		}
 	}
 }
+
+#endif

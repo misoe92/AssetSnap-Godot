@@ -20,20 +20,22 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using AssetSnap.Explorer;
+using Godot;
+
 namespace AssetSnap.Front.Nodes.Hoverable
 {
-    using AssetSnap.Explorer;
-    using Godot;
-
+	/// <summary>
+    /// Partial class representing a margin container that responds to hover events and applies an Array modifier on click.
+    /// </summary>
 	[Tool]
 	public partial class ArrayMarginContainer : HoverableMarginContainer
 	{
-		/*
-		** Applies the Array modifier on click
-		**
-		** @param InputEvent @event
-		** @return void
-		*/
+		/// <summary>
+        /// Handles the mouse click event to apply the Array modifier.
+        /// </summary>
+        /// <param name="event">The input event representing the mouse click.</param>
+        /// <returns>Void.</returns>
 		public override void _MouseClick( InputEvent @event )
 		{
 			if( @event is InputEventMouseButton EventMouseButton ) 

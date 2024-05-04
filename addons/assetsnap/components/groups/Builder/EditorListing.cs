@@ -20,16 +20,24 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using System.Collections.Generic;
+using AssetSnap.Component;
+using AssetSnap.Explorer;
+using Godot;
+
 namespace AssetSnap.Front.Components.Groups.Builder
 {
-	using System.Collections.Generic;
-	using AssetSnap.Component;
-	using AssetSnap.Explorer;
-	using Godot;
-
+	/// <summary>
+	/// Partial class representing an editor listing for the GroupBuilder component.
+	/// </summary>
 	[Tool]
 	public partial class EditorListing : LibraryComponent
 	{
+		/// <summary>
+		/// Constructor for EditorListing class.
+		/// </summary>
 		public EditorListing()
 		{
 			Name = "GroupBuilderEditorListing";
@@ -46,6 +54,9 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			//_include = false;
 		}
 
+		/// <summary>
+		/// Initializes the EditorListing component.
+		/// </summary>
 		public override void Initialize()
 		{
 			SizeFlagsVertical = Control.SizeFlags.ExpandFill;
@@ -83,17 +94,26 @@ namespace AssetSnap.Front.Components.Groups.Builder
 
 			_FinalizeFields();
 		}
-
+		
+		/// <summary>
+		/// Hides the EditorListing component.
+		/// </summary>		
 		public void DoHide()
 		{
 			Visible = false;
 		}
 
+		/// <summary>
+		/// Shows the EditorListing component.
+		/// </summary>
 		public void DoShow()
 		{
 			Visible = true;
 		}
 
+		/// <summary>
+		/// Hides the top bar UI element.
+		/// </summary>
 		public void HideTopbar()
 		{
 			Trait<Containerable>()
@@ -101,6 +121,9 @@ namespace AssetSnap.Front.Components.Groups.Builder
 				.SetVisible(false);
 		}
 
+		/// <summary>
+		/// Shows the top bar UI element.
+		/// </summary>
 		public void ShowTopbar()
 		{
 			Trait<Containerable>()
@@ -108,6 +131,9 @@ namespace AssetSnap.Front.Components.Groups.Builder
 				.SetVisible(true);
 		}
 
+		/// <summary>
+		/// Updates the EditorListing component.
+		/// </summary>
 		public void Update()
 		{
 			if (null != ExplorerUtils.Get().GroupBuilder._Editor.Group)
@@ -130,9 +156,12 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			}
 		}
 
+		/// <summary>
+		/// Resets the EditorListing component.
+		/// </summary>
 		public void Reset()
 		{
-			Container container = Trait<Containerable>()
+			Godot.Container container = Trait<Containerable>()
 				.Select(2)
 				.GetInnerContainer();
 
@@ -143,6 +172,9 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			}
 		}
 
+		/// <summary>
+		/// Initializes the fields of the EditorListing component.
+		/// </summary>
 		private void _InitializeFields()
 		{
 			Trait<Panelable>()
@@ -223,17 +255,20 @@ namespace AssetSnap.Front.Components.Groups.Builder
 				.Instantiate();
 		}
 
+		/// <summary>
+		/// Finalizes the fields of the EditorListing component.
+		/// </summary>
 		private void _FinalizeFields()
 		{
-			Container containerOne = Trait<Containerable>()
+			Godot.Container containerOne = Trait<Containerable>()
 				.Select(0)
 				.GetInnerContainer();
 
-			Container containerTwoOne = Trait<Containerable>()
+			Godot.Container containerTwoOne = Trait<Containerable>()
 				.Select(1)
 				.GetInnerContainer(0);
 
-			Container containerTwoTwo = Trait<Containerable>()
+			Godot.Container containerTwoTwo = Trait<Containerable>()
 				.Select(1)
 				.GetInnerContainer(1);
 
@@ -294,6 +329,9 @@ namespace AssetSnap.Front.Components.Groups.Builder
 				);
 		}
 
+		/// <summary>
+		/// Sets up the group objects for the EditorListing component.
+		/// </summary>
 		private void _SetupGroupObjects()
 		{
 			List<string> Components = new()
@@ -335,6 +373,9 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			}
 		}
 
+		/// <summary>
+		/// Sets up the UI when no objects are found.
+		/// </summary>
 		private void _SetupNoFound()
 		{
 			MarginContainer NoFoundMargin = new();
@@ -355,6 +396,9 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			Trait<Containerable>().Select(2).GetInnerContainer().AddChild(NoFoundMargin);
 		}
 
+		/// <summary>
+		/// Sets up the UI when no group is chosen.
+		/// </summary>
 		private void _SetupNoGroup()
 		{
 			MarginContainer NoFoundMargin = new();
@@ -379,6 +423,9 @@ namespace AssetSnap.Front.Components.Groups.Builder
 				.AddChild(NoFoundMargin);
 		}
 
+		/// <summary>
+        /// Event handler for opening group options.
+        /// </summary>
 		private void _OnOpenGroupOptions()
 		{
 			_GlobalExplorer.GroupBuilder._Editor.GroupOptions.DoShow();
@@ -386,3 +433,5 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		}
 	}
 }
+
+#endif

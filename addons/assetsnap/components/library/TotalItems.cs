@@ -20,11 +20,16 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using AssetSnap.Component;
+using Godot;
+
 namespace AssetSnap.Front.Components.Library
 {
-	using AssetSnap.Component;
-	using Godot;
-
+	/// <summary>
+	/// A component that displays the total number of items in the library.
+	/// </summary>
 	[Tool]
 	public partial class TotalItems : LibraryComponent
 	{
@@ -32,11 +37,9 @@ namespace AssetSnap.Front.Components.Library
 
 		private int ItemCount = 0;
 
-		/*
-		** Component constructor
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Component constructor.
+		/// </summary>
 		public TotalItems()
 		{
 			Name = "LibraryItems";
@@ -49,11 +52,9 @@ namespace AssetSnap.Front.Components.Library
 			//_include = false;
 		}
 
-		/*
-		** Initializes the component
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Initializes the component.
+		/// </summary>
 		public override void Initialize()
 		{
 			base.Initialize();
@@ -77,11 +78,19 @@ namespace AssetSnap.Front.Components.Library
 				.AddToContainer(this);
 		}
 		
+		/// <summary>
+		/// Gets the total item count.
+		/// </summary>
+		/// <returns>The total item count.</returns>
 		public int GetItemCount() 
 		{
 			return ItemCount;
 		}
 		
+		/// <summary>
+		/// Sets the total item count.
+		/// </summary>
+		/// <param name="count">The new total item count.</param>
 		public void SetItemCount(int count ) 
 		{
 			ItemCount = count;
@@ -99,11 +108,18 @@ namespace AssetSnap.Front.Components.Library
 			}
 		}
 		
+		/// <summary>
+		/// Handles the event when the item count is updated.
+		/// </summary>
+		/// <param name="count">The new item count.</param>
 		private void _OnItemCountUpdated(int count )
 		{
 			SetItemCount(count);
 		}
 
+		/// <summary>
+        /// Overrides the _ExitTree method to detach from events before being removed from the scene tree.
+        /// </summary>
 		public override void _ExitTree()
 		{
 			Library.ItemCountUpdated -= _OnItemCountUpdated; 
@@ -111,3 +127,5 @@ namespace AssetSnap.Front.Components.Library
 		}
 	}
 }
+
+#endif

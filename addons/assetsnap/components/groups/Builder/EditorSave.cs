@@ -20,16 +20,24 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using AssetSnap.Component;
+using Godot;
+
 namespace AssetSnap.Front.Components.Groups.Builder
 {
-	using AssetSnap.Component;
-	using Godot;
-
+	/// <summary>
+	/// Represents an editor component for saving group builder data.
+	/// </summary>
 	[Tool]
 	public partial class EditorSave : LibraryComponent
 	{
 		private static readonly string Text = "Save";
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="EditorSave"/> class.
+		/// </summary>
 		public EditorSave()
 		{
 			Name = "GroupBuilderEditorSave";
@@ -45,6 +53,9 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			//_include = false;
 		}
 
+		/// <summary>
+		/// Initializes the editor save component.
+		/// </summary>
 		public override void Initialize()
 		{
 			if (Initiated)
@@ -60,6 +71,9 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			_FinalizeFields();
 		}
 
+		/// <summary>
+		/// Shows the editor save component.
+		/// </summary>
 		public void DoShow()
 		{
 			Trait<Buttonable>()
@@ -67,6 +81,9 @@ namespace AssetSnap.Front.Components.Groups.Builder
 				.SetVisible(true);
 		}
 
+		/// <summary>
+		/// Hides the editor save component.
+		/// </summary>
 		public void DoHide()
 		{
 			Trait<Buttonable>()
@@ -74,11 +91,17 @@ namespace AssetSnap.Front.Components.Groups.Builder
 				.SetVisible(false);
 		}
 
+		/// <summary>
+		/// Called when the save action is triggered.
+		/// </summary>
 		private void _OnSave()
 		{
 			_GlobalExplorer.GroupBuilder._Editor.UpdateGroup();
 		}
 
+		/// <summary>
+		/// Initializes the fields required for the editor save component.
+		/// </summary>
 		private void _InitializeFields()
 		{
 			Trait<Containerable>()
@@ -98,6 +121,9 @@ namespace AssetSnap.Front.Components.Groups.Builder
 				.Instantiate();
 		}
 
+		/// <summary>
+        /// Finalizes the fields of the editor save component.
+        /// </summary>
 		private void _FinalizeFields()
 		{
 			Trait<Containerable>()
@@ -116,3 +142,5 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		}
 	}
 }
+
+#endif

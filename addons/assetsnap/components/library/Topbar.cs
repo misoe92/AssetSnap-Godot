@@ -20,24 +20,38 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using System.Collections.Generic;
+using AssetSnap.Component;
+using Godot;
+
 namespace AssetSnap.Front.Components.Library
 {
-	using System.Collections.Generic;
-	using AssetSnap.Component;
-	using Godot;
-
+	/// <summary>
+	/// Represents the top bar component of the library.
+	/// </summary>
 	[Tool]
 	public partial class Topbar : LibraryComponent
 	{
+		/// <summary>
+		/// The title of the library list.
+		/// </summary>
 		public ListTitle _LibraryListTitle;
+		
+		/// <summary>
+		/// The search component of the library.
+		/// </summary>
 		public Search _LibrarySearch;
+		
+		/// <summary>
+		/// The total number of items in the library.
+		/// </summary>
 		public TotalItems _LibraryItems;
 		
-		/*
-		** Constructor
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Constructor for Topbar class.
+		/// </summary>
 		public Topbar()
 		{
 			Name = "LibraryTopbar";
@@ -52,11 +66,9 @@ namespace AssetSnap.Front.Components.Library
 			//_include = false; 
 		}
 
-		/*
-		** Initializes the component 
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Initializes the top bar component.
+		/// </summary>
 		public override void Initialize()
 		{
 			base.Initialize();
@@ -122,7 +134,11 @@ namespace AssetSnap.Front.Components.Library
 				.Select(0)
 				.AddToContainer(this);
 		}
-	
+		
+		/// <summary>
+        /// Retrieves the container associated with the top bar.
+        /// </summary>
+        /// <returns>The container node.</returns>
 		public Container GetContainer()
 		{
 			return Trait<Containerable>()
@@ -131,3 +147,5 @@ namespace AssetSnap.Front.Components.Library
 		}
 	}
 }
+
+#endif

@@ -21,15 +21,19 @@
 // SOFTWARE.
 
 #if TOOLS
+
+using System;
+using System.Linq;
+using System.Reflection;
+using System.Collections.Generic;
+using Godot;
+using AssetSnap.Explorer;
+
 namespace AssetSnap.Component
 {
-	using System;
-	using System.Linq;
-	using System.Reflection;
-	using System.Collections.Generic;
-	using Godot;
-	using AssetSnap.Explorer;
-
+	/// <summary>
+	/// Base class for managing components and instances.
+	/// </summary>
 	[Tool]
 	public partial class Base : Node, ISerializationListener
 	{
@@ -37,6 +41,7 @@ namespace AssetSnap.Component
 		private Godot.Collections.Array<GodotObject> _DisposeQueue = new();
 		private Godot.Collections.Dictionary<string, GodotObject> _Components = new();
 		private Godot.Collections.Array<GodotObject> _Instances = new();
+		
 		[Export]
 		public Godot.Collections.Array<string> ComponentTypes { get => _ComponentTypes; set => _ComponentTypes = value; }	
 		[Export]
@@ -47,6 +52,10 @@ namespace AssetSnap.Component
 		public Godot.Collections.Array<GodotObject> Instances { get => _Instances; set => _Instances = value; }	
 		
 		private static Base _Instance = null;
+		
+		/// <summary>
+		/// Gets the singleton instance of the Base class.
+		/// </summary>
 		public static Base Singleton
 		{
 			get
@@ -61,9 +70,9 @@ namespace AssetSnap.Component
 			}
 		}
 		
-		/*
-		** Initialization of Component BaseHandler
-		*/ 
+		/// <summary>
+		/// Initializes the Component BaseHandler by registering classes in the specified namespace.
+		/// </summary>
 		public void Initialize() 
 		{
 			string TargetNamespace = "AssetSnap.Front.Components";
@@ -72,21 +81,37 @@ namespace AssetSnap.Component
 			EnterClassesInNamespace(ClassesInNamespace);
 		}
 		
+		/// <summary>
+		/// Gets the count of instances.
+		/// </summary>
+		/// <returns>The count of instances.</returns>
 		public int InstancesCount()
 		{
 			return Instances.Count;	
 		}
 		
+		/// <summary>
+		/// Gets the count of components.
+		/// </summary>
+		/// <returns>The count of components.</returns>
 		public int Count()
 		{
 			return Components.Count;
 		}
 		
+		/// <summary>
+		/// Gets the keys of components.
+		/// </summary>
+		/// <returns>The keys of components.</returns>
 		public System.Collections.Generic.ICollection<string> Keys()
 		{
 			return Components.Keys;
 		}
 		
+		/// <summary>
+		/// Removes the specified component.
+		/// </summary>
+		/// <param name="component">The component to remove.</param>
 		public void Remove( BaseComponent component )
 		{
 			if( Instances.Contains(component) ) 
@@ -95,6 +120,10 @@ namespace AssetSnap.Component
 			}
 		}
 		
+		/// <summary>
+		/// Removes a component by its type string.
+		/// </summary>
+		/// <param name="TypeString">The type string of the component to remove.</param>
 		public void RemoveByTypeString( string TypeString ) 
 		{
 			if( Components.ContainsKey(TypeString) ) 
@@ -103,6 +132,9 @@ namespace AssetSnap.Component
 			}
 		}
 		
+		/// <summary>
+		/// Disposes single components in the dispose queue.
+		/// </summary>
 		public void DisposeSingleComponents()
 		{
 			while( Components.Count > 0 ) 
@@ -119,12 +151,11 @@ namespace AssetSnap.Component
 			}
 		}
 		
-		/*
-		** Fetches classes inside a given namespace
-		**
-		** @param string TargetNamespace - The namespace we wish to extract classes from
-		** @return IEnumerable<Type>
-		*/
+		/// <summary>
+		/// Fetches classes inside a given namespace.
+		/// </summary>
+		/// <param name="TargetNamespace">The namespace from which to extract classes.</param>
+		/// <returns>An enumerable collection of types.</returns>
 		private IEnumerable<Type> GetClassesInNamespace(string TargetNamespace)
 		{
 			// Get all types in the current assembly
@@ -140,14 +171,10 @@ namespace AssetSnap.Component
 			return classesInNamespace;
 		}
 		
-		/*
-		** This enteres the components into the tree if it's valid and
-		** initializes elements that are needed for other
-		** functionalities
-		**
-		** @param IEnumerable<Type> ClassesInNamespace
-		** @return void
-		*/
+		/// <summary>
+		/// Enters the classes in the specified namespace.
+		/// </summary>
+		/// <param name="ClassesInNamespace">The classes to enter.</param>
 		private void EnterClassesInNamespace(IEnumerable<Type> ClassesInNamespace)
 		{
 			foreach (Type classType in ClassesInNamespace)
@@ -160,14 +187,13 @@ namespace AssetSnap.Component
 			}
 		}
 		
-		/*
-		** Enters the component into the tree and adds it to
-		** a list for easy control later on.
-		**
-		** @param object instance
-		** @param string TypeName 
-		** @return void 
-		*/
+		/// <summary>
+		/// Enters the component into the tree and adds it to
+		/// a list for easy control later on.
+		/// </summary>
+		/// <param name="instance">The instance of the component to enter.</param>
+		/// <param name="TypeName">The type name of the component.</param>
+		/// <returns>void</returns>
 		private void EnterComponent( object instance, string TypeName)
 		{
 			BaseComponent _Component = ObjectToBaseComponent(instance);
@@ -183,17 +209,21 @@ namespace AssetSnap.Component
 			_Components.Add(TypeName, _Component);
 		}
 		
-		/*
-		** Checks if given object is a base component
-		**
-		** @param object instance
-		** @return bool  
-		*/
+		/// <summary>
+		/// Checks if the given object is a base component.
+		/// </summary>
+		/// <param name="instance">The object to check.</param>
+		/// <returns>bool</returns>
 		private bool IsComponent( object instance )
 		{
 			return instance is BaseComponent;
 		}
 		
+		/// <summary>
+		/// Determines whether the given object should be included.
+		/// </summary>
+		/// <param name="instance">The object to check.</param>
+		/// <returns>bool</returns>
 		private bool ShouldInclude( object instance ) 
 		{
 			if( instance is BaseComponent _component && _component._include is bool BoolVal ) 
@@ -204,13 +234,12 @@ namespace AssetSnap.Component
 			return false;
 		}
 		
-		/*
-		** Converts an object to BaseComponent if possible
-		** If it fails it will return null
-		**
-		** @param object instance
-		** @return BaseComponent 
-		*/
+		/// <summary>
+		/// Converts an object to a BaseComponent if possible.
+		/// If it fails, it will return null.
+		/// </summary>
+		/// <param name="instance">The object to convert.</param>
+		/// <returns>BaseComponent</returns>
 		private BaseComponent ObjectToBaseComponent( object instance ) 
 		{
 			if( instance is BaseComponent AsComponent ) 
@@ -221,6 +250,11 @@ namespace AssetSnap.Component
 			return null;
 		}
 		
+		/// <summary>
+		/// Clears the specified instance from the list of instances.
+		/// </summary>
+		/// <param name="instance">The instance to clear.</param>
+		/// <returns>void</returns>
 		public void ClearInstance( BaseComponent instance ) 
 		{
 			if( Instances.Contains( instance ) ) 
@@ -229,6 +263,11 @@ namespace AssetSnap.Component
 			}
 		}
 		
+		/// <summary>
+		/// Clears the component of the specified type from the Components dictionary.
+		/// </summary>
+		/// <param name="debug">If true, debug messages will be printed.</param>
+		/// <returns>void</returns>
 		public void Clear<T>( bool debug = false)
 		{
 			string key = typeof(T).FullName.Replace("AssetSnap.Front.Components.", "").Split(".").Join("");
@@ -274,13 +313,12 @@ namespace AssetSnap.Component
 			// _Components.Add(key, Activator.CreateInstance<T>() as BaseComponent);
 		}
 		
-		/*
-		** Fetches an instance of a single object
-		** and returns it to the querier.
-		**
-		** @param bool unique[false]
-		** @return T - Can be various of types depending on the component
-		*/
+		/// <summary>
+		/// Fetches an instance of a single object and returns it to the querier.
+		/// </summary>
+		/// <typeparam name="T">The type of object to fetch.</typeparam>
+		/// <param name="unique">If true, ensures a unique instance is returned.</param>
+		/// <returns>T - Can be various types depending on the component.</returns>
 		public T Single<T>( bool unique = false )
 		{
 			int CurrentCount = _Instances.Count;
@@ -359,13 +397,12 @@ namespace AssetSnap.Component
 			return default(T);
 		}
 		
-		/*
-		** Fetches an instance of a single object
-		** and returns it to the querier.
-		**
-		** @param bool unique[false]
-		** @return T - Can be various of types depending on the component
-		*/
+		/// <summary>
+		/// Fetches an instance of a single object and returns it to the querier.
+		/// </summary>
+		/// <param name="key">The key representing the type of object to fetch.</param>
+		/// <param name="unique">If true, ensures a unique instance is returned.</param>
+		/// <returns>BaseComponent - Can be various types depending on the component.</returns>
 		public BaseComponent Single( string key, bool unique = false )
 		{
 			string[] keyArr = key.Split(".");
@@ -426,13 +463,11 @@ namespace AssetSnap.Component
 			}
 		}
 
-		
-		/*
-		** Checks if the given key has a component
-		**
-		** @param string key
-		** @return bool
-		*/
+		/// <summary>
+		/// Checks if the given key has a component.
+		/// </summary>
+		/// <param name="key">The key to check.</param>
+		/// <returns>True if the component exists, otherwise false.</returns>
 		public bool Has( string key )
 		{
 			if( false == _ComponentTypes.Contains(key.Split(".").Join("")) ) 
@@ -443,6 +478,10 @@ namespace AssetSnap.Component
 			return true;
 		}
 		
+		/// <summary>
+		/// Removes the specified component from the internal container and then adds it again.
+		/// </summary>
+		/// <param name="key">The key of the component to end.</param>
 		public void End( string key ) 
 		{
 			if( false == Has( key ) ) 
@@ -461,14 +500,11 @@ namespace AssetSnap.Component
 				.AddChild(_Components[key.Split(".").Join("")] as BaseComponent);
 		}
 		
-		/*
-		** Checks if a given array of keys
-		** is to be found in the components 
-		** array
-		**
-		** @param string[] keys
-		** @return bool
-		*/
+		/// <summary>
+		/// Checks if all the given keys are present in the components array.
+		/// </summary>
+		/// <param name="keys">An array of keys to check.</param>
+		/// <returns>True if all keys are present, otherwise false.</returns>
 		public bool HasAll( string[] keys )
 		{
 			if( _ComponentTypes == null || _ComponentTypes.Count == 0 ) 
@@ -489,15 +525,22 @@ namespace AssetSnap.Component
 			return true;
 		}
 		
-		
+		/// <summary>
+		/// This method is called before serializing the object.
+		/// </summary>
 		public void OnBeforeSerialize()
 		{
 			//
 		}
+		
+		/// <summary>
+		/// This method is called after deserializing the object.
+		/// </summary>
 		public void OnAfterDeserialize()
 		{
 			_Instance = this;
 		}
 	}
 }
+
 #endif

@@ -20,15 +20,23 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using AssetSnap.Component;
+using AssetSnap.Instance.Input;
+using Godot;
+
 namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 {
-	using AssetSnap.Component;
-	using AssetSnap.Instance.Input;
-	using Godot;
-
+	/// <summary>
+	/// Represents a component for adjusting drag offset in the group builder.
+	/// </summary>
 	[Tool]
 	public partial class DragOffset : GroupOptionSpinboxableComponent
 	{
+		/// <summary>
+		/// Default constructor for DragOffset class.
+		/// </summary>
 		public DragOffset()
 		{
 			Name = "GroupsBuilderGroupOptionsDragOffset";
@@ -39,6 +47,9 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 			};
 		}
 		
+		/// <summary>
+		/// Initializes the fields of the DragOffset component.
+		/// </summary>
 		protected override void _InitializeFields()
 		{
 			Trait<Spinboxable>()
@@ -57,6 +68,10 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 				.GetLineEdit().AddThemeConstantOverride("minimum_character_width", 24);
 		}
 
+		/// <summary>
+        /// Event handler for when the drag offset value is changed.
+        /// </summary>
+        /// <param name="value">The new value of the drag offset.</param>
 		private void _OnValueChanged( float value )
 		{
 			if ( _GlobalExplorer.InputDriver is DragAddInputDriver dragAddInputDriver )
@@ -75,3 +90,5 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 		}
 	}
 }
+
+#endif

@@ -26,6 +26,9 @@ using AssetSnap.Trait;
 using Godot;
 namespace AssetSnap.Component
 {
+	/// <summary>
+    /// A dropdownable component that extends ContainerTrait, allowing the creation of dropdown menus.
+    /// </summary>
 	[Tool]
 	public partial class Dropdownable : ContainerTrait
 	{
@@ -59,20 +62,20 @@ namespace AssetSnap.Component
 		private string DefaultValue = "";
 		private string PrefixLabel = "";
 		
-		/*
-		** Public methods
-		*/
+		/// <summary>
+        /// Constructor for the Dropdownable class.
+        /// </summary>
 		public Dropdownable()
 		{
 			Name = "Dropdownable";
 			TypeString = GetType().ToString();
 		}
 		
-		/*
-		** Instantiate an instance of the trait
-		**
-		** @return Dropdownable
-		*/
+		/// <summary>
+        /// Instantiate an instance of the trait.
+        /// </summary>
+        /// <param name="i">An integer value.</param>
+        /// <returns>Returns the instantiated Dropdownable instance.</returns>
 		public Dropdownable Instantiate(int i)
 		{
 			UsePaddingContainer = false;
@@ -152,13 +155,12 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		/*
-		** Selects an placed button in the
-		** nodes array by index
-		**
-		** @param int index
-		** @return Dropdownable
-		*/
+		/// <summary>
+        /// Selects a placed button in the nodes array by index.
+        /// </summary>
+        /// <param name="index">The index of the button to select.</param>
+        /// <param name="debug">Optional parameter to enable debugging.</param>
+        /// <returns>Returns the updated Dropdownable instance.</returns>
 		public override Dropdownable Select(int index, bool debug = false)
 		{
 			base._Select(index);
@@ -172,13 +174,11 @@ namespace AssetSnap.Component
 			return this; 
 		}
 		
-		/*
-		** Selects an placed button in the
-		** nodes array by name
-		**
-		** @param string name
-		** @return Dropdownable
-		*/
+		/// <summary>
+        /// Selects a placed button in the nodes array by name.
+        /// </summary>
+        /// <param name="name">The name of the button to select.</param>
+        /// <returns>Returns the updated Dropdownable instance.</returns>
 		public override Dropdownable SelectByName(string name)
 		{
 			base.SelectByName(name);
@@ -186,12 +186,11 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		/*
-		** Adds an button node to the dropdown
-		**
-		** @param Button button
-		** @return Dropdownable
-		*/
+		/// <summary>
+        /// Adds a button node to the dropdown.
+        /// </summary>
+        /// <param name="button">The button to add.</param>
+        /// <returns>Returns the updated Dropdownable instance.</returns>
 		public Dropdownable AddItem( Button button )
 		{
 			Items.Add(button);
@@ -199,13 +198,10 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		/*
-		** Adds the currently chosen dropdown
-		** to a specified container
-		**
-		** @param Node Container
-		** @return void
-		*/
+		/// <summary>
+        /// Adds the currently chosen dropdown to a specified container.
+        /// </summary>
+        /// <param name="Container">The container to which the dropdown will be added.</param>
 		public void AddToContainer( Node Container ) 
 		{
 			if( null == Dependencies || false == Dependencies.ContainsKey(TraitName + "_MarginContainer") ) 
@@ -227,16 +223,11 @@ namespace AssetSnap.Component
 			Reset();
 		}
 		
-		/*
-		** Setter Methods
-		*/
-		
-		/*
-		** Sets a name for the current dropdown
-		**
-		** @param string text
-		** @return Dropdownable
-		*/
+		/// <summary>
+        /// Sets a name for the current dropdown.
+        /// </summary>
+        /// <param name="text">The name to set.</param>
+        /// <returns>Returns the updated Dropdownable instance.</returns>
 		public Dropdownable SetName( string text ) 
 		{
 			base._SetName(text);
@@ -244,12 +235,11 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		/*
-		** Sets a prefix for the current dropdown
-		**
-		** @param string text
-		** @return Dropdownable
-		*/
+		/// <summary>
+        /// Sets a prefix for the current dropdown.
+        /// </summary>
+        /// <param name="text">The prefix to set.</param>
+        /// <returns>Returns the updated Dropdownable instance.</returns>
 		public Dropdownable SetPrefix( string text ) 
 		{
 			PrefixLabel = text;
@@ -257,13 +247,11 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		/*
-		** Sets the default value for
-		** the dropdown
-		**
-		** @param string value
-		** @return Dropdownable
-		*/
+		/// <summary>
+        /// Sets the default value for the dropdown.
+        /// </summary>
+        /// <param name="value">The default value to set.</param>
+        /// <returns>Returns the updated Dropdownable instance.</returns>
 		public Dropdownable SetDefaultValue(string value) 
 		{
 			DefaultValue = value;
@@ -271,14 +259,12 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		/*
-		** Sets margin values for 
-		** the currently chosen dropdown
-		**
-		** @param int value
-		** @param string side
-		** @return Dropdownable
-		*/
+		/// <summary>
+        /// Sets margin values for the currently chosen dropdown.
+        /// </summary>
+        /// <param name="value">The margin value.</param>
+        /// <param name="side">The side for which to set the margin.</param>
+        /// <returns>Returns the updated Dropdownable instance.</returns>
 		public override Dropdownable SetMargin( int value, string side = "" ) 
 		{
 			base.SetMargin(value, side);
@@ -286,14 +272,12 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		/*
-		** Sets padding values for 
-		** the currently chosen dropdown
-		**
-		** @param int value
-		** @param string side
-		** @return Dropdownable
-		*/
+		/// <summary>
+        /// Sets padding values for the currently chosen dropdown.
+        /// </summary>
+        /// <param name="value">The padding value.</param>
+        /// <param name="side">The side for which to set the padding.</param>
+        /// <returns>Returns the updated Dropdownable instance.</returns>
 		public override Dropdownable SetPadding( int value, string side = "" ) 
 		{
 			base.SetPadding(value, side);
@@ -301,15 +285,10 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		/*
-		** Getter Methods
-		*/
-		
-		/*
-		** Returns the inner container
-		**
-		** @return Container
-		*/
+		/// <summary>
+        /// Returns the inner container of the dropdown.
+        /// </summary>
+        /// <returns>Returns the inner container.</returns>
 		public Container GetDropdownContainer()
 		{
 			if( null == Dependencies || false == Dependencies.ContainsKey(TraitName + "_ItemsInnerContainer") ) 
@@ -320,16 +299,9 @@ namespace AssetSnap.Component
 			return Dependencies[TraitName + "_ItemsInnerContainer"].As<Container>();
 		}
 				
-		/*
-		** Private
-		*/
-		
-		/*
-		** Resets the trait to
-		** a cleared state
-		**
-		** @return void
-		*/
+		/// <summary>
+        /// Resets the trait to a cleared state.
+        /// </summary>
 		protected override void Reset()
 		{
 			panelContainer = null;

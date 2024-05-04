@@ -21,15 +21,19 @@
 // SOFTWARE.
 
 #if TOOLS
+
+using System.Collections.Generic;
+using AssetSnap.Explorer;
+using AssetSnap.Front.Components.Library;
+using AssetSnap.Front.Nodes;
+using AssetSnap.Static;
+using Godot;
+
 namespace AssetSnap.ContextMenu
 {
-	using System.Collections.Generic;
-	using AssetSnap.Explorer;
-	using AssetSnap.Front.Components.Library;
-	using AssetSnap.Front.Nodes;
-	using AssetSnap.Static;
-	using Godot;
-	
+	/// <summary>
+	/// Base class for managing the context menu in the AssetSnap addon.
+	/// </summary>
 	public partial class Base : Node, ISerializationListener
 	{
 		private readonly PackedScene _Scene = GD.Load<PackedScene>("res://addons/assetsnap/scenes/ContextMenu.tscn");
@@ -49,25 +53,39 @@ namespace AssetSnap.ContextMenu
 			}
 		}
 		
+		/// <summary>
+		/// Constructor for the Base class.
+		/// </summary>
+		/// <remarks>
+		/// This constructor initializes the Base class.
+		/// It sets the name of the context menu node to "AssetSnapContextMenu" and assigns the current instance to the static <see cref="_Instance"/> property.
+		/// </remarks>
+		/// <returns>Void.</returns>
 		public Base()
 		{
 			Name = "AssetSnapContextMenu";
 			_Instance = this;
 		}
 		
+		/// <summary>
+		/// Method called before serialization.
+		/// </summary>
 		public void OnBeforeSerialize()
 		{
 			//
 		}
 
+		/// <summary>
+		/// Method called after deserialization.
+		/// </summary>
 		public void OnAfterDeserialize()
 		{
 			_Instance = this;
 		}
 		
-		/*
-		** Initializes the context handler
-		*/ 
+		/// <summary>
+		/// Initializes the context handler.
+		/// </summary>
 		public void Initialize()
 		{
 			if( false == _ShouldUseOverlay())
@@ -87,16 +105,21 @@ namespace AssetSnap.ContextMenu
 			}
 		}
 		
+		/// <summary>
+		/// This method is called when the node and its children are ready.
+		/// </summary>
+		/// <remarks>
+		/// It calls the <see cref="_Initialize"/> method to initialize the context menu.
+		/// </remarks>
+		/// <returns>Void.</returns>
 		public override void _Ready()
 		{
 			_Initialize();
 		}
 	
-		/*
-		** Shows the context menu
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Shows the context menu.
+		/// </summary>
 		public void Show()
 		{
 			if( false == IsContextMenuValid() )
@@ -123,11 +146,9 @@ namespace AssetSnap.ContextMenu
 			}
 		}
 		
-		/*
-		** Hides the context menu
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Hides the context menu.
+		/// </summary>
 		public void Hide() 
 		{
 			if( false == IsContextMenuValid() )
@@ -138,13 +159,10 @@ namespace AssetSnap.ContextMenu
 			SetVisible(false);
 		}
 		
-		/*
-		** Sets the current rotation values based on a given vector3
-		** parameter
-		**
-		** @param Vector3 Rotation
-		** @return void
-		*/
+		/// <summary>
+		/// Sets the current rotation values based on a given vector3 parameter.
+		/// </summary>
+		/// <param name="Rotation">The rotation vector.</param>
 		public void SetRotationValues( Vector3 Rotation ) 
 		{
 			if(false == _ShouldUseOverlay() ||  false == IsContextMenuValid() ) 
@@ -163,13 +181,10 @@ namespace AssetSnap.ContextMenu
 			Handle.RotationDegrees = Rotation;
 		}
 		
-		/*
-		** Sets the current scale values based on a given vector3
-		** parameter
-		**
-		** @param Vector3 Scale
-		** @return void
-		*/
+		/// <summary>
+		/// Sets the current scale values based on a given vector3 parameter.
+		/// </summary>
+		/// <param name="Scale">The scale vector.</param>
 		public void SetScaleValues( Vector3 Scale ) 
 		{
 			if(false == _ShouldUseOverlay() || false == IsContextMenuValid() ) 
@@ -188,6 +203,10 @@ namespace AssetSnap.ContextMenu
 			Handle.Scale = Scale;
 		}
 		
+		/// <summary>
+		/// Gets the instance of the context menu.
+		/// </summary>
+		/// <returns>The instance of the context menu.</returns>
 		public AsContextMenu GetInstance()
 		{	
 			if( false == HasInstance() )
@@ -198,6 +217,10 @@ namespace AssetSnap.ContextMenu
 			return GetNode("AsContextMenu") as AsContextMenu;
 		}
 		
+		/// <summary>
+		/// Checks if an instance of the context menu exists.
+		/// </summary>
+		/// <returns>True if an instance exists, false otherwise.</returns>
 		public bool HasInstance()
 		{
 			if( false == HasNode("AsContextMenu") || false == EditorPlugin.IsInstanceValid( GetNode("AsContextMenu") ) ) 
@@ -208,11 +231,10 @@ namespace AssetSnap.ContextMenu
 			return true;
 		}
 		
-		/*
-		** Fetches the current rotation values
-		**
-		** @return Vector3
-		*/
+		/// <summary>
+		/// Fetches the current rotation values.
+		/// </summary>
+		/// <returns>The rotation values as a Vector3.</returns>
 		public Vector3 GetRotateValues()
 		{
 			if(false == _ShouldUseOverlay() || false == IsContextMenuValid() ) 
@@ -228,11 +250,10 @@ namespace AssetSnap.ContextMenu
 			return Vector3.Zero;
 		}
 		
-		/*
-		** Fetches the current scale values
-		**
-		** @return Vector3
-		*/
+		/// <summary>
+		/// Fetches the current scale values.
+		/// </summary>
+		/// <returns>The scale values as a Vector3.</returns>
 		public Vector3 GetScaleValues()
 		{
 			if(false == _ShouldUseOverlay() || false == IsContextMenuValid() ) 
@@ -248,11 +269,10 @@ namespace AssetSnap.ContextMenu
 			return Vector3.Zero;
 		}
 		
-		/*
-		** Fetches the current angle value
-		**
-		** @return int
-		*/
+		/// <summary>
+		/// Fetches the current angle value.
+		/// </summary>
+		/// <returns>The current angle as an integer.</returns>
 		public int GetCurrentAngle()
 		{
 			if(false == _ShouldUseOverlay() || false == IsContextMenuValid() ) 
@@ -268,10 +288,10 @@ namespace AssetSnap.ContextMenu
 			return 0;
 		}
 		
-		/*
-		** Defines the visibility state of
-		** the context menu
-		*/
+		/// <summary>
+		/// Sets the visibility state of the context menu.
+		/// </summary>
+		/// <param name="state">The visibility state.</param>
 		public void SetVisible(bool state)
 		{
 			if( false == HasInstance() ) 
@@ -283,11 +303,10 @@ namespace AssetSnap.ContextMenu
 			GetInstance().Active = state;
 		}
 		
-		/*
-		** Checks if context menu is hidden
-		**
-		** @return bool
-		*/
+		/// <summary>
+		/// Checks if the context menu is hidden.
+		/// </summary>
+		/// <returns>True if the context menu is hidden, false otherwise.</returns>
 		public bool IsHidden() 
 		{
 			if( false == IsContextMenuValid() || false == _ShouldUseOverlay()) 
@@ -298,11 +317,10 @@ namespace AssetSnap.ContextMenu
 			return GetInstance().Visible == false;
 		}
 		
-		/*
-		** Checks if the instance of ContextMenu is valid or not
-		**
-		** @return bool
-		*/
+		/// <summary>
+		/// Checks if the instance of the context menu is valid.
+		/// </summary>
+		/// <returns>True if the instance is valid, false otherwise.</returns>
 		public bool IsContextMenuValid()
 		{
 			return
@@ -313,23 +331,22 @@ namespace AssetSnap.ContextMenu
 				null != GetInstance().GetParent();
 		}
 		
-		/*
-		** Initialies the scene and adds
-		** it to the tree
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Initializes the scene and adds it to the tree.
+		/// </summary>
+		/// <remarks>
+		/// This method initializes the scene for the context menu and adds it to the tree.
+		/// It sets the visibility of the context menu to false by default.
+		/// </remarks>
+		/// <returns>Void.</returns>
 		private void _Initialize() 
 		{
 			SetVisible(false);			
 		}
 
-		/*
-		** Initialies the components needed
-		** for the context menu
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Initializes the components needed for the context menu.
+		/// </summary>
 		public void InitializeComponents()
 		{
 			if( false == Plugin.Singleton.HasInternalContainer() ) 
@@ -360,21 +377,19 @@ namespace AssetSnap.ContextMenu
 			}
 		}
 	
-		/*
-		** Checks if the components needed are available
-		** 
-		** @return bool
-		*/
+		/// <summary>
+		/// Checks if the components needed for the context menu are available.
+		/// </summary>
+		/// <returns>True if all components are available, false otherwise.</returns>
 		public bool HasComponents() 
 		{
 			return ExplorerUtils.Get().Components.HasAll(Components.ToArray());
 		}
 		
-		/*
-		** Checks if context menu should be used or not
-		**
-		** @return bool
-		*/
+		/// <summary>
+		/// Checks if the context menu should be used or not.
+		/// </summary>
+		/// <returns>True if the context menu should be used, false otherwise.</returns>
 		private bool _ShouldUseOverlay()
 		{
 			return SettingsStatic.ShouldUseASOverlay();

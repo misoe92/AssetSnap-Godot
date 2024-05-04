@@ -20,24 +20,27 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using AssetSnap.Explorer;
+using AssetSnap.Front.Nodes;
+using AssetSnap.States;
+using Godot;
+
 namespace AssetSnap.Front.Modifiers
 {
-	using System;
-	using AssetSnap.Explorer;
-	using AssetSnap.Front.Nodes;
-	using AssetSnap.States;
-
-	using Godot;
-
+	/// <summary>
+	/// Partial class for scattering modification on a 3D node.
+	/// </summary>
 	public partial class AsScatterModifier
 	{
+		/// <summary>
+        /// Name of the scatter modifier.
+        /// </summary>
 		public string Name = "AsScatterModifier";
 
-		/*
-		** Applies the modifier
-		** 
-		** @return async Task<bool>
-		*/
+		/// <summary>
+        /// Applies the modifier asynchronously.
+        /// </summary>
+        /// <returns>Returns true if the modifier is successfully applied, false otherwise.</returns>
 		public bool Apply()
 		{
 			if (HasHandle() == false)
@@ -50,12 +53,10 @@ namespace AssetSnap.Front.Modifiers
 			return true;
 		}
 
-		/*
-		** Applies simple modifier, without a parenting
-		** static body
-		** 
-		** @return async Task<bool>
-		*/
+		/// <summary>
+        /// Applies a simple modifier without parenting to a static body.
+        /// </summary>
+        /// <returns>Returns true if the simple modifier is successfully applied, false otherwise.</returns>
 		public bool ApplySimple()
 		{
 			Node3D Handle = GetHandle() as Node3D;
@@ -95,21 +96,19 @@ namespace AssetSnap.Front.Modifiers
 			return true;
 		}
 
-		/*
-		** Fetches the current handle
-		** 
-		** @return Node
-		*/
+		/// <summary>
+        /// Retrieves the current handle.
+        /// </summary>
+        /// <returns>Returns the current handle as a Node.</returns>
 		public Node GetHandle()
 		{
 			return StatesUtils.Get().EditingObject;
 		}
 
-		/*
-		** Checks if handle exists
-		** 
-		** @return bool
-		*/
+		/// <summary>
+        /// Checks if a handle exists.
+        /// </summary>
+        /// <returns>Returns true if a handle exists, false otherwise.</returns>
 		public bool HasHandle()
 		{
 			Node3D Handle = StatesUtils.Get().EditingObject;

@@ -24,13 +24,24 @@ using AssetSnap.Front.Configs;
 
 namespace AssetSnap.Settings
 {
+	/// <summary>
+	/// Utility class for accessing settings configuration.
+	/// </summary>
 	public static class SettingsUtils
 	{
+		/// <summary>
+		/// Retrieves the settings configuration instance.
+		/// </summary>
+		/// <returns>The settings configuration instance.</returns>
 		public static SettingsConfig Get()
 		{
 			return SettingsConfig.Singleton;
 		}
 		
+		/// <summary>
+        /// Checks if the settings configuration is valid.
+        /// </summary>
+        /// <returns>True if the settings configuration is valid, otherwise false.</returns>
 		public static bool IsValid()
 		{
 			return Get() != null;

@@ -20,15 +20,23 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using AssetSnap.Component;
+using AssetSnap.States;
+using Godot;
+
 namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 {
-	using AssetSnap.Component;
-    using AssetSnap.States;
-    using Godot;
-
+	/// <summary>
+	/// Component representing the visibility end option for a group in the groups builder.
+	/// </summary>
 	[Tool]
 	public partial class VisibilityEnd : GroupOptionSpinboxableComponent
 	{
+		/// <summary>
+		/// Constructor for the VisibilityEnd class.
+		/// </summary>
 		public VisibilityEnd()
 		{
 			Name = "GroupsBuilderGroupOptionsVisibilityEnd";
@@ -39,6 +47,9 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 			};
 		}
 		
+		/// <summary>
+		/// Initializes the fields for the visibility end component.
+		/// </summary>
 		protected override void _InitializeFields()
 		{
 			Trait<Spinboxable>()
@@ -57,6 +68,10 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 				.GetLineEdit().AddThemeConstantOverride("minimum_character_width", 24);
 		}
 
+		/// <summary>
+        /// Handles the value change event for the visibility end component.
+        /// </summary>
+        /// <param name="value">The new value for visibility end.</param>
 		private void _OnValueChanged( float value )
 		{
 			if( StatesUtils.Get().PlacingMode == GlobalStates.PlacingModeEnum.Group ) 
@@ -68,3 +83,5 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 		}
 	}
 }
+
+#endif

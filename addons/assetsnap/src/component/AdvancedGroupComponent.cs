@@ -21,14 +21,20 @@
 // SOFTWARE.
 
 #if TOOLS
-using AssetSnap.Front.Nodes;
+
 using Godot;
 
 namespace AssetSnap.Component
 {
+	/// <summary>
+	/// An advanced group component for managing grouped objects.
+	/// </summary>
 	[Tool]
 	public partial class AdvancedGroupComponent : GroupObjectComponent
 	{	
+		/// <summary>
+		/// Initializes the fields of the advanced group component.
+		/// </summary>
 		protected override void _InitializeFields()
 		{
 			Trait<Containerable>()
@@ -50,6 +56,10 @@ namespace AssetSnap.Component
 				.SetType(Labelable.TitleType.HeaderSmall)
 				.Instantiate();
 		}
+		
+		/// <summary>
+        /// Finalizes the fields of the advanced group component.
+        /// </summary>
 		protected override void _FinalizeFields()
 		{
 			Container OuterContainer = Trait<Containerable>()
@@ -71,4 +81,5 @@ namespace AssetSnap.Component
 		}
 	}
 }
+
 #endif

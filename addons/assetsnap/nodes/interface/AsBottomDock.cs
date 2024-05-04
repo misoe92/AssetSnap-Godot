@@ -21,13 +21,17 @@
 // SOFTWARE.
 
 #if TOOLS
+
+using System.Collections.Generic;
+using AssetSnap.Component;
+using AssetSnap.Front.Components;
+using Godot;
+
 namespace AssetSnap.Front.Nodes
 {
-	using System.Collections.Generic;
-	using AssetSnap.Component;
-	using AssetSnap.Front.Components;
-	using Godot;
-
+	/// <summary>
+	/// Partial class representing the bottom dock UI element.
+	/// </summary>
 	[Tool]
 	public partial class AsBottomDock : VBoxContainer
 	{
@@ -51,6 +55,9 @@ namespace AssetSnap.Front.Nodes
 		public new Control.SizeFlags SizeFlagsVertical = Control.SizeFlags.ExpandFill;
 		private readonly Callable _callable = Callable.From((int index) => { _OnTabChanged(index); });
 
+		/// <summary>
+		/// Called when the node enters the scene tree.
+		/// </summary>
 		public override void _EnterTree()
 		{
 			Name = "BottomDock";
@@ -60,11 +67,9 @@ namespace AssetSnap.Front.Nodes
 			SetupGeneralTab();
 		}
 
-		/*
-		** Configure and initialize the "General" tab.
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Configures and initializes the "General" tab.
+		/// </summary>
 		private void SetupGeneralTab()
 		{
 			SetupLoadingContainers();
@@ -79,6 +84,9 @@ namespace AssetSnap.Front.Nodes
 			AddChild(_LoadingContainer);
 		}
 
+		/// <summary>
+		/// Sets up the loading containers.
+		/// </summary>
 		private void SetupLoadingContainers()
 		{
 			_LoadingContainer = new();
@@ -109,12 +117,9 @@ namespace AssetSnap.Front.Nodes
 			_LoadingContainer.AddChild(margin);
 		}
 
-		/*
-		** Initialies the containers which will be used
-		** in our general tab..
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Initializes the containers used in the general tab.
+		/// </summary>
 		private void SetupGeneralTabContainers()
 		{
 			_TabContainer = new()
@@ -161,12 +166,9 @@ namespace AssetSnap.Front.Nodes
 			};
 		}
 
-		/*
-		** Places our containers in the tabcontainer
-		** so it becomes visible and useable.
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Places the containers in the tab container.
+		/// </summary>
 		private void PlaceGeneralTabContainers()
 		{
 			MainContainer.AddChild(SubContainerOne);
@@ -177,12 +179,9 @@ namespace AssetSnap.Front.Nodes
 			_TabContainer.AddChild(_PanelContainer);
 		}
 
-		/*
-		** Initializes the various components that the general tab
-		** need to display it's content
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// Initializes the various components of the general tab.
+		/// </summary>
 		private void InitializeGeneralTabComponents()
 		{
 			if (GlobalExplorer.GetInstance().Components.HasAll(GeneralComponents.ToArray()))
@@ -215,6 +214,9 @@ namespace AssetSnap.Front.Nodes
 			}
 		}
 
+		/// <summary>
+		/// Event handler for the load listing event.
+		/// </summary>
 		private void _OnLoadListing()
 		{
 			GlobalExplorer.GetInstance().Components.Clear<LibrariesListing>();
@@ -227,6 +229,10 @@ namespace AssetSnap.Front.Nodes
 			}
 		}
 
+		/// <summary>
+        /// Event handler for tab changes.
+        /// </summary>
+        /// <param name="index">The index of the tab.</param>
 		private static void _OnTabChanged(int index)
 		{
 			if (
@@ -242,4 +248,5 @@ namespace AssetSnap.Front.Nodes
 		}
 	}
 }
+
 #endif

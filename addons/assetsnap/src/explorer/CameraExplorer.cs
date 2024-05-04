@@ -21,11 +21,14 @@
 // SOFTWARE.
 
 #if TOOLS
+
+using Godot;
+
 namespace AssetSnap
 {
-    using System;
-    using Godot;
-
+	/// <summary>
+	/// Partial class representing a camera explorer, inheriting from BaseExplorer.
+	/// </summary>
 	[Tool]
 	public partial class CameraExplorer : BaseExplorer
 	{
@@ -34,9 +37,9 @@ namespace AssetSnap
 		protected Vector3? _PositionDraw;
 		protected Vector3? _NormalDraw;
 		
-		/*
-		** Projected values
-		*/
+		/// <summary>
+		/// Gets or sets the projected ray origin.
+		/// </summary>
 		public Vector3? ProjectRayOrigin 
 		{
 			get => _ProjectRayOrigin;
@@ -45,6 +48,10 @@ namespace AssetSnap
 				_ProjectRayOrigin = value;
 			}
 		}
+		
+		/// <summary>
+		/// Gets or sets the projected ray normal.
+		/// </summary>
 		public Vector3? ProjectRayNormal 
 		{
 			get => _ProjectRayNormal;
@@ -54,6 +61,9 @@ namespace AssetSnap
 			}
 		}
 		
+		/// <summary>
+		/// Gets or sets the drawn position.
+		/// </summary>
 		public Vector3? PositionDraw
 		{
 			get => _PositionDraw;
@@ -63,6 +73,9 @@ namespace AssetSnap
 			}	
 		}
 		
+		/// <summary>
+		/// Gets or sets the drawn normal.
+		/// </summary>
 		public Vector3? NormalDraw
 		{
 			get => _NormalDraw;
@@ -72,41 +85,73 @@ namespace AssetSnap
 			}
 		}
 		
+		/// <summary>
+		/// Gets the projected ray origin as a Vector3.
+		/// </summary>
+		/// <returns>The projected ray origin.</returns>
 		public Vector3 GetProjectOrigin()
 		{
 			return (Vector3)ProjectRayOrigin;
 		}
 		
+		/// <summary>
+		/// Gets the projected ray normal as a Vector3.
+		/// </summary>
+		/// <returns>The projected ray normal.</returns>
 		public Vector3 GetProjectNormal()
 		{
 			return (Vector3)ProjectRayNormal;
 		}
 		
+		/// <summary>
+		/// Gets the drawn position as a Vector3.
+		/// </summary>
+		/// <returns>The drawn position.</returns>
 		public Vector3 GetPositionDrawn()
 		{
 			return null != PositionDraw ? (Vector3)PositionDraw : Vector3.Zero;
 		}
 		
+		/// <summary>
+		/// Gets the drawn normal as a Vector3.
+		/// </summary>
+		/// <returns>The drawn normal.</returns>
 		public Vector3 GetNomalDrawn()
 		{
 			return (Vector3)NormalDraw;
 		}
 		
+		/// <summary>
+		/// Checks if the projected ray origin is set.
+		/// </summary>
+		/// <returns>True if the projected ray origin is set, false otherwise.</returns>
 		public bool HasProjectOrigin()
 		{
 			return ProjectRayOrigin != null;
 		}
 		
+		/// <summary>
+		/// Checks if the projected ray normal is set.
+		/// </summary>
+		/// <returns>True if the projected ray normal is set, false otherwise.</returns>
 		public bool HasProjectNormal()
 		{
 			return ProjectRayNormal != null;
 		}
 		
+		/// <summary>
+		/// Checks if the drawn position is set.
+		/// </summary>
+		/// <returns>True if the drawn position is set, false otherwise.</returns>
 		public bool HasPositionDrawn()
 		{
 			return PositionDraw != null;
 		}
 		
+		/// <summary>
+        /// Checks if the drawn normal is set.
+        /// </summary>
+        /// <returns>True if the drawn normal is set, false otherwise.</returns>
 		public bool HasNormalDrawn()
 		{
 			return NormalDraw != null;

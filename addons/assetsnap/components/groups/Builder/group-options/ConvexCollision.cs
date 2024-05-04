@@ -20,14 +20,22 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
+using AssetSnap.Component;
+using Godot;
+
 namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 {
-	using AssetSnap.Component;
-	using Godot;
-
+	/// <summary>
+	/// Represents a group option for convex collision.
+	/// </summary>
 	[Tool]
 	public partial class ConvexCollision : GroupOptionCheckableComponent
 	{
+		/// <summary>
+		/// Constructor for ConvexCollision class.
+		/// </summary>
 		public ConvexCollision()
 		{
 			Name = "GroupsBuilderGroupOptionsConvexCollision";
@@ -38,6 +46,9 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 			};
 		}
 
+		/// <summary>
+		/// Initializes the fields for the ConvexCollision group option.
+		/// </summary>
 		protected override void _InitializeFields()
 		{
 			Trait<Checkable>()
@@ -48,6 +59,9 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 				.Instantiate();
 		}
 
+		/// <summary>
+        /// Event handler for when the convex collision option is checked.
+        /// </summary>
 		private void _OnCheck()
 		{
 			_GlobalExplorer.GroupBuilder._Editor.Group.ConvexCollision = !_GlobalExplorer.GroupBuilder._Editor.Group.ConvexCollision;
@@ -76,3 +90,5 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 		}
 	}
 }
+
+#endif

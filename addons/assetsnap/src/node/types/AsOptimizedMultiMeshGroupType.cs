@@ -20,24 +20,24 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using Godot;
+
 namespace AssetSnap.ASNode.Types
 {
-	using Godot;
-	
+	/// <summary>
+    /// Represents a custom node type for optimized multi-mesh groups.
+    /// </summary>
 	[Tool]
 	public class AsOptimizedMultiMeshGroupType : NodeType
 	{
-		/*
-		** Construction of the custom node type.
-		*/
+		/// <summary>
+        /// Constructs a new instance of the custom node type for optimized multi-mesh groups.
+        /// </summary>
 		public AsOptimizedMultiMeshGroupType()
 		{
 			Name = "AsOptimizedMultiMeshGroup3D";
-
 			Inherits = "Node3D";
-
 			ScriptPath = "res://addons/assetsnap/nodes/3d/AsOptimizedMultiMeshGroup3D.cs";
-
 			IconPath = "res://addons/assetsnap/assets/icons/Node.svg";
 		}
 	}

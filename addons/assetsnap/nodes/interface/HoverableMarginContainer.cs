@@ -20,11 +20,13 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using Godot;
+
 namespace AssetSnap.Front.Nodes
 {
-	using System;
-	using Godot;
-
+	/// <summary>
+	/// Represents a margin container with hoverable behavior.
+	/// </summary>
 	[Tool]
 	public partial class HoverableMarginContainer : MarginContainer
 	{
@@ -32,25 +34,45 @@ namespace AssetSnap.Front.Nodes
 		private Callable? MouseLeaveCallable; 
 		private Callable? MouseClickCallable;
 
+		/// <summary>
+		/// The color when not hovered.
+		/// </summary>
 		[Export]
 		public Color NormalColor = new Color(28.0f / 255.0f,28.0f / 255.0f,28.0f / 255.0f,0.0f / 255.0f);
+		
+		/// <summary>
+		/// The color when hovered.
+		/// </summary>
 		[Export]
 		public Color HoverColor = new Color(28.0f / 255.0f,28.0f / 255.0f,28.0f / 255.0f,255.0f / 255.0f);
+		
+		/// <summary>
+		/// The color when focused.
+		/// </summary>
 		[Export]
 		public Color FocusColor = new Color(28.0f / 255.0f,28.0f / 255.0f,28.0f / 255.0f,255.0f / 255.0f);
 		
+		/// <summary>
+		/// The text color when not hovered.
+		/// </summary>
 		[Export]
 		public Color TextNormalColor = new Color(255.0f / 255.0f,255.0f / 255.0f,255.0f / 255.0f,255.0f / 255.0f);
+		
+		/// <summary>
+		/// The text color when hovered.
+		/// </summary>
 		[Export]
 		public Color TextHoverColor = new Color(189.0f / 255.0f,189.0f / 255.0f,189.0f / 255.0f,255.0f / 255.0f);
+		
+		/// <summary>
+        /// The text color when focused.
+        /// </summary>
 		[Export]
 		public Color TextFocusColor = new Color(189.0f / 255.0f,189.0f / 255.0f,189.0f / 255.0f,255.0f / 255.0f);
 	
-		/*
-		** Configuration of the hoverable margin container
-		** 
-		** @return void
-		*/
+		/// <summary>
+        /// Configures the hoverable margin container.
+        /// </summary>
 		public override void _EnterTree()
 		{
 			MouseEnterCallable = new Callable(this, "_MouseEnter");
@@ -73,11 +95,9 @@ namespace AssetSnap.Front.Nodes
 			}
 		}
 
-		/*
-		** Handles transitions to hover color
-		** 
-		** @return void
-		*/
+		/// <summary>
+        /// Handles transitions to hover color.
+        /// </summary>
 		public virtual void _MouseEnter()
 		{
 			Label _Label = GetNode<Label>("VBoxContainer/Label");
@@ -92,11 +112,9 @@ namespace AssetSnap.Front.Nodes
 			_Label.SelfModulate = TextHoverColor;
 		}
 		
-		/*
-		** Handles transitions back to normal color
-		** 
-		** @return void
-		*/
+		/// <summary>
+        /// Handles transitions back to normal color.
+        /// </summary>
 		public virtual void _MouseLeave()
 		{
 			Label _Label = GetNode<Label>("VBoxContainer/Label");
@@ -111,13 +129,10 @@ namespace AssetSnap.Front.Nodes
 			_Label.SelfModulate = TextNormalColor;
 		}
 		
-		/*
-		** If parent is a select list, on click
-		** it then sets the active of said select list
-		** to that of this class
-		** 
-		** @return void
-		*/
+		/// <summary>
+        /// If parent is a select list, on click sets the active of said select list to that of this class.
+        /// </summary>
+        /// <param name="event">The input event.</param>
 		public virtual void _MouseClick( InputEvent @event )
 		{
 			if( @event is InputEventMouseButton EventMouseButton ) 
@@ -141,13 +156,10 @@ namespace AssetSnap.Front.Nodes
 			}
 		}
 		
-		/*
-		** Checks if parent is a select list,
-		** if so it then checks if this item
-		** equals the active item
-		** 
-		** @return bool
-		*/	
+		/// <summary>
+        /// Checks if parent is a select list, if so checks if this item equals the active item.
+        /// </summary>
+        /// <returns>True if active, false otherwise.</returns>
 		public virtual bool IsActive()
 		{
 			var _parent = GetParent();
@@ -163,11 +175,9 @@ namespace AssetSnap.Front.Nodes
 			return false;
 		}
 
-		/*
-		** Cleans up references, parameters and fields
-		** 
-		** @return void
-		*/	
+		/// <summary>
+        /// Cleans up references, parameters, and fields.
+        /// </summary>
 		public override void _ExitTree()
 		{
 			if( MouseEnterCallable is Callable _EnterCallable ) 

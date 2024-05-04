@@ -24,6 +24,7 @@
 using System.Collections.Generic;
 using AssetSnap.Trait;
 using Godot;
+
 namespace AssetSnap.Component
 {
 	[Tool]
@@ -41,20 +42,23 @@ namespace AssetSnap.Component
 		private float MaximumValue = 0;
 		private double DefaultValue = 0;
 		
-		/*
-		** Public methods
-		*/
+		/* The `public Spinboxable()` constructor in the `Spinboxable` class is initializing the `Name`
+		property to "Spinboxable" and setting the `TypeString` property to the string representation of
+		the class type. This constructor is called when an instance of the `Spinboxable` class is created,
+		and it helps in setting initial values for these properties. */
 		public Spinboxable()
 		{
 			Name = "Spinboxable";
 			TypeString = GetType().ToString();
 		}
 		
-		/*
-		** Instantiate an instance of the trait
-		**
-		** @return Spinboxable
-		*/
+		/// <summary>
+		/// The below function instantiates a SpinBox control with specified properties and connects it to a
+		/// callable action.
+		/// </summary>
+		/// <returns>
+		/// The method `Instantiate()` is returning an instance of the `Spinboxable` trait.
+		/// </returns>
 		public override Spinboxable Instantiate()
 		{
 			base._Instantiate();
@@ -116,13 +120,19 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		/*
-		** Selects an placed spinbox in the
-		** nodes array by index
-		**
-		** @param int index
-		** @return Spinboxable
-		*/
+		/// <summary>
+		/// This C# function selects a placed spinbox in the nodes array by index and returns a Spinboxable
+		/// object.
+		/// </summary>
+		/// <param name="index">The `index` parameter in the `Select` method is used to specify the index of
+		/// the spinbox that you want to select from the nodes array.</param>
+		/// <param name="debug">The `debug` parameter in the `Select` method is a boolean flag that can be set
+		/// to `true` or `false`. When set to `true`, it enables debugging mode which can help in
+		/// troubleshooting and identifying any issues during the execution of the method. If set to `false`,
+		/// debugging</param>
+		/// <returns>
+		/// The method `Select` is returning an object that implements the `Spinboxable` interface.
+		/// </returns>
 		public override Spinboxable Select(int index, bool debug = false)
 		{
 			base._Select(index, debug);
@@ -136,13 +146,17 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		/*
-		** Selects an placed spinbox in the
-		** nodes array by name
-		**
-		** @param string name
-		** @return Spinboxable
-		*/
+		/// <summary>
+		/// The SelectByName function in C# selects a placed spinbox in the nodes array by name and sets it as
+		/// a dependency.
+		/// </summary>
+		/// <param name="name">The `name` parameter in the `SelectByName` method is a string that represents
+		/// the name of the spinbox that you want to select from the array of nodes. The method iterates
+		/// through the array of nodes (which seem to be buttons in this case) and checks if the name of
+		/// the</param>
+		/// <returns>
+		/// The method `SelectByName` is returning an object that implements the `Spinboxable` interface.
+		/// </returns>
 		public override Spinboxable SelectByName( string name ) 
 		{
 			foreach( Button button in Nodes ) 
@@ -157,13 +171,16 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		/*
-		** Adds the currently chosen button
-		** to a specified container
-		**
-		** @param Node Container
-		** @return void
-		*/
+		/// <summary>
+		/// The AddToContainer function adds the currently chosen button to a specified container after
+		/// checking for its existence in the Dependencies dictionary.
+		/// </summary>
+		/// <param name="Node">The `Node` parameter in the `AddToContainer` method represents the container to
+		/// which the currently chosen button will be added. It is the target container where the button will
+		/// be placed.</param>
+		/// <returns>
+		/// void
+		/// </returns>
 		public void AddToContainer( Node Container )
 		{
 			if( false == Dependencies.ContainsKey(TraitName + "_MarginContainer") ) 
@@ -177,16 +194,14 @@ namespace AssetSnap.Component
 			_AddToContainer(Container, Dependencies[TraitName + "_MarginContainer"].As<MarginContainer>());
 		}
 		
-		/*
-		** Setter Methods
-		*/
-		
-		/*
-		** Sets the name of the current spinbox
-		**
-		** @param string text
-		** @return Spinboxable
-		*/
+		/// <summary>
+		/// This C# function sets the name of the current spinbox and returns a Spinboxable object.
+		/// </summary>
+		/// <param name="text">The `text` parameter in the `SetName` method is a string that represents the name
+		/// you want to set for the current spinbox.</param>
+		/// <returns>
+		/// The method `SetName` is returning an object of type `Spinboxable`.
+		/// </returns>
 		public Spinboxable SetName( string text ) 
 		{
 			base._SetName(text);
@@ -194,12 +209,15 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		/*
-		** Sets the prefix of the current spinbox
-		**
-		** @param string Prefix
-		** @return Spinboxable
-		*/
+		/// <summary>
+		/// This C# function sets the prefix of a spinbox and returns the object for chaining.
+		/// </summary>
+		/// <param name="Prefix">The `SetPrefix` method in the code snippet allows you to set the prefix of
+		/// the current spinbox. The method takes a string parameter named `Prefix`, which represents the
+		/// prefix you want to set for the spinbox.</param>
+		/// <returns>
+		/// The method `SetPrefix` is returning an object that implements the `Spinboxable` interface.
+		/// </returns>
 		public Spinboxable SetPrefix( string Prefix ) 
 		{
 			_Prefix = Prefix;
@@ -207,12 +225,15 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		/*
-		** Sets the tooltip text of the current spinbox
-		**
-		** @param string text
-		** @return Spinboxable
-		*/
+		/// <summary>
+		/// The SetTooltipText function sets the tooltip text of the current spinbox and returns a Spinboxable
+		/// object.
+		/// </summary>
+		/// <param name="text">The `text` parameter in the `SetTooltipText` method is a string that represents
+		/// the tooltip text that you want to set for the current spinbox.</param>
+		/// <returns>
+		/// The method `SetTooltipText` is returning an object that implements the `Spinboxable` interface.
+		/// </returns>
 		public Spinboxable SetTooltipText( string text ) 
 		{
 			TooltipText = text;
@@ -220,12 +241,15 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		/*
-		** Sets the step value of the current spinbox
-		**
-		** @param float StepSize
-		** @return Spinboxable
-		*/
+		/// <summary>
+		/// The SetStep function sets the step value of the current spinbox in C#.
+		/// </summary>
+		/// <param name="StepSize">StepSize is a float value that represents the step value to set for the
+		/// current spinbox. This value determines the increment or decrement amount when the spinbox is
+		/// adjusted up or down.</param>
+		/// <returns>
+		/// The method `SetStep` returns an object of type `Spinboxable`.
+		/// </returns>
 		public Spinboxable SetStep( float StepSize ) 
 		{
 			_Step = StepSize;
@@ -233,12 +257,16 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		/*
-		** Sets the minimum value of the current spinbox
-		**
-		** @param float minValue
-		** @return Spinboxable
-		*/
+		/// <summary>
+		/// The SetMinValue function in C# sets the minimum value of the current spinbox and returns a
+		/// Spinboxable object.
+		/// </summary>
+		/// <param name="minValue">The `minValue` parameter in the `SetMinValue` method represents the minimum
+		/// value that can be set for the current spinbox. This value determines the lower limit of the range
+		/// of values that the spinbox can accept.</param>
+		/// <returns>
+		/// The method `SetMinValue` is returning an object of type `Spinboxable`.
+		/// </returns>
 		public Spinboxable SetMinValue(float minValue ) 
 		{
 			MinimumValue = minValue;
@@ -246,12 +274,15 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		/*
-		** Sets the maximum value of the current spinbox
-		**
-		** @param float maxValue
-		** @return Spinboxable
-		*/
+		/// <summary>
+		/// The SetMaxValue function in C# sets the maximum value of a spinbox and returns the object
+		/// implementing the Spinboxable interface.
+		/// </summary>
+		/// <param name="maxValue">The `maxValue` parameter is a floating-point number that represents the
+		/// maximum value that can be set for the current spinbox.</param>
+		/// <returns>
+		/// The method `SetMaxValue` is returning an object of type `Spinboxable`.
+		/// </returns>
 		public Spinboxable SetMaxValue(float maxValue ) 
 		{
 			MaximumValue = maxValue;
@@ -259,12 +290,15 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		/*
-		** Sets the value of the current spinbox
-		**
-		** @param double value
-		** @return Spinboxable
-		*/
+		/// <summary>
+		/// This C# function sets the value of a spinbox element and returns the object implementing the
+		/// Spinboxable interface.
+		/// </summary>
+		/// <param name="value">The `value` parameter in the `SetValue` method is of type `double` and
+		/// represents the value that will be set for the current spinbox.</param>
+		/// <returns>
+		/// The method `SetValue` returns an object that implements the `Spinboxable` interface.
+		/// </returns>
 		public Spinboxable SetValue( double value )
 		{
 			DefaultValue = value;
@@ -277,12 +311,15 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		/*
-		** Sets the visibility state of the current spinbox
-		**
-		** @param bool state
-		** @return Spinboxable
-		*/
+		/// <summary>
+		/// The function SetVisible sets the visibility state of the current spinbox.
+		/// </summary>
+		/// <param name="state">The `state` parameter in the `SetVisible` method is a boolean value that
+		/// determines the visibility state of the spinbox. If `state` is `true`, the spinbox will be visible;
+		/// if `state` is `false`, the spinbox will be hidden.</param>
+		/// <returns>
+		/// The method `SetVisible` is returning an object of type `Spinboxable`.
+		/// </returns>
 		public override Spinboxable SetVisible(bool state)
 		{
 			base.SetVisible(state);
@@ -290,12 +327,16 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		/*
-		** Sets the action of the current spinbox
-		**
-		** @param Callable action
-		** @return Spinboxable
-		*/
+		/// <summary>
+		/// The SetAction method assigns a Callable action to the current spinbox and returns a Spinboxable
+		/// object.
+		/// </summary>
+		/// <param name="Callable">In Java, `Callable` is a functional interface in the `java.util.concurrent`
+		/// package. It represents a task that can be executed and return a result. The `call()` method of the
+		/// `Callable` interface is used to perform the task and return the result.</param>
+		/// <returns>
+		/// The method SetAction returns an object of type Spinboxable.
+		/// </returns>
 		public Spinboxable SetAction( Callable action ) 
 		{
 			_Action = action;
@@ -303,13 +344,18 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		/*
-		** Sets the dimensions of the current spinbox
-		**
-		** @param int width
-		** @param int height
-		** @return Spinboxable
-		*/
+		/// <summary>
+		/// The SetDimensions method in C# sets the dimensions of the current spinbox and returns a
+		/// Spinboxable object.
+		/// </summary>
+		/// <param name="width">The `width` parameter specifies the width of the spinbox. It determines how
+		/// wide the spinbox will be displayed on the screen.</param>
+		/// <param name="height">The height parameter in the SetDimensions method specifies the vertical
+		/// dimension of the spinbox. It determines how tall the spinbox will be when displayed on the
+		/// screen.</param>
+		/// <returns>
+		/// The method is returning an object that implements the Spinboxable interface.
+		/// </returns>
 		public override Spinboxable SetDimensions( int width, int height )
 		{
 			base.SetDimensions(width,height);
@@ -317,13 +363,15 @@ namespace AssetSnap.Component
 			return this;
 		}
 				
-		/*
-		** Sets the vertical size flag, which controls the x
-		** axis, and how it should act.
-		**
-		** @param Control.SizeFlags flag
-		** @return Spinboxable
-		*/
+		/// <summary>
+		/// The function SetHorizontalSizeFlags sets the vertical size flag for the x axis in a C# class.
+		/// </summary>
+		/// <param name="flag">The `flag` parameter in the `SetHorizontalSizeFlags` method is of type
+		/// `Control.SizeFlags`. It is used to set the vertical size flag, which controls the x axis
+		/// behavior.</param>
+		/// <returns>
+		/// The method is returning an object that implements the Spinboxable interface.
+		/// </returns>
 		public override Spinboxable SetHorizontalSizeFlags(Control.SizeFlags flag)
 		{
 			base.SetHorizontalSizeFlags(flag);
@@ -331,13 +379,15 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		/*
-		** Sets the vertical size flag, which controls the y
-		** axis, and how it should act.
-		**
-		** @param Control.SizeFlags flag
-		** @return Spinboxable
-		*/
+		/// <summary>
+		/// This C# function sets the vertical size flags for a control, controlling the y-axis behavior.
+		/// </summary>
+		/// <param name="flag">The `flag` parameter in the `SetVerticalSizeFlags` method is of type
+		/// `Control.SizeFlags`. It is used to set the vertical size flag, which controls the y-axis behavior
+		/// of the control.</param>
+		/// <returns>
+		/// The method is returning an object of type Spinboxable.
+		/// </returns>
 		public override Spinboxable SetVerticalSizeFlags(Control.SizeFlags flag)
 		{
 			base.SetVerticalSizeFlags(flag);
@@ -345,14 +395,17 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		/*
-		** Sets margin values for 
-		** the currently chosen spinbox
-		**
-		** @param int value
-		** @param string side
-		** @return Spinboxable
-		*/
+		/// <summary>
+		/// The SetMargin function sets margin values for the currently chosen spinbox in C#.
+		/// </summary>
+		/// <param name="value">The `value` parameter represents the margin value that you want to set for the
+		/// spinbox. It is an integer value that determines the size of the margin.</param>
+		/// <param name="side">The `side` parameter in the `SetMargin` method is a string that specifies which
+		/// side of the spinbox the margin value should be applied to. It can have values like "top",
+		/// "bottom", "left", "right", or an empty string if the margin value should be applied to</param>
+		/// <returns>
+		/// The method `SetMargin` is returning an object of type `Spinboxable`.
+		/// </returns>
 		public override Spinboxable SetMargin( int value, string side = "" ) 
 		{
 			base.SetMargin(value, side);
@@ -360,15 +413,14 @@ namespace AssetSnap.Component
 			return this;
 		}
 		
-		/*
-		** Getter Methods
-		*/
-		
-		/*
-		** Fetches the value of the current spinbox
-		**
-		** @return double
-		*/
+		/// <summary>
+		/// This C# function retrieves the value of the current spinbox.
+		/// </summary>
+		/// <returns>
+		/// The method `GetValue` returns a double value, which is the value of the current spinbox. If the
+		/// spinbox exists in the Dependencies dictionary and is of type SpinBox, then the method returns the
+		/// value of the spinbox. Otherwise, it returns 0.
+		/// </returns>
 		public double GetValue()
 		{
 			if( false != Dependencies.ContainsKey(TraitName + "_WorkingNode") && Dependencies[TraitName + "_WorkingNode"].As<GodotObject>() is SpinBox WorkingInput) 
@@ -379,16 +431,9 @@ namespace AssetSnap.Component
 			return 0;
 		}
 		
-		/*
-		** Private methods
-		*/
-		
-		/*
-		** Resets the trait to
-		** a cleared state
-		**
-		** @return void
-		*/
+		/// <summary>
+		/// The Reset method clears the state of a trait by resetting its properties to default values.
+		/// </summary>
 		protected override void Reset()
 		{
 			Size = Vector2.Zero;
