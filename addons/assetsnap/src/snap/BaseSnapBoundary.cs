@@ -42,6 +42,15 @@ namespace AssetSnap.Snap
 				_Node = value;
 			}
 		}
+		
+		/// <summary>
+		/// Gets the snap boundary.
+		/// </summary>
+		/// <returns>The snap boundary.</returns>
+		public AsSnapBoundary GetBoundary()
+		{
+			return Node;
+		}
 
 		/// <summary>
 		/// Gets or sets the visibility of the snap boundary.
@@ -55,8 +64,6 @@ namespace AssetSnap.Snap
 			}
 		}
 		
-		private AsSnapBoundary _Node;
-		
 		/// <summary>
 		/// Determines whether the snap boundary is active.
 		/// </summary>
@@ -66,14 +73,7 @@ namespace AssetSnap.Snap
 			return false;	
 		}
 		
-		/// <summary>
-		/// Gets the snap boundary.
-		/// </summary>
-		/// <returns>The snap boundary.</returns>
-		public AsSnapBoundary GetBoundary()
-		{
-			return Node;
-		}
+		private AsSnapBoundary _Node;
 	}
 }
 
