@@ -28,6 +28,36 @@ namespace AssetSnap.Static
 	public static class SettingsStatic
 	{
 		/// <summary>
+		/// Gets the transparency level.
+		/// </summary>
+		/// <returns>The transparency level as a float value.</returns>
+		public static float TransparencyLevel()
+		{
+			GlobalExplorer _GlobalExplorer = GlobalExplorer.GetInstance();
+			return _GlobalExplorer.Settings.GetKey("initial_model_spawn_in_level").As<float>();
+		}
+
+		/// <summary>
+		/// Gets the transparency fade duration.
+		/// </summary>
+		/// <returns>The transparency fade duration as a float value.</returns>
+		public static float TransparencyFadeDuration()
+		{
+			GlobalExplorer _GlobalExplorer = GlobalExplorer.GetInstance();
+			return _GlobalExplorer.Settings.GetKey("model_spawn_in_duration").As<float>();
+		}
+		
+		/// <summary>
+		/// Gets the preview image size.
+		/// </summary>
+		/// <returns>The preview image size as an integer value.</returns>
+		public static int PreviewImageSize()
+		{
+			GlobalExplorer _GlobalExplorer = GlobalExplorer.GetInstance();
+			return _GlobalExplorer.Settings.GetKey("model_preview_size").As<int>();
+		}
+		
+		/// <summary>
 		/// Checks if new children should be pushed to the current scene.
 		/// </summary>
 		/// <returns>True if new children should be pushed to the current scene; otherwise, false.</returns>
@@ -68,36 +98,6 @@ namespace AssetSnap.Static
 		}
 
 		/// <summary>
-		/// Gets the transparency level.
-		/// </summary>
-		/// <returns>The transparency level as a float value.</returns>
-		public static float TransparencyLevel()
-		{
-			GlobalExplorer _GlobalExplorer = GlobalExplorer.GetInstance();
-			return _GlobalExplorer.Settings.GetKey("initial_model_spawn_in_level").As<float>();
-		}
-
-		/// <summary>
-		/// Gets the transparency fade duration.
-		/// </summary>
-		/// <returns>The transparency fade duration as a float value.</returns>
-		public static float TransparencyFadeDuration()
-		{
-			GlobalExplorer _GlobalExplorer = GlobalExplorer.GetInstance();
-			return _GlobalExplorer.Settings.GetKey("model_spawn_in_duration").As<float>();
-		}
-
-		/// <summary>
-		/// Gets the preview image size.
-		/// </summary>
-		/// <returns>The preview image size as an integer value.</returns>
-		public static int PreviewImageSize()
-		{
-			GlobalExplorer _GlobalExplorer = GlobalExplorer.GetInstance();
-			return _GlobalExplorer.Settings.GetKey("model_preview_size").As<int>();
-		}
-
-		/// <summary>
 		/// Checks if an asset should be focused after placement.
 		/// </summary>
 		/// <returns>True if an asset should be focused after placement; otherwise, false.</returns>
@@ -114,9 +114,9 @@ namespace AssetSnap.Static
 		}
 		
 		/// <summary>
-        /// Checks if AS overlay should be used.
-        /// </summary>
-        /// <returns>True if AS overlay should be used; otherwise, false.</returns>
+		/// Checks if AS overlay should be used.
+		/// </summary>
+		/// <returns>True if AS overlay should be used; otherwise, false.</returns>
 		public static bool ShouldUseASOverlay()
 		{
 			bool value = GlobalExplorer.GetInstance().Settings.GetKey("use_as_overlay").As<bool>();

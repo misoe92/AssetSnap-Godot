@@ -31,15 +31,6 @@ namespace AssetSnap.Static
 	public static class HandleStatic
 	{
 		/// <summary>
-		/// Retrieves the handle node for static objects in the scene.
-		/// </summary>
-		/// <returns>The handle node.</returns>
-		public static Node3D Get()
-		{
-			return GlobalExplorer.GetInstance().GetHandle();	
-		}
-		
-		/// <summary>
 		/// Updates the properties of grouped objects in the scene.
 		/// </summary>
 		/// <param name="index">The index of the child object in the group.</param>
@@ -78,11 +69,11 @@ namespace AssetSnap.Static
 		}
 		
 		/// <summary>
-        /// Updates the properties of a single grouped object in the scene.
-        /// </summary>
-        /// <param name="index">The index of the child object in the group.</param>
-        /// <param name="key">The property key to update.</param>
-        /// <param name="value">The new value for the property.</param>
+		/// Updates the properties of a single grouped object in the scene.
+		/// </summary>
+		/// <param name="index">The index of the child object in the group.</param>
+		/// <param name="key">The property key to update.</param>
+		/// <param name="value">The new value for the property.</param>
 		public static void MaybeUpdateGroup( int index, string key, Variant value)
 		{
 			Node3D Handle = Get();
@@ -111,6 +102,15 @@ namespace AssetSnap.Static
 
 				asGrouped3D.Update();
 			}
+		}
+		
+		/// <summary>
+		/// Retrieves the handle node for static objects in the scene.
+		/// </summary>
+		/// <returns>The handle node.</returns>
+		public static Node3D Get()
+		{
+			return GlobalExplorer.GetInstance().GetHandle();	
 		}
 	}
 }
