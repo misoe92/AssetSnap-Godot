@@ -82,7 +82,7 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		{
 			Name = "GroupBuilderEditorGroupObject";
 
-			UsingTraits = new()
+			_UsingTraits = new()
 			{
 				{ typeof(Labelable).ToString() },
 				{ typeof(Thumbnaileable).ToString() },
@@ -100,7 +100,7 @@ namespace AssetSnap.Front.Components.Groups.Builder
 		{
 			base.Initialize();
 
-			Initiated = true;
+			_Initiated = true;
 
 			_InitializeFields();
 

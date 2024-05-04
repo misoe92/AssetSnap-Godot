@@ -39,7 +39,7 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 		public SnapToX()
 		{
 			Name = "GroupsBuilderGroupOptionsSnapToX";
-			UsingTraits = new()
+			_UsingTraits = new()
 			{
 				{ typeof(Checkable).ToString() },
 			};

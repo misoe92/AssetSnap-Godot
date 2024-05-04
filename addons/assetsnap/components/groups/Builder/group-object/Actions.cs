@@ -40,7 +40,7 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupObject
 		{
 			Name = "GroupsBuilderGroupObjectActions";
 
-			UsingTraits = new()
+			_UsingTraits = new()
 			{
 				{ typeof(Buttonable).ToString() },
 				{ typeof(Labelable).ToString() },

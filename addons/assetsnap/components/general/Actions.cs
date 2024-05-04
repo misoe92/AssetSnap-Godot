@@ -43,7 +43,7 @@ namespace AssetSnap.Front.Components
 		{
 			Name = "Actions";
 
-			UsingTraits = new()
+			_UsingTraits = new()
 			{
 				{ typeof(Containerable).ToString() },
 				{ typeof(Labelable).ToString() },
@@ -62,7 +62,7 @@ namespace AssetSnap.Front.Components
 		{
 			base.Initialize();
 
-			Initiated = true;
+			_Initiated = true;
 
 			Trait<Containerable>()
 				.SetName("AddFolderContainer")

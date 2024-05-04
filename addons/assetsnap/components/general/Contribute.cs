@@ -33,9 +33,9 @@ namespace AssetSnap.Front.Components
 	[Tool]
 	public partial class Contribute : TraitableComponent
 	{
-		private readonly string TitleText = "Contributions";
-		private readonly string DescriptionText = "Below is a list over the people who have actively contributed to the development of the plugin.";
-		private readonly string[] contributors = new string[]
+		private readonly string _TitleText = "Contributions";
+		private readonly string _DescriptionText = "Below is a list over the people who have actively contributed to the development of the plugin.";
+		private readonly string[] _Contributors = new string[]
 		{
 			"Mike Sørensen | https://github.com/misoe92",
 		};
@@ -51,7 +51,7 @@ namespace AssetSnap.Front.Components
 		{
 			Name = "Contribute";
 			
-			UsingTraits = new()
+			_UsingTraits = new()
 			{
 				{ typeof(Labelable).ToString() },
 			};
@@ -68,13 +68,13 @@ namespace AssetSnap.Front.Components
 		{
 			base.Initialize();
 			
-			Initiated = true;
+			_Initiated = true;
 			
 			Trait<Labelable>()
 				.SetMargin(0, "bottom")
 				.SetName( "ContributeTitle" )
 				.SetType( Labelable.TitleType.HeaderLarge)
-				.SetText( TitleText )
+				.SetText( _TitleText )
 				.SetAutoWrap(TextServer.AutowrapMode.Word)
 				.Instantiate();
 			 
@@ -84,7 +84,7 @@ namespace AssetSnap.Front.Components
 				.SetName( "ContributeDescription" )
 				.SetType( Labelable.TitleType.TextMedium)
 				.SetAutoWrap(TextServer.AutowrapMode.Word)
-				.SetText( DescriptionText )
+				.SetText( _DescriptionText )
 				.Instantiate();
 				
 			Trait<Labelable>()
@@ -115,9 +115,9 @@ namespace AssetSnap.Front.Components
 			_ContributorsContainer.AddThemeConstantOverride("margin_top", 10);
 			_ContributorsContainer.AddThemeConstantOverride("margin_bottom", 0);
 
-			for( int i = 0; i < contributors.Length; i++) 
+			for( int i = 0; i < _Contributors.Length; i++) 
 			{
-				string contributor = contributors[i];
+				string contributor = _Contributors[i];
 
 				Label _Label = new()
 				{
