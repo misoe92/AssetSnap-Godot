@@ -53,15 +53,57 @@ namespace AssetSnap.Nodes
 		}
 
 		public Vector2I Size = new Vector2I(SettingsStatic.PreviewImageSize(), SettingsStatic.PreviewImageSize());
-
 		public Godot.Collections.Array<string> Queue = new();
 		public Godot.Collections.Array<string> QueueSignals = new();
 		public Godot.Collections.Array<string> QueueLibrary = new();
 		public Godot.Collections.Array<TextureRect> QueueTextures = new();
 
 		private SubViewport _viewport;
-		private Camera3D Camera;
+		private Camera3D _Camera;
 
+		/// <summary>
+		/// Clears the preview images in the specified directory.
+		/// </summary>
+		/// <param name="AbsolutePath">The absolute path of the directory containing the preview images.</param>
+		public static void ClearPreviewImages(string AbsolutePath)
+		{
+			if (DirAccess.DirExistsAbsolute(AbsolutePath))
+			{
+				DirAccess folder = DirAccess.Open(AbsolutePath);
+				folder.IncludeHidden = false;
+				folder.IncludeNavigational = false;
+				folder.ListDirBegin();
+
+				while (true)
+				{
+					string fileName = folder.GetNext();
+					if (fileName == "")
+					{
+						break;
+					}
+
+					string filePath = $"{AbsolutePath}/{fileName}";
+
+					if (DirAccess.DirExistsAbsolute(filePath))
+					{
+						// Recursively clear subdirectories
+						ClearPreviewImages(filePath);
+						DirAccess.RemoveAbsolute(filePath);
+					}
+					else
+					{
+						DirAccess.RemoveAbsolute(filePath);
+					}
+				}
+
+				folder.ListDirEnd();
+			}
+			else
+			{
+				GD.PushWarning("Path not found");
+			}
+		}
+		
 		/// <summary>
 		/// Prepares conditions for preview image extraction.
 		/// </summary>
@@ -140,56 +182,13 @@ namespace AssetSnap.Nodes
 
 			_viewport.AddChild(SceneLight);
 
-			Camera = new Camera3D()
+			_Camera = new Camera3D()
 			{
 				Current = false,
 				Fov = 22.5f,
 			};
 
-			_viewport.AddChild(Camera);
-		}
-
-		/// <summary>
-		/// Clears the preview images in the specified directory.
-		/// </summary>
-		/// <param name="AbsolutePath">The absolute path of the directory containing the preview images.</param>
-		public static void ClearPreviewImages(string AbsolutePath)
-		{
-			if (DirAccess.DirExistsAbsolute(AbsolutePath))
-			{
-				DirAccess folder = DirAccess.Open(AbsolutePath);
-				folder.IncludeHidden = false;
-				folder.IncludeNavigational = false;
-				folder.ListDirBegin();
-
-				while (true)
-				{
-					string fileName = folder.GetNext();
-					if (fileName == "")
-					{
-						break;
-					}
-
-					string filePath = $"{AbsolutePath}/{fileName}";
-
-					if (DirAccess.DirExistsAbsolute(filePath))
-					{
-						// Recursively clear subdirectories
-						ClearPreviewImages(filePath);
-						DirAccess.RemoveAbsolute(filePath);
-					}
-					else
-					{
-						DirAccess.RemoveAbsolute(filePath);
-					}
-				}
-
-				folder.ListDirEnd();
-			}
-			else
-			{
-				GD.PushWarning("Path not found");
-			}
+			_viewport.AddChild(_Camera);
 		}
 
 		/// <summary>
@@ -314,7 +313,7 @@ namespace AssetSnap.Nodes
 
 				if (node == null)
 				{
-					throw new Exception("No model was found");
+					throw new System.Exception("No model was found");
 				}
 
 				// Add the model to the viewport
@@ -370,7 +369,7 @@ namespace AssetSnap.Nodes
 				// Return saved image
 				return preview;
 			}
-			catch( Exception e ) 
+			catch( System.Exception e ) 
 			{
 				GD.PushError(e.Message);
 				return new Image();	
@@ -388,10 +387,10 @@ namespace AssetSnap.Nodes
 			transform.Basis *= new Basis(Vector3.Left, Mathf.DegToRad(22.5f));
 
 			Aabb aabb = NodeUtils.CalculateNodeAabb(node);
-			float distance = aabb.GetLongestAxisSize() / Mathf.Tan(Mathf.DegToRad(Camera.Fov) * 0.5f);
+			float distance = aabb.GetLongestAxisSize() / Mathf.Tan(Mathf.DegToRad(_Camera.Fov) * 0.5f);
 
 			transform.Origin = transform * (Vector3.Back * distance) + aabb.GetCenter();
-			Camera.GlobalTransform = transform.Orthonormalized();
+			_Camera.GlobalTransform = transform.Orthonormalized();
 		}
 
 		/// <summary>
