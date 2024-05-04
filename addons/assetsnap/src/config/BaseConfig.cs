@@ -20,6 +20,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
 using Godot;
 
 namespace AssetSnap.Config
@@ -90,3 +92,5 @@ namespace AssetSnap.Config
 		}
 	} 
 }
+
+#endif
