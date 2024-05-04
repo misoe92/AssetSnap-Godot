@@ -103,7 +103,6 @@ namespace AssetSnap
 		private readonly string _Version = "0.1.2";
 		private readonly string _Name = "Plugin";
 		private bool _Disposed = false;
-		private bool _initialized = false;
 		private CoreEnter _CoreEnter = new();
 		private CoreInput _CoreInput = new();
 		private CoreProcess _CoreProcess = new();
