@@ -58,7 +58,7 @@ namespace AssetSnap.Front.Nodes
 		public bool WaypointAdded { get => _WaypointAdded; set{ _WaypointAdded = value; } }
 		
 		private Godot.Collections.Dictionary<string, Variant> _SpawnSettings = new(); 
-		private ModelDriver Driver;
+		private ModelDriver _Driver;
 		private bool _Floating = false; 
 		private bool _WaypointAdded = false; 
 
@@ -75,8 +75,8 @@ namespace AssetSnap.Front.Nodes
 		/// </summary>
 		public override void _EnterTree()
 		{
-			Driver = new();
-			Driver.RegisterType(this);
+			_Driver = new();
+			_Driver.RegisterType(this);
 
 			if (false == Floating && IsInstanceValid(this))
 			{
@@ -148,7 +148,34 @@ namespace AssetSnap.Front.Nodes
 		{
 			SpawnSettings.Remove(key);
 		}
+		
+		/// <summary>
+		/// Sets the name of the library associated with the node.
+		/// </summary>
+		/// <param name="name">The name of the library.</param>
+		public void SetLibraryName(string name)
+		{
+			LibraryName = name;
+		}
 
+		/// <summary>
+		/// Retrieves the name of the library associated with the node.
+		/// </summary>
+		/// <returns>The name of the library associated with the node.</returns>
+		public string GetLibraryName()
+		{
+			return LibraryName;
+		}
+		
+		/// <summary>
+		/// Retrieves the delta time.
+		/// </summary>
+		/// <returns>The delta time.</returns>
+		public float GetDeltaTime()
+		{
+			return ExplorerUtils.Get().DeltaTime;
+		}
+		
 		/// <summary>
 		/// Calculates the axis-aligned bounding box (AABB) of the node.
 		/// </summary>
@@ -199,43 +226,6 @@ namespace AssetSnap.Front.Nodes
 		}
 
 		/// <summary>
-		/// Retrieves the name of the library associated with the node.
-		/// </summary>
-		/// <returns>The name of the library associated with the node.</returns>
-		public string GetLibraryName()
-		{
-			return LibraryName;
-		}
-
-		/// <summary>
-		/// Checks if a setting with the provided key exists in the spawn settings dictionary.
-		/// </summary>
-		/// <param name="key">The key of the setting to check.</param>
-		/// <returns>True if the setting exists, otherwise false.</returns>
-		public bool HasSetting(string key)
-		{
-			return SpawnSettings.ContainsKey(key);
-		}
-
-		/// <summary>
-		/// Checks if the node has a library name.
-		/// </summary>
-		/// <returns>True if the node has a library name, otherwise false.</returns>
-		public bool HasLibraryName()
-		{
-			return LibraryName != null && LibraryName != "";
-		}
-
-		/// <summary>
-		/// Sets the name of the library associated with the node.
-		/// </summary>
-		/// <param name="name">The name of the library.</param>
-		public void SetLibraryName(string name)
-		{
-			LibraryName = name;
-		}
-
-		/// <summary>
 		/// Retrieves the library associated with the node.
 		/// </summary>
 		/// <returns>The library instance if found, otherwise null.</returns>
@@ -276,6 +266,7 @@ namespace AssetSnap.Front.Nodes
 			return StatesUtils.Get().EditingObject;
 		}
 
+		
 		/// <summary>
 		/// Retrieves the handle associated with the node.
 		/// </summary>
@@ -291,16 +282,26 @@ namespace AssetSnap.Front.Nodes
 		/// <returns>The model type of the node.</returns>
 		public ModelDriver.ModelTypes GetModelType()
 		{
-			return Driver.GetModelType();
+			return _Driver.GetModelType();
+		}
+		
+		/// <summary>
+		/// Checks if a setting with the provided key exists in the spawn settings dictionary.
+		/// </summary>
+		/// <param name="key">The key of the setting to check.</param>
+		/// <returns>True if the setting exists, otherwise false.</returns>
+		public bool HasSetting(string key)
+		{
+			return SpawnSettings.ContainsKey(key);
 		}
 
 		/// <summary>
-		/// Retrieves the delta time.
+		/// Checks if the node has a library name.
 		/// </summary>
-		/// <returns>The delta time.</returns>
-		public float GetDeltaTime()
+		/// <returns>True if the node has a library name, otherwise false.</returns>
+		public bool HasLibraryName()
 		{
-			return ExplorerUtils.Get().DeltaTime;
+			return LibraryName != null && LibraryName != "";
 		}
 
 		/// <summary>
@@ -353,14 +354,6 @@ namespace AssetSnap.Front.Nodes
 		/// </summary>
 		public override void _ExitTree()
 		{
-			// if (null != ExplorerUtils.Get() && null != ExplorerUtils.Get().Waypoints)
-			// {
-			// 	if (IsInstanceValid(this))
-			// 	{
-			// 		// ExplorerUtils.Get().Waypoints.Remove(this, Transform.Origin);
-			// 	}
-			// }
-
 			Floating = true;
 			WaypointAdded = false;
 

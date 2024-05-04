@@ -31,10 +31,6 @@ namespace AssetSnap.Front.Nodes
 	[Tool]
 	public partial class AsOptimizedMultiMeshGroup3D : Node3D
 	{
-
-		protected bool disposed = false;
-		protected bool Initiated = false;
-		
 		/// <summary>
 		/// Gets or sets the current item count in the multi-mesh group.
 		/// </summary>
@@ -53,7 +49,7 @@ namespace AssetSnap.Front.Nodes
 			set 
 			{
 				_Object = value;
-				if( Initiated ) 
+				if( _Initiated ) 
 				{
 					_Update();
 				}
@@ -72,7 +68,7 @@ namespace AssetSnap.Front.Nodes
 			set 
 			{
 				_ChunkSize = value;
-				if( Initiated ) 
+				if( _Initiated ) 
 				{
 					_Update();
 				}
@@ -89,7 +85,7 @@ namespace AssetSnap.Front.Nodes
 			set 
 			{
 				_TransformBuffer = value;
-				if( Initiated ) 
+				if( _Initiated ) 
 				{
 					_Update();
 				}
@@ -106,13 +102,16 @@ namespace AssetSnap.Front.Nodes
 			set 
 			{
 				_RulesBuffer = value;
-				if( Initiated ) 
+				if( _Initiated ) 
 				{
 					_Update();
 				}
 			}
 		}
-
+		
+		protected bool _Disposed = false;
+		protected bool _Initiated = false;
+		
 		private Mesh _Object;
 		private int _ChunkSize = 20;
 		private Godot.Collections.Array<Transform3D> _TransformBuffer = new();
@@ -131,14 +130,14 @@ namespace AssetSnap.Front.Nodes
 				}
 				else 
 				{
-					GlobalExplorer.GetInstance().States.OptimizedGroups.Add(_Object, new(){ this });
+					StatesUtils.Get().OptimizedGroups.Add(_Object, new(){ this });
 				}
 			}
 			
 			ClearChildren();
 			Update();
 			
-			Initiated = true;
+			_Initiated = true;
 		}
 		
 		/// <summary>
@@ -241,7 +240,7 @@ namespace AssetSnap.Front.Nodes
 		/// </summary>
 		private void _Update()
 		{
-			if( disposed ) 
+			if( _Disposed ) 
 			{
 				return;
 			}
@@ -346,7 +345,7 @@ namespace AssetSnap.Front.Nodes
 		public override void _ExitTree()
 		{
 			GlobalExplorer.GetInstance().States.OptimizedGroups.Remove(_Object);
-			disposed = true;
+			_Disposed = true;
 			ClearChildren();
 			base._ExitTree();
 		}
