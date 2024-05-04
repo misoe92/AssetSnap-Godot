@@ -35,33 +35,7 @@ namespace AssetSnap.Front.Nodes
 	[Tool]
 	public partial class AsGrouped3D : AsGroup3D
 	{
-
-		private List<GroupedConnection> Connections = new();
-
-		private string _GroupPath = "";
-		private int _SnapLayer = 0;
-		private float _ObjectOffsetX = 0.0f;
-		private float _ObjectOffsetZ = 0.0f;	
-		private float _SnapHeightValue = 0.0f;	
-		private float _SnapXValue = 0.0f;
-		private float _SnapZValue = 0.0f;
-		private float _DistanceToTop = 0.0f;
-		private float _DistanceToBottom = 0.0f;
-		private float _DistanceToLeft = 0.0f;
-		private float _DistanceToRight = 0.0f;
-		private bool _OptimizedSpawn = false;
-		private bool _SphereCollision = false;
-		private bool _ConvexCollision = false;
-		private bool _ConvexClean = false;
-		private bool _ConvexSimplify = false;
-		private bool _ConcaveCollision = false;
-		private bool _SnapToObject = false;
-		private bool _SnapToHeight = false;
-		private bool _SnapToX = false;
-		private bool _SnapToZ = false;
-		private Godot.Collections.Array<Godot.Collections.Dictionary<string, Variant>> _ChildOptions = new();
-
-		/// <summary>
+/// <summary>
 		/// The path of the group.
 		/// </summary>
 		[Export]
@@ -188,10 +162,34 @@ namespace AssetSnap.Front.Nodes
 		public bool SnapToZ { get => _SnapToZ; set { _SnapToZ = value; } }
 
 		/// <summary>
-        /// Options for child nodes.
-        /// </summary>
+		/// Options for child nodes.
+		/// </summary>
 		[Export]
 		public Godot.Collections.Array<Godot.Collections.Dictionary<string, Variant>> ChildOptions { get => _ChildOptions; set { _ChildOptions = value; } }
+		
+		private string _GroupPath = "";
+		private int _SnapLayer = 0;
+		private float _ObjectOffsetX = 0.0f;
+		private float _ObjectOffsetZ = 0.0f;	
+		private float _SnapHeightValue = 0.0f;	
+		private float _SnapXValue = 0.0f;
+		private float _SnapZValue = 0.0f;
+		private float _DistanceToTop = 0.0f;
+		private float _DistanceToBottom = 0.0f;
+		private float _DistanceToLeft = 0.0f;
+		private float _DistanceToRight = 0.0f;
+		private bool _OptimizedSpawn = false;
+		private bool _SphereCollision = false;
+		private bool _ConvexCollision = false;
+		private bool _ConvexClean = false;
+		private bool _ConvexSimplify = false;
+		private bool _ConcaveCollision = false;
+		private bool _SnapToObject = false;
+		private bool _SnapToHeight = false;
+		private bool _SnapToX = false;
+		private bool _SnapToZ = false;
+		private List<GroupedConnection> _Connections = new();
+		private Godot.Collections.Array<Godot.Collections.Dictionary<string, Variant>> _ChildOptions = new();
 
 		/// <summary>
 		/// Called when the node enters the scene tree.
@@ -220,16 +218,7 @@ namespace AssetSnap.Front.Nodes
 
 			base._EnterTree();
 		}
-
-		/// <summary>
-		/// Returns the Axis-Aligned Bounding Box (AABB) of the node.
-		/// </summary>
-		/// <returns>The AABB of the node.</returns>
-		public Aabb GetAabb()
-		{
-			return NodeUtils.CalculateNodeAabb(this);
-		}
-
+		
 		/// <summary>
 		/// Updates the group, reloading group data and redrawing the local space of the node.
 		/// </summary>
@@ -251,9 +240,9 @@ namespace AssetSnap.Front.Nodes
 			{
 				ClearCurrentChildren();
 				int Instanced = 0;
-				for (int i = 0; i < Connections.Count; i++)
+				for (int i = 0; i < _Connections.Count; i++)
 				{
-					GroupedConnection connection = Connections[i];
+					GroupedConnection connection = _Connections[i];
 					int index = 0;
 					
 					foreach( string path in resource._Paths )
@@ -306,7 +295,7 @@ namespace AssetSnap.Front.Nodes
 		/// <param name="mesh">The mesh of the connection.</param>
 		public void AddConnection(int id, AsOptimizedMultiMeshGroup3D optimizedMeshGroup, Mesh mesh)
 		{
-			Connections.Add(
+			_Connections.Add(
 				new OptimizedMultiMeshConnection()
 				{
 					InstanceId = id,
@@ -323,6 +312,33 @@ namespace AssetSnap.Front.Nodes
 		public void Clear()
 		{
 			ClearCurrentChildren();
+		}
+		
+		/// <summary>
+		/// Called when the node exits the scene tree.
+		/// </summary>
+		public override void _ExitTree()
+		{
+			if (StatesUtils.Get().GroupedObjects.ContainsKey(GroupPath))
+			{
+				StatesUtils.Get().GroupedObjects[GroupPath].Remove(this);
+
+				if (StatesUtils.Get().GroupedObjects[GroupPath].Count == 0)
+				{
+					StatesUtils.Get().GroupedObjects.Remove(GroupPath);
+				}
+			}
+
+			base._EnterTree();
+		}
+
+		/// <summary>
+		/// Returns the Axis-Aligned Bounding Box (AABB) of the node.
+		/// </summary>
+		/// <returns>The AABB of the node.</returns>
+		public Aabb GetAabb()
+		{
+			return NodeUtils.CalculateNodeAabb(this);
 		}
 
 		/// <summary>
@@ -342,24 +358,5 @@ namespace AssetSnap.Front.Nodes
 		{
 			return SettingsStatic.ShouldAddCollision();
 		}
-
-		/// <summary>
-		/// Called when the node exits the scene tree.
-		/// </summary>
-		public override void _ExitTree()
-		{
-			if (StatesUtils.Get().GroupedObjects.ContainsKey(GroupPath))
-			{
-				StatesUtils.Get().GroupedObjects[GroupPath].Remove(this);
-
-				if (StatesUtils.Get().GroupedObjects[GroupPath].Count == 0)
-				{
-					StatesUtils.Get().GroupedObjects.Remove(GroupPath);
-				}
-			}
-
-			base._EnterTree();
-		}
-
 	}
 }
