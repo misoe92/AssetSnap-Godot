@@ -34,18 +34,16 @@ namespace AssetSnap.Front.Components.Library
 	[Tool]
 	public partial class Search : LibraryComponent
 	{
-		private readonly string Title = "Search Library";
-		private string value = "";
-		private string LastValue = "";
-		private double ValueIntervalTimer = 0.0;
+		public AsSearchInput SearchInput { get; set; }
 		
+		private readonly string _Title = "Search Library";
+		private string _Value = "";
+		private string _LastValue = "";
+		private double _ValueIntervalTimer = 0.0;
 		private	Label _Label;
-		public AsSearchInput _SearchInput { get; set; }
-
 		private bool _Searching = false;
 		private bool _Searched = false;
-
-		private Callable? SearchCallable;
+		private Callable? _SearchCallable;
 		
 		/// <summary>
 		/// Constructor for the Search component.
@@ -54,7 +52,7 @@ namespace AssetSnap.Front.Components.Library
 		{
 			Name = "LibrarySearch";
 			
-			UsingTraits = new()
+			_UsingTraits = new()
 			{
 				{ typeof(Containerable).ToString() },
 				{ typeof(Buttonable).ToString() },
@@ -69,7 +67,7 @@ namespace AssetSnap.Front.Components.Library
 		public override void Initialize()
 		{
 			base.Initialize();
-			Initiated = true;
+			_Initiated = true;
 
 			Trait<Containerable>()
 				.SetName("SearchContainer")
@@ -79,17 +77,17 @@ namespace AssetSnap.Front.Components.Library
 				.SetInnerOrientation(Containerable.ContainerOrientation.Horizontal)
 				.Instantiate();
 			
-			_SearchInput = new()
+			SearchInput = new()
 			{
 				SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
-				PlaceholderText = Title
+				PlaceholderText = _Title
 			};
 		
-			SearchCallable = new Callable(this, "_OnSearchQuery");
+			_SearchCallable = new Callable(this, "_OnSearchQuery");
 
-			if( SearchCallable is Callable _callable ) 
+			if( _SearchCallable is Callable _callable ) 
 			{
-				_SearchInput.Connect(LineEdit.SignalName.TextChanged, _callable);
+				SearchInput.Connect(LineEdit.SignalName.TextChanged, _callable);
 			}
 
 			Trait<Buttonable>()
@@ -105,7 +103,7 @@ namespace AssetSnap.Front.Components.Library
 			Trait<Containerable>()
 				.Select(0)
 				.GetInnerContainer()
-				.AddChild(_SearchInput);
+				.AddChild(SearchInput);
 
 			Trait<Buttonable>()
 				.Select(0)
@@ -126,7 +124,7 @@ namespace AssetSnap.Front.Components.Library
 		/// <param name="delta">Time elapsed since the last frame.</param>
 		public override void _Process(double delta) 
 		{
-			if( null == _SearchInput ) 
+			if( null == SearchInput ) 
 			{
 				return;
 			}
@@ -141,7 +139,7 @@ namespace AssetSnap.Front.Components.Library
 			}
 			
 			if(
-				value != "" &&
+				_Value != "" &&
 				null != Trait<Buttonable>() &&
 				false == Trait<Buttonable>()
 					.Select(0)
@@ -153,7 +151,7 @@ namespace AssetSnap.Front.Components.Library
 					.SetVisible(true);
 			}
 			else if(
-				value == "" &&
+				_Value == "" &&
 				null != Trait<Buttonable>() &&
 				true == Trait<Buttonable>()
 					.Select(0)
@@ -165,39 +163,21 @@ namespace AssetSnap.Front.Components.Library
 					.SetVisible(false);
 			}
 
-			if(value != LastValue) 
+			if(_Value != _LastValue) 
 			{
-				LastValue = value;
-				ValueIntervalTimer = GlobalExplorer.GetInstance().DeltaTime;
+				_LastValue = _Value;
+				_ValueIntervalTimer = GlobalExplorer.GetInstance().DeltaTime;
 				_Searched = false;
 			}
 			else if(_Searched == false)
 			{
-				if( GlobalExplorer.GetInstance().DeltaTime - ValueIntervalTimer > 1) 
+				if( GlobalExplorer.GetInstance().DeltaTime - _ValueIntervalTimer > 1) 
 				{
 					_Searched = true;
-					ValueIntervalTimer = 0.0;
+					_ValueIntervalTimer = 0.0;
 					Library._LibraryListing.Update();
 				} 
 			}
-		}
-		
-		/// <summary>
-		/// Event handler for updating the search query and setting the search state when input is received.
-		/// </summary>
-		/// <param name="text">The new search query text.</param>
-		private void _OnSearchQuery(string text)
-		{
-			if (text != "" || text == "" && value != "")
-			{
-				_Searching = true;
-			}
-			else
-			{
-				_Searching = false;
-			}
-
-			value = text;
 		}
 		
 		/// <summary>
@@ -216,16 +196,34 @@ namespace AssetSnap.Front.Components.Library
 		/// <returns>True if the search text is valid, otherwise false.</returns>
 		public bool SearchValid( string text )
 		{
-			return text.ToLower().Contains(value.ToLower());
+			return text.ToLower().Contains(_Value.ToLower());
+		}
+		
+		/// <summary>
+		/// Event handler for updating the search query and setting the search state when input is received.
+		/// </summary>
+		/// <param name="text">The new search query text.</param>
+		private void _OnSearchQuery(string text)
+		{
+			if (text != "" || text == "" && _Value != "")
+			{
+				_Searching = true;
+			}
+			else
+			{
+				_Searching = false;
+			}
+
+			_Value = text;
 		}
 
 		/// <summary>
-        /// Clears the current search query.
-        /// </summary>
+		/// Clears the current search query.
+		/// </summary>
 		private void _ClearCurrentQuery()
 		{
-			_SearchInput.Clear();
-			value = "";
+			SearchInput.Clear();
+			_Value = "";
 		}
 	}
 }

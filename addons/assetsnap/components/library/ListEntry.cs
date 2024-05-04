@@ -36,29 +36,6 @@ namespace AssetSnap.Front.Components.Library
 	[Tool]
 	public partial class ListEntry : LibraryComponent
 	{
-		private readonly static Theme SnapTheme = GD.Load<Theme>("res://addons/assetsnap/assets/themes/SnapTheme.tres");
-		private readonly static Texture2D ChevronLeft = GD.Load<Texture2D>("res://addons/assetsnap/assets/icons/chevron-left.svg");
-		private readonly static Texture2D ChevronRight = GD.Load<Texture2D>("res://addons/assetsnap/assets/icons/chevron-right.svg");
-		private string _Folder;
-		private string _Filename;
-		private string _FormattedFileName;
-		private AsLibraryPanelContainer _PanelContainer;
-		private MarginContainer _MarginContainer;
-		private MarginContainer _LabelMarginContainer;
-		private Label _Label;
-		private VBoxContainer _InnerContainer;
-		private AsModelViewerRect _TextureRect;
-		private Control absoluteContainer;
-		private int ImageRotation = 0;
-
-		private Container leftInnerContainer;
-		private Container middleInnerContainer;
-		private Container rightInnerContainer;
-
-		private Label xLabel;
-		private Label yLabel;
-		private Label zLabel;
-		
 		public string Folder
 		{
 			get => _Folder;
@@ -77,6 +54,29 @@ namespace AssetSnap.Front.Components.Library
 			}
 		}
 
+		private readonly static Theme _SnapTheme = GD.Load<Theme>("res://addons/assetsnap/assets/themes/SnapTheme.tres");
+		private readonly static Texture2D _ChevronLeft = GD.Load<Texture2D>("res://addons/assetsnap/assets/icons/chevron-left.svg");
+		private readonly static Texture2D _ChevronRight = GD.Load<Texture2D>("res://addons/assetsnap/assets/icons/chevron-right.svg");
+		private string _Folder;
+		private string _Filename;
+		private string _FormattedFileName;
+		private int _ImageRotation = 0;
+		
+		private AsLibraryPanelContainer _PanelContainer;
+		private MarginContainer _MarginContainer;
+		private MarginContainer _LabelMarginContainer;
+		private Label _Label;
+		private VBoxContainer _InnerContainer;
+		private AsModelViewerRect _TextureRect;
+		private Control _AbsoluteContainer;
+
+		private Container _LeftInnerContainer;
+		private Container _MiddleInnerContainer;
+		private Container _RightInnerContainer;
+
+		private Label _XLabel;
+		private Label _YLabel;
+		private Label _ZLabel;
 
 		/// <summary>
 		/// Class constructor.
@@ -86,7 +86,7 @@ namespace AssetSnap.Front.Components.Library
 			Name = "LibraryListEntry";
 			//_include = false;
 			
-			UsingTraits = new()
+			_UsingTraits = new()
 			{
 				{ typeof(Buttonable).ToString() },
 				{ typeof(Containerable).ToString() },
@@ -110,14 +110,14 @@ namespace AssetSnap.Front.Components.Library
 			SizeFlagsVertical = SizeFlags.ExpandFill;
 
 			base.Initialize();
-			Initiated = true;
+			_Initiated = true;
 
 			if (Filename == null || Folder == null)
 			{
 				return;
 			}
 
-			PrepareFilenameTitles();
+			_PrepareFilenameTitles();
 
 			string filename = Filename;
 			if (Filename.Contains("."))
@@ -140,33 +140,33 @@ namespace AssetSnap.Front.Components.Library
 				.SetInnerOrientation(AssetSnap.Trait.ContainerTrait.ContainerOrientation.Horizontal)
 				.Instantiate();
 
-			leftInnerContainer = Trait<Containerable>()
+			_LeftInnerContainer = Trait<Containerable>()
 				.Select(0)
 				.GetInnerContainer(0);
 
-			middleInnerContainer = Trait<Containerable>()
+			_MiddleInnerContainer = Trait<Containerable>()
 				.Select(0)
 				.GetInnerContainer(1);
 			
-			rightInnerContainer = Trait<Containerable>()
+			_RightInnerContainer = Trait<Containerable>()
 				.Select(0)
 				.GetInnerContainer(2);
 				
-			if( null == leftInnerContainer || null == middleInnerContainer || null == rightInnerContainer)	
+			if( null == _LeftInnerContainer || null == _MiddleInnerContainer || null == _RightInnerContainer)	
 			{
 				return;
 			}
 
-			leftInnerContainer.SizeFlagsHorizontal = SizeFlags.ShrinkBegin;
-			rightInnerContainer.SizeFlagsHorizontal = SizeFlags.ShrinkBegin;
+			_LeftInnerContainer.SizeFlagsHorizontal = SizeFlags.ShrinkBegin;
+			_RightInnerContainer.SizeFlagsHorizontal = SizeFlags.ShrinkBegin;
 			
-			leftInnerContainer.CustomMinimumSize = new Vector2(30, 0);
-			rightInnerContainer.CustomMinimumSize = new Vector2(30, 0);
+			_LeftInnerContainer.CustomMinimumSize = new Vector2(30, 0);
+			_RightInnerContainer.CustomMinimumSize = new Vector2(30, 0);
 
-			middleInnerContainer.TooltipText = Filename;
+			_MiddleInnerContainer.TooltipText = Filename;
 
-			middleInnerContainer.Connect(VBoxContainer.SignalName.MouseEntered, Callable.From(() => { _OnMiddleContainerMouseEnter(); }));
-			middleInnerContainer.Connect(VBoxContainer.SignalName.MouseExited, Callable.From(() => { _OnMiddleContainerMouseLeave(); }));
+			_MiddleInnerContainer.Connect(VBoxContainer.SignalName.MouseEntered, Callable.From(() => { _OnMiddleContainerMouseEnter(); }));
+			_MiddleInnerContainer.Connect(VBoxContainer.SignalName.MouseExited, Callable.From(() => { _OnMiddleContainerMouseLeave(); }));
 
 			Trait<Containerable>()
 				.Select(0)
@@ -178,13 +178,16 @@ namespace AssetSnap.Front.Components.Library
 			// For example, you could display it in your UI or store it for later use
 			_PanelContainer.SetFilePath(Folder + "/" + Filename);
 
-			absoluteContainer = new();
-			// Set the Rect Min and Max sizes for the Control
-			absoluteContainer.Size = new Vector2(200, 200);
-			absoluteContainer.Visible = false;
+			_AbsoluteContainer = new()
+			{
+				Size = new Vector2(200, 200),
+				Visible = false
+			};
 
-			VBoxContainer absoluteVboxcontainer = new();
-			absoluteVboxcontainer.Position = new Vector2(-25, 0);
+			VBoxContainer absoluteVboxcontainer = new()
+			{
+				Position = new Vector2(-25, 0),
+			};
 			absoluteVboxcontainer.AddThemeConstantOverride("separation", 0);
 
 			Label sizeLabel = new()
@@ -193,34 +196,34 @@ namespace AssetSnap.Front.Components.Library
 				Text = "Size"
 			};
 
-			xLabel = new()
+			_XLabel = new()
 			{
 				ThemeTypeVariation = Labelable.TitleType.TextTinyDiffused.ToString(),
 				Text = "X: " + Mathf.Round(SettingsUtils.Get().GetModelSize(filename).X * 100) / 100
 			};
 
-			yLabel = new()
+			_YLabel = new()
 			{
 				ThemeTypeVariation = Labelable.TitleType.TextTinyDiffused.ToString(),
 				Text = "Y: " + Mathf.Round(SettingsUtils.Get().GetModelSize(filename).Y * 100) / 100
 			};
 
-			zLabel = new()
+			_ZLabel = new()
 			{
 				ThemeTypeVariation = Labelable.TitleType.TextTinyDiffused.ToString(),
 				Text = "Z: " + Mathf.Round(SettingsUtils.Get().GetModelSize(filename).Z * 100) / 100
 			};
 
 			absoluteVboxcontainer.AddChild(sizeLabel);
-			absoluteVboxcontainer.AddChild(xLabel);
-			absoluteVboxcontainer.AddChild(yLabel);
-			absoluteVboxcontainer.AddChild(zLabel);
-			absoluteContainer.AddChild(absoluteVboxcontainer);
-			middleInnerContainer.AddChild(absoluteContainer);
+			absoluteVboxcontainer.AddChild(_XLabel);
+			absoluteVboxcontainer.AddChild(_YLabel);
+			absoluteVboxcontainer.AddChild(_ZLabel);
+			_AbsoluteContainer.AddChild(absoluteVboxcontainer);
+			_MiddleInnerContainer.AddChild(_AbsoluteContainer);
 			
-			_InitializeLeftArrow(leftInnerContainer, Filename, Folder, Library.GetName());
-			_InitializeRightArrow(rightInnerContainer, Filename, Folder, Library.GetName());
-			_InitializePreviewContainer(Filename, Folder, middleInnerContainer);
+			_InitializeLeftArrow(_LeftInnerContainer, Filename, Folder, Library.GetName());
+			_InitializeRightArrow(_RightInnerContainer, Filename, Folder, Library.GetName());
+			_InitializePreviewContainer(Filename, Folder, _MiddleInnerContainer);
 			_InitializeLabelContainer(_PanelContainer);
 
 			// Add container to parent container
@@ -239,9 +242,9 @@ namespace AssetSnap.Front.Components.Library
 		{
 			if (name == Filename)
 			{
-				xLabel.Text = "X: " + Mathf.Round(value.X * 100) / 100;
-				yLabel.Text = "Y: " + Mathf.Round(value.Y * 100) / 100;
-				zLabel.Text = "Z: " + Mathf.Round(value.Z * 100) / 100;
+				_XLabel.Text = "X: " + Mathf.Round(value.X * 100) / 100;
+				_YLabel.Text = "Y: " + Mathf.Round(value.Y * 100) / 100;
+				_ZLabel.Text = "Z: " + Mathf.Round(value.Z * 100) / 100;
 			}
 		}
 
@@ -250,9 +253,9 @@ namespace AssetSnap.Front.Components.Library
 		/// </summary>
 		private void _OnMiddleContainerMouseEnter()
 		{
-			leftInnerContainer.GetChild<Control>(0).Visible = false;
-			rightInnerContainer.GetChild<Control>(0).Visible = false;
-			absoluteContainer.Visible = true;
+			_LeftInnerContainer.GetChild<Control>(0).Visible = false;
+			_RightInnerContainer.GetChild<Control>(0).Visible = false;
+			_AbsoluteContainer.Visible = true;
 		}
 
 		/// <summary>
@@ -260,9 +263,9 @@ namespace AssetSnap.Front.Components.Library
 		/// </summary>
 		private void _OnMiddleContainerMouseLeave()
 		{
-			leftInnerContainer.GetChild<Control>(0).Visible = true;
-			rightInnerContainer.GetChild<Control>(0).Visible = true;
-			absoluteContainer.Visible = false;
+			_LeftInnerContainer.GetChild<Control>(0).Visible = true;
+			_RightInnerContainer.GetChild<Control>(0).Visible = true;
+			_AbsoluteContainer.Visible = false;
 		}
 
 		/// <summary>
@@ -277,11 +280,11 @@ namespace AssetSnap.Front.Components.Library
 			Trait<Buttonable>()
 				.SetName(FolderPath + "-" + FileName + "-Left")
 				.SetType(Buttonable.ButtonType.SmallFlatButton)
-				.SetIcon(ChevronLeft.Duplicate(true) as Texture2D)
+				.SetIcon(_ChevronLeft.Duplicate(true) as Texture2D)
 				.SetTooltipText("Rotate preview by -90 degrees")
 				.SetCursorShape(CursorShape.PointingHand)
 				.SetMouseFilter(MouseFilterEnum.Stop)
-				.SetTheme(SnapTheme)
+				.SetTheme(_SnapTheme)
 				.SetAction( () => { _OnLeftArrowPressed(); })
 				.Instantiate()
 				.Select(0)
@@ -302,11 +305,11 @@ namespace AssetSnap.Front.Components.Library
 			Trait<Buttonable>()
 				.SetName(FolderPath + "-" + FileName + "-Right")
 				.SetType(Buttonable.ButtonType.SmallFlatButton)
-				.SetIcon(ChevronRight.Duplicate(true) as Texture2D)
+				.SetIcon(_ChevronRight.Duplicate(true) as Texture2D)
 				.SetTooltipText("Rotate preview by 90 degrees")
 				.SetCursorShape(CursorShape.PointingHand)
 				.SetMouseFilter(MouseFilterEnum.Stop)
-				.SetTheme(SnapTheme)
+				.SetTheme(_SnapTheme)
 				.SetAction( () => { _OnRightArrowPressed(); })
 				.Instantiate()
 				.Select(1)
@@ -322,16 +325,16 @@ namespace AssetSnap.Front.Components.Library
 		{
 			if( EditorPlugin.IsInstanceValid(_TextureRect) ) 
 			{
-				if (ImageRotation == 180)
+				if (_ImageRotation == 180)
 				{
-					ImageRotation = -90;
+					_ImageRotation = -90;
 				}
 				else
 				{
-					ImageRotation += 90;
+					_ImageRotation += 90;
 				}
 
-				Texture2D image = SetRotatedImage(Filename, Library.GetName());
+				Texture2D image = _SetRotatedImage(Filename, Library.GetName());
 				_TextureRect._MeshPreviewReady(Folder + "/" + Filename, image, image, _TextureRect);
 			}
 		}
@@ -343,54 +346,20 @@ namespace AssetSnap.Front.Components.Library
 		{
 			if( EditorPlugin.IsInstanceValid(_TextureRect) ) 
 			{
-				if (ImageRotation == -180)
+				if (_ImageRotation == -180)
 				{
-					ImageRotation = 90;
+					_ImageRotation = 90;
 				}
 				else
 				{
-					ImageRotation -= 90;
+					_ImageRotation -= 90;
 				}
 
-				Texture2D image = SetRotatedImage(Filename, Library.GetName());
+				Texture2D image = _SetRotatedImage(Filename, Library.GetName());
 				_TextureRect._MeshPreviewReady(Folder + "/" + Filename, image, image, _TextureRect);
 			}
 		}
 		
-		/// <summary>
-		/// Sets the rotated image based on the current rotation angle.
-		/// </summary>
-		/// <param name="FileName">The name of the file.</param>
-		/// <param name="LibraryName">The name of the library.</param>
-		/// <returns>The rotated image.</returns>
-		private Texture2D SetRotatedImage(string FileName, string LibraryName)
-		{
-			Texture2D image = null;
-			string BasePath = "res://assetsnap/previews/" + LibraryName + "/" + FileName.Split(".")[0];
-			if (ImageRotation == 0)
-			{
-				if( FileAccess.FileExists( BasePath + "/default.png" ) ) 
-				{
-					image = GD.Load<Texture2D>("res://assetsnap/previews/" + LibraryName + "/" + FileName.Split(".")[0] + "/default.png");
-				}
-			}
-			else if (ImageRotation < 0)
-			{
-				if( FileAccess.FileExists( BasePath + "/default-minus" + ImageRotation + ".png" ) ) 
-				{
-					image = GD.Load<Texture2D>("res://assetsnap/previews/" + LibraryName + "/" + FileName.Split(".")[0] + "/default-minus" + ImageRotation + ".png");
-				}
-			}
-			else
-			{
-				if( FileAccess.FileExists( BasePath + "/default-" + ImageRotation + ".png" ) ) 
-				{
-					image = GD.Load<Texture2D>("res://assetsnap/previews/" + LibraryName + "/" + FileName.Split(".")[0] + "/default-" + ImageRotation + ".png");
-				}
-			}
-
-			return image;
-		}
 
 		/// <summary>
 		/// Initializes the preview container.
@@ -498,7 +467,7 @@ namespace AssetSnap.Front.Components.Library
 		/// <summary>
 		/// Prepares the filename for display as a label.
 		/// </summary>
-		private void PrepareFilenameTitles()
+		private void _PrepareFilenameTitles()
 		{
 			string filename = Filename;
 			if (Filename.Contains("."))
@@ -508,14 +477,40 @@ namespace AssetSnap.Front.Components.Library
 
 			_FormattedFileName = filename.Substring(0, filename.Length > 18 ? 19 : filename.Length).Split("_").Join(" ").Split("-").Join(" ");
 		}
-
+		
 		/// <summary>
-        /// Handles the _ExitTree event.
-        /// </summary>
-		public override void _ExitTree()
+		/// Sets the rotated image based on the current rotation angle.
+		/// </summary>
+		/// <param name="FileName">The name of the file.</param>
+		/// <param name="LibraryName">The name of the library.</param>
+		/// <returns>The rotated image.</returns>
+		private Texture2D _SetRotatedImage(string FileName, string LibraryName)
 		{
-			
-			base._ExitTree();
+			Texture2D image = null;
+			string BasePath = "res://assetsnap/previews/" + LibraryName + "/" + FileName.Split(".")[0];
+			if (_ImageRotation == 0)
+			{
+				if( FileAccess.FileExists( BasePath + "/default.png" ) ) 
+				{
+					image = GD.Load<Texture2D>("res://assetsnap/previews/" + LibraryName + "/" + FileName.Split(".")[0] + "/default.png");
+				}
+			}
+			else if (_ImageRotation < 0)
+			{
+				if( FileAccess.FileExists( BasePath + "/default-minus" + _ImageRotation + ".png" ) ) 
+				{
+					image = GD.Load<Texture2D>("res://assetsnap/previews/" + LibraryName + "/" + FileName.Split(".")[0] + "/default-minus" + _ImageRotation + ".png");
+				}
+			}
+			else
+			{
+				if( FileAccess.FileExists( BasePath + "/default-" + _ImageRotation + ".png" ) ) 
+				{
+					image = GD.Load<Texture2D>("res://assetsnap/previews/" + LibraryName + "/" + FileName.Split(".")[0] + "/default-" + _ImageRotation + ".png");
+				}
+			}
+
+			return image;
 		}
 	}
 }
