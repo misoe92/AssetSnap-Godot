@@ -20,6 +20,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if TOOLS
+
 using System.Threading.Tasks;
 using Godot;
 
@@ -31,40 +33,17 @@ namespace AssetSnap.GroupBuilder
 	[Tool]
 	public partial class MainScreen : VBoxContainer
 	{
-		private PanelContainer ToolbarPanelContainer;
-		private SubViewportContainer ViewportContainer;
-		private SubViewport Viewport;
-		private Node3D CameraContainer;
-		private Camera3D Camera;
-
-		private Vector2I Acceleration = new Vector2I(0, 0);
-		private float levitate = 0.0f;
-		private float levitateRate = 1.5f;
-		private float moveSpeedRate = 6.0f;
-
-		private bool _PreviewEnvironment = false;
-		private bool PreviewEnvironment
+		public bool PreviewEnvironment
 		{
 			get => _PreviewEnvironment;
 			set
 			{
 				_PreviewEnvironment = value;
-				_MaybeInitializeEnvironment(Viewport);
+				_MaybeInitializeEnvironment(_Viewport);
 			}
 		}
-
-		// Sensitivity for mouse movement
-		private float mouseSensitivity = 0.25f;
-		private float mouseYSensitivity = 10;
-
-		// Variables to store current rotation
-		private float pitch = 0.0f;
-		private float yaw = 0.0f;
-
-		private MarginContainer _marginContainer;
-
-		private bool _ListensForInput = false;
-		private bool ListensForInput
+		
+		public bool ListensForInput
 		{
 			get => _ListensForInput;
 			set
@@ -72,6 +51,29 @@ namespace AssetSnap.GroupBuilder
 				_ListensForInput = value;
 			}
 		}
+		
+		private float _Levitate = 0.0f;
+		private float _LevitateRate = 1.5f;
+		private float _MoveSpeedRate = 6.0f;
+		
+		// Sensitivity for mouse movement
+		private float _MouseSensitivity = 0.25f;
+		private float _MouseYSensitivity = 10;
+
+		// Variables to store current rotation
+		private float _Pitch = 0.0f;
+		private float _Yaw = 0.0f;
+		
+		private Vector2I _Acceleration = new Vector2I(0, 0);
+		
+		private PanelContainer _ToolbarPanelContainer;
+		private SubViewportContainer _ViewportContainer;
+		private SubViewport _Viewport;
+		private Node3D _CameraContainer;
+		private Camera3D _Camera;
+		private MarginContainer _MarginContainer;
+		private bool _ListensForInput = false;
+		private bool _PreviewEnvironment = false;
 
 		/// <summary>
 		/// Called when the node is added to the scene tree.
@@ -88,12 +90,12 @@ namespace AssetSnap.GroupBuilder
 				false == HasGroup()
 			)
 			{
-				_marginContainer = new();
+				_MarginContainer = new();
 
-				_marginContainer.AddThemeConstantOverride("margin_left", 25);
-				_marginContainer.AddThemeConstantOverride("margin_right", 25);
-				_marginContainer.AddThemeConstantOverride("margin_top", 10);
-				_marginContainer.AddThemeConstantOverride("margin_bottom", 0);
+				_MarginContainer.AddThemeConstantOverride("margin_left", 25);
+				_MarginContainer.AddThemeConstantOverride("margin_right", 25);
+				_MarginContainer.AddThemeConstantOverride("margin_top", 10);
+				_MarginContainer.AddThemeConstantOverride("margin_bottom", 0);
 
 				Label label = new()
 				{
@@ -101,8 +103,8 @@ namespace AssetSnap.GroupBuilder
 					ThemeTypeVariation = "HeaderLarge",
 				};
 
-				_marginContainer.AddChild(label);
-				AddChild(_marginContainer);
+				_MarginContainer.AddChild(label);
+				AddChild(_MarginContainer);
 				return;
 			}
 
@@ -123,22 +125,22 @@ namespace AssetSnap.GroupBuilder
 			
 			// Check if a group has been set
 			// If so, render a representation of that group.
-			if (IsInstanceValid(Viewport) || false == HasGroup())
+			if (IsInstanceValid(_Viewport) || false == HasGroup())
 			{
-				if (false == HasGroup() && IsInstanceValid(ViewportContainer))
+				if (false == HasGroup() && IsInstanceValid(_ViewportContainer))
 				{
-					RemoveChild(ToolbarPanelContainer);
-					ToolbarPanelContainer.QueueFree();
+					RemoveChild(_ToolbarPanelContainer);
+					_ToolbarPanelContainer.QueueFree();
 
-					RemoveChild(ViewportContainer);
-					ViewportContainer.QueueFree();
+					RemoveChild(_ViewportContainer);
+					_ViewportContainer.QueueFree();
 
-					_marginContainer = new();
+					_MarginContainer = new();
 
-					_marginContainer.AddThemeConstantOverride("margin_left", 25);
-					_marginContainer.AddThemeConstantOverride("margin_right", 25);
-					_marginContainer.AddThemeConstantOverride("margin_top", 10);
-					_marginContainer.AddThemeConstantOverride("margin_bottom", 0);
+					_MarginContainer.AddThemeConstantOverride("margin_left", 25);
+					_MarginContainer.AddThemeConstantOverride("margin_right", 25);
+					_MarginContainer.AddThemeConstantOverride("margin_top", 10);
+					_MarginContainer.AddThemeConstantOverride("margin_bottom", 0);
 
 					Label label = new()
 					{
@@ -146,8 +148,8 @@ namespace AssetSnap.GroupBuilder
 						ThemeTypeVariation = "HeaderLarge",
 					};
 
-					_marginContainer.AddChild(label);
-					AddChild(_marginContainer);
+					_MarginContainer.AddChild(label);
+					AddChild(_MarginContainer);
  
 					return;
 				}
@@ -155,10 +157,10 @@ namespace AssetSnap.GroupBuilder
 				return;
 			}
 
-			if( IsInstanceValid(_marginContainer) ) 
+			if( IsInstanceValid(_MarginContainer) ) 
 			{
-				RemoveChild(_marginContainer);
-				_marginContainer.QueueFree();
+				RemoveChild(_MarginContainer);
+				_MarginContainer.QueueFree();
 				
 				_InitializeToolbar();
 				_InitializePreview();
@@ -172,8 +174,8 @@ namespace AssetSnap.GroupBuilder
 		/// </summary>
 		public void Update()
 		{
-			Remove3DPreview(Viewport);
-			Render3DPreview(Viewport);
+			Remove3DPreview(_Viewport);
+			Render3DPreview(_Viewport);
 		}
 
 		/// <summary>
@@ -181,7 +183,7 @@ namespace AssetSnap.GroupBuilder
 		/// </summary>
 		private void _InitializeToolbar()
 		{
-			ToolbarPanelContainer = new()
+			_ToolbarPanelContainer = new()
 			{
 				Name = "ToolbarPanelContainer",
 				CustomMinimumSize = new Vector2(0, 20),
@@ -212,8 +214,8 @@ namespace AssetSnap.GroupBuilder
 
 			ToolbarContainer.AddChild(label);
 			ToolbarContainer.AddChild(PreviewToggler);
-			ToolbarPanelContainer.AddChild(ToolbarContainer);
-			AddChild(ToolbarPanelContainer);
+			_ToolbarPanelContainer.AddChild(ToolbarContainer);
+			AddChild(_ToolbarPanelContainer);
 		}
 
 		/// <summary>
@@ -302,14 +304,14 @@ namespace AssetSnap.GroupBuilder
 		private async void _InitializePreview()
 		{
 			// Create a Viewport to render the 3D preview
-			ViewportContainer = new SubViewportContainer()
+			_ViewportContainer = new SubViewportContainer()
 			{
 				Stretch = true,
 				SizeFlagsHorizontal = SizeFlags.ExpandFill,
 				SizeFlagsVertical = SizeFlags.ExpandFill,
 			};
 
-			Viewport = new SubViewport()
+			_Viewport = new SubViewport()
 			{
 				Name = "PreviewViewport",
 				Size = new Vector2I(0, 0),
@@ -340,19 +342,19 @@ namespace AssetSnap.GroupBuilder
 
 			world.Environment = environment;
 
-			Viewport.World3D = world;
+			_Viewport.World3D = world;
 
-			CameraContainer = new();
-			Camera = new();
+			_CameraContainer = new();
+			_Camera = new();
 
 			Transform3D cameraTransform = new(Basis.Identity, Vector3.Zero);
 			cameraTransform.Origin.Y = 1f;
 			cameraTransform.Origin.Z = 5f;
-			Camera.Transform = cameraTransform;
+			_Camera.Transform = cameraTransform;
 
-			Vector3 cameraRot = Camera.RotationDegrees;
+			Vector3 cameraRot = _Camera.RotationDegrees;
 
-			Camera.RotationDegrees = cameraRot;
+			_Camera.RotationDegrees = cameraRot;
 
 			DirectionalLight3D directionalLight = new DirectionalLight3D()
 			{
@@ -364,20 +366,20 @@ namespace AssetSnap.GroupBuilder
 				ShadowEnabled = true,
 			};
 
-			Viewport.AddChild(directionalLight);
+			_Viewport.AddChild(directionalLight);
 
-			await _MaybeInitializeEnvironment(Viewport);
+			await _MaybeInitializeEnvironment(_Viewport);
 
 			// Render the 3D preview onto the Viewport's texture
-			Render3DPreview(Viewport);
+			Render3DPreview(_Viewport);
 
 			// Add the Viewport to your main screen container
-			CameraContainer.AddChild(Camera);
-			Viewport.AddChild(CameraContainer);
-			ViewportContainer.AddChild(Viewport);
-			AddChild(ViewportContainer);
+			_CameraContainer.AddChild(_Camera);
+			_Viewport.AddChild(_CameraContainer);
+			_ViewportContainer.AddChild(_Viewport);
+			AddChild(_ViewportContainer);
 
-			ViewportContainer.Connect(Control.SignalName.GuiInput, Callable.From((InputEvent Event) => { _OnMaybeListenToInput(Event); }));
+			_ViewportContainer.Connect(Control.SignalName.GuiInput, Callable.From((InputEvent Event) => { _OnMaybeListenToInput(Event); }));
 		}
 
 		/// <summary>
@@ -394,62 +396,62 @@ namespace AssetSnap.GroupBuilder
 					// Move forward
 					if ((inputEventKey.Keycode == Key.W || inputEventKey.Keycode == Key.Up) && true == inputEventKey.Pressed)
 					{
-						Acceleration.Y = 1;
+						_Acceleration.Y = 1;
 					}
 
 					// Move backwards
 					if ((inputEventKey.Keycode == Key.S || inputEventKey.Keycode == Key.Down) && true == inputEventKey.Pressed)
 					{
-						Acceleration.Y = -1;
+						_Acceleration.Y = -1;
 					}
 
 					if ((inputEventKey.Keycode == Key.S || inputEventKey.Keycode == Key.Down || inputEventKey.Keycode == Key.W || inputEventKey.Keycode == Key.Up) && false == inputEventKey.Pressed)
 					{
-						Acceleration.Y = 0;
+						_Acceleration.Y = 0;
 					}
 
 					// Move to the left
 					if ((inputEventKey.Keycode == Key.A || inputEventKey.Keycode == Key.Left) && true == inputEventKey.Pressed)
 					{
-						Acceleration.X = -1;
+						_Acceleration.X = -1;
 					}
 
 					// Move to the right
 					if ((inputEventKey.Keycode == Key.D || inputEventKey.Keycode == Key.Right) && true == inputEventKey.Pressed)
 					{
-						Acceleration.X = 1;
+						_Acceleration.X = 1;
 					}
 
 					if ((inputEventKey.Keycode == Key.A || inputEventKey.Keycode == Key.Left || inputEventKey.Keycode == Key.D || inputEventKey.Keycode == Key.Right) && false == inputEventKey.Pressed)
 					{
-						Acceleration.X = 0;
+						_Acceleration.X = 0;
 					}
 
 					// Go upwards
 					if (inputEventKey.Keycode == Key.Space && true == inputEventKey.Pressed)
 					{
-						levitate = 1;
+						_Levitate = 1;
 					}
 					else if (inputEventKey.Keycode == Key.Space && false == inputEventKey.Pressed)
 					{
-						levitate = 0;
+						_Levitate = 0;
 					}
 
 					// Go downwards
 					if (inputEventKey.Keycode == Key.Alt && true == inputEventKey.Pressed)
 					{
-						levitate = -1;
+						_Levitate = -1;
 					}
 					else if (inputEventKey.Keycode == Key.Alt && false == inputEventKey.Pressed)
 					{
-						levitate = 0;
+						_Levitate = 0;
 					}
 
 					if (inputEventKey.Keycode == Key.Q)
 					{
-						Transform3D transform = Camera.Transform;
+						Transform3D transform = _Camera.Transform;
 						transform.Origin = Vector3.Zero;
-						Camera.Transform = transform;
+						_Camera.Transform = transform;
 					}
 				}
 
@@ -459,16 +461,16 @@ namespace AssetSnap.GroupBuilder
 					// Get the mouse motion since the last frame
 					Vector2 mouseMotion = eventMouseMotion.Relative;
 					// Update yaw (horizontal rotation) based on mouse X movement
-					yaw -= mouseMotion.X * mouseSensitivity;
+					_Yaw -= mouseMotion.X * _MouseSensitivity;
 
 					// Update pitch (vertical rotation) based on mouse Y movement
-					pitch -= mouseMotion.Y * mouseSensitivity;
+					_Pitch -= mouseMotion.Y * _MouseSensitivity;
 
 					// Clamp the pitch to prevent flipping
-					pitch = Mathf.Clamp(pitch, -Mathf.Pi / 0.1f, Mathf.Pi / 0.1f);
+					_Pitch = Mathf.Clamp(_Pitch, -Mathf.Pi / 0.1f, Mathf.Pi / 0.1f);
 
 					// Set the new rotation of the camera
-					Camera.RotationDegrees = new Vector3(pitch, yaw, 0);
+					_Camera.RotationDegrees = new Vector3(_Pitch, _Yaw, 0);
 				}
 
 				if (@event is InputEventMouseButton eventMouseButton)
@@ -476,11 +478,11 @@ namespace AssetSnap.GroupBuilder
 					// Ability to turn up movement speed
 					if (eventMouseButton.ButtonIndex == MouseButton.WheelUp && false == eventMouseButton.Pressed)
 					{
-						moveSpeedRate += 1;
+						_MoveSpeedRate += 1;
 					}
 					else if (eventMouseButton.ButtonIndex == MouseButton.WheelDown && false == eventMouseButton.Pressed)
 					{
-						moveSpeedRate -= 1;
+						_MoveSpeedRate -= 1;
 					}
 				}
 			}
@@ -498,10 +500,10 @@ namespace AssetSnap.GroupBuilder
 			if (ListensForInput)
 			{
 				// Get the forward and right vectors from the camera's orientation
-				Vector3 forward = -Camera.Basis.Z.Normalized();
-				Vector3 right = Camera.Basis.X.Normalized();
+				Vector3 forward = -_Camera.Basis.Z.Normalized();
+				Vector3 right = _Camera.Basis.X.Normalized();
 
-				Transform3D transform = Camera.Transform;
+				Transform3D transform = _Camera.Transform;
 				// Vector3 MovementVector = Vector3.Zero;
 				Vector3 MovementVector = new(
 					transform.Origin.X,
@@ -510,21 +512,21 @@ namespace AssetSnap.GroupBuilder
 				);
 
 				// Move and rotate the camera based on the input received
-				if (Acceleration.X != 0 || Acceleration.Y != 0)
+				if (_Acceleration.X != 0 || _Acceleration.Y != 0)
 				{
 					// Calculate the movement vector relative to the camera's orientation
-					MovementVector += right * Acceleration.X;
-					MovementVector += forward * Acceleration.Y;
+					MovementVector += right * _Acceleration.X;
+					MovementVector += forward * _Acceleration.Y;
 				}
 
-				if (levitate != 0)
+				if (_Levitate != 0)
 				{
 					// We should move up or down on the Y axis
-					transform.Origin.Y += levitate * (float)delta;
+					transform.Origin.Y += _Levitate * (float)delta;
 				}
 
-				transform.Origin = transform.Origin.Lerp(MovementVector, moveSpeedRate * (float)delta);
-				Camera.Transform = transform;
+				transform.Origin = transform.Origin.Lerp(MovementVector, _MoveSpeedRate * (float)delta);
+				_Camera.Transform = transform;
 
 			}
 			base._PhysicsProcess(delta);
@@ -552,9 +554,9 @@ namespace AssetSnap.GroupBuilder
 					Input.Singleton.MouseMode = Input.MouseModeEnum.Visible;
 
 					// Reset movement when we tab out of listening
-					Acceleration.X = 0;
-					Acceleration.Y = 0;
-					levitate = 0.0f;
+					_Acceleration.X = 0;
+					_Acceleration.Y = 0;
+					_Levitate = 0.0f;
 
 				}
 			}
@@ -581,8 +583,6 @@ namespace AssetSnap.GroupBuilder
 
 				if (MeshObject is Mesh _mesh)
 				{
-
-
 					MeshInstance3D meshinstance3d = new()
 					{
 						Mesh = _mesh,
@@ -655,17 +655,21 @@ namespace AssetSnap.GroupBuilder
 		}
 
 		/// <summary>
-        /// Called when the node is about to be removed from the scene tree.
-        /// </summary>
+		/// Called when the node is about to be removed from the scene tree.
+		/// </summary>
 		public override void _ExitTree()
 		{
 			// Clean up when the plugin is deactivated 
-			if (null != ViewportContainer && IsInstanceValid(ViewportContainer) && ViewportContainer.IsConnected(Control.SignalName.GuiInput, Callable.From((InputEvent Event) => { _OnMaybeListenToInput(Event); })))
+			if (
+				null != _ViewportContainer &&
+				IsInstanceValid(_ViewportContainer) &&
+				_ViewportContainer.IsConnected(Control.SignalName.GuiInput, Callable.From((InputEvent Event) => { _OnMaybeListenToInput(Event); }))
+			)
 			{
-				ViewportContainer.Disconnect(Control.SignalName.GuiInput, Callable.From((InputEvent Event) => { _OnMaybeListenToInput(Event); }));
+				_ViewportContainer.Disconnect(Control.SignalName.GuiInput, Callable.From((InputEvent Event) => { _OnMaybeListenToInput(Event); }));
 			}
-			// viewport.QueueFree();
-			// textureRect.QueueFree();
 		}
 	}
 }
+
+#endif
