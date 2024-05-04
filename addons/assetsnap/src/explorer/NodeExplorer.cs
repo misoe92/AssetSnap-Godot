@@ -35,13 +35,6 @@ namespace AssetSnap
 	[Tool]
 	public partial class NodeExplorer : CameraExplorer
 	{
-		protected AsMeshInstance3D _Model;
-		protected Node _HandleNode;
-		protected GroupResource _Group;
-		protected AsGrouped3D _GroupedObject;
-		protected Library.Instance _CurrentLibrary;
-		protected Callable? UpdateHandleCallable;
-		
 		/// <summary>
 		/// Defines whether or not a forced focus is active.
 		/// </summary>
@@ -57,43 +50,18 @@ namespace AssetSnap
 				_HandleNode = value;
 			}
 		}
-
+		
 		/// <summary>
 		/// The node to force focus to.
 		/// </summary>
 		public Node3D _ForceFocus;
 		
-		/// <summary>
-		/// Whether or not a library is active.
-		/// </summary>
-		public bool HasLibrary
-		{
-			get => CurrentLibrary != null;
-		}
-		
-		/// <summary>
-		/// The active library.
-		/// </summary>
-		public Library.Instance CurrentLibrary 
-		{
-			get => _CurrentLibrary;
-			set
-			{
-				_CurrentLibrary = value;
-			}
-		}
-		
-		/// <summary>
-		/// Current selected model from the asset library.
-		/// </summary>
-		public AssetSnap.Front.Nodes.AsMeshInstance3D Model 
-		{
-			get => _Model;
-			set
-			{
-				_Model = value;
-			}
-		}
+		protected AsMeshInstance3D _Model;
+		protected Node _HandleNode;
+		protected GroupResource _Group;
+		protected AsGrouped3D _GroupedObject;
+		protected Library.Instance _CurrentLibrary;
+		protected Callable? _UpdateHandleCallable;
 		
 		/// <summary>
 		/// Whether or not a model is active.
@@ -120,38 +88,6 @@ namespace AssetSnap
 		}
 		
 		/// <summary>
-		/// Current selected group from the group builder.
-		/// </summary>
-		public GroupResource Group 
-		{
-			get => _Group;
-			set
-			{
-				_Group = value;
-			}
-		}
-		
-		/// <summary>
-		/// Current selected group from the group builder.
-		/// </summary>
-		public AsGrouped3D GroupedObject 
-		{
-			get => _GroupedObject;
-			set
-			{
-				_GroupedObject = value;
-			}
-		}
-		
-		/// <summary>
-		/// Whether or not a group is active.
-		/// </summary>
-		public bool HasGroup
-		{
-			get => Group != null;
-		}
-		
-		/// <summary>
 		/// Default constructor for the NodeExplorer class.
 		/// </summary>	
 		public NodeExplorer()
@@ -170,7 +106,7 @@ namespace AssetSnap
 		/// </summary>
 		protected void UpdateHandle()
 		{
-			if( EditorInterface.Singleton.GetInspector().GetEditedObject() == null && Model == null) 
+			if( EditorInterface.Singleton.GetInspector().GetEditedObject() == null && StatesUtils.Get().EditingObject == null) 
 			{
 				HandleNode = null;
 				
@@ -188,26 +124,25 @@ namespace AssetSnap
 		/// </summary>
 		public void ClearHandle()
 		{
-			Model = null;
 			HandleNode = null;
 		}
 		
 		/// <summary>
-        /// Returns the update callable.
-        /// </summary>
-        /// <returns>The update callable.</returns>
+		/// Returns the update callable.
+		/// </summary>
+		/// <returns>The update callable.</returns>
 		public Callable UpdateCallable()
 		{
-			return (Callable)UpdateHandleCallable;
+			return (Callable)_UpdateHandleCallable;
 		}
 		
 		/// <summary>
-        /// Checks if the update handle method is connected.
-        /// </summary>
-        /// <returns>True if the update handle method is connected, false otherwise.</returns>
+		/// Checks if the update handle method is connected.
+		/// </summary>
+		/// <returns>True if the update handle method is connected, false otherwise.</returns>
 		protected bool IsUpdateHandleConnected() 
 		{
-			if (UpdateHandleCallable is Callable callable)
+			if (_UpdateHandleCallable is Callable callable)
 			{
 				EditorInspector Inspector = EditorInterface.Singleton.GetInspector();
 				return Inspector.IsConnected(EditorInspector.SignalName.EditedObjectChanged, callable);
@@ -217,9 +152,9 @@ namespace AssetSnap
 		}
 		
 		/// <summary>
-        /// Fetches the current handle.
-        /// </summary>
-        /// <returns>The current handle.</returns>
+		/// Fetches the current handle.
+		/// </summary>
+		/// <returns>The current handle.</returns>
 		public Node3D GetHandle()
 		{
 			if( States.PlacingMode == GlobalStates.PlacingModeEnum.Model ) 
@@ -233,9 +168,9 @@ namespace AssetSnap
 		}
 		
 		/// <summary>
-        /// Checks if the current handle is that of a Model.
-        /// </summary>
-        /// <returns>True if the current handle is a Model, false otherwise.</returns>
+		/// Checks if the current handle is that of a Model.
+		/// </summary>
+		/// <returns>True if the current handle is a Model, false otherwise.</returns>
 		public bool HandleIsModel()
 		{
 			Node3D Handle = StatesUtils.Get().EditingObject;
