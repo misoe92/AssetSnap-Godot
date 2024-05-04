@@ -239,13 +239,20 @@ As of 0.1.1
 As of 0.1.2
 - [x] Upgraded settings UI
 - [X] Level of detail Control
+- [X] Model visibility control
 - [X] Better Decal UI
 - [x] Better folder structure for components
 - [x] Stability fixes
+- [X] Most if not all code has been structured to follow the same pattern/standard
+- [X] Better Library UI, and rotation of models
+- [X] Better collision setup
+- [X] Better model preview generator, that supports .FBX, .GLTF, .GLB and .Obj.
+- [X] Toggleable model transparency when placing
 
 As of 0.1.3
 - [ ] Upgraded control around the preview of groups
 - [ ] Upgraded UI in the group builder
+- [ ] Optimization of code base, to make it more compact.
 - [ ] And more
 
 See the [open issues](https://github.com/misoe92/AssetSnap-Godot/issues) for a full list of proposed features (and known issues).
