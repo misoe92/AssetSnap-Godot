@@ -100,6 +100,16 @@ namespace AssetSnap.Component
 				Trait<Checkable>().Select(1).SetValue(state);
 			}
 		}
+		
+		/// <summary>
+		/// Resets the component to its default state.
+		/// </summary>
+		public void Reset()
+		{
+			state = false;
+			UsingGlue = false;
+			_value = 0.0f;
+		}
 			
 		/// <summary>
 		/// Applies glue to the boundary's Y axis.
@@ -126,13 +136,24 @@ namespace AssetSnap.Component
 		}
 		
 		/// <summary>
-		/// Resets the component to its default state.
+		/// Checks if Snap to height glue is enabled.
 		/// </summary>
-		public void Reset()
+		/// <returns><c>true</c> if Snap to height glue is enabled; otherwise, <c>false</c>.</returns>
+		public bool IsSnapToGlue()
 		{
-			state = false;
-			UsingGlue = false;
-			_value = 0.0f;
+			switch( Angle ) 
+			{
+				case GlobalStates.SnapAngleEnums.X:
+					return _GlobalExplorer.States.SnapToXGlue == GlobalStates.LibraryStateEnum.Enabled;
+					
+				case GlobalStates.SnapAngleEnums.Y:
+					return _GlobalExplorer.States.SnapToHeightGlue == GlobalStates.LibraryStateEnum.Enabled;
+					
+				case GlobalStates.SnapAngleEnums.Z:
+					return _GlobalExplorer.States.SnapToZGlue == GlobalStates.LibraryStateEnum.Enabled;
+			}
+
+			return false;
 		}
 		
 		/// <summary>
@@ -151,27 +172,6 @@ namespace AssetSnap.Component
 					
 				case GlobalStates.SnapAngleEnums.Z:
 					return _GlobalExplorer.States.SnapToZ == GlobalStates.LibraryStateEnum.Enabled;
-			}
-
-			return false;
-		}
-
-		/// <summary>
-		/// Checks if Snap to height glue is enabled.
-		/// </summary>
-		/// <returns><c>true</c> if Snap to height glue is enabled; otherwise, <c>false</c>.</returns>
-		protected bool _IsSnapToGlue()
-		{
-			switch( Angle ) 
-			{
-				case GlobalStates.SnapAngleEnums.X:
-					return _GlobalExplorer.States.SnapToXGlue == GlobalStates.LibraryStateEnum.Enabled;
-					
-				case GlobalStates.SnapAngleEnums.Y:
-					return _GlobalExplorer.States.SnapToHeightGlue == GlobalStates.LibraryStateEnum.Enabled;
-					
-				case GlobalStates.SnapAngleEnums.Z:
-					return _GlobalExplorer.States.SnapToZGlue == GlobalStates.LibraryStateEnum.Enabled;
 			}
 
 			return false;

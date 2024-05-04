@@ -107,7 +107,7 @@ namespace AssetSnap.BottomDock
 		/// <param name="container">The container to add.</param>
 		public void Add( Container container )
 		{
-			if( false == IsValid(container) || null == ExplorerUtils.Get()._Plugin ) 
+			if( false == _IsValid(container) || null == ExplorerUtils.Get()._Plugin ) 
 			{
 				return;
 			}
@@ -118,30 +118,6 @@ namespace AssetSnap.BottomDock
 			}
 
 			ExplorerUtils.Get()._Plugin.GetTabContainer().AddChild(container, true);
-		}
-		
-		/// <summary>
-		/// Checks if a child exists in the tab container.
-		/// </summary>
-		/// <param name="container">The container to check.</param>
-		/// <returns>True if the container exists, otherwise false.</returns>
-		public bool Has( Container container )
-		{
-			if( null == ExplorerUtils.Get()._Plugin.GetTabContainer() || false == EditorPlugin.IsInstanceValid(ExplorerUtils.Get()._Plugin.GetTabContainer()) ) 
-			{
-				GD.PushError("Invalid container @ Bottom Dock: ", container.Name);
-				return false;
-			}
-			
-			foreach( Node child in ExplorerUtils.Get()._Plugin.GetTabContainer().GetChildren() ) 
-			{
-				if( EditorPlugin.IsInstanceValid(child) && child.Name == container.Name ) 
-				{
-					return true;
-				}
-			}
- 
-			return false;
 		}
 
 		/// <summary>
@@ -177,11 +153,35 @@ namespace AssetSnap.BottomDock
 		}
 		
 		/// <summary>
-        /// Checks if a container is valid.
-        /// </summary>
-        /// <param name="_Container">The container to check.</param>
-        /// <returns>True if the container is valid, otherwise false.</returns>
-		private bool IsValid( Container _Container )
+		/// Checks if a child exists in the tab container.
+		/// </summary>
+		/// <param name="container">The container to check.</param>
+		/// <returns>True if the container exists, otherwise false.</returns>
+		public bool Has( Container container )
+		{
+			if( null == ExplorerUtils.Get()._Plugin.GetTabContainer() || false == EditorPlugin.IsInstanceValid(ExplorerUtils.Get()._Plugin.GetTabContainer()) ) 
+			{
+				GD.PushError("Invalid container @ Bottom Dock: ", container.Name);
+				return false;
+			}
+			
+			foreach( Node child in ExplorerUtils.Get()._Plugin.GetTabContainer().GetChildren() ) 
+			{
+				if( EditorPlugin.IsInstanceValid(child) && child.Name == container.Name ) 
+				{
+					return true;
+				}
+			}
+ 
+			return false;
+		}
+		
+		/// <summary>
+		/// Checks if a container is valid.
+		/// </summary>
+		/// <param name="_Container">The container to check.</param>
+		/// <returns>True if the container is valid, otherwise false.</returns>
+		private bool _IsValid( Container _Container )
 		{
 			return null != _Container && true == EditorPlugin.IsInstanceValid(_Container); 
 		}
