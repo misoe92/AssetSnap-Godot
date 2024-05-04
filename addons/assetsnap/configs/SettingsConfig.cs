@@ -104,7 +104,7 @@ namespace AssetSnap.Front.Configs
 		/// </summary>
 		public SettingsConfig()
 		{
-			_Name = "AssetSnapConfig";
+			_Name = "Settings";
 		}
 
 		/// <summary>

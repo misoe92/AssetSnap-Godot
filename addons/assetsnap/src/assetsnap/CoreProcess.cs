@@ -169,7 +169,7 @@ namespace AssetSnap.Core
 		/// <returns>True if the context menu should be hidden, otherwise false.</returns>
 		private bool _ShouldHideContextMenu()
 		{
-			if (null == ExplorerUtils.Get() || true == ExplorerUtils.Get().ContextMenu.IsHidden())
+			if (null == ExplorerUtils.Get() || null == ExplorerUtils.Get().ContextMenu || true == ExplorerUtils.Get().ContextMenu.IsHidden())
 			{
 				return false;
 			}
@@ -211,7 +211,7 @@ namespace AssetSnap.Core
         /// <returns>True if the context menu should be shown, otherwise false.</returns>
 		private bool _ShouldShowContextMenu()
 		{
-			if (null == ExplorerUtils.Get() || false == ExplorerUtils.Get().ContextMenu.IsHidden())
+			if (null == ExplorerUtils.Get() || null == ExplorerUtils.Get().ContextMenu || false == ExplorerUtils.Get().ContextMenu.IsHidden())
 			{
 				return false;
 			}

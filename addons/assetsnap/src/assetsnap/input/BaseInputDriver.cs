@@ -201,7 +201,7 @@ namespace AssetSnap.Instance.Input
 							if (null != StatesUtils.Get().CurrentLibrary)
 							{
 								StatesUtils.Get().CurrentLibrary.ClearAllPanelState();
-								StatesUtils.Get().CurrentLibrary = null;
+								// StatesUtils.Get().CurrentLibrary = null;
 							}
 
 							StatesUtils.Get().Group = null;
@@ -210,7 +210,7 @@ namespace AssetSnap.Instance.Input
 
 						if (ExplorerUtils.Get().States.PlacingMode == GlobalStates.PlacingModeEnum.Group)
 						{
-							StatesUtils.Get().CurrentLibrary = null;
+							// StatesUtils.Get().CurrentLibrary = null;
 							StatesUtils.Get().PlacingMode = GlobalStates.PlacingModeEnum.Model;
 							StatesUtils.Get().Group = null;
 							StatesUtils.Get().GroupedObject = null;
@@ -230,7 +230,10 @@ namespace AssetSnap.Instance.Input
 					}
 					else if (false == SettingsStatic.ShouldFocusAsset())
 					{
-						StatesUtils.Get().CurrentLibrary._LibrarySettings.Editing.SetText("None");
+						if( null != StatesUtils.Get().CurrentLibrary ) 
+						{
+							StatesUtils.Get().CurrentLibrary._LibrarySettings.Editing.SetText("None");
+						}
 						StatesUtils.Get().EditingObject = null;
 						StatesUtils.Get().GroupedObject = null;
 					}

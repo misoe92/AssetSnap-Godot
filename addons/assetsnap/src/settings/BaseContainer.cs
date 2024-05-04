@@ -188,6 +188,7 @@ namespace AssetSnap.Settings
 			var Iteration = 0;
 			SettingsConfig _Config = GlobalExplorer.GetInstance().Settings;
 			Godot.Collections.Dictionary<string, Variant> _Settings = _Config.GetSettings();
+			
 			foreach ((string key, Variant value) in _Settings)
 			{
 				string k = key + "_type";

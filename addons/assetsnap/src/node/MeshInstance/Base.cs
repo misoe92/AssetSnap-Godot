@@ -210,15 +210,6 @@ namespace AssetSnap.ASNode.MeshInstance
 		}
 
 		/// <summary>
-		/// Gets the model node from the global explorer instance.
-		/// </summary>
-		/// <returns>The model node.</returns>
-		public Node3D GetModel()
-		{
-			return GlobalExplorer.GetInstance().Model;
-		}
-
-		/// <summary>
 		/// Gets the handle node from the global explorer instance.
 		/// </summary>
 		/// <returns>The handle node.</returns>

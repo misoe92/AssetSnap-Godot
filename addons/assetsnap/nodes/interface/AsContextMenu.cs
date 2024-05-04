@@ -51,14 +51,13 @@ namespace AssetSnap.Front.Nodes
 		private int _MediumScreenOffsetX = 140;
 		private int _SmallScreenOffsetX = 145;
 		private int _ScreenOffsetY = 123;
-
+	
 		/// <summary>
 		/// Called when the node enters the scene tree.
 		/// </summary>
 		public override void _EnterTree()
 		{
 			Name = "AsContextMenu";
-			
 			base._EnterTree();
 		}
 		
@@ -72,10 +71,13 @@ namespace AssetSnap.Front.Nodes
 			EditorInterface.Singleton.GetBaseControl().Connect(Control.SignalName.Resized, Callable.From(ResizeAction));
 			EditorInterface.Singleton.GetFileSystemDock().GetParent().Connect(Control.SignalName.Resized, Callable.From(ResizeAction));
 
-			ExplorerUtils.Get().ContextMenu.GetInstance().Connect(
-				SignalName.VectorsChanged,
-				new Callable(this, "_OnUpdateVectors")
-			);
+			if( null != ExplorerUtils.Get().ContextMenu.GetInstance() ) 
+			{
+				ExplorerUtils.Get().ContextMenu.GetInstance().Connect(
+					SignalName.VectorsChanged,
+					new Callable(this, "_OnUpdateVectors")
+				);
+			}
 		}
 		
 		/// <summary>

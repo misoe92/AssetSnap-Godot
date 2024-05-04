@@ -89,6 +89,10 @@ namespace AssetSnap.Config
 			{
 				_LoadOk = true;
 			}
+			else 
+			{
+				GD.PushError("Could not load config");
+			}
 		}
 	} 
 }
