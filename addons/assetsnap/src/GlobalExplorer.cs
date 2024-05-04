@@ -212,7 +212,6 @@ namespace AssetSnap
 			if (Node is AsMeshInstance3D _instance)
 			{
 				HandleNode = _instance;
-				Model = _instance;
 
 				Library.Instance Library = GetLibraryByName(_instance.GetLibraryName());
 				Library._LibrarySettings._LSEditing.SetText(Node.Name);
