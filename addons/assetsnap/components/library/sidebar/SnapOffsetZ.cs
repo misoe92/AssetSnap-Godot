@@ -201,7 +201,7 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 				{
 					Trait<Spinboxable>()
 						.Select(0)
-						.SetValue(_GlobalExplorer.States.SnapToObjectOffsetZValue);
+						.SetValue(StatesUtils.Get().SnapToObjectOffsetZValue);
 				}
 			}
 		}

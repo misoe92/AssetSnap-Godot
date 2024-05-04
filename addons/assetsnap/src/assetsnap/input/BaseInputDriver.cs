@@ -230,7 +230,7 @@ namespace AssetSnap.Instance.Input
 					}
 					else if (false == SettingsStatic.ShouldFocusAsset())
 					{
-						StatesUtils.Get().CurrentLibrary._LibrarySettings._LSEditing.SetText("None");
+						StatesUtils.Get().CurrentLibrary._LibrarySettings.Editing.SetText("None");
 						StatesUtils.Get().EditingObject = null;
 						StatesUtils.Get().GroupedObject = null;
 					}

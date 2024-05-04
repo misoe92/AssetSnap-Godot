@@ -234,7 +234,7 @@ namespace AssetSnap.Front.Components
 		/// </summary>
 		private void _OnConfirm()
 		{
-			Plugin.Singleton.EmitSignal(Plugin.SignalName.OnRemoveFolder, title);
+			Plugin.Singleton.EmitSignal(Plugin.SignalName.OnRemoveFolder, Title);
 		}
 		
 		/// <summary>

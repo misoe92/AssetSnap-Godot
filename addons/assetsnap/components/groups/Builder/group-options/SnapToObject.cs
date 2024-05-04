@@ -23,6 +23,7 @@
 #if TOOLS
 
 using AssetSnap.Component;
+using AssetSnap.States;
 using Godot;
 
 namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
@@ -66,13 +67,13 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 		{
 			_GlobalExplorer.GroupBuilder._Editor.Group.SnapToObject = !_GlobalExplorer.GroupBuilder._Editor.Group.SnapToObject;
 				
-			if( true == _GlobalExplorer.GroupBuilder._Editor.Group.SnapToObject && _GlobalExplorer.States.PlacingMode == GlobalStates.PlacingModeEnum.Group )
+			if( true == _GlobalExplorer.GroupBuilder._Editor.Group.SnapToObject && StatesUtils.Get().PlacingMode == GlobalStates.PlacingModeEnum.Group )
 			{
-				_GlobalExplorer.States.SnapToObject = GlobalStates.LibraryStateEnum.Enabled;
+				StatesUtils.Get().SnapToObject = GlobalStates.LibraryStateEnum.Enabled;
 			}
-			else if( _GlobalExplorer.States.PlacingMode == GlobalStates.PlacingModeEnum.Group )
+			else if( StatesUtils.Get().PlacingMode == GlobalStates.PlacingModeEnum.Group )
 			{
-				_GlobalExplorer.States.SnapToObject = GlobalStates.LibraryStateEnum.Disabled;
+				StatesUtils.Get().SnapToObject = GlobalStates.LibraryStateEnum.Disabled;
 			}
 												
 			Parent._UpdateGroupOptions();

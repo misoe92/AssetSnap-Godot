@@ -305,8 +305,8 @@ namespace AssetSnap.Front.Components.Groups.Builder
 			_GroupBuilderEditorGroupOptionConvexCollision.SetValue(_GlobalExplorer.GroupBuilder._Editor.Group.ConvexCollision);
 			_GroupBuilderEditorGroupOptionConvexClean.SetValue(_GlobalExplorer.GroupBuilder._Editor.Group.ConvexClean);
 			_GroupBuilderEditorGroupOptionConvexSimplify.SetValue(_GlobalExplorer.GroupBuilder._Editor.Group.ConvexSimplify);
-			_GroupBuilderEditorGroupOptionPlacementSimple.SetValue(_GlobalExplorer.States.PlacingType == GlobalStates.PlacingTypeEnum.Simple);
-			_GroupBuilderEditorGroupOptionPlacementOptimized.SetValue(_GlobalExplorer.States.PlacingType == GlobalStates.PlacingTypeEnum.Optimized);
+			_GroupBuilderEditorGroupOptionPlacementSimple.SetValue(StatesUtils.Get().PlacingType == GlobalStates.PlacingTypeEnum.Simple);
+			_GroupBuilderEditorGroupOptionPlacementOptimized.SetValue(StatesUtils.Get().PlacingType == GlobalStates.PlacingTypeEnum.Optimized);
 			_GroupBuilderEditorGroupOptionDragOffset.SetValue(DragAddInputDriver.GetInstance().SizeOffset);
 
 			if (true == _GroupBuilderEditorGroupOptionSnapToObject.GetValue())

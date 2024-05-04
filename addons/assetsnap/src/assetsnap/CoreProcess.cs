@@ -273,19 +273,19 @@ namespace AssetSnap.Core
 					ItemTransform.Origin = _HandleObjectSnap(ItemTransform.Origin);
 
 					// Checks if glue is used and applies it
-					if (_UsesGlue(StatesUtils.Get().CurrentLibrary._LibrarySettings._LSSnapToHeight))
+					if (_UsesGlue(StatesUtils.Get().CurrentLibrary._LibrarySettings.SnapToHeight))
 					{
-						ItemTransform.Origin = _ApplyGlue(ItemTransform.Origin, StatesUtils.Get().CurrentLibrary._LibrarySettings._LSSnapToHeight);
+						ItemTransform.Origin = _ApplyGlue(ItemTransform.Origin, StatesUtils.Get().CurrentLibrary._LibrarySettings.SnapToHeight);
 					}
 
-					if (_UsesGlue(StatesUtils.Get().CurrentLibrary._LibrarySettings._LSSnapToX))
+					if (_UsesGlue(StatesUtils.Get().CurrentLibrary._LibrarySettings.SnapToX))
 					{
-						ItemTransform.Origin = _ApplyGlue(ItemTransform.Origin, StatesUtils.Get().CurrentLibrary._LibrarySettings._LSSnapToX);
+						ItemTransform.Origin = _ApplyGlue(ItemTransform.Origin, StatesUtils.Get().CurrentLibrary._LibrarySettings.SnapToX);
 					}
 
-					if (_UsesGlue(StatesUtils.Get().CurrentLibrary._LibrarySettings._LSSnapToZ))
+					if (_UsesGlue(StatesUtils.Get().CurrentLibrary._LibrarySettings.SnapToZ))
 					{
-						ItemTransform.Origin = _ApplyGlue(ItemTransform.Origin, StatesUtils.Get().CurrentLibrary._LibrarySettings._LSSnapToZ);
+						ItemTransform.Origin = _ApplyGlue(ItemTransform.Origin, StatesUtils.Get().CurrentLibrary._LibrarySettings.SnapToZ);
 					}
 
 					// Updates decal preview

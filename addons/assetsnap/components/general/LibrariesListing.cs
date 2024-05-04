@@ -233,7 +233,7 @@ namespace AssetSnap.Front.Components
 						if (null != component && IsInstanceValid(component) && component is LibrariesListingEntry _component)
 						{
 							string title = _GlobalExplorer.Settings.Folders[index];
-							_component.title = title;
+							_component.Title = title;
 							_component.Initialize();
 						}
 					}

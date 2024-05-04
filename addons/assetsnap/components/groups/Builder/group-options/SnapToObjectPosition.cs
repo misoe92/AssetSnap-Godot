@@ -23,6 +23,7 @@
 #if TOOLS
 
 using AssetSnap.Component;
+using AssetSnap.States;
 using Godot;
 
 namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
@@ -40,7 +41,7 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 		{
 			Name = "GroupsBuilderGroupOptionsSnapToObjectPosition";
 			
-			UsingTraits = new()
+			_UsingTraits = new()
 			{
 				{ typeof(Spinboxable).ToString() },
 			};
@@ -55,7 +56,7 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 				.SetName("InitializeGroupOptionSnapObjectContainer")
 				.SetMargin(35, "right")
 				.SetText("Top")
-				.SetValue(_GlobalExplorer.States.GroupSnapsTo == GlobalStates.SnapPosition.Top)
+				.SetValue(StatesUtils.Get().GroupSnapsTo == GlobalStates.SnapPosition.Top)
 				.SetAction( Callable.From( () => { _OnSnapGroupToTop(); }) )
 				.Instantiate();
 				
@@ -63,7 +64,7 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 				.SetName("InitializeGroupOptionSnapObjectContainer")
 				.SetMargin(35, "right")
 				.SetText("Middle")
-				.SetValue(_GlobalExplorer.States.GroupSnapsTo == GlobalStates.SnapPosition.Middle)
+				.SetValue(StatesUtils.Get().GroupSnapsTo == GlobalStates.SnapPosition.Middle)
 				.SetAction( Callable.From( () => { _OnSnapGroupToMiddle(); }) )
 				.Instantiate();
 				
@@ -71,7 +72,7 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 				.SetName("InitializeGroupOptionSnapObjectContainer")
 				.SetMargin(35, "right")
 				.SetText("Bottom")
-				.SetValue(_GlobalExplorer.States.GroupSnapsTo == GlobalStates.SnapPosition.Bottom)
+				.SetValue(StatesUtils.Get().GroupSnapsTo == GlobalStates.SnapPosition.Bottom)
 				.SetAction( Callable.From( () => { _OnSnapGroupToBottom(); }) )
 				.Instantiate();
 		}
@@ -101,7 +102,7 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
         /// </summary>
 		private void _OnSnapGroupToTop()
 		{
-			_GlobalExplorer.States.GroupSnapsTo = GlobalStates.SnapPosition.Top;
+			StatesUtils.Get().GroupSnapsTo = GlobalStates.SnapPosition.Top;
 
 			Trait<Checkable>()
 				.Select(1)
@@ -117,7 +118,7 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
         /// </summary>
 		private void _OnSnapGroupToMiddle()
 		{
-			_GlobalExplorer.States.GroupSnapsTo = GlobalStates.SnapPosition.Middle;
+			StatesUtils.Get().GroupSnapsTo = GlobalStates.SnapPosition.Middle;
 			
 			Trait<Checkable>()
 				.Select(0)
@@ -133,7 +134,7 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
         /// </summary>
 		private void _OnSnapGroupToBottom()
 		{
-			_GlobalExplorer.States.GroupSnapsTo = GlobalStates.SnapPosition.Bottom;
+			StatesUtils.Get().GroupSnapsTo = GlobalStates.SnapPosition.Bottom;
 			
 			Trait<Checkable>()
 				.Select(0)

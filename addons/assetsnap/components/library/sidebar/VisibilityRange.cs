@@ -245,7 +245,7 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		{
 			return
 				null != _GlobalExplorer &&
-				null != _GlobalExplorer.States &&
+				null != StatesUtils.Get() &&
 				false != _Initiated &&
 				null != Trait<Checkable>() &&
 				false != HasTrait<Checkable>();

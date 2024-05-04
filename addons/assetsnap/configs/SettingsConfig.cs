@@ -34,11 +34,12 @@ namespace AssetSnap.Front.Configs
 	/// </summary>
 	public partial class SettingsConfig : Config.BaseConfig
 	{
+		public bool Initialized = false;
+		
 		private string _ConfigPath;
 		private string[] _Folders;
 		private Godot.Collections.Dictionary<string, Variant> _Settings;
 		private BaseContainer _Container;
-		private bool _Initialized = false;
 
 		/// <summary>
 		/// Gets the singleton instance of SettingsConfig.
@@ -151,7 +152,7 @@ namespace AssetSnap.Front.Configs
 
 				_Folders = _FolderList.ToArray();
 				_FolderList.Clear();
-				_Initialized = true;
+				Initialized = true;
 			}
 			else
 			{

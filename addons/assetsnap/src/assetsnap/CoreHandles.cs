@@ -86,7 +86,7 @@ namespace AssetSnap.Core
 			{
 				if (null != StatesUtils.Get().CurrentLibrary)
 				{
-					StatesUtils.Get().CurrentLibrary._LibrarySettings._LSEditing.SetText("None");
+					StatesUtils.Get().CurrentLibrary._LibrarySettings.Editing.SetText("None");
 				}
 
 				if (null != ExplorerUtils.Get().Library && null != ExplorerUtils.Get().Library.Libraries)
@@ -97,7 +97,7 @@ namespace AssetSnap.Core
 						if (EditorPlugin.IsInstanceValid(_Library) && null != _Library._LibrarySettings)
 						{
 							_Library._LibrarySettings.ClearAll();
-							_Library._LibrarySettings._LSEditing.SetText("None");
+							_Library._LibrarySettings.Editing.SetText("None");
 						}
 					}
 				}
@@ -131,7 +131,7 @@ namespace AssetSnap.Core
 					{
 						instance.ClearAllPanelState();
 						instance._LibrarySettings.ClearAll();
-						instance._LibrarySettings._LSEditing.SetText("None");
+						instance._LibrarySettings.Editing.SetText("None");
 					}
 				}
 				StatesUtils.Get().EditingObject = _Node;
@@ -149,7 +149,7 @@ namespace AssetSnap.Core
 				}
 
 				ExplorerUtils.Get().BottomDock.SetTab(Library);
-				Library._LibrarySettings._LSEditing.SetText(_Node.Name);
+				Library._LibrarySettings.Editing.SetText(_Node.Name);
 
 				/** Update library settings **/
 				if (_Node.HasLibrarySettings())
@@ -187,7 +187,7 @@ namespace AssetSnap.Core
 					{
 						instance.ClearAllPanelState();
 						instance._LibrarySettings.ClearAll();
-						instance._LibrarySettings._LSEditing.SetText("None");
+						instance._LibrarySettings.Editing.SetText("None");
 					}
 				}
 				StatesUtils.Get().EditingObject = _Node;
@@ -205,7 +205,7 @@ namespace AssetSnap.Core
 				}
 
 				ExplorerUtils.Get().BottomDock.SetTab(Library);
-				Library._LibrarySettings._LSEditing.SetText(_Node.Name);
+				Library._LibrarySettings.Editing.SetText(_Node.Name);
 
 				/** Update library settings **/
 				if (_Node.HasLibrarySettings())

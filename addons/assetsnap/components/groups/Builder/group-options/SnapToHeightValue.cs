@@ -23,6 +23,7 @@
 #if TOOLS
 
 using AssetSnap.Component;
+using AssetSnap.States;
 using Godot;
 
 namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
@@ -76,9 +77,9 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 		{
 			_GlobalExplorer.GroupBuilder._Editor.Group.SnapToHeightValue = value;
 
-			if (_GlobalExplorer.States.PlacingMode == GlobalStates.PlacingModeEnum.Group)
+			if (StatesUtils.Get().PlacingMode == GlobalStates.PlacingModeEnum.Group)
 			{
-				_GlobalExplorer.States.SnapToHeightValue = value;
+				StatesUtils.Get().SnapToHeightValue = value;
 			}
 
 			Parent._UpdateGroupOptions();

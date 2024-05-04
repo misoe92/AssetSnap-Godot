@@ -270,8 +270,8 @@ namespace AssetSnap.Settings
 					{
 						SettingsSpinBox _SettingsSpinBox = GlobalExplorer.GetInstance().Components.Single<SettingsSpinBox>(true);
 
-						_SettingsSpinBox.key = key;
-						_SettingsSpinBox.value = value;
+						_SettingsSpinBox.Key = key;
+						_SettingsSpinBox.Value = value;
 						_SettingsSpinBox.Initialize();
 						_Container.AddChild(_SettingsSpinBox);
 					}
@@ -301,8 +301,8 @@ namespace AssetSnap.Settings
 					{
 						SettingsCheckbox _SettingsCheckbox = GlobalExplorer.GetInstance().Components.Single<SettingsCheckbox>(true);
 
-						_SettingsCheckbox.key = key;
-						_SettingsCheckbox.value = value;
+						_SettingsCheckbox.Key = key;
+						_SettingsCheckbox.Value = value;
 						_SettingsCheckbox.Initialize();
 						_Container.AddChild(_SettingsCheckbox);
 					}

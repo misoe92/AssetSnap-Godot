@@ -196,7 +196,7 @@ namespace AssetSnap
 			if (null == Node)
 			{
 				StatesUtils.Get().CurrentLibrary.ClearActivePanelState(null);
-				StatesUtils.Get().CurrentLibrary._LibrarySettings._LSEditing.SetText("None");
+				StatesUtils.Get().CurrentLibrary._LibrarySettings.Editing.SetText("None");
 
 				StatesUtils.Get().EditingObject = null;
 				StatesUtils.Get().Group = null;
@@ -214,7 +214,7 @@ namespace AssetSnap
 				HandleNode = _instance;
 
 				Library.Instance Library = GetLibraryByName(_instance.GetLibraryName());
-				Library._LibrarySettings._LSEditing.SetText(Node.Name);
+				Library._LibrarySettings.Editing.SetText(Node.Name);
 				StatesUtils.Get().CurrentLibrary = Library;
 
 				if (InputDriver is DragAddInputDriver DraggableInputDriver)
@@ -228,7 +228,7 @@ namespace AssetSnap
 				HandleNode = _nodeInstance;
 
 				Library.Instance Library = GetLibraryByName(_nodeInstance.GetLibraryName());
-				Library._LibrarySettings._LSEditing.SetText(Node.Name);
+				Library._LibrarySettings.Editing.SetText(Node.Name);
 				StatesUtils.Get().CurrentLibrary = Library;
 
 				if (InputDriver is DragAddInputDriver DraggableInputDriver)

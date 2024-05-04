@@ -23,6 +23,7 @@
 #if TOOLS
 
 using AssetSnap.Component;
+using AssetSnap.States;
 using Godot;
 
 namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
@@ -71,18 +72,18 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
 			_GlobalExplorer.GroupBuilder._Editor.Group.ConvexClean = false;
 			_GlobalExplorer.GroupBuilder._Editor.Group.ConvexSimplify = false;
 			
-			if( true == _GlobalExplorer.GroupBuilder._Editor.Group.ConcaveCollision && _GlobalExplorer.States.PlacingMode == GlobalStates.PlacingModeEnum.Group )
+			if( true == _GlobalExplorer.GroupBuilder._Editor.Group.ConcaveCollision && StatesUtils.Get().PlacingMode == GlobalStates.PlacingModeEnum.Group )
 			{
-				_GlobalExplorer.States.ConcaveCollision = GlobalStates.LibraryStateEnum.Enabled;
+				StatesUtils.Get().ConcaveCollision = GlobalStates.LibraryStateEnum.Enabled;
 				
-				_GlobalExplorer.States.ConvexCollision = GlobalStates.LibraryStateEnum.Disabled;
-				_GlobalExplorer.States.ConvexClean = GlobalStates.LibraryStateEnum.Disabled;
-				_GlobalExplorer.States.ConvexSimplify = GlobalStates.LibraryStateEnum.Disabled;
-				_GlobalExplorer.States.SphereCollision = GlobalStates.LibraryStateEnum.Disabled;
+				StatesUtils.Get().ConvexCollision = GlobalStates.LibraryStateEnum.Disabled;
+				StatesUtils.Get().ConvexClean = GlobalStates.LibraryStateEnum.Disabled;
+				StatesUtils.Get().ConvexSimplify = GlobalStates.LibraryStateEnum.Disabled;
+				StatesUtils.Get().SphereCollision = GlobalStates.LibraryStateEnum.Disabled;
 			}
-			else if( _GlobalExplorer.States.PlacingMode == GlobalStates.PlacingModeEnum.Group )
+			else if( StatesUtils.Get().PlacingMode == GlobalStates.PlacingModeEnum.Group )
 			{
-				_GlobalExplorer.States.ConcaveCollision = GlobalStates.LibraryStateEnum.Disabled;
+				StatesUtils.Get().ConcaveCollision = GlobalStates.LibraryStateEnum.Disabled;
 			}
 			Parent._UpdateGroupOptions();
 			

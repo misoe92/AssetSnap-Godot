@@ -299,9 +299,9 @@ namespace AssetSnap.Front.Components.Groups.Builder
 
 			GlobalExplorer.GetInstance().GroupBuilder._Sidebar.RefreshExistingGroups();
 
-			if (_GlobalExplorer.States.GroupedObjects.ContainsKey(GroupPath))
+			if (StatesUtils.Get().GroupedObjects.ContainsKey(GroupPath))
 			{
-				foreach (Node3D node in _GlobalExplorer.States.GroupedObjects[GroupPath])
+				foreach (Node3D node in StatesUtils.Get().GroupedObjects[GroupPath])
 				{
 					if (node is AsGrouped3D asGrouped3D)
 					{

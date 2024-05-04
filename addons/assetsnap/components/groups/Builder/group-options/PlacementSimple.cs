@@ -23,6 +23,7 @@
 #if TOOLS
 
 using AssetSnap.Component;
+using AssetSnap.States;
 using Godot;
 
 namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
@@ -64,10 +65,10 @@ namespace AssetSnap.Front.Components.Groups.Builder.GroupOptions
         /// </summary>
 		private void _OnCheck()
 		{
-			_GlobalExplorer.States.PlacingType = GlobalStates.PlacingTypeEnum.Simple;
+			StatesUtils.Get().PlacingType = GlobalStates.PlacingTypeEnum.Simple;
 			
 			Parent._UpdateGroupOptions();
-			_MaybeUpdateGrouped("PlacementSimple", _GlobalExplorer.States.PlacingType == GlobalStates.PlacingTypeEnum.Simple);
+			_MaybeUpdateGrouped("PlacementSimple", StatesUtils.Get().PlacingType == GlobalStates.PlacingTypeEnum.Simple);
 			_HasGroupDataHasChanged();
 		}
 	}

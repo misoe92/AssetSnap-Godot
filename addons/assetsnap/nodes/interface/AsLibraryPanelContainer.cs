@@ -118,8 +118,8 @@ namespace AssetSnap.Front.Nodes
 					SetState(true);
 					PrepareMeshInstance();
 
-					Library._LibrarySettings._LSSnapToHeight.SetState(true);
-					Library._LibrarySettings._LSSnapToHeight.Sync();
+					Library._LibrarySettings.SnapToHeight.SetState(true);
+					Library._LibrarySettings.SnapToHeight.Sync();
 
 					ExplorerUtils.Get().SetFocusToNode(_Instance);
 
