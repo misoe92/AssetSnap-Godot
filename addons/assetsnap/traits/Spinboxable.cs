@@ -92,8 +92,8 @@ namespace AssetSnap.Component
 				Prefix = _Prefix,
 				Step = _Step,
 				TooltipText = _TooltipText,
-				SizeFlagsHorizontal = SizeFlagsHorizontal,
-				SizeFlagsVertical = SizeFlagsVertical
+				SizeFlagsHorizontal = _SizeFlagsHorizontal,
+				SizeFlagsVertical = _SizeFlagsVertical
 			};
 		
 			if( _MaximumValue != 0 ) 
@@ -111,14 +111,14 @@ namespace AssetSnap.Component
 				WorkingInput.Value = _DefaultValue;
 			}
 			
-			if( Vector2.Zero != CustomMinimumSize ) 
+			if( Vector2.Zero != _CustomMinimumSize ) 
 			{
-				WorkingInput.CustomMinimumSize = CustomMinimumSize;
+				WorkingInput.CustomMinimumSize = _CustomMinimumSize;
 			}
 			
-			if( Vector2.Zero != Size ) 
+			if( Vector2.Zero != _Size ) 
 			{
-				WorkingInput.Size = Size;
+				WorkingInput.Size = _Size;
 			}
 			
 			if( _Action is Callable _callable ) 
@@ -435,8 +435,8 @@ namespace AssetSnap.Component
 		/// </summary>
 		protected override void Reset()
 		{
-			Size = Vector2.Zero;
-			CustomMinimumSize = Vector2.Zero;
+			_Size = Vector2.Zero;
+			_CustomMinimumSize = Vector2.Zero;
 			_Prefix = "";
 			_TooltipText = "";
 			_DefaultValue = 0;

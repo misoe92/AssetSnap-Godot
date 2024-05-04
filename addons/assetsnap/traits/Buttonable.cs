@@ -75,7 +75,7 @@ namespace AssetSnap.Component
 			Name = "Buttonable";
 			TypeString = GetType().ToString();
 
-			Margin = new()
+			_Margin = new()
 			{
 				{"left", 20},
 				{"right", 20},
@@ -83,8 +83,8 @@ namespace AssetSnap.Component
 				{"bottom", 25},
 			};
 			
-			SizeFlagsHorizontal = Control.SizeFlags.ShrinkBegin;
-			SizeFlagsVertical = Control.SizeFlags.ShrinkCenter;
+			_SizeFlagsHorizontal = Control.SizeFlags.ShrinkBegin;
+			_SizeFlagsVertical = Control.SizeFlags.ShrinkCenter;
 		}
 		
 		/// <summary>
@@ -103,9 +103,9 @@ namespace AssetSnap.Component
 				TooltipText = _TooltipText,
 				ThemeTypeVariation = _WorkingButtonType.ToString(),
 				MouseDefaultCursorShape = _DefaultCursorShape,
-				SizeFlagsHorizontal = SizeFlagsHorizontal,
-				SizeFlagsVertical = SizeFlagsVertical,
-				Visible = Visible,
+				SizeFlagsHorizontal = _SizeFlagsHorizontal,
+				SizeFlagsVertical = _SizeFlagsVertical,
+				Visible = _Visible,
 				MouseFilter = _MouseFilter,
 				Theme = _Theme,
 			};
@@ -377,14 +377,14 @@ namespace AssetSnap.Component
 		{
 			if( side == "" ) 
 			{
-				Margin["top"] = value;
-				Margin["bottom"] = value;
-				Margin["left"] = value;
-				Margin["right"] = value;
+				_Margin["top"] = value;
+				_Margin["bottom"] = value;
+				_Margin["left"] = value;
+				_Margin["right"] = value;
 			}
 			else 
 			{
-				Margin[side] = value;
+				_Margin[side] = value;
 			}
 			
 			return this;
@@ -396,7 +396,7 @@ namespace AssetSnap.Component
 		/// <returns>Returns true if the button is visible; otherwise, false.</returns>
 		public bool IsVisible()
 		{
-			return Visible;
+			return _Visible;
 		}
 		
 		/// <summary>

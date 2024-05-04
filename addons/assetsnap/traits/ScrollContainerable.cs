@@ -101,7 +101,7 @@ namespace AssetSnap.Component
 			};
 			
 			// Apply padding to the ScrollPaddingContainer
-			foreach( (string side, int value ) in Padding ) 
+			foreach( (string side, int value ) in _Padding ) 
 			{
 				ScrollPaddingContainer.AddThemeConstantOverride("margin_" + side, value);
 			}

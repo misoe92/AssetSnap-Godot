@@ -144,7 +144,7 @@ namespace AssetSnap.Trait
 		/// <returns>The container with the updated visibility state.</returns>
 		public virtual ContainerTrait SetVisible(bool state)
 		{
-			Visible = state;
+			_Visible = state;
 
 			if (
 				null != Dependencies &&
@@ -164,7 +164,7 @@ namespace AssetSnap.Trait
 		/// <returns>The container with the toggled visibility state.</returns>
 		public virtual ContainerTrait ToggleVisible( bool debug = false)
 		{
-			Visible = !Visible;
+			_Visible = !_Visible;
 			
 			if (
 				null != Dependencies &&
@@ -236,7 +236,7 @@ namespace AssetSnap.Trait
 			{
 				if (false != Dependencies.ContainsKey(TraitName + "_MarginContainer"))
 				{
-					foreach ((string marginSide, int marginValue) in Margin)
+					foreach ((string marginSide, int marginValue) in _Margin)
 					{
 						Dependencies[TraitName + "_MarginContainer"].As<MarginContainer>().AddThemeConstantOverride("margin_" + marginSide, marginValue);
 					}
@@ -267,7 +267,7 @@ namespace AssetSnap.Trait
 			{
 				if (false != Dependencies.ContainsKey(TraitName + "_PaddingContainer"))
 				{
-					foreach ((string marginSide, int marginValue) in Margin)
+					foreach ((string marginSide, int marginValue) in _Margin)
 					{
 						Dependencies[TraitName + "_PaddingContainer"].As<MarginContainer>().AddThemeConstantOverride("margin_" + marginSide, marginValue);
 					}
@@ -356,25 +356,25 @@ namespace AssetSnap.Trait
 			{
 				Name = prefix + "-ContainerMargin",
 				SizeFlagsHorizontal = _ContainerHorizontalSizeFlag,
-				SizeFlagsVertical = SizeFlagsVertical,
-				Visible = Visible,
+				SizeFlagsVertical = _SizeFlagsVertical,
+				Visible = _Visible,
 			};
 
-			if (Size != Vector2.Zero)
+			if (_Size != Vector2.Zero)
 			{
-				_MarginContainer.Size = Size;
+				_MarginContainer.Size = _Size;
 			}
 
-			if (CustomMinimumSize != Vector2.Zero)
+			if (_CustomMinimumSize != Vector2.Zero)
 			{
-				_MarginContainer.CustomMinimumSize = CustomMinimumSize;
+				_MarginContainer.CustomMinimumSize = _CustomMinimumSize;
 			}
 
 			MarginContainer _PaddingContainer = new()
 			{
 				Name = prefix + "-ContainerPadding",
 				SizeFlagsHorizontal = _ContainerHorizontalSizeFlag,
-				SizeFlagsVertical = SizeFlagsVertical,
+				SizeFlagsVertical = _SizeFlagsVertical,
 			};
 
 			Container _InnerContainer;
@@ -385,7 +385,7 @@ namespace AssetSnap.Trait
 				{
 					Name = prefix + "-ContainerInner",
 					SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
-					SizeFlagsVertical = SizeFlagsVertical,
+					SizeFlagsVertical = _SizeFlagsVertical,
 				};
 			}
 			else
@@ -394,19 +394,19 @@ namespace AssetSnap.Trait
 				{
 					Name = prefix + "-ContainerInner",
 					SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
-					SizeFlagsVertical = SizeFlagsVertical,
+					SizeFlagsVertical = _SizeFlagsVertical,
 				};
 			}
 
-			foreach ((string side, int value) in Margin)
+			foreach ((string side, int value) in _Margin)
 			{
 				_MarginContainer.AddThemeConstantOverride("margin_" + side, value);
 			}
 
 			VBoxContainer _ContainerNode = new()
 			{
-				SizeFlagsHorizontal = SizeFlagsHorizontal,
-				SizeFlagsVertical = SizeFlagsVertical,
+				SizeFlagsHorizontal = _SizeFlagsHorizontal,
+				SizeFlagsVertical = _SizeFlagsVertical,
 				Name = prefix + "_Container",
 			};
 
@@ -417,7 +417,7 @@ namespace AssetSnap.Trait
 
 			if (_UsePaddingContainer)
 			{
-				foreach ((string side, int value) in Padding)
+				foreach ((string side, int value) in _Padding)
 				{
 					_PaddingContainer.AddThemeConstantOverride("margin_" + side, value);
 				}
@@ -426,8 +426,8 @@ namespace AssetSnap.Trait
 			for (int i = 0; i < ColumnCount; i++)
 			{
 				Container innerContainer = _Orientation == ContainerOrientation.Horizontal ? new HBoxContainer() : new VBoxContainer();
-				innerContainer.SizeFlagsHorizontal = SizeFlagsHorizontal;
-				innerContainer.SizeFlagsVertical = SizeFlagsVertical;
+				innerContainer.SizeFlagsHorizontal = _SizeFlagsHorizontal;
+				innerContainer.SizeFlagsVertical = _SizeFlagsVertical;
 				innerContainer.Name = prefix + "-inner-" + i;
 
 				innerContainer.AddThemeConstantOverride("separation", _Seperation);
@@ -484,8 +484,8 @@ namespace AssetSnap.Trait
 			_Layout = ContainerLayout.OneColumn;
 			_Orientation = ContainerOrientation.Vertical;
 			_InnerOrientation = ContainerOrientation.Vertical;
-			Size = Vector2.Zero;
-			CustomMinimumSize = Vector2.Zero;
+			_Size = Vector2.Zero;
+			_CustomMinimumSize = Vector2.Zero;
 			Dependencies = new();
 			TraitName = "";
 		}

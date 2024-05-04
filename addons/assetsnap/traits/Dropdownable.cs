@@ -110,7 +110,7 @@ namespace AssetSnap.Component
 				Visible = false,
 			};
 
-			foreach( (string side, int value ) in Padding ) 
+			foreach( (string side, int value ) in _Padding ) 
 			{ 
 				PanelPaddingContainer.AddThemeConstantOverride("margin_" + side, value);
 			}
@@ -129,7 +129,7 @@ namespace AssetSnap.Component
 				Icon = GD.Load<Texture2D>("res://addons/assetsnap/assets/icons/chevron-down.svg"),
 				IconAlignment = HorizontalAlignment.Right,
 				Alignment = HorizontalAlignment.Left,
-				Margin = Margin,
+				Margin = _Margin,
 			};
 			
 			if( "" != _DefaultValue ) 

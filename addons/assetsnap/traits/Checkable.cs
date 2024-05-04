@@ -82,18 +82,18 @@ namespace AssetSnap.Component
 				Text = _Text,
 				TooltipText = _TooltipText,
 				ButtonPressed = _ButtonPressed,
-				SizeFlagsHorizontal = SizeFlagsHorizontal,
-				SizeFlagsVertical = SizeFlagsVertical
+				SizeFlagsHorizontal = _SizeFlagsHorizontal,
+				SizeFlagsVertical = _SizeFlagsVertical
 			};
 
-			if( Vector2.Zero != CustomMinimumSize ) 
+			if( Vector2.Zero != _CustomMinimumSize ) 
 			{
-				WorkingInput.CustomMinimumSize = CustomMinimumSize;
+				WorkingInput.CustomMinimumSize = _CustomMinimumSize;
 			}
 			
-			if( Vector2.Zero != Size ) 
+			if( Vector2.Zero != _Size ) 
 			{
-				WorkingInput.Size = Size;
+				WorkingInput.Size = _Size;
 			}
 
 			// Setup node structure

@@ -47,7 +47,7 @@ namespace AssetSnap.Component
 			Name = "Listable";
 			TypeString = GetType().ToString();
 
-			Margin = new()
+			_Margin = new()
 			{
 				{"left", 20},
 				{"right", 20},
@@ -81,8 +81,8 @@ namespace AssetSnap.Component
 			VBoxContainer _WorkingNode = new()
 			{
 				Name = "Listable-Container",
-				CustomMinimumSize = CustomMinimumSize,
-				Size = Size,
+				CustomMinimumSize = _CustomMinimumSize,
+				Size = _Size,
 			};
 			
 			Godot.Collections.Array _components = new();

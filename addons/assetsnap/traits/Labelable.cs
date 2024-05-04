@@ -59,7 +59,7 @@ namespace AssetSnap.Component
 		{
 			Name = "Labelable";
 			
-			Margin = new()
+			_Margin = new()
 			{
 				{"left", 15},
 				{"right", 15},
@@ -68,8 +68,8 @@ namespace AssetSnap.Component
 			};
 
 			TypeString = GetType().ToString();
-			SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
-			SizeFlagsVertical = Control.SizeFlags.ShrinkBegin;
+			_SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+			_SizeFlagsVertical = Control.SizeFlags.ShrinkBegin;
 		}
 		
 		/// <summary>
@@ -109,7 +109,7 @@ namespace AssetSnap.Component
 			{
 				_Orientation = ContainerOrientation.Horizontal;
 				_InnerOrientation = ContainerOrientation.Vertical;
-				SizeFlagsHorizontal = Control.SizeFlags.ShrinkBegin;
+				_SizeFlagsHorizontal = Control.SizeFlags.ShrinkBegin;
 			}
 
 			base.Instantiate();
@@ -123,11 +123,11 @@ namespace AssetSnap.Component
 			{
 				Name = TraitName,
 				Text = _Title,
-				CustomMinimumSize = CustomMinimumSize,
-				Size = Size,
+				CustomMinimumSize = _CustomMinimumSize,
+				Size = _Size,
 				ThemeTypeVariation = _Type.ToString(),
-				SizeFlagsHorizontal = SizeFlagsHorizontal,
-				SizeFlagsVertical = SizeFlagsVertical,
+				SizeFlagsHorizontal = _SizeFlagsHorizontal,
+				SizeFlagsVertical = _SizeFlagsVertical,
 				AutowrapMode = _AutowrapMode,
 				HorizontalAlignment = _HorizontalAlignment
 			};
@@ -410,10 +410,10 @@ namespace AssetSnap.Component
 
 			base.Reset();
 
-			SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
-			SizeFlagsVertical = Control.SizeFlags.ShrinkBegin;
+			_SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+			_SizeFlagsVertical = Control.SizeFlags.ShrinkBegin;
 
-			Margin = new()
+			_Margin = new()
 			{
 				{"left", 15},
 				{"right", 15},

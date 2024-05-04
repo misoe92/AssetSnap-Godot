@@ -54,7 +54,7 @@ namespace AssetSnap.Component
 			Name = "Panelable";
 			TypeString = GetType().ToString();
 
-			Margin = new()
+			_Margin = new()
 			{
 				{"left", 0},
 				{"right", 0},
@@ -62,7 +62,7 @@ namespace AssetSnap.Component
 				{"bottom", 5},
 			};
 
-			Padding = new()
+			_Padding = new()
 			{
 				{"left", 10},
 				{"right", 10},
@@ -100,13 +100,13 @@ namespace AssetSnap.Component
 			_MarginContainer = new()
 			{
 				Name = "PanelMarginContainer",
-				SizeFlagsHorizontal = SizeFlagsHorizontal,
-				SizeFlagsVertical = SizeFlagsVertical,
-				Visible = Visible,
+				SizeFlagsHorizontal = _SizeFlagsHorizontal,
+				SizeFlagsVertical = _SizeFlagsVertical,
+				Visible = _Visible,
 			};
 
 			// Apply margin to MarginContainer
-			foreach ((string side, int value) in Margin)
+			foreach ((string side, int value) in _Margin)
 			{
 				_MarginContainer.AddThemeConstantOverride("margin_" + side, value);
 			}
@@ -116,20 +116,20 @@ namespace AssetSnap.Component
 			{
 				Name = TraitName,
 				ThemeTypeVariation = _Type.ToString(),
-				SizeFlagsHorizontal = SizeFlagsHorizontal,
-				SizeFlagsVertical = SizeFlagsVertical,
+				SizeFlagsHorizontal = _SizeFlagsHorizontal,
+				SizeFlagsVertical = _SizeFlagsVertical,
 			};
 			
 			// Create PaddingContainer
 			_PaddingContainer = new()
 			{
 				Name = "PanelPaddingContainer",
-				SizeFlagsHorizontal = SizeFlagsHorizontal,
-				SizeFlagsVertical = SizeFlagsVertical,
+				SizeFlagsHorizontal = _SizeFlagsHorizontal,
+				SizeFlagsVertical = _SizeFlagsVertical,
 			};
 
 			// Apply padding to PaddingContainer
-			foreach ((string side, int value) in Padding)
+			foreach ((string side, int value) in _Padding)
 			{
 				_PaddingContainer.AddThemeConstantOverride("margin_" + side, value);
 			}
@@ -268,14 +268,14 @@ namespace AssetSnap.Component
 		{
 			if (side == "")
 			{
-				Margin["top"] = value;
-				Margin["bottom"] = value;
-				Margin["left"] = value;
-				Margin["right"] = value;
+				_Margin["top"] = value;
+				_Margin["bottom"] = value;
+				_Margin["left"] = value;
+				_Margin["right"] = value;
 			}
 			else
 			{
-				Margin[side] = value;
+				_Margin[side] = value;
 			}
 
 			return this;
