@@ -24,6 +24,7 @@
 
 using AssetSnap.Component;
 using AssetSnap.Front.Nodes;
+using AssetSnap.States;
 using Godot;
 
 namespace AssetSnap.Front.Components.Library.Sidebar
@@ -44,7 +45,7 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		{
 			Name = "LSConcaveCollision";
 			
-			UsingTraits = new()
+			_UsingTraits = new()
 			{
 				{ typeof(Checkable).ToString() },
 			};
@@ -59,7 +60,7 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		{
 			base.Initialize();
 			Callable _callable = Callable.From(() => { _OnCheckboxPressed(); });
-			Initiated = true;
+			_Initiated = true;
 			
 			Trait<Checkable>()
 				.SetName("ConcaveCollision")
@@ -89,6 +90,37 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 				base.MaybeUpdateValue(data);
 			}
 		}
+		
+		/// <summary>
+		/// Resets the state back to disabled.
+		/// </summary>
+		public void Reset()
+		{
+			StatesUtils.Get().ConcaveCollision = GlobalStates.LibraryStateEnum.Disabled;
+		}
+		
+		/// <summary>
+		/// Synchronizes its value to a global central state controller.
+		/// </summary>
+		public override void Sync() 
+		{
+			if( false == IsValid() )
+			{
+				return;
+			}
+			
+			StatesUtils.Get().ConcaveCollision = Trait<Checkable>().Select(0).GetValue() ? GlobalStates.LibraryStateEnum.Enabled : GlobalStates.LibraryStateEnum.Disabled;
+		}
+		
+		/// <summary>
+		/// Overrides the _ExitTree method of the parent class.
+		/// </summary>
+		public override void _ExitTree()
+		{
+			_Initiated = false;
+			
+			base._ExitTree();
+		}
 				
 		/// <summary>
 		/// Updates spawn settings, collisions, and more on checkbox pressed event.
@@ -97,13 +129,13 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		{
 			Node3D handle = _GlobalExplorer.GetHandle();
 
-			if( false == IsActive() ) 
+			if( false == _IsActive() ) 
 			{
-				_GlobalExplorer.States.ConcaveCollision = GlobalStates.LibraryStateEnum.Enabled;
-				_GlobalExplorer.States.SphereCollision = GlobalStates.LibraryStateEnum.Disabled;
-				_GlobalExplorer.States.ConvexCollision = GlobalStates.LibraryStateEnum.Disabled;
-				_GlobalExplorer.States.ConvexClean = GlobalStates.LibraryStateEnum.Disabled;
-				_GlobalExplorer.States.ConvexSimplify = GlobalStates.LibraryStateEnum.Disabled;
+				StatesUtils.Get().ConcaveCollision = GlobalStates.LibraryStateEnum.Enabled;
+				StatesUtils.Get().SphereCollision = GlobalStates.LibraryStateEnum.Disabled;
+				StatesUtils.Get().ConvexCollision = GlobalStates.LibraryStateEnum.Disabled;
+				StatesUtils.Get().ConvexClean = GlobalStates.LibraryStateEnum.Disabled;
+				StatesUtils.Get().ConvexSimplify = GlobalStates.LibraryStateEnum.Disabled;
 												
 				UpdateSpawnSettings("ConcaveCollision", true);
 				UpdateSpawnSettings("SphereCollision", false);
@@ -113,7 +145,7 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			}
 			else 
 			{
-				_GlobalExplorer.States.ConcaveCollision = GlobalStates.LibraryStateEnum.Disabled;
+				StatesUtils.Get().ConcaveCollision = GlobalStates.LibraryStateEnum.Disabled;
 				UpdateSpawnSettings("ConcaveCollision", false);
 			}
 			
@@ -130,40 +162,9 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		/// Checks if the component state is active.
 		/// </summary>
 		/// <returns>True if the component is active, otherwise false.</returns>
-		public override bool IsActive() 
+		protected override bool _IsActive() 
 		{
-			return _GlobalExplorer.States.ConcaveCollision == GlobalStates.LibraryStateEnum.Enabled;
-		}
-				
-		/// <summary>
-		/// Resets the state back to disabled.
-		/// </summary>
-		public void Reset()
-		{
-			_GlobalExplorer.States.ConcaveCollision = GlobalStates.LibraryStateEnum.Disabled;
-		}
-		
-		/// <summary>
-		/// Synchronizes its value to a global central state controller.
-		/// </summary>
-		public override void Sync() 
-		{
-			if( false == IsValid() )
-			{
-				return;
-			}
-			
-			_GlobalExplorer.States.ConcaveCollision = Trait<Checkable>().Select(0).GetValue() ? GlobalStates.LibraryStateEnum.Enabled : GlobalStates.LibraryStateEnum.Disabled;
-		}
-		
-		/// <summary>
-		/// Overrides the _ExitTree method of the parent class.
-		/// </summary>
-		public override void _ExitTree()
-		{
-			Initiated = false;
-			
-			base._ExitTree();
+			return StatesUtils.Get().ConcaveCollision == GlobalStates.LibraryStateEnum.Enabled;
 		}
 	}
 }

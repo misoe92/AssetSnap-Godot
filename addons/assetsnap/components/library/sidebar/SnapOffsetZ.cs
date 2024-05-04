@@ -34,22 +34,21 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 	[Tool]
 	public partial class SnapOffsetZ : LSObjectComponent
 	{
-		private float _value = 0.0f;
-		protected float value
+		protected float Value
 		{
-			get => _value;
+			get => _Value;
 			set
 			{
-				_value = value;
+				_Value = value;
 				if (IsValid() && Trait<Spinboxable>().Select(0).IsValid())
 				{
 					Trait<Spinboxable>().Select(0).SetValue(value);
 				}
 			}
 		}
-
 		private readonly string _Title = "Offset Z: ";
 		private readonly string _Tooltip = "Offsets the Z axis when snapping to object, enabling for precise operations.";
+		private float _Value = 0.0f;
 
 		/// <summary>
 		/// Constructor of the SnapOffsetZ component.
@@ -58,7 +57,7 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		{
 			Name = "LSSnapOffsetZ";
 
-			UsingTraits = new()
+			_UsingTraits = new()
 			{
 				{ typeof(Spinboxable).ToString() },
 			};
@@ -75,7 +74,7 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 
 			Callable _callable = Callable.From((double value) => { _OnSpinBoxValueChange((float)value); });
 
-			Initiated = true;
+			_Initiated = true;
 
 			Trait<Spinboxable>()
 				.SetName("SnapObjectOffsetZ")
@@ -94,14 +93,90 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 				.Select(0)
 				.AddToContainer(this);
 
-			Plugin.GetInstance().StatesChanged += (Godot.Collections.Array data) => { MaybeUpdateValue(data); };
+			Plugin.GetInstance().StatesChanged += (Godot.Collections.Array data) => { _MaybeUpdateValue(data); };
+		}
+		
+		/// <summary>
+		/// Synchronizes the SnapOffsetZ component's value with a global state controller.
+		/// </summary>
+		public override void Sync()
+		{
+			if (false == IsValid())
+			{
+				return;
+			}
+
+			StatesUtils.Get().SnapToObjectOffsetXValue = (float)Trait<Spinboxable>().Select(0).GetValue();
+		}
+		
+		/// <summary>
+		/// Resets the SnapOffsetZ component to its default value.
+		/// </summary>
+		public void Reset()
+		{
+			StatesUtils.Get().SnapToObjectOffsetZValue = 0.0f;
+		}
+		
+		/// <summary>
+		/// Sets the visibility state of the SnapOffsetZ component.
+		/// </summary>
+		/// <param name="state">The visibility state to set.</param>
+		public override void SetVisible(bool state)
+		{
+			if (false == IsValid())
+			{
+				return;
+			}
+
+			Trait<Spinboxable>()
+				.Select(0)
+				.SetVisible(state);
+		}
+		
+		/// <summary>
+		/// Retrieves the current value of the SnapOffsetZ component.
+		/// </summary>
+		/// <returns>The current offset value.</returns>
+		public float GetValue()
+		{
+			return StatesUtils.Get().SnapToObjectOffsetZValue;
 		}
 
 		/// <summary>
-        /// Handles updating the SnapOffsetZ component's value based on state changes.
-        /// </summary>
-        /// <param name="data">The array of data containing state change information.</param>
-		private void MaybeUpdateValue(Godot.Collections.Array data)
+		/// Checks if the SnapOffsetZ component is valid.
+		/// </summary>
+		/// <returns>True if the component is valid, otherwise false.</returns>
+		public bool IsValid()
+		{
+			return
+				null != _GlobalExplorer &&
+				null != StatesUtils.Get() &&
+				false != _Initiated &&
+				false != HasTrait<Spinboxable>() &&
+				null != Trait<Spinboxable>();
+		}
+		
+		/// <summary>
+		/// Checks if the SnapOffsetZ component is currently visible.
+		/// </summary>
+		/// <returns>True if the component is visible, otherwise false.</returns>
+		public override bool IsVisible()
+		{
+			if (false == IsValid())
+			{
+				return false;
+			}
+
+			return Trait<Spinboxable>()
+				.Select(0)
+				.IsVisible();
+		}
+
+		/// <summary>
+		/// Handles updating the SnapOffsetZ component's value based on state changes.
+		/// </summary>
+		/// <param name="data">The array of data containing state change information.</param>
+		private void _MaybeUpdateValue(Godot.Collections.Array data)
 		{
 			if (data[0].As<string>() == "SnapToObject" || data[0].As<string>() == "SnapToObjectOffsetZValue")
 			{
@@ -132,89 +207,13 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		}
 
 		/// <summary>
-		/// Sets the visibility state of the SnapOffsetZ component.
-		/// </summary>
-		/// <param name="state">The visibility state to set.</param>
-		public override void SetVisible(bool state)
-		{
-			if (false == IsValid())
-			{
-				return;
-			}
-
-			Trait<Spinboxable>()
-				.Select(0)
-				.SetVisible(state);
-		}
-
-		/// <summary>
-        /// Checks if the SnapOffsetZ component is currently visible.
-        /// </summary>
-        /// <returns>True if the component is visible, otherwise false.</returns>
-		public override bool IsVisible()
-		{
-			if (false == IsValid())
-			{
-				return false;
-			}
-
-			return Trait<Spinboxable>()
-				.Select(0)
-				.IsVisible();
-		}
-
-		/// <summary>
 		/// Handles updating the value when the SpinBox value changes.
 		/// </summary>
 		/// <param name="value">The new value of the SpinBox.</param>
 		private void _OnSpinBoxValueChange(float value)
 		{
-			_GlobalExplorer.States.SnapToObjectOffsetZValue = value;
+			StatesUtils.Get().SnapToObjectOffsetZValue = value;
 			UpdateSpawnSettings("SnapToObjectOffsetZValue", value);
-		}
-
-		/// <summary>
-		/// Retrieves the current value of the SnapOffsetZ component.
-		/// </summary>
-		/// <returns>The current offset value.</returns>
-		public float GetValue()
-		{
-			return _GlobalExplorer.States.SnapToObjectOffsetZValue;
-		}
-
-		/// <summary>
-		/// Resets the SnapOffsetZ component to its default value.
-		/// </summary>
-		public void Reset()
-		{
-			_GlobalExplorer.States.SnapToObjectOffsetZValue = 0.0f;
-		}
-
-		/// <summary>
-		/// Checks if the SnapOffsetZ component is valid.
-		/// </summary>
-		/// <returns>True if the component is valid, otherwise false.</returns>
-		public bool IsValid()
-		{
-			return
-				null != _GlobalExplorer &&
-				null != _GlobalExplorer.States &&
-				false != Initiated &&
-				false != HasTrait<Spinboxable>() &&
-				null != Trait<Spinboxable>();
-		}
-
-		/// <summary>
-		/// Synchronizes the SnapOffsetZ component's value with a global state controller.
-		/// </summary>
-		public override void Sync()
-		{
-			if (false == IsValid())
-			{
-				return;
-			}
-
-			_GlobalExplorer.States.SnapToObjectOffsetXValue = (float)Trait<Spinboxable>().Select(0).GetValue();
 		}
 	}
 }

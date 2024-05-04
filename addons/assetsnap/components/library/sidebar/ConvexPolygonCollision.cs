@@ -24,6 +24,7 @@
 
 using AssetSnap.Component;
 using AssetSnap.Front.Nodes;
+using AssetSnap.States;
 using Godot;
 
 namespace AssetSnap.Front.Components.Library.Sidebar
@@ -40,7 +41,7 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		private readonly string _CheckboxTooltip = "Use with caution, since this method is more expensive than a simple collision shape.";
 		private readonly string _cleanCheckboxTooltip = "If clean is true (default), duplicate and interior vertices are removed automatically. You can set it to false to make the process faster if not needed.";
 		private readonly string _simplifyCheckboxTooltip = "If simplify is true, the geometry can be further simplified to reduce the number of vertices. Disabled by default.";
-		private bool Exited = false;
+		private bool _Exited = false;
 
 		/// <summary>
 		/// Constructor of the component.
@@ -49,7 +50,7 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		{
 			Name = "LSConvexPolygonCollision";
 			
-			UsingTraits = new()
+			_UsingTraits = new()
 			{
 				{ typeof(Checkable).ToString() },
 			};
@@ -68,7 +69,7 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			Callable _cleanCallable = Callable.From(() => { _OnCleanCheckboxPressed(); });
 			Callable _simplifyCallable = Callable.From(() => { _OnSimplifyCheckboxPressed(); });
 			
-			Initiated = true;
+			_Initiated = true;
 			
 			Trait<Checkable>()
 				.SetName("ConvexCollision")
@@ -137,7 +138,7 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 					return;
 				}
 				
-				if( IsActive() ) 
+				if( _IsActive() ) 
 				{
 					SetCleanCheckboxVisibility(true);
 					SetSimplifyCheckboxVisibility(true);
@@ -148,20 +149,20 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 					SetSimplifyCheckboxVisibility(false);
 				}
 				
-				if( IsCleanActive() && false == CleanCheckboxChecked() ) 
+				if( _IsCleanActive() && false == _CleanCheckboxChecked() ) 
 				{
 					SetCleanCheckboxState(true);
 				}
-				else if( false == IsCleanActive() && true == CleanCheckboxChecked() ) 
+				else if( false == _IsCleanActive() && true == _CleanCheckboxChecked() ) 
 				{
 					SetCleanCheckboxState(false);
 				}
 				
-				if( IsSimplifyActive() && false == SimplifyCheckboxChecked() ) 
+				if( _IsSimplifyActive() && false == _SimplifyCheckboxChecked() ) 
 				{
 					SetSimplifyCheckboxState(true);
 				}
-				else if( false == IsSimplifyActive() && true == SimplifyCheckboxChecked() ) 
+				else if( false == _IsSimplifyActive() && true == _SimplifyCheckboxChecked() ) 
 				{
 					SetSimplifyCheckboxState(false);
 				}
@@ -223,17 +224,48 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		}
 		
 		/// <summary>
+        /// Resets the state back to disabled.
+        /// </summary>
+		public void Reset()
+		{
+			StatesUtils.Get().ConvexCollision = GlobalStates.LibraryStateEnum.Disabled; 
+			StatesUtils.Get().ConvexClean = GlobalStates.LibraryStateEnum.Disabled; 
+			StatesUtils.Get().ConvexSimplify = GlobalStates.LibraryStateEnum.Disabled; 
+		}
+			
+		/// <summary>
+        /// Syncronizes its value to a global central state controller.
+        /// </summary>
+		public override void Sync() 
+		{
+			if( true == _Initiated && Trait<Checkable>().Select(0).IsValid() )
+			{
+				StatesUtils.Get().ConvexCollision = Trait<Checkable>().Select(0).GetValue() ? GlobalStates.LibraryStateEnum.Enabled : GlobalStates.LibraryStateEnum.Disabled;
+			}
+			
+			if( true == _Initiated && Trait<Checkable>().Select(1).IsValid() )
+			{
+				StatesUtils.Get().ConvexClean = Trait<Checkable>().Select(1).GetValue() ? GlobalStates.LibraryStateEnum.Enabled : GlobalStates.LibraryStateEnum.Disabled;
+			}
+			
+			if( true == _Initiated && Trait<Checkable>().Select(2).IsValid() )
+			{
+				StatesUtils.Get().ConvexSimplify = Trait<Checkable>().Select(2).GetValue() ? GlobalStates.LibraryStateEnum.Enabled : GlobalStates.LibraryStateEnum.Disabled;
+			}
+		}
+		
+		/// <summary>
 		/// Handles checkbox press event.
 		/// </summary>
 		private void _OnCheckboxPressed()
 		{
 			Node3D handle = _GlobalExplorer.GetHandle();
 
-			if( false == IsActive() ) 
+			if( false == _IsActive() ) 
 			{
-				_GlobalExplorer.States.ConvexCollision = GlobalStates.LibraryStateEnum.Enabled;
-				_GlobalExplorer.States.SphereCollision = GlobalStates.LibraryStateEnum.Disabled;
-				_GlobalExplorer.States.ConcaveCollision = GlobalStates.LibraryStateEnum.Disabled;
+				StatesUtils.Get().ConvexCollision = GlobalStates.LibraryStateEnum.Enabled;
+				StatesUtils.Get().SphereCollision = GlobalStates.LibraryStateEnum.Disabled;
+				StatesUtils.Get().ConcaveCollision = GlobalStates.LibraryStateEnum.Disabled;
 								
 				UpdateSpawnSettings("ConvexCollision", true);
 				UpdateSpawnSettings("SphereCollision", false);
@@ -243,9 +275,9 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			}
 			else
 			{
-				_GlobalExplorer.States.ConvexCollision = GlobalStates.LibraryStateEnum.Disabled;
-				_GlobalExplorer.States.ConvexClean = GlobalStates.LibraryStateEnum.Disabled;
-				_GlobalExplorer.States.ConvexSimplify = GlobalStates.LibraryStateEnum.Disabled;
+				StatesUtils.Get().ConvexCollision = GlobalStates.LibraryStateEnum.Disabled;
+				StatesUtils.Get().ConvexClean = GlobalStates.LibraryStateEnum.Disabled;
+				StatesUtils.Get().ConvexSimplify = GlobalStates.LibraryStateEnum.Disabled;
 										
 				UpdateSpawnSettings("ConvexCollision", false);
 				UpdateSpawnSettings("ConvexClean", false);
@@ -259,7 +291,6 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 					staticBody3D.UpdateCollision();
 				}
 			}
-			
 		}
 		
 		/// <summary>
@@ -269,14 +300,14 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		{
 			bool state = false; 
 			
-			if( false == IsCleanActive() ) 
+			if( false == _IsCleanActive() ) 
 			{
-				_GlobalExplorer.States.ConvexClean = GlobalStates.LibraryStateEnum.Enabled;
+				StatesUtils.Get().ConvexClean = GlobalStates.LibraryStateEnum.Enabled;
 				state = true;
 			}
 			else 
 			{
-				_GlobalExplorer.States.ConvexClean = GlobalStates.LibraryStateEnum.Disabled;
+				StatesUtils.Get().ConvexClean = GlobalStates.LibraryStateEnum.Disabled;
 			}
 			
 			Node3D handle = _GlobalExplorer.GetHandle();
@@ -299,14 +330,14 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		{
 			bool state = false; 
 			
-			if( false == IsSimplifyActive() ) 
+			if( false == _IsSimplifyActive() ) 
 			{
-				_GlobalExplorer.States.ConvexClean = GlobalStates.LibraryStateEnum.Enabled;
+				StatesUtils.Get().ConvexClean = GlobalStates.LibraryStateEnum.Enabled;
 				state = true;
 			}
 			else 
 			{
-				_GlobalExplorer.States.ConvexClean = GlobalStates.LibraryStateEnum.Disabled;
+				StatesUtils.Get().ConvexClean = GlobalStates.LibraryStateEnum.Disabled;
 			}
 			
 			Node3D handle = _GlobalExplorer.GetHandle();
@@ -325,31 +356,31 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		/// <summary>
 		/// Checks if the simplify checkbox is active.
 		/// </summary>
-		public bool IsSimplifyActive()
+		private bool _IsSimplifyActive()
 		{
-			return _GlobalExplorer.States.ConvexSimplify == GlobalStates.LibraryStateEnum.Enabled;
+			return StatesUtils.Get().ConvexSimplify == GlobalStates.LibraryStateEnum.Enabled;
 		}
 		
 		/// <summary>
 		/// Checks if the clean checkbox is active.
 		/// </summary>
-		public bool IsCleanActive()
+		private bool _IsCleanActive()
 		{
-			return _GlobalExplorer.States.ConvexClean == GlobalStates.LibraryStateEnum.Enabled;
+			return StatesUtils.Get().ConvexClean == GlobalStates.LibraryStateEnum.Enabled;
 		}
 		
 		/// <summary>
 		/// Checks if the collision should use the ConvexPolygon collision.
 		/// </summary>
-		public override bool IsActive() 
+		protected override bool _IsActive() 
 		{
-			return _GlobalExplorer.States.ConvexCollision == GlobalStates.LibraryStateEnum.Enabled;
+			return StatesUtils.Get().ConvexCollision == GlobalStates.LibraryStateEnum.Enabled;
 		}
 		
 		/// <summary>
 		/// Checks if the clean checkbox is checked.
 		/// </summary>
-		private bool CleanCheckboxChecked()
+		private bool _CleanCheckboxChecked()
 		{
 			if( false == IsValid() )
 			{
@@ -362,7 +393,7 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		/// <summary>
 		/// Checks if the clean checkbox is visible.
 		/// </summary>	
-		private bool CleanCheckboxVisible()
+		private bool _CleanCheckboxVisible()
 		{
 			if( false == IsValid() )
 			{
@@ -375,7 +406,7 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		/// <summary>
 		/// Checks if the simplify checkbox is checked.
 		/// </summary>
-		private bool SimplifyCheckboxChecked()
+		private bool _SimplifyCheckboxChecked()
 		{
 			if( false == IsValid() )
 			{
@@ -386,9 +417,9 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		}
 		
 		/// <summary>
-        /// Checks if the simplify checkbox is visible.
-        /// </summary>
-		private bool SimplifyCheckboxVisible()
+		/// Checks if the simplify checkbox is visible.
+		/// </summary>
+		private bool _SimplifyCheckboxVisible()
 		{
 			if( false == IsValid() )
 			{
@@ -396,37 +427,6 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			}
 			
 			return Trait<Checkable>().Select(2).IsVisible();
-		}
-		
-		/// <summary>
-        /// Resets the state back to disabled.
-        /// </summary>
-		public void Reset()
-		{
-			_GlobalExplorer.States.ConvexCollision = GlobalStates.LibraryStateEnum.Disabled; 
-			_GlobalExplorer.States.ConvexClean = GlobalStates.LibraryStateEnum.Disabled; 
-			_GlobalExplorer.States.ConvexSimplify = GlobalStates.LibraryStateEnum.Disabled; 
-		}
-			
-		/// <summary>
-        /// Syncronizes its value to a global central state controller.
-        /// </summary>
-		public override void Sync() 
-		{
-			if( true == Initiated && Trait<Checkable>().Select(0).IsValid() )
-			{
-				_GlobalExplorer.States.ConvexCollision = Trait<Checkable>().Select(0).GetValue() ? GlobalStates.LibraryStateEnum.Enabled : GlobalStates.LibraryStateEnum.Disabled;
-			}
-			
-			if( true == Initiated && Trait<Checkable>().Select(1).IsValid() )
-			{
-				_GlobalExplorer.States.ConvexClean = Trait<Checkable>().Select(1).GetValue() ? GlobalStates.LibraryStateEnum.Enabled : GlobalStates.LibraryStateEnum.Disabled;
-			}
-			
-			if( true == Initiated && Trait<Checkable>().Select(2).IsValid() )
-			{
-				_GlobalExplorer.States.ConvexSimplify = Trait<Checkable>().Select(2).GetValue() ? GlobalStates.LibraryStateEnum.Enabled : GlobalStates.LibraryStateEnum.Disabled;
-			}
 		}
 	}
 }

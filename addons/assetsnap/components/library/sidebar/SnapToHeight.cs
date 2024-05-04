@@ -52,7 +52,7 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			Name = "LSSnapToHeight";
 			Angle = GlobalStates.SnapAngleEnums.Y;
 
-			UsingTraits = new()
+			_UsingTraits = new()
 			{
 				{ typeof(Checkable).ToString() },
 				{ typeof(Spinboxable).ToString() },
@@ -68,7 +68,7 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		{
 			base.Initialize();
 
-			Initiated = true;
+			_Initiated = true;
 
 			_InitializeCheckBox(this);
 			_InitializeGlue(this);
@@ -78,9 +78,9 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		}
 
 		/// <summary>
-        /// Handles updates to the component based on external changes.
-        /// </summary>
-        /// <param name="data">Data related to the update.</param>
+		/// Handles updates to the component based on external changes.
+		/// </summary>
+		/// <param name="data">Data related to the update.</param>
 		public override void MaybeUpdateValue(Godot.Collections.Array data)
 		{
 			if (data[0].As<string>() == "SnapToHeight" || data[0].As<string>() == "SnapToHeightValue")
@@ -103,11 +103,26 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 				base.MaybeUpdateValue(data);
 			}
 		}
+		
+		/// <summary>
+        /// Synchronizes the state of the SnapToHeight component with the global state controller.
+        /// </summary>
+		public override void Sync()
+		{
+			if (false == IsValid())
+			{
+				return;
+			}
+
+			StatesUtils.Get().SnapToHeight = Trait<Checkable>().Select(0).GetValue() ? GlobalStates.LibraryStateEnum.Enabled : GlobalStates.LibraryStateEnum.Disabled;
+			StatesUtils.Get().SnapToHeightGlue = Trait<Checkable>().Select(1).GetValue() ? GlobalStates.LibraryStateEnum.Enabled : GlobalStates.LibraryStateEnum.Disabled;
+			StatesUtils.Get().SnapToHeightValue = (float)Trait<Spinboxable>().GetValue();
+		}
 
 		/// <summary>
-        /// Initializes the checkbox UI element for SnapToHeight.
-        /// </summary>
-        /// <param name="BoxContainer">Container where the checkbox will be added.</param>
+		/// Initializes the checkbox UI element for SnapToHeight.
+		/// </summary>
+		/// <param name="BoxContainer">Container where the checkbox will be added.</param>
 		private void _InitializeCheckBox(VBoxContainer BoxContainer)
 		{
 			Callable _callable = Callable.From(() => { _OnCheckboxPressed(); });
@@ -128,9 +143,9 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		}
 
 		/// <summary>
-        /// Initializes the glue checkbox UI element for SnapToHeight.
-        /// </summary>
-        /// <param name="BoxContainer">Container where the checkbox will be added.</param>
+		/// Initializes the glue checkbox UI element for SnapToHeight.
+		/// </summary>
+		/// <param name="BoxContainer">Container where the checkbox will be added.</param>
 		private void _InitializeGlue(VBoxContainer BoxContainer)
 		{
 			Callable _callable = Callable.From(() => { _OnGlueCheckboxPressed(); });
@@ -151,9 +166,9 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		}
 
 		/// <summary>
-        /// Initializes the spin box UI element for SnapToHeight.
-        /// </summary>
-        /// <param name="BoxContainer">Container where the spin box will be added.</param>
+		/// Initializes the spin box UI element for SnapToHeight.
+		/// </summary>
+		/// <param name="BoxContainer">Container where the spin box will be added.</param>
 		private void _InitializeSpinBox(VBoxContainer BoxContainer)
 		{
 			Callable _callable = Callable.From((double value) => { _OnSpinBoxValueChange((float)value); });
@@ -176,21 +191,21 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		}
 
 		/// <summary>
-        /// Handles the action when the main checkbox is pressed.
-        /// </summary>
+		/// Handles the action when the main checkbox is pressed.
+		/// </summary>
 		private void _OnCheckboxPressed()
 		{
 			bool state = false;
-			if (false == IsSnapTo())
+			if (false == _IsSnapTo())
 			{
-				_GlobalExplorer.States.SnapToHeight = GlobalStates.LibraryStateEnum.Enabled;
-				_GlobalExplorer.States.SnapToHeightGlue = GlobalStates.LibraryStateEnum.Enabled;
+				StatesUtils.Get().SnapToHeight = GlobalStates.LibraryStateEnum.Enabled;
+				StatesUtils.Get().SnapToHeightGlue = GlobalStates.LibraryStateEnum.Enabled;
 				state = true;
 			}
 			else
 			{
-				_GlobalExplorer.States.SnapToHeight = GlobalStates.LibraryStateEnum.Disabled;
-				_GlobalExplorer.States.SnapToHeightGlue = GlobalStates.LibraryStateEnum.Disabled;
+				StatesUtils.Get().SnapToHeight = GlobalStates.LibraryStateEnum.Disabled;
+				StatesUtils.Get().SnapToHeightGlue = GlobalStates.LibraryStateEnum.Disabled;
 			}
 
 			UpdateSpawnSettings("SnapToHeight", state);
@@ -198,50 +213,35 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		}
 
 		/// <summary>
-        /// Handles the action when the glue checkbox is pressed.
-        /// </summary>
+		/// Handles the action when the glue checkbox is pressed.
+		/// </summary>
 		private void _OnGlueCheckboxPressed()
 		{
 			bool state = false;
 
 			if (false == IsSnapToGlue())
 			{
-				_GlobalExplorer.States.SnapToHeightGlue = GlobalStates.LibraryStateEnum.Enabled;
+				StatesUtils.Get().SnapToHeightGlue = GlobalStates.LibraryStateEnum.Enabled;
 				state = true;
 			}
 			else
 			{
-				_GlobalExplorer.States.SnapToHeightGlue = GlobalStates.LibraryStateEnum.Disabled;
+				StatesUtils.Get().SnapToHeightGlue = GlobalStates.LibraryStateEnum.Disabled;
 			}
 
 			UpdateSpawnSettings("SnapToHeightGlue", state);
 		}
 
 		/// <summary>
-        /// Handles the action when the value of the spin box changes.
-        /// </summary>
-        /// <param name="value">The new value of the spin box.</param>
+		/// Handles the action when the value of the spin box changes.
+		/// </summary>
+		/// <param name="value">The new value of the spin box.</param>
 		private void _OnSpinBoxValueChange(float value)
 		{
 			_value = value;
-			_GlobalExplorer.States.SnapToHeightValue = value;
+			StatesUtils.Get().SnapToHeightValue = value;
 
 			UpdateSpawnSettings("SnapToHeightValue", state);
-		}
-
-		/// <summary>
-        /// Synchronizes the state of the SnapToHeight component with the global state controller.
-        /// </summary>
-		public override void Sync()
-		{
-			if (false == IsValid())
-			{
-				return;
-			}
-
-			StatesUtils.Get().SnapToHeight = Trait<Checkable>().Select(0).GetValue() ? GlobalStates.LibraryStateEnum.Enabled : GlobalStates.LibraryStateEnum.Disabled;
-			StatesUtils.Get().SnapToHeightGlue = Trait<Checkable>().Select(1).GetValue() ? GlobalStates.LibraryStateEnum.Enabled : GlobalStates.LibraryStateEnum.Disabled;
-			StatesUtils.Get().SnapToHeightValue = (float)Trait<Spinboxable>().GetValue();
 		}
 	}
 }

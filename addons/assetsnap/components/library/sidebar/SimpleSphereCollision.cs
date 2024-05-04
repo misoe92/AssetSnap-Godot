@@ -24,13 +24,14 @@
 
 using AssetSnap.Component;
 using AssetSnap.Front.Nodes;
+using AssetSnap.States;
 using Godot;
 
 namespace AssetSnap.Front.Components.Library.Sidebar
 {
 	/// <summary>
-    /// Represents a simple sphere collision component.
-    /// </summary>
+	/// Represents a simple sphere collision component.
+	/// </summary>
 	[Tool]
 	public partial class SimpleSphereCollision : LSCollisionComponent
 	{
@@ -38,13 +39,13 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		private readonly string _CheckboxTooltip = "Simple sphere collision, is fast.";
 
 		/// <summary>
-        /// Constructor of the component.
-        /// </summary>
+		/// Constructor of the component.
+		/// </summary>
 		public SimpleSphereCollision()
 		{
 			Name = "LSSimpleSphereCollision";
 			
-			UsingTraits = new()
+			_UsingTraits = new()
 			{
 				{ typeof(Checkable).ToString() },
 			};
@@ -53,13 +54,13 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		}
 		
 		/// <summary>
-        /// Initializes the component.
-        /// </summary>
+		/// Initializes the component.
+		/// </summary>
 		public override void Initialize()
 		{
 			base.Initialize();
 			Callable _callable = Callable.From(() => { _OnCheckboxPressed(); });
-			Initiated = true;
+			_Initiated = true;
 			
 			Trait<Checkable>()
 				.SetName("SnapObjectCheckbox")
@@ -79,9 +80,9 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		}
 		
 		/// <summary>
-        /// Synchronizes the state of various checkboxes with their internal state.
-        /// </summary>
-        /// <param name="data">An array containing the data to update.</param>
+		/// Synchronizes the state of various checkboxes with their internal state.
+		/// </summary>
+		/// <param name="data">An array containing the data to update.</param>
 		public override void MaybeUpdateValue(Godot.Collections.Array data)
 		{
 			if (data[0].As<string>() == "SphereCollision")
@@ -89,26 +90,59 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 				base.MaybeUpdateValue(data);
 			}
 		}
+		
+		
+		/// <summary>
+		/// Resets the state back to disabled.
+		/// </summary>
+		public void Reset()
+		{
+			StatesUtils.Get().SphereCollision = GlobalStates.LibraryStateEnum.Disabled;
+		}
+		
+		/// <summary>
+		/// Syncronizes its value to a global central state controller.
+		/// </summary>
+		public override void Sync() 
+		{
+			if(
+				false == IsValid()
+			) 
+			{
+				return;
+			}
+			
+			StatesUtils.Get().SphereCollision = Trait<Checkable>().Select(0).GetValue() ? GlobalStates.LibraryStateEnum.Enabled : GlobalStates.LibraryStateEnum.Disabled;
+		}
+		
+		/// <summary>
+		/// Checks if the component state is active.
+		/// </summary>
+		/// <returns>True if the component state is active, otherwise false.</returns>
+		protected override bool _IsActive() 
+		{
+			return StatesUtils.Get().SphereCollision == GlobalStates.LibraryStateEnum.Enabled;
+		}
 
 		/// <summary>
-        /// Updates collisions and spawn settings of the model.
-        /// </summary>
+		/// Updates collisions and spawn settings of the model.
+		/// </summary>
 		private void _OnCheckboxPressed()
 		{
-			if( false == Initiated ) 
+			if( false == _Initiated ) 
 			{
 				return;
 			}
 			
 			Node3D handle = _GlobalExplorer.GetHandle();
 			
-			if( false == IsActive() ) 
+			if( false == _IsActive() ) 
 			{
-				_GlobalExplorer.States.SphereCollision = GlobalStates.LibraryStateEnum.Enabled;
-				_GlobalExplorer.States.ConcaveCollision = GlobalStates.LibraryStateEnum.Disabled;
-				_GlobalExplorer.States.ConvexCollision = GlobalStates.LibraryStateEnum.Disabled;
-				_GlobalExplorer.States.ConvexClean = GlobalStates.LibraryStateEnum.Disabled;
-				_GlobalExplorer.States.ConvexSimplify = GlobalStates.LibraryStateEnum.Disabled;
+				StatesUtils.Get().SphereCollision = GlobalStates.LibraryStateEnum.Enabled;
+				StatesUtils.Get().ConcaveCollision = GlobalStates.LibraryStateEnum.Disabled;
+				StatesUtils.Get().ConvexCollision = GlobalStates.LibraryStateEnum.Disabled;
+				StatesUtils.Get().ConvexClean = GlobalStates.LibraryStateEnum.Disabled;
+				StatesUtils.Get().ConvexSimplify = GlobalStates.LibraryStateEnum.Disabled;
 				
 				UpdateSpawnSettings("SphereCollision", true);
 				UpdateSpawnSettings("ConcaveCollision", false);
@@ -118,7 +152,7 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			}
 			else
 			{
-				_GlobalExplorer.States.SphereCollision = GlobalStates.LibraryStateEnum.Disabled;
+				StatesUtils.Get().SphereCollision = GlobalStates.LibraryStateEnum.Disabled;
 				
 				UpdateSpawnSettings("SphereCollision", false);
 			}
@@ -130,39 +164,6 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 					staticBody3D.UpdateCollision();
 				}
 			}
-
-		}
-
-		/// <summary>
-        /// Checks if the component state is active.
-        /// </summary>
-        /// <returns>True if the component state is active, otherwise false.</returns>
-		public override bool IsActive() 
-		{
-			return _GlobalExplorer.States.SphereCollision == GlobalStates.LibraryStateEnum.Enabled;
-		}
-		
-		/// <summary>
-        /// Resets the state back to disabled.
-        /// </summary>
-		public void Reset()
-		{
-			_GlobalExplorer.States.SphereCollision = GlobalStates.LibraryStateEnum.Disabled;
-		}
-		
-		/// <summary>
-        /// Syncronizes its value to a global central state controller.
-        /// </summary>
-		public override void Sync() 
-		{
-			if(
-				false == IsValid()
-			) 
-			{
-				return;
-			}
-			
-			_GlobalExplorer.States.SphereCollision = Trait<Checkable>().Select(0).GetValue() ? GlobalStates.LibraryStateEnum.Enabled : GlobalStates.LibraryStateEnum.Disabled;
 		}
 	}
 }

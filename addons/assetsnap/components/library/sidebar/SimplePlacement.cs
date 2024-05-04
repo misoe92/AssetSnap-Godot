@@ -23,6 +23,7 @@
 #if TOOLS
 
 using AssetSnap.Component;
+using AssetSnap.States;
 using Godot;
 
 namespace AssetSnap.Front.Components.Library.Sidebar
@@ -43,7 +44,7 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		{
 			Name = "LSSimplePlacement";
 
-			UsingTraits = new()
+			_UsingTraits = new()
 			{
 				{ typeof(Checkable).ToString() },
 			};
@@ -59,7 +60,7 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			base.Initialize();
 			Callable _callable = Callable.From(() => { _OnCheckboxPressed(); });
 
-			Initiated = true;
+			_Initiated = true;
 
 			Trait<Checkable>()
 				.SetName("SimplePlacementCheckbox")
@@ -80,9 +81,9 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		}
 
 		/// <summary>
-        /// Updates the value of the component based on global states.
-        /// </summary>
-        /// <param name="data">Data array containing information about the global states.</param>
+		/// Updates the value of the component based on global states.
+		/// </summary>
+		/// <param name="data">Data array containing information about the global states.</param>
 		public void MaybeUpdateValue(Godot.Collections.Array data)
 		{
 			if (data[0].As<string>() == "PlacingType")
@@ -99,8 +100,40 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		}
 
 		/// <summary>
-        /// Event handler for checkbox pressed.
-        /// </summary>
+		/// Checks if the component state is active.
+		/// </summary>
+		/// <returns>True if the component state is active, otherwise false.</returns>
+		public bool IsActive()
+		{
+			return StatesUtils.Get().PlacingType == GlobalStates.PlacingTypeEnum.Simple;
+		}
+
+		/// <summary>
+		/// Checks if the component state is optimized.
+		/// </summary>
+		/// <returns>True if the component state is optimized, otherwise false.</returns>
+		public bool IsOptimized()
+		{
+			return StatesUtils.Get().PlacingType == GlobalStates.PlacingTypeEnum.Optimized;
+		}
+
+		/// <summary>
+		/// Syncronizes the component's value to a global central state controller.
+		/// </summary>
+		public override void Sync()
+		{
+			if (
+				IsValid() &&
+				Trait<Checkable>().Select(0).GetValue()
+			)
+			{
+				StatesUtils.Get().PlacingType = GlobalStates.PlacingTypeEnum.Simple;
+			}
+		}
+		
+		/// <summary>
+		/// Event handler for checkbox pressed.
+		/// </summary>
 		private void _OnCheckboxPressed()
 		{
 			if (
@@ -110,40 +143,8 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 				return;
 			}
 
-			_GlobalExplorer.States.PlacingType = GlobalStates.PlacingTypeEnum.Simple;
+			StatesUtils.Get().PlacingType = GlobalStates.PlacingTypeEnum.Simple;
 			UpdateSpawnSettings("PlacingType", "Simple");
-		}
-
-		/// <summary>
-        /// Checks if the component state is active.
-        /// </summary>
-        /// <returns>True if the component state is active, otherwise false.</returns>
-		public bool IsActive()
-		{
-			return GlobalExplorer.GetInstance().States.PlacingType == GlobalStates.PlacingTypeEnum.Simple;
-		}
-
-		/// <summary>
-        /// Checks if the component state is optimized.
-        /// </summary>
-        /// <returns>True if the component state is optimized, otherwise false.</returns>
-		public bool IsOptimized()
-		{
-			return _GlobalExplorer.States.PlacingType == GlobalStates.PlacingTypeEnum.Optimized;
-		}
-
-		/// <summary>
-        /// Syncronizes the component's value to a global central state controller.
-        /// </summary>
-		public override void Sync()
-		{
-			if (
-				IsValid() &&
-				Trait<Checkable>().Select(0).GetValue()
-			)
-			{
-				_GlobalExplorer.States.PlacingType = GlobalStates.PlacingTypeEnum.Simple;
-			}
 		}
 	}
 }

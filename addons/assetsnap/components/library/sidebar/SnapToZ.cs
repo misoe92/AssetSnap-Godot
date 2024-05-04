@@ -23,6 +23,7 @@
 #if TOOLS
 
 using AssetSnap.Component;
+using AssetSnap.States;
 using Godot;
 	
 namespace AssetSnap.Front.Components.Library.Sidebar
@@ -48,7 +49,7 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 			Name = "LSSnapToZ";
 			Angle = GlobalStates.SnapAngleEnums.Z;
 			
-			UsingTraits = new()
+			_UsingTraits = new()
 			{
 				{ typeof(Checkable).ToString() },
 				{ typeof(Spinboxable).ToString() },
@@ -64,7 +65,7 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		{
 			base.Initialize();
 
-			Initiated = true;
+			_Initiated = true;
 			
 			_InitializeCheckBox(this);
 			_InitializeGlue(this);
@@ -73,9 +74,9 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		}
 
 		/// <summary>
-        /// Updates the component value if necessary based on incoming data.
-        /// </summary>
-        /// <param name="data">The incoming data.</param>
+		/// Updates the component value if necessary based on incoming data.
+		/// </summary>
+		/// <param name="data">The incoming data.</param>
 		public override void MaybeUpdateValue(Godot.Collections.Array data)
 		{
 			if( data[0].As<string>() == "SnapToZ" || data[0].As<string>() == "SnapToZValue" ) 
@@ -99,11 +100,26 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 				base.MaybeUpdateValue(data);
 			}
 		}
+		
+		/// <summary>
+        /// Syncronizes its value to a global central state controller.
+        /// </summary>
+		public override void Sync() 
+		{
+			if( IsValid() )
+			{
+				return;
+			} 
+			
+			StatesUtils.Get().SnapToZ = Trait<Checkable>().Select(0).GetValue() ? GlobalStates.LibraryStateEnum.Enabled : GlobalStates.LibraryStateEnum.Disabled;
+			StatesUtils.Get().SnapToZGlue = Trait<Checkable>().Select(1).GetValue() ? GlobalStates.LibraryStateEnum.Enabled : GlobalStates.LibraryStateEnum.Disabled;
+			StatesUtils.Get().SnapToZValue = (float)Trait<Spinboxable>().GetValue();
+		}
 	
 		/// <summary>
-        /// Initializes the checkbox that holds the state value of the component.
-        /// </summary>
-        /// <param name="BoxContainer">The container to add the checkbox to.</param>
+		/// Initializes the checkbox that holds the state value of the component.
+		/// </summary>
+		/// <param name="BoxContainer">The container to add the checkbox to.</param>
 		private void _InitializeCheckBox( VBoxContainer BoxContainer ) 
 		{
 			Callable _callable = Callable.From(() => { _OnCheckboxPressed(); });
@@ -124,9 +140,9 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		}
 		
 		/// <summary>
-        /// Initializes the checkbox that holds the state value of the using glue option.
-        /// </summary>
-        /// <param name="BoxContainer">The container to add the checkbox to.</param>
+		/// Initializes the checkbox that holds the state value of the using glue option.
+		/// </summary>
+		/// <param name="BoxContainer">The container to add the checkbox to.</param>
 		private void _InitializeGlue( VBoxContainer BoxContainer ) 
 		{
 			Callable _callable = Callable.From(() => { _OnGlueCheckboxPressed(); });
@@ -148,9 +164,9 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		}
 		
 		/// <summary>
-        /// Initializes the spinbox that holds the value of the component.
-        /// </summary>
-        /// <param name="BoxContainer">The container to add the spinbox to.</param>
+		/// Initializes the spinbox that holds the value of the component.
+		/// </summary>
+		/// <param name="BoxContainer">The container to add the spinbox to.</param>
 		private void _InitializeSpinBox( VBoxContainer BoxContainer ) 
 		{
 			Callable _callable = Callable.From((double value) => { _OnSpinBoxValueChange((float)value); });
@@ -174,22 +190,22 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		}
 		
 		/// <summary>
-        /// Updates spawn settings and the internal value for snapping to the X Axis.
-        /// </summary>
+		/// Updates spawn settings and the internal value for snapping to the X Axis.
+		/// </summary>
 		private void _OnCheckboxPressed()
 		{
 			bool state = false;
 			
-			if( false == IsSnapTo() ) 
+			if( false == _IsSnapTo() ) 
 			{
-				_GlobalExplorer.States.SnapToZ = GlobalStates.LibraryStateEnum.Enabled;
-				_GlobalExplorer.States.SnapToZGlue = GlobalStates.LibraryStateEnum.Enabled;
+				StatesUtils.Get().SnapToZ = GlobalStates.LibraryStateEnum.Enabled;
+				StatesUtils.Get().SnapToZGlue = GlobalStates.LibraryStateEnum.Enabled;
 				state = true;
 			}
 			else 
 			{
-				_GlobalExplorer.States.SnapToZ = GlobalStates.LibraryStateEnum.Disabled;
-				_GlobalExplorer.States.SnapToZGlue = GlobalStates.LibraryStateEnum.Disabled;
+				StatesUtils.Get().SnapToZ = GlobalStates.LibraryStateEnum.Disabled;
+				StatesUtils.Get().SnapToZGlue = GlobalStates.LibraryStateEnum.Disabled;
 			}
 			
 			string key = "SnapToZ";
@@ -197,20 +213,20 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		}
 		
 		/// <summary>
-        /// Updates spawn settings and the internal value for using glue.
-        /// </summary>
+		/// Updates spawn settings and the internal value for using glue.
+		/// </summary>
 		private void _OnGlueCheckboxPressed()
 		{
 			state = false;
 			
 			if( false == IsSnapToGlue() ) 
 			{
-				_GlobalExplorer.States.SnapToZGlue = GlobalStates.LibraryStateEnum.Enabled;
+				StatesUtils.Get().SnapToZGlue = GlobalStates.LibraryStateEnum.Enabled;
 				state = true;
 			}
 			else 
 			{
-				_GlobalExplorer.States.SnapToZGlue = GlobalStates.LibraryStateEnum.Disabled;
+				StatesUtils.Get().SnapToZGlue = GlobalStates.LibraryStateEnum.Disabled;
 			}
 			
 			string key = "SnapToZGlue";
@@ -218,30 +234,15 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		}
 		
 		/// <summary>
-        /// Updates SpawnSettings on the model when component value is changed.
-        /// </summary>
-        /// <param name="value">The new value of the spinbox.</param>
+		/// Updates SpawnSettings on the model when component value is changed.
+		/// </summary>
+		/// <param name="value">The new value of the spinbox.</param>
 		private void _OnSpinBoxValueChange(float value)
 		{
 			_value = value;
-			_GlobalExplorer.States.SnapToZValue = value;
+			StatesUtils.Get().SnapToZValue = value;
 			string key = "SnapToZValue";
 			UpdateSpawnSettings(key, _value);
-		}
-		
-		/// <summary>
-        /// Syncronizes its value to a global central state controller.
-        /// </summary>
-		public override void Sync() 
-		{
-			if( IsValid() )
-			{
-				return;
-			} 
-			
-			_GlobalExplorer.States.SnapToZ = Trait<Checkable>().Select(0).GetValue() ? GlobalStates.LibraryStateEnum.Enabled : GlobalStates.LibraryStateEnum.Disabled;
-			_GlobalExplorer.States.SnapToZGlue = Trait<Checkable>().Select(1).GetValue() ? GlobalStates.LibraryStateEnum.Enabled : GlobalStates.LibraryStateEnum.Disabled;
-			_GlobalExplorer.States.SnapToZValue = (float)Trait<Spinboxable>().GetValue();
 		}
 	}
 }

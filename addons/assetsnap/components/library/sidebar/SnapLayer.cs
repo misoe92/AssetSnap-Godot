@@ -23,6 +23,7 @@
 #if TOOLS
 
 using AssetSnap.Component;
+using AssetSnap.States;
 using Godot;
 
 namespace AssetSnap.Front.Components.Library.Sidebar
@@ -43,7 +44,7 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		{
 			Name = "LSSnapLayer";
 			
-			UsingTraits = new()
+			_UsingTraits = new()
 			{
 				{ typeof(Spinboxable).ToString() },
 			};
@@ -60,7 +61,7 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 
 			Callable _callable = Callable.From((double value) => { _OnSpinBoxValueChange((int)value); });
 			
-			Initiated = true;
+			_Initiated = true;
 			
 			Trait<Spinboxable>()
 				.SetName("SnapLayerSpinBox")
@@ -78,14 +79,49 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 				.Select(0)
 				.AddToContainer( this );
 				
-			Plugin.GetInstance().StatesChanged += (Godot.Collections.Array data) => { MaybeUpdateValue(data); };
+			Plugin.GetInstance().StatesChanged += (Godot.Collections.Array data) => { _MaybeUpdateValue(data); };
 		}
 		
+		/// <summary>
+		/// Resets the SnapLayer component.
+		/// </summary>
+		public void Reset()
+		{
+			StatesUtils.Get().SnapLayer = 0;
+		}
+			
+		/// <summary>
+		/// Syncronizes the SnapLayer value to a global central state controller.
+		/// </summary>
+		public override void Sync() 
+		{
+			if( false == IsValid() ) 
+			{
+				return;
+			}
+			
+			StatesUtils.Get().SnapLayer = (int)Trait<Spinboxable>().GetValue();
+		}
+		
+		/// <summary>
+		/// Checks if the SnapLayer component is valid.
+		/// </summary>
+		/// <returns>True if the component is valid, otherwise false.</returns>
+		public bool IsValid()
+		{
+			return
+				null != _GlobalExplorer &&
+				null != StatesUtils.Get() &&
+				false != _Initiated &&
+				null != Trait<Spinboxable>() &&
+				false != HasTrait<Spinboxable>();
+		}
+	
 		/// <summary>
 		/// Updates the SnapLayer value if relevant data is received.
 		/// </summary>
 		/// <param name="data">Array containing relevant data.</param>
-		private void MaybeUpdateValue(Godot.Collections.Array data)
+		private void _MaybeUpdateValue(Godot.Collections.Array data)
 		{
 			if( data[0].As<string>() == "SnapLayer" ) 
 			{
@@ -101,43 +137,8 @@ namespace AssetSnap.Front.Components.Library.Sidebar
 		/// <param name="value">The new value of the spin box.</param>
 		private void _OnSpinBoxValueChange( int value )
 		{
-			_GlobalExplorer.States.SnapLayer = value;						
+			StatesUtils.Get().SnapLayer = value;						
 			UpdateSpawnSettings("SnapLayer", value);
-		}
-		
-		/// <summary>
-		/// Resets the SnapLayer component.
-		/// </summary>
-		public void Reset()
-		{
-			_GlobalExplorer.States.SnapLayer = 0;
-		}
-		
-		/// <summary>
-        /// Checks if the SnapLayer component is valid.
-        /// </summary>
-        /// <returns>True if the component is valid, otherwise false.</returns>
-		public bool IsValid()
-		{
-			return
-				null != _GlobalExplorer &&
-				null != _GlobalExplorer.States &&
-				false != Initiated &&
-				null != Trait<Spinboxable>() &&
-				false != HasTrait<Spinboxable>();
-		}
-		
-		/// <summary>
-        /// Syncronizes the SnapLayer value to a global central state controller.
-        /// </summary>
-		public override void Sync() 
-		{
-			if( false == IsValid() ) 
-			{
-				return;
-			}
-			
-			_GlobalExplorer.States.SnapLayer = (int)Trait<Spinboxable>().GetValue();
 		}
 	}
 }

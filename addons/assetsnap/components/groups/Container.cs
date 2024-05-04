@@ -40,13 +40,10 @@ namespace AssetSnap.Front.Components.Groups
 		{
 			Name = "GroupContainer";
 			
-			UsingTraits = new()
+			_UsingTraits = new()
 			{
 				{ typeof(Containerable).ToString() },
 			};
-			
-			//_include = false;
-			// _include = false;
 		}
 		
 		/// <summary>
@@ -59,43 +56,10 @@ namespace AssetSnap.Front.Components.Groups
 			
 			base.Initialize();
 			
-			Initiated = true;
+			_Initiated = true;
 
 			_InitializeFields();
 			_FinalizeFields();
-		}
-		
-		/// <summary>
-		/// Initializes the fields of the container.
-		/// </summary>
-		private void _InitializeFields()
-		{
-			Trait<Containerable>()
-				.SetName("GroupContainer")
-				.SetMargin(10, "bottom")
-				.SetVerticalSizeFlags(Control.SizeFlags.ExpandFill)
-				.SetHorizontalSizeFlags(Control.SizeFlags.ExpandFill)
-				.SetLayout( Containerable.ContainerLayout.TwoColumns )
-				.Instantiate();
-		}
-		
-		/// <summary>
-        /// Finalizes the fields of the container.
-        /// </summary>
-		private void _FinalizeFields()
-		{
-			Godot.Container sidebar = Trait<Containerable>()
-				.Select(0)
-				.GetInnerContainer(0);
-
-			sidebar.CustomMinimumSize = new Vector2(300, 0);
-			sidebar.SizeFlagsHorizontal = 0;
-
-			Trait<Containerable>()
-				.Select(0)
-				.AddToContainer(
-					this
-				);
 		}
 		
 		/// <summary>
@@ -118,6 +82,39 @@ namespace AssetSnap.Front.Components.Groups
 			return Trait<Containerable>()
 				.Select(0)
 				.GetInnerContainer(1);
+		}
+		
+		/// <summary>
+		/// Initializes the fields of the container.
+		/// </summary>
+		private void _InitializeFields()
+		{
+			Trait<Containerable>()
+				.SetName("GroupContainer")
+				.SetMargin(10, "bottom")
+				.SetVerticalSizeFlags(Control.SizeFlags.ExpandFill)
+				.SetHorizontalSizeFlags(Control.SizeFlags.ExpandFill)
+				.SetLayout( Containerable.ContainerLayout.TwoColumns )
+				.Instantiate();
+		}
+		
+		/// <summary>
+		/// Finalizes the fields of the container.
+		/// </summary>
+		private void _FinalizeFields()
+		{
+			Godot.Container sidebar = Trait<Containerable>()
+				.Select(0)
+				.GetInnerContainer(0);
+
+			sidebar.CustomMinimumSize = new Vector2(300, 0);
+			sidebar.SizeFlagsHorizontal = 0;
+
+			Trait<Containerable>()
+				.Select(0)
+				.AddToContainer(
+					this
+				);
 		}
 	}
 }
