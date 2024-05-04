@@ -137,21 +137,6 @@ namespace AssetSnap
 		}
 		
 		/// <summary>
-		/// Checks if the update handle method is connected.
-		/// </summary>
-		/// <returns>True if the update handle method is connected, false otherwise.</returns>
-		protected bool IsUpdateHandleConnected() 
-		{
-			if (_UpdateHandleCallable is Callable callable)
-			{
-				EditorInspector Inspector = EditorInterface.Singleton.GetInspector();
-				return Inspector.IsConnected(EditorInspector.SignalName.EditedObjectChanged, callable);
-			}
-			
-			return false;
-		}
-		
-		/// <summary>
 		/// Fetches the current handle.
 		/// </summary>
 		/// <returns>The current handle.</returns>
@@ -181,6 +166,21 @@ namespace AssetSnap
 			}
 
 			return Handle is AssetSnap.Front.Nodes.AsMeshInstance3D;
+		}
+		
+		/// <summary>
+		/// Checks if the update handle method is connected.
+		/// </summary>
+		/// <returns>True if the update handle method is connected, false otherwise.</returns>
+		protected bool _IsUpdateHandleConnected() 
+		{
+			if (_UpdateHandleCallable is Callable callable)
+			{
+				EditorInspector Inspector = EditorInterface.Singleton.GetInspector();
+				return Inspector.IsConnected(EditorInspector.SignalName.EditedObjectChanged, callable);
+			}
+			
+			return false;
 		}
 	}
 }

@@ -32,11 +32,6 @@ namespace AssetSnap
 	[Tool]
 	public partial class CameraExplorer : BaseExplorer
 	{
-		protected Vector3? _ProjectRayOrigin;
-		protected Vector3? _ProjectRayNormal;
-		protected Vector3? _PositionDraw;
-		protected Vector3? _NormalDraw;
-		
 		/// <summary>
 		/// Gets or sets the projected ray origin.
 		/// </summary>
@@ -84,6 +79,11 @@ namespace AssetSnap
 				_NormalDraw = value;
 			}
 		}
+		
+		protected Vector3? _ProjectRayOrigin;
+		protected Vector3? _ProjectRayNormal;
+		protected Vector3? _PositionDraw;
+		protected Vector3? _NormalDraw;
 		
 		/// <summary>
 		/// Gets the projected ray origin as a Vector3.
@@ -149,9 +149,9 @@ namespace AssetSnap
 		}
 		
 		/// <summary>
-        /// Checks if the drawn normal is set.
-        /// </summary>
-        /// <returns>True if the drawn normal is set, false otherwise.</returns>
+		/// Checks if the drawn normal is set.
+		/// </summary>
+		/// <returns>True if the drawn normal is set, false otherwise.</returns>
 		public bool HasNormalDrawn()
 		{
 			return NormalDraw != null;
