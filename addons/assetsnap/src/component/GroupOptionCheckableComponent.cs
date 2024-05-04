@@ -45,7 +45,7 @@ namespace AssetSnap.Component
 		{
 			base.Initialize();
 			
-			Initiated = true;
+			_Initiated = true;
 			
 			_InitializeFields();
 			_FinalizeFields();

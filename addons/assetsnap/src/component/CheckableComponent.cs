@@ -48,7 +48,7 @@ namespace AssetSnap.Component
 				return false;
 			}
 
-			if (false == Initiated)
+			if (false == _Initiated)
 			{
 				return false;
 			}

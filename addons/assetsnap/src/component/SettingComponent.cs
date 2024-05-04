@@ -29,7 +29,6 @@ namespace AssetSnap.Component
 	/// </summary>
 	public partial class SettingsComponent : BaseComponent
 	{
-		protected Library.Instance _Library;
 		
 		/// <summary>
 		/// Gets or sets the library instance associated with the component.
@@ -43,6 +42,8 @@ namespace AssetSnap.Component
 				_OnLibraryChange();
 			}
 		}
+
+		protected Library.Instance _Library;
 
 		/// <summary>
 		/// Virtual method called each time a library change occurs.

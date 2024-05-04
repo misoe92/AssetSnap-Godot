@@ -37,22 +37,6 @@ namespace AssetSnap.Component
 	[Tool]
 	public partial class Base : Node, ISerializationListener
 	{
-		private Godot.Collections.Array<string> _ComponentTypes = new();
-		private Godot.Collections.Array<GodotObject> _DisposeQueue = new();
-		private Godot.Collections.Dictionary<string, GodotObject> _Components = new();
-		private Godot.Collections.Array<GodotObject> _Instances = new();
-		
-		[Export]
-		public Godot.Collections.Array<string> ComponentTypes { get => _ComponentTypes; set => _ComponentTypes = value; }	
-		[Export]
-		public Godot.Collections.Array<GodotObject> DisposeQueue { get => _DisposeQueue; set => _DisposeQueue = value; }	
-		[Export]
-		public Godot.Collections.Dictionary<string, GodotObject> Components { get => _Components; set => _Components = value; }	
-		[Export]
-		public Godot.Collections.Array<GodotObject> Instances { get => _Instances; set => _Instances = value; }	
-		
-		private static Base _Instance = null;
-		
 		/// <summary>
 		/// Gets the singleton instance of the Base class.
 		/// </summary>
@@ -70,42 +54,30 @@ namespace AssetSnap.Component
 			}
 		}
 		
+		[Export]
+		public Godot.Collections.Array<string> ComponentTypes { get => _ComponentTypes; set => _ComponentTypes = value; }	
+		[Export]
+		public Godot.Collections.Array<GodotObject> DisposeQueue { get => _DisposeQueue; set => _DisposeQueue = value; }	
+		[Export]
+		public Godot.Collections.Dictionary<string, GodotObject> Components { get => _Components; set => _Components = value; }	
+		[Export]
+		public Godot.Collections.Array<GodotObject> Instances { get => _Instances; set => _Instances = value; }	
+		
+		private static Base _Instance = null;
+		private Godot.Collections.Array<string> _ComponentTypes = new();
+		private Godot.Collections.Array<GodotObject> _DisposeQueue = new();
+		private Godot.Collections.Dictionary<string, GodotObject> _Components = new();
+		private Godot.Collections.Array<GodotObject> _Instances = new();
+		
 		/// <summary>
 		/// Initializes the Component BaseHandler by registering classes in the specified namespace.
 		/// </summary>
 		public void Initialize() 
 		{
 			string TargetNamespace = "AssetSnap.Front.Components";
-			IEnumerable<Type> ClassesInNamespace = GetClassesInNamespace(TargetNamespace);
+			IEnumerable<Type> ClassesInNamespace = _GetClassesInNamespace(TargetNamespace);
 
-			EnterClassesInNamespace(ClassesInNamespace);
-		}
-		
-		/// <summary>
-		/// Gets the count of instances.
-		/// </summary>
-		/// <returns>The count of instances.</returns>
-		public int InstancesCount()
-		{
-			return Instances.Count;	
-		}
-		
-		/// <summary>
-		/// Gets the count of components.
-		/// </summary>
-		/// <returns>The count of components.</returns>
-		public int Count()
-		{
-			return Components.Count;
-		}
-		
-		/// <summary>
-		/// Gets the keys of components.
-		/// </summary>
-		/// <returns>The keys of components.</returns>
-		public System.Collections.Generic.ICollection<string> Keys()
-		{
-			return Components.Keys;
+			_EnterClassesInNamespace(ClassesInNamespace);
 		}
 		
 		/// <summary>
@@ -120,6 +92,7 @@ namespace AssetSnap.Component
 			}
 		}
 		
+				
 		/// <summary>
 		/// Removes a component by its type string.
 		/// </summary>
@@ -149,105 +122,6 @@ namespace AssetSnap.Component
 					}
 				}
 			}
-		}
-		
-		/// <summary>
-		/// Fetches classes inside a given namespace.
-		/// </summary>
-		/// <param name="TargetNamespace">The namespace from which to extract classes.</param>
-		/// <returns>An enumerable collection of types.</returns>
-		private IEnumerable<Type> GetClassesInNamespace(string TargetNamespace)
-		{
-			// Get all types in the current assembly
-			Type[] types = Assembly.GetExecutingAssembly().GetTypes();
-
-			// Filter types by namespace recursively
-			IEnumerable<Type> classesInNamespace = types
-				.Where(type => type.Namespace != null && 
-							(type.Namespace == TargetNamespace || 
-								type.Namespace.StartsWith(TargetNamespace + ".")) && 
-							type.IsClass);
-
-			return classesInNamespace;
-		}
-		
-		/// <summary>
-		/// Enters the classes in the specified namespace.
-		/// </summary>
-		/// <param name="ClassesInNamespace">The classes to enter.</param>
-		private void EnterClassesInNamespace(IEnumerable<Type> ClassesInNamespace)
-		{
-			foreach (Type classType in ClassesInNamespace)
-			{
-				string TypeName = classType.FullName;
-				string TypeKey = TypeName.Replace("AssetSnap.Front.Components.", "").Split(".").Join("");
-
-				// Create an instance of the class
-				_ComponentTypes.Add(TypeKey);
-			}
-		}
-		
-		/// <summary>
-		/// Enters the component into the tree and adds it to
-		/// a list for easy control later on.
-		/// </summary>
-		/// <param name="instance">The instance of the component to enter.</param>
-		/// <param name="TypeName">The type name of the component.</param>
-		/// <returns>void</returns>
-		private void EnterComponent( object instance, string TypeName)
-		{
-			BaseComponent _Component = ObjectToBaseComponent(instance);
-			
-			if( _Component == null ) 
-			{
-				GD.PushWarning("Component was not entered into the array");
-				return;
-			}
-				
-			_Component.TypeString = TypeName;
-			_Component.Enter();
-			_Components.Add(TypeName, _Component);
-		}
-		
-		/// <summary>
-		/// Checks if the given object is a base component.
-		/// </summary>
-		/// <param name="instance">The object to check.</param>
-		/// <returns>bool</returns>
-		private bool IsComponent( object instance )
-		{
-			return instance is BaseComponent;
-		}
-		
-		/// <summary>
-		/// Determines whether the given object should be included.
-		/// </summary>
-		/// <param name="instance">The object to check.</param>
-		/// <returns>bool</returns>
-		private bool ShouldInclude( object instance ) 
-		{
-			if( instance is BaseComponent _component && _component._include is bool BoolVal ) 
-			{
-				return BoolVal;
-			}
-			
-			return false;
-		}
-		
-		/// <summary>
-		/// Converts an object to a BaseComponent if possible.
-		/// If it fails, it will return null.
-		/// </summary>
-		/// <param name="instance">The object to convert.</param>
-		/// <returns>BaseComponent</returns>
-		private BaseComponent ObjectToBaseComponent( object instance ) 
-		{
-			if( instance is BaseComponent AsComponent ) 
-			{
-				return AsComponent;
-			}
-			
-			return null;
 		}
 		
 		/// <summary>
@@ -313,6 +187,23 @@ namespace AssetSnap.Component
 			// _Components.Add(key, Activator.CreateInstance<T>() as BaseComponent);
 		}
 		
+		
+		/// <summary>
+		/// This method is called before serializing the object.
+		/// </summary>
+		public void OnBeforeSerialize()
+		{
+			//
+		}
+		
+		/// <summary>
+		/// This method is called after deserializing the object.
+		/// </summary>
+		public void OnAfterDeserialize()
+		{
+			_Instance = this;
+		}
+		
 		/// <summary>
 		/// Fetches an instance of a single object and returns it to the querier.
 		/// </summary>
@@ -332,9 +223,9 @@ namespace AssetSnap.Component
 			if( false == _Components.ContainsKey(key) && false == unique ) 
 			{
 				object instance = Activator.CreateInstance(typeof(T));
-				if( IsComponent(instance) && ShouldInclude(instance) ) 
+				if( _IsComponent(instance) && _ShouldInclude(instance) ) 
 				{
-					EnterComponent(instance, key);
+					_EnterComponent(instance, key);
 				}
 				else  
 				{
@@ -416,9 +307,9 @@ namespace AssetSnap.Component
 			if( false == _Components.ContainsKey(keyName.Split(".").Join("")) && false == unique) 
 			{
 				object instance = Activator.CreateInstance(Type.GetType(keyName));
-				if( IsComponent(instance) && ShouldInclude(instance) ) 
+				if( _IsComponent(instance) && _ShouldInclude(instance) ) 
 				{
-					EnterComponent(instance, key);
+					_EnterComponent(instance, key);
 				}
 				else  
 				{
@@ -501,6 +392,33 @@ namespace AssetSnap.Component
 		}
 		
 		/// <summary>
+		/// Gets the count of instances.
+		/// </summary>
+		/// <returns>The count of instances.</returns>
+		public int InstancesCount()
+		{
+			return Instances.Count;	
+		}
+		
+		/// <summary>
+		/// Gets the count of components.
+		/// </summary>
+		/// <returns>The count of components.</returns>
+		public int Count()
+		{
+			return Components.Count;
+		}
+		
+		/// <summary>
+		/// Gets the keys of components.
+		/// </summary>
+		/// <returns>The keys of components.</returns>
+		public System.Collections.Generic.ICollection<string> Keys()
+		{
+			return Components.Keys;
+		}
+			
+		/// <summary>
 		/// Checks if all the given keys are present in the components array.
 		/// </summary>
 		/// <param name="keys">An array of keys to check.</param>
@@ -524,22 +442,107 @@ namespace AssetSnap.Component
 			
 			return true;
 		}
-		
+
 		/// <summary>
-		/// This method is called before serializing the object.
+		/// Fetches classes inside a given namespace.
 		/// </summary>
-		public void OnBeforeSerialize()
+		/// <param name="TargetNamespace">The namespace from which to extract classes.</param>
+		/// <returns>An enumerable collection of types.</returns>
+		private IEnumerable<Type> _GetClassesInNamespace(string TargetNamespace)
 		{
-			//
+			// Get all types in the current assembly
+			Type[] types = Assembly.GetExecutingAssembly().GetTypes();
+
+			// Filter types by namespace recursively
+			IEnumerable<Type> classesInNamespace = types
+				.Where(type => type.Namespace != null && 
+							(type.Namespace == TargetNamespace || 
+								type.Namespace.StartsWith(TargetNamespace + ".")) && 
+							type.IsClass);
+
+			return classesInNamespace;
 		}
 		
 		/// <summary>
-		/// This method is called after deserializing the object.
+		/// Enters the classes in the specified namespace.
 		/// </summary>
-		public void OnAfterDeserialize()
+		/// <param name="ClassesInNamespace">The classes to enter.</param>
+		private void _EnterClassesInNamespace(IEnumerable<Type> ClassesInNamespace)
 		{
-			_Instance = this;
+			foreach (Type classType in ClassesInNamespace)
+			{
+				string TypeName = classType.FullName;
+				string TypeKey = TypeName.Replace("AssetSnap.Front.Components.", "").Split(".").Join("");
+
+				// Create an instance of the class
+				_ComponentTypes.Add(TypeKey);
+			}
 		}
+		
+		/// <summary>
+		/// Enters the component into the tree and adds it to
+		/// a list for easy control later on.
+		/// </summary>
+		/// <param name="instance">The instance of the component to enter.</param>
+		/// <param name="TypeName">The type name of the component.</param>
+		/// <returns>void</returns>
+		private void _EnterComponent( object instance, string TypeName)
+		{
+			BaseComponent _Component = ObjectToBaseComponent(instance);
+			
+			if( _Component == null ) 
+			{
+				GD.PushWarning("Component was not entered into the array");
+				return;
+			}
+				
+			_Component.TypeString = TypeName;
+			_Component.Enter();
+			_Components.Add(TypeName, _Component);
+		}
+		
+		/// <summary>
+		/// Checks if the given object is a base component.
+		/// </summary>
+		/// <param name="instance">The object to check.</param>
+		/// <returns>bool</returns>
+		private bool _IsComponent( object instance )
+		{
+			return instance is BaseComponent;
+		}
+		
+		/// <summary>
+		/// Determines whether the given object should be included.
+		/// </summary>
+		/// <param name="instance">The object to check.</param>
+		/// <returns>bool</returns>
+		private bool _ShouldInclude( object instance ) 
+		{
+			if( instance is BaseComponent _component && _component.Include is bool BoolVal ) 
+			{
+				return BoolVal;
+			}
+			
+			return false;
+		}
+		
+		/// <summary>
+		/// Converts an object to a BaseComponent if possible.
+		/// If it fails, it will return null.
+		/// </summary>
+		/// <param name="instance">The object to convert.</param>
+		/// <returns>BaseComponent</returns>
+		private BaseComponent ObjectToBaseComponent( object instance ) 
+		{
+			if( instance is BaseComponent AsComponent ) 
+			{
+				return AsComponent;
+			}
+			
+			return null;
+		}
+		
+		
 	}
 }
 
