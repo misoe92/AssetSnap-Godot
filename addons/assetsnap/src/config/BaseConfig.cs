@@ -25,68 +25,68 @@ using Godot;
 namespace AssetSnap.Config
 {
 	/// <summary>
-    /// Base class for configuration handling.
-    /// </summary>
+	/// Base class for configuration handling.
+	/// </summary>
 	[Tool]
 	public partial class BaseConfig
 	{
-		protected string Name = "AssetSnapConfig"; 
-		protected readonly string BasePath = "res://addons/assetsnap/"; 
-		protected readonly string DefaultConfigSection = "Settings";
-		protected string LoadedConfigFilename;
-		protected bool LoadOk; 
+		protected readonly string _BasePath = "res://addons/assetsnap/"; 
+		protected readonly string _DefaultConfigSection = "Settings";
+		protected string _Name = "AssetSnapConfig"; 
+		protected string _LoadedConfigFilename;
+		protected bool _LoadOk; 
 		protected ConfigFile _Config;
 		
 		/// <summary>
-        /// Constructor for the BaseConfig class.
-        /// </summary>
-        /// <remarks>
-        /// Initializes the LoadOk field to false.
-        /// </remarks>	
+		/// Constructor for the BaseConfig class.
+		/// </summary>
+		/// <remarks>
+		/// Initializes the LoadOk field to false.
+		/// </remarks>	
 		public BaseConfig()
 		{
-			LoadOk = false;
+			_LoadOk = false;
 		}
-
+		
 		/// <summary>
-        /// Loads the configuration from the specified file name.
-        /// </summary>
-        /// <param name="_ConfigName">The name of the configuration file.</param>
-        /// <returns>Void.</returns>
+		/// Sets a value in the configuration and saves it.
+		/// </summary>
+		/// <param name="_key">The key to set the value for.</param>
+		/// <param name="_value">The value to set.</param>
+		/// <returns>Void.</returns>
+		public virtual void SetKey( string _key, Variant _value )
+		{
+			_Config.SetValue(_Name, _key, _value);
+			_Config.Save(_BasePath + _LoadedConfigFilename);
+			GlobalExplorer.GetInstance()._Plugin.EmitSignal(Plugin.SignalName.SettingKeyChanged, new Godot.Collections.Array() { _key, _value });
+		}
+		
+		/// <summary>
+		/// Retrieves a single key value from the configuration.
+		/// </summary>
+		/// <param name="_key">The key to retrieve the value for.</param>
+		/// <returns>The value associated with the specified key.</returns>
+		public virtual Variant GetKey( string _key )
+		{
+			return _Config.GetValue( _DefaultConfigSection, _key );
+		}
+		
+		/// <summary>
+		/// Loads the configuration from the specified file name.
+		/// </summary>
+		/// <param name="_ConfigName">The name of the configuration file.</param>
+		/// <returns>Void.</returns>
 		protected void LoadConfig( string _ConfigName)
 		{
 			_Config = new();
 			
-			LoadedConfigFilename = _ConfigName;
-			Error err = _Config.Load(BasePath + LoadedConfigFilename);
+			_LoadedConfigFilename = _ConfigName;
+			Error err = _Config.Load(_BasePath + _LoadedConfigFilename);
 
 			if (err == Error.Ok)
 			{
-				LoadOk = true;
+				_LoadOk = true;
 			}
-		}
-		
-		/// <summary>
-        /// Retrieves a single key value from the configuration.
-        /// </summary>
-        /// <param name="_key">The key to retrieve the value for.</param>
-        /// <returns>The value associated with the specified key.</returns>
-		public virtual Variant GetKey( string _key )
-		{
-			return _Config.GetValue( DefaultConfigSection, _key );
-		}
-		
-		/// <summary>
-        /// Sets a value in the configuration and saves it.
-        /// </summary>
-        /// <param name="_key">The key to set the value for.</param>
-        /// <param name="_value">The value to set.</param>
-        /// <returns>Void.</returns>
-		public virtual void SetKey( string _key, Variant _value )
-		{
-			_Config.SetValue(Name, _key, _value);
-			_Config.Save(BasePath + LoadedConfigFilename);
-			GlobalExplorer.GetInstance()._Plugin.EmitSignal(Plugin.SignalName.SettingKeyChanged, new Godot.Collections.Array() { _key, _value });
 		}
 	} 
 }
