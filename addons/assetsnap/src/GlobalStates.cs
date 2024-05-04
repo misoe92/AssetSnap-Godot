@@ -22,23 +22,21 @@
 
 #if TOOLS
 
+using System;
+using System.Collections.Generic;
+using System.Reflection;
+using AssetSnap.States;
+using AssetSnap.Front.Nodes;
+using Godot;
+
 namespace AssetSnap
 {
-	using System;
-	using System.Collections.Generic;
-	using System.Reflection;
-	using AssetSnap.States;
-
-	using AssetSnap.Front.Nodes;
-	using Godot;
-
 	/// <summary>
 	/// This class represents the global states for the AssetSnap tool.
 	/// </summary>
 	[Tool]
 	public partial class GlobalStates : LoadStates
 	{
-
 		/** Library Enums **/
 		public enum LibraryStateEnum
 		{
@@ -52,12 +50,14 @@ namespace AssetSnap
 			Null,
 			Spawned,
 		}
+		
 		public enum SnapPosition
 		{
 			Top,
 			Middle,
 			Bottom,
 		}
+		
 		public enum VisibilityStateEnum
 		{
 			Hidden,
@@ -82,19 +82,7 @@ namespace AssetSnap
 			Simple, // Simple mesh instances
 			Optimized, // Multimesh
 		}
-
-		/** Decal States **/
-		private SpawnStateEnum _DecalSpawned = SpawnStateEnum.Null;
-		private VisibilityStateEnum _DecalVisible = VisibilityStateEnum.Hidden;
-		private PlacingModeEnum _PlacingMode = PlacingModeEnum.Model;
-		private PlacingTypeEnum _PlacingType = PlacingTypeEnum.Simple;
-		private string _EditingTitle = "None";
-		private Node3D _EditingObject = null;
-		private bool _EditingObjectIsPlaced = false;
-		private bool _MultiDrop = false;
-		private Node _CurrentScene = null;
-		private Library.Instance _CurrentLibrary = null;
-
+		
 		/// <summary>
 		/// Gets or sets the title of the currently edited object.
 		/// </summary>
@@ -261,24 +249,7 @@ namespace AssetSnap
 				}
 			}
 		}
-		/** Group Enums **/
-		//
-
-		/** Library States **/
-		private LibraryStateEnum _SnapToObject = LibraryStateEnum.Disabled;
-		private LibraryStateEnum _SnapToHeight = LibraryStateEnum.Disabled;
-		private LibraryStateEnum _SnapToHeightGlue = LibraryStateEnum.Disabled;
-		private LibraryStateEnum _SnapToX = LibraryStateEnum.Disabled;
-		private LibraryStateEnum _SnapToXGlue = LibraryStateEnum.Disabled;
-		private LibraryStateEnum _SnapToZ = LibraryStateEnum.Disabled;
-		private LibraryStateEnum _SnapToZGlue = LibraryStateEnum.Disabled;
-		private LibraryStateEnum _SphereCollision = LibraryStateEnum.Disabled;
-		private LibraryStateEnum _ConcaveCollision = LibraryStateEnum.Disabled;
-		private LibraryStateEnum _ConvexCollision = LibraryStateEnum.Disabled;
-		private LibraryStateEnum _ConvexClean = LibraryStateEnum.Disabled;
-		private LibraryStateEnum _ConvexSimplify = LibraryStateEnum.Disabled;
-		private LibraryStateEnum _LevelOfDetailsState = LibraryStateEnum.Disabled;
-
+		
 		[ExportCategory("Placement States & Values")]
 		[Export]
 		public LibraryStateEnum SnapToObject
@@ -461,26 +432,7 @@ namespace AssetSnap
 				}
 			}
 		}
-
-		/** Group States **/
-
-
-		/** Library Values **/
-		private string _VisibilityFadeMode = "Use project default";
-		private int _SnapLayer = 0;
-		private float _SnapToObjectOffsetXValue = 0;
-		private float _SnapToObjectOffsetZValue = 0;
-		private float _SnapToHeightValue = 0;
-		private float _SnapToXValue = 0;
-		private float _SnapToZValue = 0;
-		private float _DragSizeOffset = 0;
-		private float _LevelOfDetails = 0;
-		private float _VisibilityRangeBegin = 0;
-		private float _VisibilityRangeBeginMargin = 0;
-		private float _VisibilityRangeEnd = 0;
-		private float _VisibilityRangeEndMargin = 0;
-
-
+		
 		[Export]
 		public int SnapLayer
 		{
@@ -680,15 +632,7 @@ namespace AssetSnap
 				}
 			}
 		}
-
-		public List<SnapAngleEnums> BoundaryActiveAngles { get; set; } = new List<SnapAngleEnums>();
-
-		/** Group Values **/
-		private SnapPosition _GroupSnapsTo = SnapPosition.Middle;
-		private GroupResource _Group;
-		private AsGrouped3D _GroupedObject;
-		private Godot.Collections.Dictionary<string, Godot.Collections.Array<AsGrouped3D>> _GroupedObjects = new();
-
+		
 		[ExportCategory("Group")]
 		[Export]
 		public SnapPosition GroupSnapsTo
@@ -733,11 +677,7 @@ namespace AssetSnap
 				StateChanged("GroupedObjects", value);
 			}
 		}
-
-		public Godot.Collections.Dictionary<Mesh, Godot.Collections.Array<AsOptimizedMultiMeshGroup3D>> OptimizedGroups = new();
-		public string Name = "GlobalStates";
-
-		private static GlobalStates _Instance;
+		
 		public static GlobalStates Singleton
 		{
 			get
@@ -750,71 +690,118 @@ namespace AssetSnap
 				return _Instance;
 			}
 		}
+		
+		public string Name = "GlobalStates";
+		public Godot.Collections.Dictionary<Mesh, Godot.Collections.Array<AsOptimizedMultiMeshGroup3D>> OptimizedGroups = new();
+		public List<SnapAngleEnums> BoundaryActiveAngles { get; set; } = new List<SnapAngleEnums>();
+		
+		private static GlobalStates _Instance;
+	
+		/** Library Values **/
+		private string _VisibilityFadeMode = "Use project default";
+		private int _SnapLayer = 0;
+		private float _SnapToObjectOffsetXValue = 0;
+		private float _SnapToObjectOffsetZValue = 0;
+		private float _SnapToHeightValue = 0;
+		private float _SnapToXValue = 0;
+		private float _SnapToZValue = 0;
+		private float _DragSizeOffset = 0;
+		private float _LevelOfDetails = 0;
+		private float _VisibilityRangeBegin = 0;
+		private float _VisibilityRangeBeginMargin = 0;
+		private float _VisibilityRangeEnd = 0;
+		private float _VisibilityRangeEndMargin = 0;
+
+
+		/** Decal States **/
+		private string _EditingTitle = "None";
+		private bool _EditingObjectIsPlaced = false;
+		private bool _MultiDrop = false;
+		private SpawnStateEnum _DecalSpawned = SpawnStateEnum.Null;
+		private VisibilityStateEnum _DecalVisible = VisibilityStateEnum.Hidden;
+		private PlacingModeEnum _PlacingMode = PlacingModeEnum.Model;
+		private PlacingTypeEnum _PlacingType = PlacingTypeEnum.Simple;
+		private Node3D _EditingObject = null;
+		private Node _CurrentScene = null;
+		private Library.Instance _CurrentLibrary = null;
+
+		/** Library States **/
+		private LibraryStateEnum _SnapToObject = LibraryStateEnum.Disabled;
+		private LibraryStateEnum _SnapToHeight = LibraryStateEnum.Disabled;
+		private LibraryStateEnum _SnapToHeightGlue = LibraryStateEnum.Disabled;
+		private LibraryStateEnum _SnapToX = LibraryStateEnum.Disabled;
+		private LibraryStateEnum _SnapToXGlue = LibraryStateEnum.Disabled;
+		private LibraryStateEnum _SnapToZ = LibraryStateEnum.Disabled;
+		private LibraryStateEnum _SnapToZGlue = LibraryStateEnum.Disabled;
+		private LibraryStateEnum _SphereCollision = LibraryStateEnum.Disabled;
+		private LibraryStateEnum _ConcaveCollision = LibraryStateEnum.Disabled;
+		private LibraryStateEnum _ConvexCollision = LibraryStateEnum.Disabled;
+		private LibraryStateEnum _ConvexClean = LibraryStateEnum.Disabled;
+		private LibraryStateEnum _ConvexSimplify = LibraryStateEnum.Disabled;
+		private LibraryStateEnum _LevelOfDetailsState = LibraryStateEnum.Disabled;
+
+		private SnapPosition _GroupSnapsTo = SnapPosition.Middle;
+		private GroupResource _Group;
+		private AsGrouped3D _GroupedObject;
+		private Godot.Collections.Dictionary<string, Godot.Collections.Array<AsGrouped3D>> _GroupedObjects = new();
 
 		/// <summary>
-		/// Checks if the class has a field or property with the given name.
+		/// Sets the value associated with a given key.
 		/// </summary>
-		/// <param name="name">The name of the field or property to check.</param>
-		/// <returns>True if the class has a field or property with the given name, otherwise false.</returns>
-		public bool Has(string name)
+		/// <param name="name">The name of the key.</param>
+		/// <param name="value">The value to set.</param>
+		public void Set(string name, Variant value)
 		{
-			// Get all fields and properties of the class
-			FieldInfo[] fields = GetType().GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-			PropertyInfo[] properties = GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+			// Get the type of the class
+			Type type = GetType();
 
-			// Check if any field or property matches the provided name
-			foreach (var field in fields)
+			// Get the field or property with the provided name
+			FieldInfo field = type.GetField(name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+			PropertyInfo property = type.GetProperty(name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+
+			if (null == property && null == field)
 			{
-				if (field.Name == name)
-					return true;
+				return;
 			}
 
-			foreach (var property in properties)
+			if (value.VariantType == Variant.Type.Bool)
 			{
-				if (property.Name == name)
-					return true;
+				bool boolVal = value.As<bool>();
+				if (boolVal)
+				{
+					LibraryStateEnum EnumVal = LibraryStateEnum.Enabled;
+					property.SetValue(this, EnumVal);
+				}
+				else
+				{
+					LibraryStateEnum EnumVal = LibraryStateEnum.Disabled;
+					property.SetValue(this, EnumVal);
+				}
 			}
+			else
+			{
+				object typedValue;
+				switch (value.VariantType)
+				{
+					case Variant.Type.Int:
+						typedValue = value;
+						break;
+					case Variant.Type.Float:
+						typedValue = (float)value;
+						break;
+					default:
+						GD.Print("Unsupported variant type for property: " + name);
+						return;
+				}
 
-			return false;
+				// Set the value of the field or property
+				if (field != null)
+					field.SetValue(this, typedValue);
+				else if (property != null)
+					property.SetValue(this, typedValue);
+			}
 		}
 		
-		/// <summary>
-		/// Checks if the value associated with a key matches the provided value.
-		/// </summary>
-		/// <param name="key">The key to check.</param>
-		/// <param name="value">The value to compare.</param>
-		/// <returns>True if the value associated with the key matches the provided value, otherwise false.</returns>
-		public bool Is(string key, Variant value) 
-		{
-			Variant KeyValue = Key(key);
-			Variant.Type ValueType = value.VariantType;
-			
-			if( ValueType != KeyValue.VariantType ) 
-			{
-				// Not the same type, just return early.
-				return false;
-			}
-			
-			if( KeyValue.VariantType == Variant.Type.String) 
-			{
-				return KeyValue.As<string>() == value.As<string>();
-			}
-			else if( KeyValue.VariantType == Variant.Type.Bool )
-			{
-				return KeyValue.As<bool>() == value.As<bool>();
-			}
-			else if( KeyValue.VariantType == Variant.Type.Float )
-			{
-				return KeyValue.As<float>() == value.As<float>();
-			}
-			else if( KeyValue.VariantType == Variant.Type.Int )
-			{
-				return KeyValue.As<int>() == value.As<int>();
-			}
-
-			return false;
-		}
-
 		/// <summary>
 		/// Retrieves the value associated with a given key.
 		/// </summary>
@@ -878,63 +865,71 @@ namespace AssetSnap
 	
 			return "";
 		}
-
+		
 		/// <summary>
-        /// Sets the value associated with a given key.
-        /// </summary>
-        /// <param name="name">The name of the key.</param>
-        /// <param name="value">The value to set.</param>
-		public void Set(string name, Variant value)
+		/// Checks if the class has a field or property with the given name.
+		/// </summary>
+		/// <param name="name">The name of the field or property to check.</param>
+		/// <returns>True if the class has a field or property with the given name, otherwise false.</returns>
+		public bool Has(string name)
 		{
-			// Get the type of the class
-			Type type = GetType();
+			// Get all fields and properties of the class
+			FieldInfo[] fields = GetType().GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+			PropertyInfo[] properties = GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
 
-			// Get the field or property with the provided name
-			FieldInfo field = type.GetField(name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-			PropertyInfo property = type.GetProperty(name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-
-			if (null == property && null == field)
+			// Check if any field or property matches the provided name
+			foreach (var field in fields)
 			{
-				return;
+				if (field.Name == name)
+					return true;
 			}
 
-			if (value.VariantType == Variant.Type.Bool)
+			foreach (var property in properties)
 			{
-				bool boolVal = value.As<bool>();
-				if (boolVal)
-				{
-					LibraryStateEnum EnumVal = LibraryStateEnum.Enabled;
-					property.SetValue(this, EnumVal);
-				}
-				else
-				{
-					LibraryStateEnum EnumVal = LibraryStateEnum.Disabled;
-					property.SetValue(this, EnumVal);
-				}
+				if (property.Name == name)
+					return true;
 			}
-			else
-			{
-				object typedValue;
-				switch (value.VariantType)
-				{
-					case Variant.Type.Int:
-						typedValue = value;
-						break;
-					case Variant.Type.Float:
-						typedValue = (float)value;
-						break;
-					default:
-						GD.Print("Unsupported variant type for property: " + name);
-						return;
-				}
 
-				// Set the value of the field or property
-				if (field != null)
-					field.SetValue(this, typedValue);
-				else if (property != null)
-					property.SetValue(this, typedValue);
+			return false;
+		}
+		
+		/// <summary>
+		/// Checks if the value associated with a key matches the provided value.
+		/// </summary>
+		/// <param name="key">The key to check.</param>
+		/// <param name="value">The value to compare.</param>
+		/// <returns>True if the value associated with the key matches the provided value, otherwise false.</returns>
+		public bool Is(string key, Variant value) 
+		{
+			Variant KeyValue = Key(key);
+			Variant.Type ValueType = value.VariantType;
+			
+			if( ValueType != KeyValue.VariantType ) 
+			{
+				// Not the same type, just return early.
+				return false;
 			}
+			
+			if( KeyValue.VariantType == Variant.Type.String) 
+			{
+				return KeyValue.As<string>() == value.As<string>();
+			}
+			else if( KeyValue.VariantType == Variant.Type.Bool )
+			{
+				return KeyValue.As<bool>() == value.As<bool>();
+			}
+			else if( KeyValue.VariantType == Variant.Type.Float )
+			{
+				return KeyValue.As<float>() == value.As<float>();
+			}
+			else if( KeyValue.VariantType == Variant.Type.Int )
+			{
+				return KeyValue.As<int>() == value.As<int>();
+			}
+
+			return false;
 		}
 	}
 }
+
 #endif
