@@ -21,6 +21,7 @@
 // SOFTWARE.
 
 #if TOOLS
+
 using System;
 using AssetSnap.Trait;
 using Godot;
@@ -33,10 +34,6 @@ namespace AssetSnap.Component
 	[Tool]
 	public partial class Selectable : ContainerTrait
 	{
-		/*
-		** Enums
-		*/
-		
 		/// <summary>
 		/// Types of selectable components.
 		/// </summary>
@@ -47,25 +44,15 @@ namespace AssetSnap.Component
 			SelectableLarge,
 		};
 		
-		/*
-		** Exports
-		*/
 		[Export]
 		public Godot.Collections.Array<Callable> _Actions = new Godot.Collections.Array<Callable>();
 		
-		/*
-		** Public
-		*/
-
-		/*
-		** Protected
-		*/
-		protected string Title = "";
-		protected string Suffix = "";
+		protected string _Title = "";
+		protected string _Suffix = "";
 		protected Type _Type = Type.SelectableMedium;
-		protected TextServer.AutowrapMode AutowrapMode = TextServer.AutowrapMode.Off;
+		protected TextServer.AutowrapMode _AutowrapMode = TextServer.AutowrapMode.Off;
 		protected HorizontalAlignment _HorizontalAlignment;
-		protected Godot.Collections.Array<string> Items = new();
+		protected Godot.Collections.Array<string> _Items = new();
 
 		/// <summary>
 		/// Constructor for the Selectable component.
@@ -86,6 +73,31 @@ namespace AssetSnap.Component
 			SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
 			SizeFlagsVertical = Control.SizeFlags.ShrinkBegin;
 		}
+		
+		/// <summary>
+		/// Adds the currently chosen button to a specified container.
+		/// </summary>
+		/// <param name="Container">The container to add the button to.</param>
+		/// <param name="index">Optional index to insert the button at.</param>
+		public void AddToContainer(Node Container, int? index = null)
+		{
+			if (null == Dependencies)
+			{
+				GD.PushError("Dependencies not set @ AddToContainer");
+				return;
+			}
+
+			if (false == Dependencies.ContainsKey(TraitName + "_MarginContainer"))
+			{
+				GD.PushError("Container was not found @ AddToContainer");
+				GD.PushError("AddToContainer::Keys-> ", Dependencies.Keys);
+				GD.PushError("AddToContainer::ADDTO-> ", TraitName + "_MarginContainer");
+				return;
+			}
+
+			base._AddToContainer(Container, Dependencies[TraitName + "_MarginContainer"].As<MarginContainer>(), index);
+			Reset();
+		}
 
 		/// <summary>
 		/// Instantiate an instance of the trait.
@@ -95,7 +107,7 @@ namespace AssetSnap.Component
 		{
 			base._Instantiate();
 
-			if ("" != Suffix)
+			if ("" != _Suffix)
 			{
 				Orientation = ContainerOrientation.Horizontal;
 				InnerOrientation = ContainerOrientation.Vertical;
@@ -103,7 +115,7 @@ namespace AssetSnap.Component
 			}
 
 			base.Instantiate();
-			if (Title == "")
+			if (_Title == "")
 			{
 				GD.PushWarning("Title not found");
 				return this;
@@ -112,7 +124,7 @@ namespace AssetSnap.Component
 			OptionButton Select = new()
 			{
 				Name = TraitName,
-				Text = Title,
+				Text = _Title,
 				CustomMinimumSize = CustomMinimumSize,
 				Size = Size,
 				ThemeTypeVariation = _Type.ToString(),
@@ -121,11 +133,11 @@ namespace AssetSnap.Component
 			};
 			
 			// Add the predefined items
-			if( Items.Count != 0 ) 
+			if( _Items.Count != 0 ) 
 			{
-				for( int i = 0; i < Items.Count; i++ ) 
+				for( int i = 0; i < _Items.Count; i++ ) 
 				{
-					Select.AddItem(Items[i]);
+					Select.AddItem(_Items[i]);
 				}
 			}
 			
@@ -145,8 +157,8 @@ namespace AssetSnap.Component
 
 			Dependencies[TraitName + "_WorkingNode"] = Select;
 
-			Plugin.Singleton.traitGlobal.AddInstance(Iteration, Select, OwnerName, TypeString, Dependencies);
-			Plugin.Singleton.traitGlobal.AddName(Iteration, TraitName, OwnerName, TypeString);
+			Plugin.Singleton.TraitGlobal.AddInstance(Iteration, Select, OwnerName, TypeString, Dependencies);
+			Plugin.Singleton.TraitGlobal.AddName(Iteration, TraitName, OwnerName, TypeString);
 
 			Reset();
 			Iteration += 1;
@@ -162,7 +174,7 @@ namespace AssetSnap.Component
 		/// <returns>Returns the modified Selectable component.</returns>
 		public Selectable AddItem( string text )
 		{
-			Items.Add(text);
+			_Items.Add(text);
 			
 			if( Dependencies.ContainsKey(TraitName + "_WorkingNode")) 
 			{
@@ -190,7 +202,7 @@ namespace AssetSnap.Component
 
 			if (false != Dependencies.ContainsKey(TraitName + "_WorkingNode"))
 			{
-				Godot.Collections.Dictionary<string, Variant> dependencies = Plugin.Singleton.traitGlobal.GetDependencies(index, TypeString, OwnerName);
+				Godot.Collections.Dictionary<string, Variant> dependencies = Plugin.Singleton.TraitGlobal.GetDependencies(index, TypeString, OwnerName);
 				Dependencies = dependencies;
 				if (debug)
 				{
@@ -218,31 +230,6 @@ namespace AssetSnap.Component
 			base._SelectByName(name);
 
 			return this;
-		}
-
-		/// <summary>
-		/// Adds the currently chosen button to a specified container.
-		/// </summary>
-		/// <param name="Container">The container to add the button to.</param>
-		/// <param name="index">Optional index to insert the button at.</param>
-		public void AddToContainer(Node Container, int? index = null)
-		{
-			if (null == Dependencies)
-			{
-				GD.PushError("Dependencies not set @ AddToContainer");
-				return;
-			}
-
-			if (false == Dependencies.ContainsKey(TraitName + "_MarginContainer"))
-			{
-				GD.PushError("Container was not found @ AddToContainer");
-				GD.PushError("AddToContainer::Keys-> ", Dependencies.Keys);
-				GD.PushError("AddToContainer::ADDTO-> ", TraitName + "_MarginContainer");
-				return;
-			}
-
-			base._AddToContainer(Container, Dependencies[TraitName + "_MarginContainer"].As<MarginContainer>(), index);
-			Reset();
 		}
 
 		/// <summary>
@@ -276,7 +263,7 @@ namespace AssetSnap.Component
 		/// <returns>Returns the modified Selectable component.</returns>
 		public Selectable SetText(string text)
 		{
-			Title = text;
+			_Title = text;
 
 			if (
 				false != Dependencies.ContainsKey(TraitName + "_WorkingNode") &&
@@ -296,7 +283,7 @@ namespace AssetSnap.Component
 		/// <returns>Returns the modified Selectable component.</returns>
 		public Selectable SetSuffix(string text)
 		{
-			Suffix = text;
+			_Suffix = text;
 
 			return this;
 		}
@@ -314,10 +301,10 @@ namespace AssetSnap.Component
 		}
 
 		/// <summary>
-        /// Sets the horizontal size flag for the container.
-        /// </summary>
-        /// <param name="flag">The horizontal size flag to set.</param>
-        /// <returns>Returns the modified Selectable component.</returns>
+		/// Sets the horizontal size flag for the container.
+		/// </summary>
+		/// <param name="flag">The horizontal size flag to set.</param>
+		/// <returns>Returns the modified Selectable component.</returns>
 		public override Selectable SetContainerHorizontalSizeFlag(Control.SizeFlags flag)
 		{
 			base.SetContainerHorizontalSizeFlag(flag);
@@ -326,10 +313,10 @@ namespace AssetSnap.Component
 		}
 
 		/// <summary>
-        /// Sets the alignment for the text of the current label.
-        /// </summary>
-        /// <param name="alignment">The horizontal alignment to set.</param>
-        /// <returns>Returns the modified Selectable component.</returns>
+		/// Sets the alignment for the text of the current label.
+		/// </summary>
+		/// <param name="alignment">The horizontal alignment to set.</param>
+		/// <returns>Returns the modified Selectable component.</returns>
 		public Selectable SetAlignment(HorizontalAlignment alignment)
 		{
 			_HorizontalAlignment = alignment;
@@ -338,11 +325,11 @@ namespace AssetSnap.Component
 		}
 
 		/// <summary>
-        /// Sets the dimensions for the current label.
-        /// </summary>
-        /// <param name="width">The width of the label.</param>
-        /// <param name="height">The height of the label.</param>
-        /// <returns>Returns the modified Selectable component.</returns>
+		/// Sets the dimensions for the current label.
+		/// </summary>
+		/// <param name="width">The width of the label.</param>
+		/// <param name="height">The height of the label.</param>
+		/// <returns>Returns the modified Selectable component.</returns>
 		public override Selectable SetDimensions(int width, int height)
 		{
 			base.SetDimensions(width, height);
@@ -351,10 +338,10 @@ namespace AssetSnap.Component
 		}
 
 		/// <summary>
-        /// Sets the horizontal size flags for the container.
-        /// </summary>
-        /// <param name="flag">The horizontal size flags to set.</param>
-        /// <returns>Returns the modified Selectable component.</returns>
+		/// Sets the horizontal size flags for the container.
+		/// </summary>
+		/// <param name="flag">The horizontal size flags to set.</param>
+		/// <returns>Returns the modified Selectable component.</returns>
 		public override Selectable SetHorizontalSizeFlags(Control.SizeFlags flag)
 		{
 			base.SetHorizontalSizeFlags(flag);
@@ -363,10 +350,10 @@ namespace AssetSnap.Component
 		}
 
 		/// <summary>
-        /// Sets the vertical size flags for the container.
-        /// </summary>
-        /// <param name="flag">The vertical size flags to set.</param>
-        /// <returns>Returns the modified Selectable component.</returns>
+		/// Sets the vertical size flags for the container.
+		/// </summary>
+		/// <param name="flag">The vertical size flags to set.</param>
+		/// <returns>Returns the modified Selectable component.</returns>
 		public override Selectable SetVerticalSizeFlags(Control.SizeFlags flag)
 		{
 			base.SetVerticalSizeFlags(flag);
@@ -375,23 +362,23 @@ namespace AssetSnap.Component
 		}
 
 		/// <summary>
-        /// Sets the auto wrap mode of the label.
-        /// </summary>
-        /// <param name="mode">The auto wrap mode to set.</param>
-        /// <returns>Returns the modified Selectable component.</returns>
+		/// Sets the auto wrap mode of the label.
+		/// </summary>
+		/// <param name="mode">The auto wrap mode to set.</param>
+		/// <returns>Returns the modified Selectable component.</returns>
 		public Selectable SetAutoWrap(TextServer.AutowrapMode mode)
 		{
-			AutowrapMode = mode;
+			_AutowrapMode = mode;
 
 			return this;
 		}
 
 		/// <summary>
-        /// Sets margin values for the currently chosen label.
-        /// </summary>
-        /// <param name="value">The margin value to set.</param>
-        /// <param name="side">The side for which to set the margin.</param>
-        /// <returns>Returns the modified Selectable component.</returns>
+		/// Sets margin values for the currently chosen label.
+		/// </summary>
+		/// <param name="value">The margin value to set.</param>
+		/// <param name="side">The side for which to set the margin.</param>
+		/// <returns>Returns the modified Selectable component.</returns>
 		public override Selectable SetMargin(int value, string side = "")
 		{
 			base.SetMargin(value, side);
@@ -400,28 +387,28 @@ namespace AssetSnap.Component
 		}
 
 		/// <summary>
-        /// Fetches the text from the label.
-        /// </summary>
-        /// <returns>Returns the text of the label.</returns>
+		/// Fetches the text from the label.
+		/// </summary>
+		/// <returns>Returns the text of the label.</returns>
 		public string GetTitle()
 		{
-			return Title;
+			return _Title;
 		}
 
 		/// <summary>
-        /// Fetches the inner container of the label.
-        /// </summary>
-        /// <returns>Returns the inner container of the label.</returns>
+		/// Fetches the inner container of the label.
+		/// </summary>
+		/// <returns>Returns the inner container of the label.</returns>
 		public Container GetInnerContainer()
 		{
 			return base.GetInnerContainer(0);
 		}
 
 		/// <summary>
-        /// Checks if the label is valid.
-        /// </summary>
-        /// <param name="debug">Whether to print debug information.</param>
-        /// <returns>Returns true if the label is valid, false otherwise.</returns>
+		/// Checks if the label is valid.
+		/// </summary>
+		/// <param name="debug">Whether to print debug information.</param>
+		/// <returns>Returns true if the label is valid, false otherwise.</returns>
 		public override bool IsValid(bool debug = false)
 		{
 			if (base.IsValid(debug))
@@ -449,8 +436,8 @@ namespace AssetSnap.Component
 		/// </summary>
 		protected override void Reset()
 		{
-			Title = "";
-			Suffix = "";
+			_Title = "";
+			_Suffix = "";
 
 			base.Reset();
 
