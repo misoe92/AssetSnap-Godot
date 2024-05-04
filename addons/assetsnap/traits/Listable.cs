@@ -21,6 +21,7 @@
 // SOFTWARE.
 
 #if TOOLS
+
 using System;
 using System.Collections.Generic;
 using AssetSnap.Explorer;
@@ -34,19 +35,9 @@ namespace AssetSnap.Component
 	[Tool]
 	public partial class Listable : Trait.Base
 	{
-		/*
-		** Private
-		*/
-		private new Godot.Collections.Dictionary<string, int> Margin = new()
-		{
-			{"left", 20},
-			{"right", 20},
-			{"top", 0},
-			{"bottom", 25},
-		};
-		private Action<int, GodotObject> OnIterationAction;
-		private string ComponentName = "";
-		private int count = 0;
+		private string _ComponentName = "";
+		private int _Count = 0;
+		private Action<int, GodotObject> _OnIterationAction;
 		
 		/// <summary>
 		/// Default constructor for Listable.
@@ -55,6 +46,28 @@ namespace AssetSnap.Component
 		{
 			Name = "Listable";
 			TypeString = GetType().ToString();
+
+			Margin = new()
+			{
+				{"left", 20},
+				{"right", 20},
+				{"top", 0},
+				{"bottom", 25},
+			};
+		}
+		
+		/// <summary>
+		/// Adds the currently chosen list to a specified container.
+		/// </summary>
+		/// <param name="Container">The container to add the list to.</param>
+		public void AddToContainer( Node Container ) 
+		{
+			if( false == Dependencies.ContainsKey(TraitName + "_WorkingNode") ) 
+			{
+				return;
+			}
+			
+			base._AddToContainer(Container, Dependencies[TraitName + "_WorkingNode"].As<VBoxContainer>());
 		}
 		
 		/// <summary>
@@ -74,9 +87,9 @@ namespace AssetSnap.Component
 			
 			Godot.Collections.Array _components = new();
 			
-			for( int i = 0; i < count; i++) 
+			for( int i = 0; i < _Count; i++) 
 			{
-				string[] ComponentSingleArr = ComponentName.Split(".");
+				string[] ComponentSingleArr = _ComponentName.Split(".");
 				string ComponentSingleName = ComponentSingleArr[ComponentSingleArr.Length - 1];
 				
 				List<string> Components = new()
@@ -86,13 +99,13 @@ namespace AssetSnap.Component
 				
 				if (GlobalExplorer.GetInstance().Components.HasAll( Components.ToArray() )) 
 				{
-					GodotObject component = GlobalExplorer.GetInstance().Components.Single(ComponentName, true);
+					GodotObject component = GlobalExplorer.GetInstance().Components.Single(_ComponentName, true);
 					
 					if( null != component && EditorPlugin.IsInstanceValid( component ) && component is BaseComponent baseComponent ) 
 					{
-						if( null != OnIterationAction ) 
+						if( null != _OnIterationAction ) 
 						{
-							OnIterationAction(i, component);
+							_OnIterationAction(i, component);
 						}
 						else 
 						{
@@ -108,8 +121,8 @@ namespace AssetSnap.Component
 			Dependencies[TraitName + "_Components"] = _components;
 			Dependencies[TraitName + "_WorkingNode"] = _WorkingNode;
 
-			Plugin.Singleton.traitGlobal.AddInstance(Iteration, _WorkingNode, OwnerName, TypeString, Dependencies);
-			Plugin.Singleton.traitGlobal.AddName(Iteration, TraitName, OwnerName, TypeString);
+			Plugin.Singleton.TraitGlobal.AddInstance(Iteration, _WorkingNode, OwnerName, TypeString, Dependencies);
+			Plugin.Singleton.TraitGlobal.AddName(Iteration, TraitName, OwnerName, TypeString);
 			
 			Reset();
 			Iteration += 1;
@@ -130,7 +143,7 @@ namespace AssetSnap.Component
 
 			if( false != Dependencies.ContainsKey(TraitName + "_WorkingNode")) 
 			{
-				Godot.Collections.Dictionary<string, Variant> dependencies = Plugin.Singleton.traitGlobal.GetDependencies(index, TypeString, OwnerName);
+				Godot.Collections.Dictionary<string, Variant> dependencies = Plugin.Singleton.TraitGlobal.GetDependencies(index, TypeString, OwnerName);
 				Dependencies = dependencies;
 			}
 			else
@@ -163,23 +176,9 @@ namespace AssetSnap.Component
 		/// <returns>Returns the modified Listable.</returns>
 		public Listable Each( Action<int, GodotObject> OnIteration ) 
 		{
-			OnIterationAction = OnIteration;
+			_OnIterationAction = OnIteration;
 			
 			return this;
-		}
-		
-		/// <summary>
-		/// Adds the currently chosen list to a specified container.
-		/// </summary>
-		/// <param name="Container">The container to add the list to.</param>
-		public void AddToContainer( Node Container ) 
-		{
-			if( false == Dependencies.ContainsKey(TraitName + "_WorkingNode") ) 
-			{
-				return;
-			}
-			
-			base._AddToContainer(Container, Dependencies[TraitName + "_WorkingNode"].As<VBoxContainer>());
 		}
 		
 		/// <summary>
@@ -215,7 +214,7 @@ namespace AssetSnap.Component
 		/// <returns>Returns the modified Listable.</returns>
 		public Listable SetCount( int _count ) 
 		{
-			count = _count;
+			_Count = _count;
 
 			return this;
 		}
@@ -227,7 +226,7 @@ namespace AssetSnap.Component
 		/// <returns>Returns the modified Listable.</returns>
 		public Listable SetComponent( string componentName ) 
 		{
-			ComponentName = componentName;
+			_ComponentName = componentName;
 
 			return this;
 		}
@@ -257,13 +256,13 @@ namespace AssetSnap.Component
 		}
 
 		/// <summary>
-        /// Clears the list at the specified index.
-        /// </summary>
-        /// <param name="index">The index of the list to clear.</param>
-        /// <param name="debug">Whether to output debug information.</param>
+		/// Clears the list at the specified index.
+		/// </summary>
+		/// <param name="index">The index of the list to clear.</param>
+		/// <param name="debug">Whether to output debug information.</param>
 		public override void Clear(int index = 0, bool debug = false)
 		{
-			if( null == TypeString || null == OwnerName || null == Plugin.Singleton || null == Plugin.Singleton.traitGlobal ) 
+			if( null == TypeString || null == OwnerName || null == Plugin.Singleton || null == Plugin.Singleton.TraitGlobal ) 
 			{
 				Dependencies = new();
 				return;
@@ -271,7 +270,7 @@ namespace AssetSnap.Component
 
 			if( -1 != index ) 
 			{
-				if( false == Plugin.Singleton.traitGlobal.HasInstance( index, TypeString, OwnerName ) ) 
+				if( false == Plugin.Singleton.TraitGlobal.HasInstance( index, TypeString, OwnerName ) ) 
 				{
 					if( debug ) 
 					{
@@ -295,7 +294,7 @@ namespace AssetSnap.Component
 			}
 			else 
 			{
-				Godot.Collections.Dictionary<int, GodotObject> instances = Plugin.Singleton.traitGlobal.AllInstances(TypeString, OwnerName);
+				Godot.Collections.Dictionary<int, GodotObject> instances = Plugin.Singleton.TraitGlobal.AllInstances(TypeString, OwnerName);
 	
 				if( null == instances || instances.Count == 0 ) 
 				{
@@ -323,14 +322,15 @@ namespace AssetSnap.Component
 		}
 
 		/// <summary>
-        /// Resets the trait
-        /// </summary>
+		/// Resets the trait
+		/// </summary>
 		private void Reset()
 		{
-			count = 0;
-			ComponentName = "";
-			OnIterationAction = null;
+			_Count = 0;
+			_ComponentName = "";
+			_OnIterationAction = null;
 		}
 	}
 }
+
 #endif
