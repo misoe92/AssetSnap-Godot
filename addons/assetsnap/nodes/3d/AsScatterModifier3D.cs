@@ -35,23 +35,8 @@ namespace AssetSnap.Front.Nodes
 	[Tool]
 	public partial class AsScatterModifier3D : AsGroup3D
 	{
-		private Node _Duplicates;
-		private Color _BoundaryBoxColor;
-		private string _Name;
-		private string _DuplicateType;
-		private int WorkingCount;
-		private int PositionFail = 0;
-		private float _BoundaryBoxHeight = 1;
-		private bool PositionFailed = false;
-		private bool Initialized = false;
-
-		public AsMultiMeshInstance3D _MultiMeshInstance;
-		public MultiMesh _MultiMesh;
-		public Node3D _BoundaryNode;
-
 		[ExportGroup("Settings")]
 		[ExportSubgroup("Modifier")]
-
 		/// <summary>
 		/// Gets or sets the name of the scatter modifier.
 		/// </summary>
@@ -108,7 +93,6 @@ namespace AssetSnap.Front.Nodes
 				_ShowBoundaryBox = value;
 			}
 		}
-		private bool _ShowBoundaryBox = false;
 
 		/// <summary>
 		/// Property representing the color of the boundary box.
@@ -119,11 +103,11 @@ namespace AssetSnap.Front.Nodes
 			get => _BoundaryBoxColor;
 			set
 			{
-				if (IsInstanceValid(_BoundaryNode))
+				if (IsInstanceValid(BoundaryNode))
 				{
-					RemoveChild(_BoundaryNode);
-					_BoundaryNode.QueueFree();
-					_BoundaryNode = null;
+					RemoveChild(BoundaryNode);
+					BoundaryNode.QueueFree();
+					BoundaryNode = null;
 				}
 
 				_BoundaryBoxColor = value;
@@ -139,11 +123,11 @@ namespace AssetSnap.Front.Nodes
 			get => _BoundaryBoxHeight;
 			set
 			{
-				if (IsInstanceValid(_BoundaryNode))
+				if (IsInstanceValid(BoundaryNode))
 				{
-					RemoveChild(_BoundaryNode);
-					_BoundaryNode.QueueFree();
-					_BoundaryNode = null;
+					RemoveChild(BoundaryNode);
+					BoundaryNode.QueueFree();
+					BoundaryNode = null;
 				}
 
 				_BoundaryBoxHeight = value;
@@ -165,7 +149,6 @@ namespace AssetSnap.Front.Nodes
 				UpdateScatter();
 			}
 		}
-		private bool _UseMultiMesh = false;
 	
 		[ExportSubgroup("Collisions")]
 
@@ -182,7 +165,6 @@ namespace AssetSnap.Front.Nodes
 				UpdateScatter();
 			}
 		}
-		private bool _ForceCollisions = false;
 
 		/// <summary>
 		/// Property representing whether to allow collisions.
@@ -197,7 +179,6 @@ namespace AssetSnap.Front.Nodes
 				UpdateScatter();
 			}
 		}
-		private bool _NoCollisions = false;
 
 		/// <summary>
 		/// Property representing whether to use a sphere.
@@ -213,7 +194,6 @@ namespace AssetSnap.Front.Nodes
 				NotifyPropertyListChanged();
 			}
 		}
-		private bool _UseSphere = false;
 
 		/// <summary>
 		/// Property representing whether to use a convex polygon.
@@ -229,7 +209,6 @@ namespace AssetSnap.Front.Nodes
 				NotifyPropertyListChanged();
 			}
 		}
-		private bool _UseConvexPolygon = false;
 
 		/// <summary>
 		/// Property representing whether to clean a convex shape.
@@ -245,7 +224,6 @@ namespace AssetSnap.Front.Nodes
 				NotifyPropertyListChanged();
 			}
 		}
-		private bool _UseConvexClean = false;
 
 		/// <summary>
 		/// Property representing whether to simplify a convex shape.
@@ -261,7 +239,6 @@ namespace AssetSnap.Front.Nodes
 				NotifyPropertyListChanged();
 			}
 		}
-		private bool _UseConvexSimplify = false;
 
 		/// <summary>
 		/// Property representing whether to use a concave polygon.
@@ -277,7 +254,6 @@ namespace AssetSnap.Front.Nodes
 				NotifyPropertyListChanged();
 			}
 		}
-		private bool _UseConcavePolygon = false;
 
 		[ExportSubgroup("Mesh")]
 
@@ -293,7 +269,6 @@ namespace AssetSnap.Front.Nodes
 				_InstanceLibrary = value;
 			}
 		}
-		private string _InstanceLibrary;
 
 		[ExportCategory("General")]
 
@@ -310,7 +285,6 @@ namespace AssetSnap.Front.Nodes
 				UpdateScatter();
 			}
 		}
-		private int _ScatterRadius = 1;
 
 		/// <summary>
 		/// Property representing the scatter count.
@@ -325,7 +299,6 @@ namespace AssetSnap.Front.Nodes
 				UpdateScatter();
 			}
 		}
-		private int _ScatterCount = 1;
 
 		/// <summary>
 		/// Property representing the minimum distance.
@@ -340,7 +313,6 @@ namespace AssetSnap.Front.Nodes
 				UpdateScatter();
 			}
 		}
-		private float _MinDistance = 1.0f;
 
 		/// <summary>
 		/// Property representing the noise.
@@ -355,7 +327,6 @@ namespace AssetSnap.Front.Nodes
 				UpdateScatter();
 			}
 		}
-		private FastNoiseLite _Noise;
 	
 		[ExportCategory("Scatter Height")]
 
@@ -377,7 +348,6 @@ namespace AssetSnap.Front.Nodes
 				UpdateScatter();
 			}
 		}
-		private bool _FixedHeight = false;
 
 		/// <summary>
 		/// Property representing the fixed height value.
@@ -392,11 +362,10 @@ namespace AssetSnap.Front.Nodes
 				UpdateScatter();
 			}
 		}
-		private float _FixedHeightValue = 0.0f;
 
 		/// <summary>
-        /// Property representing whether to use raycast height.
-        /// </summary>
+		/// Property representing whether to use raycast height.
+		/// </summary>
 		[Export]
 		public bool RayCastHeight
 		{
@@ -413,6 +382,37 @@ namespace AssetSnap.Front.Nodes
 				UpdateScatter();
 			}
 		}
+		
+		
+		public AsMultiMeshInstance3D MultiMeshInstance;
+		public MultiMesh ScatterMultiMesh;
+		public Node3D BoundaryNode;
+		
+		private Node _Duplicates;
+		private Color _BoundaryBoxColor;
+		private FastNoiseLite _Noise;
+		private string _InstanceLibrary;
+		private string _Name;
+		private string _DuplicateType;
+		private int _ScatterRadius = 1;
+		private int _ScatterCount = 1;
+		private int _WorkingCount;
+		private int _PositionFail = 0;
+		private float _MinDistance = 1.0f;
+		private float _FixedHeightValue = 0.0f;
+		private float _BoundaryBoxHeight = 1;
+		private bool _FixedHeight = false;
+		private bool _PositionFailed = false;
+		private bool _Initialized = false;
+		private bool _ShowBoundaryBox = false;
+		private bool _UseConcavePolygon = false;
+		private bool _UseConvexSimplify = false;
+		private bool _UseConvexClean = false;
+		private bool _UseConvexPolygon = false;
+		private bool _UseSphere = false;
+		private bool _NoCollisions = false;
+		private bool _ForceCollisions = false;
+		private bool _UseMultiMesh = false;
 		private bool _RayCastHeight = false;
 
 		/// <summary>
@@ -431,7 +431,7 @@ namespace AssetSnap.Front.Nodes
 			);
 
 			Noise.Connect(FastNoiseLite.SignalName.Changed, new Callable(this, "_OnNoiseChange"));
-			Initialized = true;
+			_Initialized = true;
 			base._Ready();
 
 			UpdateScatter();
@@ -512,7 +512,7 @@ namespace AssetSnap.Front.Nodes
 				return;
 			}
 
-			if (ShowBoundaryBox && false == IsInstanceValid(_BoundaryNode))
+			if (ShowBoundaryBox && false == IsInstanceValid(BoundaryNode))
 			{
 				_SetupBoundaryBox();
 			}
@@ -548,7 +548,7 @@ namespace AssetSnap.Front.Nodes
 				Transparency = BaseMaterial3D.TransparencyEnum.Alpha
 			};
 
-			_BoundaryNode = new()
+			BoundaryNode = new()
 			{
 				Name = "BoundaryNode"
 			};
@@ -566,8 +566,8 @@ namespace AssetSnap.Front.Nodes
 				MaterialOverride = transparentMaterial
 			};
 
-			_BoundaryNode.AddChild(_BoundaryBody);
-			AddChild(_BoundaryNode);
+			BoundaryNode.AddChild(_BoundaryBody);
+			AddChild(BoundaryNode);
 		}
 
 		/// <summary>
@@ -583,7 +583,7 @@ namespace AssetSnap.Front.Nodes
 		/// </summary>
 		public void UpdateScatter()
 		{
-			if (false == Initialized || null == Duplicates)
+			if (false == _Initialized || null == Duplicates)
 			{
 				return;
 			}
@@ -676,7 +676,7 @@ namespace AssetSnap.Front.Nodes
 
 				} while (!IsPositionValid(newPosition, positions, i));
 
-				if (PositionFailed == false)
+				if (_PositionFailed == false)
 				{
 					// Create a new instance of the MeshInstance
 					Node3D _Model = Duplicates.Duplicate() as Node3D;
@@ -781,18 +781,18 @@ namespace AssetSnap.Front.Nodes
 		/// <param name="asMeshInstance3D">The MeshInstance3D to scatter.</param>
 		private void _CreateSimpleMultiMeshScatter(AsMeshInstance3D asMeshInstance3D)
 		{
-			_MultiMesh = new()
+			ScatterMultiMesh = new()
 			{
 				TransformFormat = MultiMesh.TransformFormatEnum.Transform3D,
 				Mesh = asMeshInstance3D.Mesh,
 				InstanceCount = _ScatterCount,
 			};
 
-			_MultiMeshInstance = new()
+			MultiMeshInstance = new()
 			{
-				Multimesh = _MultiMesh,
+				Multimesh = ScatterMultiMesh,
 			};
-			ApplyModelMeta(_MultiMeshInstance);
+			ApplyModelMeta(MultiMeshInstance);
 
 			List<Vector3> positions = new List<Vector3>();
 
@@ -824,7 +824,7 @@ namespace AssetSnap.Front.Nodes
 
 				} while (!IsPositionValid(newPosition, positions, i));
 
-				if (PositionFailed == false)
+				if (_PositionFailed == false)
 				{
 					Transform3D Trans = Transform3D.Identity;
 					Trans.Origin = new Vector3(newPosition.X, 0, newPosition.Y);
@@ -839,7 +839,7 @@ namespace AssetSnap.Front.Nodes
 						Trans.Origin.Y = CastHeight(Trans.Origin);
 					}
 
-					_MultiMesh.SetInstanceTransform(i, Trans);
+					ScatterMultiMesh.SetInstanceTransform(i, Trans);
 
 					// Add the position to the list for future checks
 					positions.Add(new Vector3(newPosition.X, Trans.Origin.Y, newPosition.Y));
@@ -853,8 +853,8 @@ namespace AssetSnap.Front.Nodes
 			}
 
 			// Add the MeshInstance to the scene
-			AddChild(_MultiMeshInstance);
-			_MultiMeshInstance.Owner = _SceneRoot;
+			AddChild(MultiMeshInstance);
+			MultiMeshInstance.Owner = _SceneRoot;
 		}
 
 		/// <summary>
@@ -866,7 +866,7 @@ namespace AssetSnap.Front.Nodes
 			// Childable
 			foreach (MeshInstance3D child in node3d.GetChildren())
 			{
-				_MultiMesh = new()
+				ScatterMultiMesh = new()
 				{
 
 					TransformFormat = MultiMesh.TransformFormatEnum.Transform3D,
@@ -874,11 +874,11 @@ namespace AssetSnap.Front.Nodes
 					InstanceCount = _ScatterCount,
 				};
 
-				_MultiMeshInstance = new()
+				MultiMeshInstance = new()
 				{
-					Multimesh = _MultiMesh,
+					Multimesh = ScatterMultiMesh,
 				};
-				ApplyModelMeta(_MultiMeshInstance);
+				ApplyModelMeta(MultiMeshInstance);
 
 				List<Vector3> positions = new List<Vector3>();
 
@@ -910,7 +910,7 @@ namespace AssetSnap.Front.Nodes
 
 					} while (!IsPositionValid(newPosition, positions, i));
 
-					if (PositionFailed == false)
+					if (_PositionFailed == false)
 					{
 						Transform3D Trans = Transform3D.Identity;
 						Trans.Origin = new Vector3(newPosition.X, 0, newPosition.Y);
@@ -925,7 +925,7 @@ namespace AssetSnap.Front.Nodes
 							Trans.Origin.Y = CastHeight(Trans.Origin);
 						}
 
-						_MultiMesh.SetInstanceTransform(i, Trans);
+						ScatterMultiMesh.SetInstanceTransform(i, Trans);
 
 						// Add the position to the list for future checks
 						positions.Add(new Vector3(newPosition.X, Trans.Origin.Y, newPosition.Y));
@@ -939,9 +939,9 @@ namespace AssetSnap.Front.Nodes
 				}
 
 				// Add the MeshInstance to the scene
-				AddChild(_MultiMeshInstance);
-				_MultiMeshInstance.Owner = _SceneRoot;
-				_MultiMeshInstance.Name = _Name + "/multiMesh";
+				AddChild(MultiMeshInstance);
+				MultiMeshInstance.Owner = _SceneRoot;
+				MultiMeshInstance.Name = _Name + "/multiMesh";
 			}
 		}
 
@@ -954,16 +954,16 @@ namespace AssetSnap.Front.Nodes
 		/// <returns><c>true</c> if the position is valid; otherwise, <c>false</c>.</returns>
 		private bool IsPositionValid(Vector2 newPosition, List<Vector3> existingPositions, int count)
 		{
-			if (WorkingCount != count)
+			if (_WorkingCount != count)
 			{
-				PositionFailed = false;
-				PositionFail = 0;
-				WorkingCount = count;
+				_PositionFailed = false;
+				_PositionFail = 0;
+				_WorkingCount = count;
 			}
 
-			if (WorkingCount == count && PositionFail > 10)
+			if (_WorkingCount == count && _PositionFail > 10)
 			{
-				PositionFailed = true;
+				_PositionFailed = true;
 				return true;
 			}
 
@@ -973,7 +973,7 @@ namespace AssetSnap.Front.Nodes
 				float distance = newPosition.DistanceTo(new Vector2(existingPosition.X, existingPosition.Z));
 				if (distance < MinDistance)
 				{
-					PositionFail += 1;
+					_PositionFail += 1;
 					return false; // Invalid position, too close to an existing position
 				}
 			}
