@@ -38,7 +38,7 @@ namespace AssetSnap.Front.Configs
 		private string[] _Folders;
 		private Godot.Collections.Dictionary<string, Variant> _Settings;
 		private BaseContainer _Container;
-		public bool Initialized = false;
+		private bool _Initialized = false;
 
 		/// <summary>
 		/// Gets the singleton instance of SettingsConfig.
@@ -57,14 +57,6 @@ namespace AssetSnap.Front.Configs
 			}
 		}
 		private static SettingsConfig _Instance = null;
-
-		/// <summary>
-		/// Gets the name of the settings configuration.
-		/// </summary>
-		public string _Name
-		{
-			get => "Settings";
-		}
 
 		/// <summary>
 		/// Gets the configuration file.
@@ -111,7 +103,7 @@ namespace AssetSnap.Front.Configs
 		/// </summary>
 		public SettingsConfig()
 		{
-			Name = "AssetSnapConfig";
+			_Name = "AssetSnapConfig";
 		}
 
 		/// <summary>
@@ -128,7 +120,7 @@ namespace AssetSnap.Front.Configs
 			LoadConfig(_ConfigPath);
 
 			// If the file didn't load, ignore it.
-			if (LoadOk)
+			if (_LoadOk)
 			{
 				List<string> _FolderList = new();
 				_Settings = new();
@@ -159,7 +151,7 @@ namespace AssetSnap.Front.Configs
 
 				_Folders = _FolderList.ToArray();
 				_FolderList.Clear();
-				Initialized = true;
+				_Initialized = true;
 			}
 			else
 			{
@@ -237,7 +229,7 @@ namespace AssetSnap.Front.Configs
 			_Config.SetValue(_Name, _key, _Value);
 			_Settings[_key] = _Value;
 			GlobalExplorer.GetInstance()._Plugin.EmitSignal(Plugin.SignalName.SettingKeyChanged, new Godot.Collections.Array() { _key, _Value });
-			Error result = _Config.Save(BasePath + _ConfigPath);
+			Error result = _Config.Save(_BasePath + _ConfigPath);
 
 			if (result != Error.Ok)
 			{
@@ -260,14 +252,14 @@ namespace AssetSnap.Front.Configs
 			}
 
 			_Config.SetValue("Folders", "Folder" + (FolderCount + 1), path);
-			Error result = _Config.Save(BasePath + _ConfigPath);
+			Error result = _Config.Save(_BasePath + _ConfigPath);
 
 			if (result != Error.Ok)
 			{
 				GD.PushError(result);
 			}
 
-			LoadOk = false;
+			_LoadOk = false;
 
 			Initialize();
 			MaybeEmitFoldersLoaded();
@@ -281,7 +273,7 @@ namespace AssetSnap.Front.Configs
 		public void AddModelSizeToCache(string name, Vector3 Size)
 		{
 			_Config.SetValue("ModelSizes", name, Size);
-			Error result = _Config.Save(BasePath + _ConfigPath);
+			Error result = _Config.Save(_BasePath + _ConfigPath);
 
 			if (result != Error.Ok)
 			{
@@ -292,34 +284,9 @@ namespace AssetSnap.Front.Configs
 		}
 
 		/// <summary>
-		/// Checks if model size exists.
+		/// Removes a folder from the array.
 		/// </summary>
-		/// <param name="name">The name of the model.</param>
-		/// <returns>True if the model size exists, false otherwise.</returns>
-		public bool HasModelSize(string name)
-		{
-			return _Config.HasSection("ModelSizes") && _Config.GetSectionKeys("ModelSizes").Contains(name);
-		}
-
-		/// <summary>
-        /// Gets the model size.
-        /// </summary>
-        /// <param name="name">The name of the model.</param>
-        /// <returns>The size of the model.</returns>
-		public Vector3 GetModelSize(string name)
-		{
-			if (HasModelSize(name))
-			{
-				return _Config.GetValue("ModelSizes", name).As<Vector3>();
-			}
-
-			return Vector3.Zero;
-		}
-
-		/// <summary>
-        /// Removes a folder from the array.
-        /// </summary>
-        /// <param name="path">The path of the folder to remove.</param>
+		/// <param name="path">The path of the folder to remove.</param>
 		public void RemoveFolder(string path)
 		{
 			string[] keys = _Config.GetSectionKeys("Folders");
@@ -336,23 +303,38 @@ namespace AssetSnap.Front.Configs
 				}
 			}
 
-			Error result = _Config.Save(BasePath + _ConfigPath);
+			Error result = _Config.Save(_BasePath + _ConfigPath);
 
 			if (result != Error.Ok)
 			{
 				GD.PushError(result);
 			}
 
-			LoadOk = false;
+			_LoadOk = false;
 			Initialize();
 			MaybeEmitFoldersLoaded();
 		}
+		
+		/// <summary>
+		/// Gets the model size.
+		/// </summary>
+		/// <param name="name">The name of the model.</param>
+		/// <returns>The size of the model.</returns>
+		public Vector3 GetModelSize(string name)
+		{
+			if (HasModelSize(name))
+			{
+				return _Config.GetValue("ModelSizes", name).As<Vector3>();
+			}
+
+			return Vector3.Zero;
+		}
 
 		/// <summary>
-        /// Gets the value associated with the specified key.
-        /// </summary>
-        /// <param name="_key">The key whose value to get.</param>
-        /// <returns>The value associated with the specified key.</returns>
+		/// Gets the value associated with the specified key.
+		/// </summary>
+		/// <param name="_key">The key whose value to get.</param>
+		/// <returns>The value associated with the specified key.</returns>
 		public override Variant GetKey(string _key)
 		{
 			if (null == _Settings || false == _Settings.ContainsKey(_key))
@@ -364,19 +346,29 @@ namespace AssetSnap.Front.Configs
 		}
 
 		/// <summary>
-        /// Converts a key to label.
-        /// </summary>
-        /// <param name="key">The key to convert.</param>
-        /// <returns>The label associated with the key.</returns>
+		/// Converts a key to label.
+		/// </summary>
+		/// <param name="key">The key to convert.</param>
+		/// <returns>The label associated with the key.</returns>
 		public string KeyToLabel(string key)
 		{
 			return key.Capitalize().Split('_').Join(" ");
 		}
+		
+		/// <summary>
+		/// Checks if model size exists.
+		/// </summary>
+		/// <param name="name">The name of the model.</param>
+		/// <returns>True if the model size exists, false otherwise.</returns>
+		public bool HasModelSize(string name)
+		{
+			return _Config.HasSection("ModelSizes") && _Config.GetSectionKeys("ModelSizes").Contains(name);
+		}
 
 		/// <summary>
-        /// Fetches the settings.
-        /// </summary>
-        /// <returns>The settings dictionary.</returns>
+		/// Fetches the settings.
+		/// </summary>
+		/// <returns>The settings dictionary.</returns>
 		public Godot.Collections.Dictionary<string, Variant> GetSettings()
 		{
 			return _Settings;

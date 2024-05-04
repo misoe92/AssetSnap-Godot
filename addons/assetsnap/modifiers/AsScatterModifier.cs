@@ -33,14 +33,23 @@ namespace AssetSnap.Front.Modifiers
 	public partial class AsScatterModifier
 	{
 		/// <summary>
-        /// Name of the scatter modifier.
-        /// </summary>
+		/// Name of the scatter modifier.
+		/// </summary>
 		public string Name = "AsScatterModifier";
 
 		/// <summary>
-        /// Applies the modifier asynchronously.
-        /// </summary>
-        /// <returns>Returns true if the modifier is successfully applied, false otherwise.</returns>
+		/// Retrieves the current handle.
+		/// </summary>
+		/// <returns>Returns the current handle as a Node.</returns>
+		public Node GetHandle()
+		{
+			return StatesUtils.Get().EditingObject;
+		}
+		
+		/// <summary>
+		/// Applies the modifier asynchronously.
+		/// </summary>
+		/// <returns>Returns true if the modifier is successfully applied, false otherwise.</returns>
 		public bool Apply()
 		{
 			if (HasHandle() == false)
@@ -54,9 +63,9 @@ namespace AssetSnap.Front.Modifiers
 		}
 
 		/// <summary>
-        /// Applies a simple modifier without parenting to a static body.
-        /// </summary>
-        /// <returns>Returns true if the simple modifier is successfully applied, false otherwise.</returns>
+		/// Applies a simple modifier without parenting to a static body.
+		/// </summary>
+		/// <returns>Returns true if the simple modifier is successfully applied, false otherwise.</returns>
 		public bool ApplySimple()
 		{
 			Node3D Handle = GetHandle() as Node3D;
@@ -97,18 +106,9 @@ namespace AssetSnap.Front.Modifiers
 		}
 
 		/// <summary>
-        /// Retrieves the current handle.
-        /// </summary>
-        /// <returns>Returns the current handle as a Node.</returns>
-		public Node GetHandle()
-		{
-			return StatesUtils.Get().EditingObject;
-		}
-
-		/// <summary>
-        /// Checks if a handle exists.
-        /// </summary>
-        /// <returns>Returns true if a handle exists, false otherwise.</returns>
+		/// Checks if a handle exists.
+		/// </summary>
+		/// <returns>Returns true if a handle exists, false otherwise.</returns>
 		public bool HasHandle()
 		{
 			Node3D Handle = StatesUtils.Get().EditingObject;
