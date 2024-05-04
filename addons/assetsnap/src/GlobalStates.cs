@@ -152,7 +152,6 @@ namespace AssetSnap
 			{
 				if (value != _MultiDrop)
 				{
-					GD.Print(value);
 					_MultiDrop = value;
 					StateChanged("MultiDrop", value);
 				}
