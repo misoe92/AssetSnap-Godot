@@ -174,10 +174,192 @@ namespace AssetSnap.GroupBuilder
 		/// </summary>
 		public void Update()
 		{
-			Remove3DPreview(_Viewport);
-			Render3DPreview(_Viewport);
+			_Remove3DPreview(_Viewport);
+			_Render3DPreview(_Viewport);
 		}
 
+		/// <summary>
+		/// Handles user input events.
+		/// </summary>
+		/// <param name="@event">The input event.</param>
+		public override void _Input(InputEvent @event)
+		{
+			if (ListensForInput)
+			{
+				// Check for movement on WSAD or arrow keys
+				if (@event is InputEventKey inputEventKey)
+				{
+					// Move forward
+					if ((inputEventKey.Keycode == Key.W || inputEventKey.Keycode == Key.Up) && true == inputEventKey.Pressed)
+					{
+						_Acceleration.Y = 1;
+					}
+
+					// Move backwards
+					if ((inputEventKey.Keycode == Key.S || inputEventKey.Keycode == Key.Down) && true == inputEventKey.Pressed)
+					{
+						_Acceleration.Y = -1;
+					}
+
+					if ((inputEventKey.Keycode == Key.S || inputEventKey.Keycode == Key.Down || inputEventKey.Keycode == Key.W || inputEventKey.Keycode == Key.Up) && false == inputEventKey.Pressed)
+					{
+						_Acceleration.Y = 0;
+					}
+
+					// Move to the left
+					if ((inputEventKey.Keycode == Key.A || inputEventKey.Keycode == Key.Left) && true == inputEventKey.Pressed)
+					{
+						_Acceleration.X = -1;
+					}
+
+					// Move to the right
+					if ((inputEventKey.Keycode == Key.D || inputEventKey.Keycode == Key.Right) && true == inputEventKey.Pressed)
+					{
+						_Acceleration.X = 1;
+					}
+
+					if ((inputEventKey.Keycode == Key.A || inputEventKey.Keycode == Key.Left || inputEventKey.Keycode == Key.D || inputEventKey.Keycode == Key.Right) && false == inputEventKey.Pressed)
+					{
+						_Acceleration.X = 0;
+					}
+
+					// Go upwards
+					if (inputEventKey.Keycode == Key.Space && true == inputEventKey.Pressed)
+					{
+						_Levitate = 1;
+					}
+					else if (inputEventKey.Keycode == Key.Space && false == inputEventKey.Pressed)
+					{
+						_Levitate = 0;
+					}
+
+					// Go downwards
+					if (inputEventKey.Keycode == Key.Alt && true == inputEventKey.Pressed)
+					{
+						_Levitate = -1;
+					}
+					else if (inputEventKey.Keycode == Key.Alt && false == inputEventKey.Pressed)
+					{
+						_Levitate = 0;
+					}
+
+					if (inputEventKey.Keycode == Key.Q)
+					{
+						Transform3D transform = _Camera.Transform;
+						transform.Origin = Vector3.Zero;
+						_Camera.Transform = transform;
+					}
+				}
+
+				if (@event is InputEventMouseMotion eventMouseMotion)
+				{
+					// Ability to turn around with the mouse as long as we listens.
+					// Get the mouse motion since the last frame
+					Vector2 mouseMotion = eventMouseMotion.Relative;
+					// Update yaw (horizontal rotation) based on mouse X movement
+					_Yaw -= mouseMotion.X * _MouseSensitivity;
+
+					// Update pitch (vertical rotation) based on mouse Y movement
+					_Pitch -= mouseMotion.Y * _MouseSensitivity;
+
+					// Clamp the pitch to prevent flipping
+					_Pitch = Mathf.Clamp(_Pitch, -Mathf.Pi / 0.1f, Mathf.Pi / 0.1f);
+
+					// Set the new rotation of the camera
+					_Camera.RotationDegrees = new Vector3(_Pitch, _Yaw, 0);
+				}
+
+				if (@event is InputEventMouseButton eventMouseButton)
+				{
+					// Ability to turn up movement speed
+					if (eventMouseButton.ButtonIndex == MouseButton.WheelUp && false == eventMouseButton.Pressed)
+					{
+						_MoveSpeedRate += 1;
+					}
+					else if (eventMouseButton.ButtonIndex == MouseButton.WheelDown && false == eventMouseButton.Pressed)
+					{
+						_MoveSpeedRate -= 1;
+					}
+				}
+			}
+
+			base._Input(@event);
+		}
+
+		/// <summary>
+		/// Physics process method called every physics frame.
+		/// </summary>
+		/// <param name="delta">The time in seconds since the last physics frame.</param>
+		public override void _PhysicsProcess(double delta)
+		{
+			// Check if we listens to input
+			if (ListensForInput)
+			{
+				// Get the forward and right vectors from the camera's orientation
+				Vector3 forward = -_Camera.Basis.Z.Normalized();
+				Vector3 right = _Camera.Basis.X.Normalized();
+
+				Transform3D transform = _Camera.Transform;
+				// Vector3 MovementVector = Vector3.Zero;
+				Vector3 MovementVector = new(
+					transform.Origin.X,
+					transform.Origin.Y,
+					transform.Origin.Z
+				);
+
+				// Move and rotate the camera based on the input received
+				if (_Acceleration.X != 0 || _Acceleration.Y != 0)
+				{
+					// Calculate the movement vector relative to the camera's orientation
+					MovementVector += right * _Acceleration.X;
+					MovementVector += forward * _Acceleration.Y;
+				}
+
+				if (_Levitate != 0)
+				{
+					// We should move up or down on the Y axis
+					transform.Origin.Y += _Levitate * (float)delta;
+				}
+
+				transform.Origin = transform.Origin.Lerp(MovementVector, _MoveSpeedRate * (float)delta);
+				_Camera.Transform = transform;
+
+			}
+			base._PhysicsProcess(delta);
+		}
+		
+		
+		/// <summary>
+		/// Checks if a group is selected.
+		/// </summary>
+		/// <returns>True if a group is selected, false otherwise.</returns>
+		public bool HasGroup()
+		{
+			GlobalExplorer explorer = GlobalExplorer.GetInstance();
+
+			return
+				null != explorer &&
+				null != GlobalExplorer.GetInstance().GroupBuilder &&
+				IsInstanceValid(GlobalExplorer.GetInstance().GroupBuilder._Editor) &&
+				IsInstanceValid(GlobalExplorer.GetInstance().GroupBuilder._Editor.Group);
+		}
+
+		/// <summary>
+		/// Called when the node is about to be removed from the scene tree.
+		/// </summary>
+		public override void _ExitTree()
+		{
+			// Clean up when the plugin is deactivated 
+			if (
+				null != _ViewportContainer &&
+				IsInstanceValid(_ViewportContainer) &&
+				_ViewportContainer.IsConnected(Control.SignalName.GuiInput, Callable.From((InputEvent Event) => { _OnMaybeListenToInput(Event); }))
+			)
+			{
+				_ViewportContainer.Disconnect(Control.SignalName.GuiInput, Callable.From((InputEvent Event) => { _OnMaybeListenToInput(Event); }));
+			}
+		}
+		
 		/// <summary>
 		/// Initializes the toolbar UI elements.
 		/// </summary>
@@ -218,6 +400,114 @@ namespace AssetSnap.GroupBuilder
 			AddChild(_ToolbarPanelContainer);
 		}
 
+
+		/// <summary>
+		/// Handles input events to start or stop listening for input.
+		/// </summary>
+		/// <param name="Event">The input event.</param>
+		private void _OnMaybeListenToInput(InputEvent Event)
+		{
+			if (Event is InputEventMouseButton eventMouseButton)
+			{
+				if (eventMouseButton.ButtonIndex == MouseButton.Right && true == eventMouseButton.Pressed)
+				{
+					ListensForInput = true;
+					Input.Singleton.MouseMode = Input.MouseModeEnum.Captured;
+					FocusMode = FocusModeEnum.All;
+					GrabFocus();
+				}
+				else if (eventMouseButton.ButtonIndex == MouseButton.Right && false == eventMouseButton.Pressed)
+				{
+					ListensForInput = false;
+					FocusMode = FocusModeEnum.None;
+					Input.Singleton.MouseMode = Input.MouseModeEnum.Visible;
+
+					// Reset movement when we tab out of listening
+					_Acceleration.X = 0;
+					_Acceleration.Y = 0;
+					_Levitate = 0.0f;
+
+				}
+			}
+		}
+
+		/// <summary>
+		/// Renders the 3D preview of the group.
+		/// </summary>
+		/// <param name="Viewport">The viewport to render the preview.</param>
+		private void _Render3DPreview(SubViewport Viewport)
+		{
+			Front.Nodes.GroupResource Group = GlobalExplorer.GetInstance().GroupBuilder._Editor.Group;
+			for (int i = 0; i < Group._Paths.Count; i++)
+			{
+				string MeshPath = Group._Paths[i];
+				Vector3 MeshOrigin = Group._Origins[i];
+				Vector3 MeshScale = Group._Scales[i];
+				Vector3 MeshRotation = Group._Rotations[i];
+
+				GodotObject MeshObject = GD.Load(MeshPath);
+
+				Transform3D transform = new(Basis.Identity, Vector3.Zero);
+				transform.Origin = MeshOrigin;
+
+				if (MeshObject is Mesh _mesh)
+				{
+					MeshInstance3D meshinstance3d = new()
+					{
+						Mesh = _mesh,
+						Transform = transform,
+						Scale = MeshScale,
+						RotationDegrees = MeshRotation,
+					};
+
+					meshinstance3d.SetMeta("IsPreview", true);
+					Viewport.AddChild(meshinstance3d);
+				}
+
+				if (MeshObject is PackedScene _scene)
+				{
+					// Scene instance
+					Node3D node = _scene.Instantiate() as Node3D;
+					node.Transform = transform;
+					node.Scale = MeshScale;
+					node.RotationDegrees = MeshRotation;
+
+					node.SetMeta("IsPreview", true);
+					Viewport.AddChild(node);
+				}
+			}
+		}
+
+		/// <summary>
+		/// Removes the 3D preview from the viewport.
+		/// </summary>
+		/// <param name="Viewport">The viewport containing the preview.</param>
+		private void _Remove3DPreview(SubViewport Viewport)
+		{
+			foreach (Node previewChild in Viewport.GetChildren())
+			{
+				if (previewChild is MeshInstance3D meshInstance3D && meshInstance3D.HasMeta("IsPreview"))
+				{
+					Viewport.RemoveChild(meshInstance3D);
+					meshInstance3D.QueueFree();
+				}
+			}
+		}
+
+		/// <summary>
+		/// Updates the texture.
+		/// </summary>
+		private void _UpdateTexture()
+		{
+			// // Capture the rendered texture from the Viewport
+			// Image textureImage = viewport.GetTexture().GetData();
+
+			// // Set the texture to the TextureRect
+			// ImageTexture imageTexture = new ImageTexture();
+			// imageTexture.CreateFromImage(textureImage);
+			// textureRect.Texture = imageTexture;
+		}
+		
 		/// <summary>
 		/// Initializes the environment preview if needed.
 		/// </summary>
@@ -371,7 +661,7 @@ namespace AssetSnap.GroupBuilder
 			await _MaybeInitializeEnvironment(_Viewport);
 
 			// Render the 3D preview onto the Viewport's texture
-			Render3DPreview(_Viewport);
+			_Render3DPreview(_Viewport);
 
 			// Add the Viewport to your main screen container
 			_CameraContainer.AddChild(_Camera);
@@ -382,293 +672,6 @@ namespace AssetSnap.GroupBuilder
 			_ViewportContainer.Connect(Control.SignalName.GuiInput, Callable.From((InputEvent Event) => { _OnMaybeListenToInput(Event); }));
 		}
 
-		/// <summary>
-		/// Handles user input events.
-		/// </summary>
-		/// <param name="@event">The input event.</param>
-		public override void _Input(InputEvent @event)
-		{
-			if (ListensForInput)
-			{
-				// Check for movement on WSAD or arrow keys
-				if (@event is InputEventKey inputEventKey)
-				{
-					// Move forward
-					if ((inputEventKey.Keycode == Key.W || inputEventKey.Keycode == Key.Up) && true == inputEventKey.Pressed)
-					{
-						_Acceleration.Y = 1;
-					}
-
-					// Move backwards
-					if ((inputEventKey.Keycode == Key.S || inputEventKey.Keycode == Key.Down) && true == inputEventKey.Pressed)
-					{
-						_Acceleration.Y = -1;
-					}
-
-					if ((inputEventKey.Keycode == Key.S || inputEventKey.Keycode == Key.Down || inputEventKey.Keycode == Key.W || inputEventKey.Keycode == Key.Up) && false == inputEventKey.Pressed)
-					{
-						_Acceleration.Y = 0;
-					}
-
-					// Move to the left
-					if ((inputEventKey.Keycode == Key.A || inputEventKey.Keycode == Key.Left) && true == inputEventKey.Pressed)
-					{
-						_Acceleration.X = -1;
-					}
-
-					// Move to the right
-					if ((inputEventKey.Keycode == Key.D || inputEventKey.Keycode == Key.Right) && true == inputEventKey.Pressed)
-					{
-						_Acceleration.X = 1;
-					}
-
-					if ((inputEventKey.Keycode == Key.A || inputEventKey.Keycode == Key.Left || inputEventKey.Keycode == Key.D || inputEventKey.Keycode == Key.Right) && false == inputEventKey.Pressed)
-					{
-						_Acceleration.X = 0;
-					}
-
-					// Go upwards
-					if (inputEventKey.Keycode == Key.Space && true == inputEventKey.Pressed)
-					{
-						_Levitate = 1;
-					}
-					else if (inputEventKey.Keycode == Key.Space && false == inputEventKey.Pressed)
-					{
-						_Levitate = 0;
-					}
-
-					// Go downwards
-					if (inputEventKey.Keycode == Key.Alt && true == inputEventKey.Pressed)
-					{
-						_Levitate = -1;
-					}
-					else if (inputEventKey.Keycode == Key.Alt && false == inputEventKey.Pressed)
-					{
-						_Levitate = 0;
-					}
-
-					if (inputEventKey.Keycode == Key.Q)
-					{
-						Transform3D transform = _Camera.Transform;
-						transform.Origin = Vector3.Zero;
-						_Camera.Transform = transform;
-					}
-				}
-
-				if (@event is InputEventMouseMotion eventMouseMotion)
-				{
-					// Ability to turn around with the mouse as long as we listens.
-					// Get the mouse motion since the last frame
-					Vector2 mouseMotion = eventMouseMotion.Relative;
-					// Update yaw (horizontal rotation) based on mouse X movement
-					_Yaw -= mouseMotion.X * _MouseSensitivity;
-
-					// Update pitch (vertical rotation) based on mouse Y movement
-					_Pitch -= mouseMotion.Y * _MouseSensitivity;
-
-					// Clamp the pitch to prevent flipping
-					_Pitch = Mathf.Clamp(_Pitch, -Mathf.Pi / 0.1f, Mathf.Pi / 0.1f);
-
-					// Set the new rotation of the camera
-					_Camera.RotationDegrees = new Vector3(_Pitch, _Yaw, 0);
-				}
-
-				if (@event is InputEventMouseButton eventMouseButton)
-				{
-					// Ability to turn up movement speed
-					if (eventMouseButton.ButtonIndex == MouseButton.WheelUp && false == eventMouseButton.Pressed)
-					{
-						_MoveSpeedRate += 1;
-					}
-					else if (eventMouseButton.ButtonIndex == MouseButton.WheelDown && false == eventMouseButton.Pressed)
-					{
-						_MoveSpeedRate -= 1;
-					}
-				}
-			}
-
-			base._Input(@event);
-		}
-
-		/// <summary>
-		/// Physics process method called every physics frame.
-		/// </summary>
-		/// <param name="delta">The time in seconds since the last physics frame.</param>
-		public override void _PhysicsProcess(double delta)
-		{
-			// Check if we listens to input
-			if (ListensForInput)
-			{
-				// Get the forward and right vectors from the camera's orientation
-				Vector3 forward = -_Camera.Basis.Z.Normalized();
-				Vector3 right = _Camera.Basis.X.Normalized();
-
-				Transform3D transform = _Camera.Transform;
-				// Vector3 MovementVector = Vector3.Zero;
-				Vector3 MovementVector = new(
-					transform.Origin.X,
-					transform.Origin.Y,
-					transform.Origin.Z
-				);
-
-				// Move and rotate the camera based on the input received
-				if (_Acceleration.X != 0 || _Acceleration.Y != 0)
-				{
-					// Calculate the movement vector relative to the camera's orientation
-					MovementVector += right * _Acceleration.X;
-					MovementVector += forward * _Acceleration.Y;
-				}
-
-				if (_Levitate != 0)
-				{
-					// We should move up or down on the Y axis
-					transform.Origin.Y += _Levitate * (float)delta;
-				}
-
-				transform.Origin = transform.Origin.Lerp(MovementVector, _MoveSpeedRate * (float)delta);
-				_Camera.Transform = transform;
-
-			}
-			base._PhysicsProcess(delta);
-		}
-
-		/// <summary>
-		/// Handles input events to start or stop listening for input.
-		/// </summary>
-		/// <param name="Event">The input event.</param>
-		private void _OnMaybeListenToInput(InputEvent Event)
-		{
-			if (Event is InputEventMouseButton eventMouseButton)
-			{
-				if (eventMouseButton.ButtonIndex == MouseButton.Right && true == eventMouseButton.Pressed)
-				{
-					ListensForInput = true;
-					Input.Singleton.MouseMode = Input.MouseModeEnum.Captured;
-					FocusMode = FocusModeEnum.All;
-					GrabFocus();
-				}
-				else if (eventMouseButton.ButtonIndex == MouseButton.Right && false == eventMouseButton.Pressed)
-				{
-					ListensForInput = false;
-					FocusMode = FocusModeEnum.None;
-					Input.Singleton.MouseMode = Input.MouseModeEnum.Visible;
-
-					// Reset movement when we tab out of listening
-					_Acceleration.X = 0;
-					_Acceleration.Y = 0;
-					_Levitate = 0.0f;
-
-				}
-			}
-		}
-
-		/// <summary>
-		/// Renders the 3D preview of the group.
-		/// </summary>
-		/// <param name="Viewport">The viewport to render the preview.</param>
-		private void Render3DPreview(SubViewport Viewport)
-		{
-			Front.Nodes.GroupResource Group = GlobalExplorer.GetInstance().GroupBuilder._Editor.Group;
-			for (int i = 0; i < Group._Paths.Count; i++)
-			{
-				string MeshPath = Group._Paths[i];
-				Vector3 MeshOrigin = Group._Origins[i];
-				Vector3 MeshScale = Group._Scales[i];
-				Vector3 MeshRotation = Group._Rotations[i];
-
-				GodotObject MeshObject = GD.Load(MeshPath);
-
-				Transform3D transform = new(Basis.Identity, Vector3.Zero);
-				transform.Origin = MeshOrigin;
-
-				if (MeshObject is Mesh _mesh)
-				{
-					MeshInstance3D meshinstance3d = new()
-					{
-						Mesh = _mesh,
-						Transform = transform,
-						Scale = MeshScale,
-						RotationDegrees = MeshRotation,
-					};
-
-					meshinstance3d.SetMeta("IsPreview", true);
-					Viewport.AddChild(meshinstance3d);
-				}
-
-				if (MeshObject is PackedScene _scene)
-				{
-					// Scene instance
-					Node3D node = _scene.Instantiate() as Node3D;
-					node.Transform = transform;
-					node.Scale = MeshScale;
-					node.RotationDegrees = MeshRotation;
-
-					node.SetMeta("IsPreview", true);
-					Viewport.AddChild(node);
-				}
-			}
-		}
-
-		/// <summary>
-		/// Removes the 3D preview from the viewport.
-		/// </summary>
-		/// <param name="Viewport">The viewport containing the preview.</param>
-		private void Remove3DPreview(SubViewport Viewport)
-		{
-			foreach (Node previewChild in Viewport.GetChildren())
-			{
-				if (previewChild is MeshInstance3D meshInstance3D && meshInstance3D.HasMeta("IsPreview"))
-				{
-					Viewport.RemoveChild(meshInstance3D);
-					meshInstance3D.QueueFree();
-				}
-			}
-		}
-
-		/// <summary>
-		/// Updates the texture.
-		/// </summary>
-		private void UpdateTexture()
-		{
-			// // Capture the rendered texture from the Viewport
-			// Image textureImage = viewport.GetTexture().GetData();
-
-			// // Set the texture to the TextureRect
-			// ImageTexture imageTexture = new ImageTexture();
-			// imageTexture.CreateFromImage(textureImage);
-			// textureRect.Texture = imageTexture;
-		}
-
-		/// <summary>
-		/// Checks if a group is selected.
-		/// </summary>
-		/// <returns>True if a group is selected, false otherwise.</returns>
-		public bool HasGroup()
-		{
-			GlobalExplorer explorer = GlobalExplorer.GetInstance();
-
-			return
-				null != explorer &&
-				null != GlobalExplorer.GetInstance().GroupBuilder &&
-				IsInstanceValid(GlobalExplorer.GetInstance().GroupBuilder._Editor) &&
-				IsInstanceValid(GlobalExplorer.GetInstance().GroupBuilder._Editor.Group);
-		}
-
-		/// <summary>
-		/// Called when the node is about to be removed from the scene tree.
-		/// </summary>
-		public override void _ExitTree()
-		{
-			// Clean up when the plugin is deactivated 
-			if (
-				null != _ViewportContainer &&
-				IsInstanceValid(_ViewportContainer) &&
-				_ViewportContainer.IsConnected(Control.SignalName.GuiInput, Callable.From((InputEvent Event) => { _OnMaybeListenToInput(Event); }))
-			)
-			{
-				_ViewportContainer.Disconnect(Control.SignalName.GuiInput, Callable.From((InputEvent Event) => { _OnMaybeListenToInput(Event); }));
-			}
-		}
 	}
 }
 
