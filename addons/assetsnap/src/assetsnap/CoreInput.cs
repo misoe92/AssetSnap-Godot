@@ -49,9 +49,9 @@ namespace AssetSnap.Core
 			}
 
 			// If no handle is currently set
-			if (false == HasHandle())
+			if (false == _HasHandle())
 			{
-				if (ScrollAllowed() == GlobalExplorer.ScrollState.SCROLL_DISABLED)
+				if (_ScrollAllowed() == GlobalExplorer.ScrollState.SCROLL_DISABLED)
 				{
 					ExplorerUtils.Get().AllowScroll = GlobalExplorer.ScrollState.SCROLL_ENABLED;
 					return (int)EditorPlugin.AfterGuiInput.Stop;
@@ -72,12 +72,12 @@ namespace AssetSnap.Core
 			}
 
 			// Maybe project from camera, depending on the current event
-			MaybeProjectFromCamera(Camera, @event);
+			_MaybeProjectFromCamera(Camera, @event);
 
 			// Run the input driver, depending on wheather it's drag or normal
 			ExplorerUtils.Get().InputDriver._Input(Camera, @event);
 
-			if (ScrollAllowed() == GlobalExplorer.ScrollState.SCROLL_DISABLED)
+			if (_ScrollAllowed() == GlobalExplorer.ScrollState.SCROLL_DISABLED)
 			{
 				ExplorerUtils.Get().AllowScroll = GlobalExplorer.ScrollState.SCROLL_ENABLED;
 				return (int)EditorPlugin.AfterGuiInput.Stop;
@@ -94,7 +94,7 @@ namespace AssetSnap.Core
         /// <param name="Camera">The 3D camera.</param>
         /// <param name="event">The input event.</param>
         /// <returns>void</returns>
-		private void MaybeProjectFromCamera(Camera3D Camera, InputEvent @event)
+		private void _MaybeProjectFromCamera(Camera3D Camera, InputEvent @event)
 		{
 			if (@event is InputEventMouseMotion _MotionEvent)
 			{
@@ -111,7 +111,7 @@ namespace AssetSnap.Core
         /// Checks if dragging is currently enabled.
         /// </summary>
         /// <returns>True if dragging is enabled, otherwise false.</returns>
-		public bool ShouldDrag()
+		private bool _ShouldDrag()
 		{
 			bool value = ExplorerUtils.Get().Settings.GetKey("allow_drag_add").As<bool>();
 
@@ -127,7 +127,7 @@ namespace AssetSnap.Core
         /// Checks if scroll is disallowed.
         /// </summary>
         /// <returns>The current scroll state.</returns>
-		public GlobalExplorer.ScrollState ScrollAllowed()
+		private GlobalExplorer.ScrollState _ScrollAllowed()
 		{
 			return ExplorerUtils.Get().AllowScroll;
 		}
@@ -136,7 +136,7 @@ namespace AssetSnap.Core
         /// Checks if we have a handle, and if it's valid.
         /// </summary>
         /// <returns>True if a handle exists and is valid, otherwise false.</returns>
-		public bool HasHandle()
+		private bool _HasHandle()
 		{
 			Node NodeHandle = ExplorerUtils.Get().GetHandle();
 			return null != NodeHandle;
@@ -147,7 +147,7 @@ namespace AssetSnap.Core
         /// </summary>
         /// <param name="value">The mouse event value.</param>
         /// <returns>void</returns>
-		public void SetMouseEvent(EventMouse value)
+		private void _SetMouseEvent(EventMouse value)
 		{
 			_MouseEvent = value;
 		}
@@ -156,7 +156,7 @@ namespace AssetSnap.Core
         /// Fetches the current mouse event.
         /// </summary>
         /// <returns>The current mouse event.</returns>
-		public EventMouse GetMouseEvent()
+		private EventMouse _GetMouseEvent()
 		{
 			return _MouseEvent;
 		}

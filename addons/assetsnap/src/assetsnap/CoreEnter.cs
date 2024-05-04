@@ -127,7 +127,7 @@ namespace AssetSnap.Core
 		/// <summary>
 		/// Handles cleanup when the plugin exits the tree.
 		/// </summary>
-		public void dispose()
+		public void Dispose()
 		{
 			_GlobalExplorer._Plugin.FoldersLoaded -= () => { _OnLoadContainers(); };
 		}

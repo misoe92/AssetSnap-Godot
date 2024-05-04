@@ -63,11 +63,11 @@ namespace AssetSnap.Component
 				Trait<Checkable>().Select(0).SetValue(false);	
 			}
 			
-			if( _IsSnapToGlue() && false == _IsSnapToGlueChecked() ) 
+			if( IsSnapToGlue() && false == _IsSnapToGlueChecked() ) 
 			{
 				Trait<Checkable>().Select(1).SetValue(true);
 			}
-			else if( false == _IsSnapToGlue() && true == _IsSnapToGlueChecked() )
+			else if( false == IsSnapToGlue() && true == _IsSnapToGlueChecked() )
 			{
 				Trait<Checkable>().Select(1).SetValue(false);	
 			}
