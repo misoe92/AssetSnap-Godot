@@ -35,41 +35,41 @@ namespace AssetSnap.Front.Components
 	[Tool]
 	public partial class SettingsCheckbox : TraitableComponent
 	{
-		private string _key;
-		private bool _value = false;
-		
 		/// <summary>
 		/// The key associated with this setting.
 		/// </summary>
-		public string key 
+		public string Key 
 		{
-			get => _key;
+			get => _Key;
 			set 
 			{
-				_key = value;
+				_Key = value;
 			}
 		}
 		
 		/// <summary>
-        /// The value of the setting.
-        /// </summary>
-		public bool value 
+		/// The value of the setting.
+		/// </summary>
+		public bool Value 
 		{ 
-			get => _value;
+			get => _Value;
 			set 
 			{
-				_value = value;
+				_Value = value;
 			}
 		}
 		
+		private string _Key;
+		private bool _Value = false;
+		
 		/// <summary>
-        /// Constructor of the component.
-        /// </summary>
+		/// Constructor of the component.
+		/// </summary>
 		public SettingsCheckbox()
 		{
 			Name = "SettingsCheckbox";
 			
-			UsingTraits = new()
+			_UsingTraits = new()
 			{
 				{ typeof(Panelable).ToString() },
 				{ typeof(Containerable).ToString() },
@@ -81,22 +81,22 @@ namespace AssetSnap.Front.Components
 		}
 		
 		/// <summary>
-        /// Initializes the component.
-        /// </summary>
+		/// Initializes the component.
+		/// </summary>
 		public override void Initialize() 
 		{
 			base.Initialize();
 			
 			Name = "SettingsCheckbox";
-			if( key == null ) 
+			if( Key == null ) 
 			{
 				return;
 			}
 			
-			Initiated = true;
+			_Initiated = true;
 
-			string title = GetTitle( key );
-			string description = GetDescription( key );
+			string title = GetTitle( Key );
+			string description = GetDescription( Key );
 
 			Trait<Panelable>()
 				.SetName("SettingsPanel")
@@ -122,9 +122,9 @@ namespace AssetSnap.Front.Components
 				.SetName("SettingsCheckboxInput")
 				.SetDimensions(0, 20)
 				.SetVerticalSizeFlags(Control.SizeFlags.ShrinkEnd)
-				.SetText( ExplorerUtils.Get().Settings.KeyToLabel( key ) )
+				.SetText( ExplorerUtils.Get().Settings.KeyToLabel( Key ) )
 				.SetAction( new Callable( this, "UpdateKey" ) )
-				.SetValue( value )
+				.SetValue( Value )
 				.Instantiate();
 			
 			ConfigureTitle( title, description );
@@ -173,10 +173,41 @@ namespace AssetSnap.Front.Components
 		}
 		
 		/// <summary>
-        /// Configures the title.
-        /// </summary>
-        /// <param name="title">The title of the setting.</param>
-        /// <param name="description">The description of the setting.</param>
+		/// Updates the settings key and interval value.
+		/// </summary>
+		public void UpdateKey()
+		{
+			Value = !Value;
+			_GlobalExplorer.Settings.SetKey(Key, Value);
+		}
+		
+		/// <summary>
+		/// Fetches the title of the setting.
+		/// </summary>
+		/// <param name="key">The key of the setting.</param>
+		/// <returns>The title of the setting.</returns>
+		public string GetTitle( string key )
+		{
+			string FinalKey = key + "_title";
+			return SettingsText.KeyToString(FinalKey);
+		}
+		
+		/// <summary>
+		/// Fetches the description of the setting.
+		/// </summary>
+		/// <param name="key">The key of the setting.</param>
+		/// <returns>The description of the setting.</returns>
+		public string GetDescription( string key )
+		{
+			string FinalKey = key + "_description";
+			return SettingsText.KeyToString(FinalKey);
+		}
+		
+		/// <summary>
+		/// Configures the title.
+		/// </summary>
+		/// <param name="title">The title of the setting.</param>
+		/// <param name="description">The description of the setting.</param>
 		private void ConfigureTitle( string title, string description)
 		{
 			if( null != title || null != description )
@@ -205,37 +236,6 @@ namespace AssetSnap.Front.Components
 						.Instantiate();
 				}
 			}
-		}
-		
-		/// <summary>
-        /// Fetches the title of the setting.
-        /// </summary>
-        /// <param name="key">The key of the setting.</param>
-        /// <returns>The title of the setting.</returns>
-		public string GetTitle( string key )
-		{
-			string FinalKey = key + "_title";
-			return SettingsText.KeyToString(FinalKey);
-		}
-		
-		/// <summary>
-        /// Fetches the description of the setting.
-        /// </summary>
-        /// <param name="key">The key of the setting.</param>
-        /// <returns>The description of the setting.</returns>
-		public string GetDescription( string key )
-		{
-			string FinalKey = key + "_description";
-			return SettingsText.KeyToString(FinalKey);
-		}
-		
-		/// <summary>
-        /// Updates the settings key and interval value.
-        /// </summary>
-		public void UpdateKey()
-		{
-			value = !value;
-			_GlobalExplorer.Settings.SetKey(key, value);
 		}
 	}
 }
