@@ -29,37 +29,37 @@ namespace AssetSnap.Waypoint
 {
 	public partial class BaseWaypoint
 	{
-		private Vector3 Origin;
-		private Vector3 Rotation;
-		private Vector3 Scale; 
-		private Node3D Model;
-		private AsGroup3D Group;
-		private bool IsModel = false;
-		private bool IsGroup = false;
+		private Vector3 _Origin;
+		private Vector3 _Rotation;
+		private Vector3 _Scale; 
+		private Node3D _Model;
+		private AsGroup3D _Group;
+		private bool _IsModel = false;
+		private bool _IsGroup = false;
 		
 		/// <summary>
 		/// Constructor for a waypoint associated with a model.
 		/// </summary>
-		/// <param name="_Origin">The origin position of the waypoint.</param>
-		/// <param name="_Rotation">The rotation of the waypoint.</param>
-		/// <param name="_Scale">The scale of the waypoint.</param>
-		/// <param name="_Model">The associated 3D model node.</param>
-		public BaseWaypoint( Vector3 _Origin, Vector3 _Rotation, Vector3 _Scale, Node3D _Model ) 
+		/// <param name="Origin">The origin position of the waypoint.</param>
+		/// <param name="Rotation">The rotation of the waypoint.</param>
+		/// <param name="Scale">The scale of the waypoint.</param>
+		/// <param name="Model">The associated 3D model node.</param>
+		public BaseWaypoint( Vector3 Origin, Vector3 Rotation, Vector3 Scale, Node3D Model ) 
 		{
-			Origin = _Origin;
-			Rotation = _Rotation;
-			Scale = _Scale;
-			Model = _Model;
+			_Origin = Origin;
+			_Rotation = Rotation;
+			_Scale = Scale;
+			_Model = Model;
 			
 			if( _Model.HasMeta("AsModel")) 
 			{
-				IsModel = true;			
-				IsGroup = false;			
+				_IsModel = true;			
+				_IsGroup = false;			
 			}
 			else if( _Model.HasMeta("AsGroup") ) 
 			{
-				IsModel = false;			
-				IsGroup = true;			
+				_IsModel = false;			
+				_IsGroup = true;			
 			}
 		}
 		
@@ -68,11 +68,11 @@ namespace AssetSnap.Waypoint
 		/// </summary>
 		/// <param name="_Origin">The origin position of the waypoint.</param>
 		/// <param name="_Group">The associated 3D group node.</param>
-		public BaseWaypoint( Vector3 _Origin, AsGroup3D _Group ) 
+		public BaseWaypoint( Vector3 Origin, AsGroup3D Group ) 
 		{
-			Origin = _Origin;
-			Group = _Group;
-			IsGroup = true;
+			_Origin = Origin;
+			_Group = Group;
+			_IsGroup = true;
 		}
 		
 		/// <summary>
@@ -81,7 +81,7 @@ namespace AssetSnap.Waypoint
 		/// <param name="scale">The new scale to set.</param>
 		public void SetScale( Vector3 scale ) 
 		{
-			Scale = scale;
+			_Scale = scale;
 		}
 			
 		/// <summary>
@@ -90,22 +90,22 @@ namespace AssetSnap.Waypoint
 		/// <returns>The AABB of the model.</returns>
 		public Aabb GetAabb()
 		{
-			if( EditorPlugin.IsInstanceValid( Model ) && Model is AsGrouped3D ) 
+			if( EditorPlugin.IsInstanceValid( _Model ) && _Model is AsGrouped3D ) 
 			{
-				AsGrouped3D _Model = Model as AsGrouped3D;
-				return _Model.GetAabb();
+				AsGrouped3D Model = _Model as AsGrouped3D;
+				return Model.GetAabb();
 			}
 			
-			if( IsGroup && EditorPlugin.IsInstanceValid( Model ) ) 
+			if( _IsGroup && EditorPlugin.IsInstanceValid( _Model ) ) 
 			{
-				AsGroup3D _Model = Model as AsGroup3D; 
+				AsGroup3D Model = _Model as AsGroup3D; 
 				return new Aabb();
 			}
 			
-			if( IsModel && EditorPlugin.IsInstanceValid( Model ) ) 
+			if( _IsModel && EditorPlugin.IsInstanceValid( _Model ) ) 
 			{
-				AsMeshInstance3D _Model = Model as AssetSnap.Front.Nodes.AsMeshInstance3D; 
-				return _Model.GetAabb();
+				AsMeshInstance3D Model = _Model as AssetSnap.Front.Nodes.AsMeshInstance3D; 
+				return Model.GetAabb();
 			}
 			
 			return new Aabb();
@@ -117,7 +117,7 @@ namespace AssetSnap.Waypoint
 		/// <returns>The associated model node.</returns>
 		public Node3D GetModel()
 		{
-			return Model;
+			return _Model;
 		}
 		
 		/// <summary>
@@ -126,7 +126,7 @@ namespace AssetSnap.Waypoint
 		/// <returns>The origin position of the model.</returns>
 		public Vector3 GetOrigin()
 		{
-			return Origin;
+			return _Origin;
 		}
 		
 		/// <summary>
@@ -135,7 +135,7 @@ namespace AssetSnap.Waypoint
 		/// <returns>The scale of the model.</returns>
 		public Vector3 GetScale()
 		{
-			return Scale;
+			return _Scale;
 		}
 	}
 }
