@@ -21,23 +21,22 @@
 // SOFTWARE.
 
 #if TOOLS
+
+using System;
+using System.Reflection;
+using AssetSnap.Front.Nodes;
+using AssetSnap.Instance.Input;
+using AssetSnap.States;
+using Godot;
+
 namespace AssetSnap
 {
-	using System;
-	using System.Reflection;
-	using AssetSnap.Front.Nodes;
-	using AssetSnap.Instance.Input;
-	using AssetSnap.States;
-	using Godot;
-
 	/// <summary>
 	/// Partial class for managing global methods and interaction with AssetSnap.
 	/// </summary>
 	[Tool]
 	public partial class GlobalExplorer : NodeExplorer
 	{
-		private static GlobalExplorer Instance;
-		
 		/// <summary>
 		/// Singleton instance of the GlobalExplorer.
 		/// </summary>
@@ -45,23 +44,25 @@ namespace AssetSnap
 		{
 			get
 			{
-				if (Instance == null)
+				if (_Instance == null)
 				{
-					Instance = new();
+					_Instance = new();
 				}
 
-				return Instance;
+				return _Instance;
 			}
 		}
-
+		
 		/// <summary>
 		/// Gets the input driver currently in use.
 		/// </summary>
 		/// <returns>The input driver instance.</returns>
 		public Instance.Input.BaseInputDriver InputDriver
 		{
-			get => DragIsAllowed() ? DragAddInputDriver.GetInstance() : BaseInputDriver.GetInstance();
+			get => _DragIsAllowed() ? DragAddInputDriver.GetInstance() : BaseInputDriver.GetInstance();
 		}
+		
+		private static GlobalExplorer _Instance;
 
 		/// <summary>
 		/// Initializes the GlobalExplorer singleton instance.
@@ -69,9 +70,9 @@ namespace AssetSnap
 		/// <returns>The initialized GlobalExplorer instance.</returns>
 		public static GlobalExplorer InitializeExplorer()
 		{
-			if (null == Instance)
+			if (null == _Instance)
 			{
-				Instance = new GlobalExplorer()
+				_Instance = new GlobalExplorer()
 				{
 					_Settings = Front.Configs.SettingsConfig.Singleton,
 					_Waypoints = new(),
@@ -90,7 +91,7 @@ namespace AssetSnap
 				};
 			}
 
-			return Instance;
+			return _Instance;
 		}
 
 		/// <summary>
@@ -101,40 +102,52 @@ namespace AssetSnap
 		{
 			return Singleton;
 		}
+		
+		/// <summary>
+		/// Checks whether a Control has a specified property.
+		/// </summary>
+		/// <param name="control">The Control to check.</param>
+		/// <param name="propertyName">The name of the property to check for.</param>
+		/// <returns>True if the Control has the specified property; otherwise, false.</returns>
+		public static bool HasProperty(Control control, string propertyName)
+		{
+			Type type = control.GetType();
+			PropertyInfo propertyInfo = type.GetProperty(propertyName);
+			return propertyInfo != null;
+		}
 
 		/// <summary>
-		/// Retrieves a library instance by its name.
+		/// Attempts to retrieve the value of a property from a Control.
 		/// </summary>
-		/// <param name="name">The name of the library instance to retrieve.</param>
-		/// <returns>The library instance.</returns>
-		public Library.Instance GetLibraryByName(string name)
+		/// <typeparam name="T">The type of the property value.</typeparam>
+		/// <param name="control">The Control to retrieve the property from.</param>
+		/// <param name="propertyName">The name of the property to retrieve.</param>
+		/// <param name="value">The retrieved value of the property.</param>
+		/// <returns>True if the property value was successfully retrieved; otherwise, false.</returns>
+		public static bool TryGetProperty<T>(Control control, string propertyName, out T value)
 		{
-			foreach (Library.Instance instance in Library.Libraries)
+			value = default(T);
+			Type type = control.GetType();
+			PropertyInfo propertyInfo = type.GetProperty(propertyName);
+			if (propertyInfo != null)
 			{
-				if (EditorPlugin.IsInstanceValid(instance) && instance.GetName() == name)
+				try
 				{
-					return instance;
+					value = (T)propertyInfo.GetValue(control);
+					return true;
+				}
+				catch (Exception e)
+				{
+					GD.PrintErr($"Failed to get property {propertyName}: {e.Message}");
+					return false;
 				}
 			}
-
-			return null;
-		}
-
-		/// <summary>
-		/// Retrieves a library instance by its index.
-		/// </summary>
-		/// <param name="index">The index of the library instance to retrieve.</param>
-		/// <returns>The library instance.</returns>
-		public Library.Instance GetLibraryByIndex(int index)
-		{
-			if (index > -1 && Library.Libraries.Count > index && EditorPlugin.IsInstanceValid(Library.Libraries[index]))
+			else
 			{
-				return Library.Libraries[index] as Library.Instance;
+				return false;
 			}
-
-			return null;
 		}
-
+		
 		/// <summary>
 		/// Prints the names of child nodes.
 		/// </summary>
@@ -155,7 +168,25 @@ namespace AssetSnap
 				}
 			}
 		}
+		
+		/// <summary>
+		/// Prints the fields of a Node.
+		/// </summary>
+		/// <param name="which">The Node whose fields to print.</param>
+		public void PrintFields(Node which)
+		{
+			Type type = which.GetType();
+			FieldInfo[] fields = type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
 
+			GD.Print($"Fields for class {type.Name}:");
+
+			foreach (FieldInfo field in fields)
+			{
+				object value = field.GetValue(which);
+				GD.Print($"{field.Name}: {value}");
+			}
+		}
+		
 		/// <summary>
 		/// Sets focus to a specific 3D node.
 		/// </summary>
@@ -225,78 +256,47 @@ namespace AssetSnap
 		}
 
 		/// <summary>
-		/// Checks whether a Control has a specified property.
+		/// Retrieves a library instance by its name.
 		/// </summary>
-		/// <param name="control">The Control to check.</param>
-		/// <param name="propertyName">The name of the property to check for.</param>
-		/// <returns>True if the Control has the specified property; otherwise, false.</returns>
-		public static bool HasProperty(Control control, string propertyName)
+		/// <param name="name">The name of the library instance to retrieve.</param>
+		/// <returns>The library instance.</returns>
+		public Library.Instance GetLibraryByName(string name)
 		{
-			Type type = control.GetType();
-			PropertyInfo propertyInfo = type.GetProperty(propertyName);
-			return propertyInfo != null;
-		}
-
-		/// <summary>
-		/// Attempts to retrieve the value of a property from a Control.
-		/// </summary>
-		/// <typeparam name="T">The type of the property value.</typeparam>
-		/// <param name="control">The Control to retrieve the property from.</param>
-		/// <param name="propertyName">The name of the property to retrieve.</param>
-		/// <param name="value">The retrieved value of the property.</param>
-		/// <returns>True if the property value was successfully retrieved; otherwise, false.</returns>
-		public static bool TryGetProperty<T>(Control control, string propertyName, out T value)
-		{
-			value = default(T);
-			Type type = control.GetType();
-			PropertyInfo propertyInfo = type.GetProperty(propertyName);
-			if (propertyInfo != null)
+			foreach (Library.Instance instance in Library.Libraries)
 			{
-				try
+				if (EditorPlugin.IsInstanceValid(instance) && instance.GetName() == name)
 				{
-					value = (T)propertyInfo.GetValue(control);
-					return true;
-				}
-				catch (Exception e)
-				{
-					GD.PrintErr($"Failed to get property {propertyName}: {e.Message}");
-					return false;
+					return instance;
 				}
 			}
-			else
-			{
-				return false;
-			}
+
+			return null;
 		}
 
 		/// <summary>
-        /// Prints the fields of a Node.
-        /// </summary>
-        /// <param name="which">The Node whose fields to print.</param>
-		public void PrintFields(Node which)
+		/// Retrieves a library instance by its index.
+		/// </summary>
+		/// <param name="index">The index of the library instance to retrieve.</param>
+		/// <returns>The library instance.</returns>
+		public Library.Instance GetLibraryByIndex(int index)
 		{
-			Type type = which.GetType();
-			FieldInfo[] fields = type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-
-			GD.Print($"Fields for class {type.Name}:");
-
-			foreach (FieldInfo field in fields)
+			if (index > -1 && Library.Libraries.Count > index && EditorPlugin.IsInstanceValid(Library.Libraries[index]))
 			{
-				object value = field.GetValue(which);
-				GD.Print($"{field.Name}: {value}");
+				return Library.Libraries[index] as Library.Instance;
 			}
+
+			return null;
 		}
 
 		/// <summary>
-        /// Checks whether drag adding of models is allowed.
-        /// </summary>
-        /// <returns>True if drag adding is allowed; otherwise, false.</returns>
-		private bool DragIsAllowed()
+		/// Checks whether drag adding of models is allowed.
+		/// </summary>
+		/// <returns>True if drag adding is allowed; otherwise, false.</returns>
+		private bool _DragIsAllowed()
 		{
 			bool value = Settings.GetKey("allow_drag_add").As<bool>();
 			return value;
 		}
-
 	}
 }
 #endif
