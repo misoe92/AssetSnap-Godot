@@ -47,6 +47,9 @@ namespace AssetSnap.Settings
 		public BaseContainer()
 		{
 			Name = "SettingsBaseContainer";
+			
+			CustomMinimumSize = new Vector2(0, 350);
+			SizeFlagsVertical = Control.SizeFlags.ShrinkBegin;
 		}
 
 		/// <summary>
