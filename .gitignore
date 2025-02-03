@@ -2,6 +2,7 @@
 .vscode/
 .godot/
 groups/*.tres
+config.cfg
 assetsnap/previews/*
 *.godot
 icon.svg
