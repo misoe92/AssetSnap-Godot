@@ -1,13 +1,11 @@
 # Godot 4+ specific ignores
 .vscode/
 .godot/
-assetsnap/previews/*
 *.godot
 icon.svg
 icon.svg.import
-Working Project.csproj
-Working Project.sln
 images/*.import
+assetsnap/previews/*
 addons/assetsnap/config.cfg
 assets/models/*
 *.sln
