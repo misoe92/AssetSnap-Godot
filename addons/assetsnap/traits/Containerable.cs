@@ -22,6 +22,7 @@
 
 #if TOOLS
 
+using System;
 using AssetSnap.Trait;
 using Godot;
 
@@ -41,7 +42,7 @@ namespace AssetSnap.Component
 			Name = "Containerable";
 			TypeString = GetType().ToString();
 		}
-		
+
 		/// <summary>
 		/// Adds the currently chosen container to a specified container.
 		/// </summary>
@@ -165,7 +166,7 @@ namespace AssetSnap.Component
 		/// </summary>
 		/// <param name="debug">Optional parameter to enable debugging.</param>
 		/// <returns>Returns the updated Containerable instance.</returns>
-		public override Containerable ToggleVisible( bool debug = false)
+		public override Containerable ToggleVisible(bool debug = false)
 		{
 			base.ToggleVisible(debug);
 
