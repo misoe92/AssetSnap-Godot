@@ -8,10 +8,9 @@ icon.svg.import
 Working Project.csproj
 Working Project.sln
 images/*.import
-addons/assetsnap/*.cfg
+addons/assetsnap/config.cfg
 assets/models/*
 *.sln
 *.csproj
 *.csproj.old
 *.tscn
-*.cfg
