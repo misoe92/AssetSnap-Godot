@@ -44,7 +44,7 @@ namespace AssetSnap.Trait
 			Vertical,
 		};
 
-		
+
 		protected int _Seperation = 1;
 		protected bool _UsePaddingContainer = true;
 		protected ContainerLayout _Layout = ContainerLayout.OneColumn;
@@ -162,24 +162,24 @@ namespace AssetSnap.Trait
 		/// </summary>
 		/// <param name="debug">Optional parameter to enable debugging.</param>
 		/// <returns>The container with the toggled visibility state.</returns>
-		public virtual ContainerTrait ToggleVisible( bool debug = false)
+		public virtual ContainerTrait ToggleVisible(bool debug = false)
 		{
 			_Visible = !_Visible;
-			
+
 			if (
 				null != Dependencies &&
 				false != Dependencies.ContainsKey(TraitName + "_MarginContainer")
 			)
 			{
 				Dependencies[TraitName + "_MarginContainer"].As<MarginContainer>().Visible = !Dependencies[TraitName + "_MarginContainer"].As<MarginContainer>().Visible;
-				if( debug )
+				if (debug)
 				{
 					GD.PushWarning("Visibility set");
 				}
 			}
-			else 
+			else
 			{
-				if( debug )
+				if (debug)
 				{
 					GD.PushWarning("No dependencies found when trying to toggle visibility");
 				}
@@ -451,24 +451,24 @@ namespace AssetSnap.Trait
 
 			return this;
 		}
-		
+
 		/// <summary>
 		/// Checks if the container is visible.
 		/// </summary>
 		/// <param name="debug">Optional parameter to enable debugging.</param>
 		/// <returns>True if the container is visible; otherwise, false.</returns>
-		public virtual bool IsVisible( bool debug = false )
+		public virtual bool IsVisible(bool debug = false)
 		{
 			if (false != Dependencies.ContainsKey(TraitName + "_MarginContainer"))
 			{
-				if( debug ) 
+				if (debug)
 				{
 					GD.Print("Visibility state found", Dependencies[TraitName + "_MarginContainer"].As<MarginContainer>().Visible);
 				}
 				return Dependencies[TraitName + "_MarginContainer"].As<MarginContainer>().Visible == true;
 			}
-			
-			if( debug ) 
+
+			if (debug)
 			{
 				GD.Print("Visibility state not found");
 			}
@@ -488,6 +488,13 @@ namespace AssetSnap.Trait
 			_CustomMinimumSize = Vector2.Zero;
 			Dependencies = new();
 			TraitName = "";
+		}
+
+		public override void _ExitTree()
+		{
+			Reset();
+
+			base._ExitTree();
 		}
 	}
 }
