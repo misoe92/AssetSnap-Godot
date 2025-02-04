@@ -35,7 +35,7 @@ namespace AssetSnap.Front.Configs
 	public partial class SettingsConfig : Config.BaseConfig
 	{
 		public bool Initialized = false;
-		
+
 		private string _ConfigPath;
 		private string[] _Folders;
 		private Godot.Collections.Dictionary<string, Variant> _Settings;
@@ -100,14 +100,6 @@ namespace AssetSnap.Front.Configs
 		}
 
 		/// <summary>
-		/// Constructor for SettingsConfig.
-		/// </summary>
-		public SettingsConfig()
-		{
-			_Name = "Settings";
-		}
-
-		/// <summary>
 		/// Initializes the settings configuration.
 		/// </summary>
 		public void Initialize()
@@ -116,6 +108,8 @@ namespace AssetSnap.Front.Configs
 			{
 				_Instance = this;
 			}
+
+			_Name = "Settings";
 
 			_ConfigPath = "config.cfg";
 			LoadConfig(_ConfigPath);
@@ -185,7 +179,8 @@ namespace AssetSnap.Front.Configs
 					_Container.GetParent().RemoveChild(_Container);
 				}
 
-				_Container.Free();
+				_Container.QueueFree();
+				_Container = null;
 			}
 		}
 
@@ -315,7 +310,7 @@ namespace AssetSnap.Front.Configs
 			Initialize();
 			MaybeEmitFoldersLoaded();
 		}
-		
+
 		/// <summary>
 		/// Gets the model size.
 		/// </summary>
@@ -355,7 +350,7 @@ namespace AssetSnap.Front.Configs
 		{
 			return key.Capitalize().Split('_').Join(" ");
 		}
-		
+
 		/// <summary>
 		/// Checks if model size exists.
 		/// </summary>
