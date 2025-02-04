@@ -31,7 +31,7 @@ namespace AssetSnap.Settings
 	public partial class BaseContainer : PanelContainer
 	{
 		public bool Initialized = false;
-		
+
 		private ScrollContainer _ScrollContainer;
 		private MarginContainer _MarginContainer;
 		private VBoxContainer _VBoxContainer;
@@ -95,7 +95,7 @@ namespace AssetSnap.Settings
 
 			_HBoxContainer = new()
 			{
-				SizeFlagsVertical = Control.SizeFlags.ShrinkBegin,
+				SizeFlagsVertical = Control.SizeFlags.ExpandFill,
 				SizeFlagsHorizontal = Control.SizeFlags.ExpandFill
 			};
 
@@ -191,7 +191,7 @@ namespace AssetSnap.Settings
 			var Iteration = 0;
 			SettingsConfig _Config = GlobalExplorer.GetInstance().Settings;
 			Godot.Collections.Dictionary<string, Variant> _Settings = _Config.GetSettings();
-			
+
 			foreach ((string key, Variant value) in _Settings)
 			{
 				string k = key + "_type";
