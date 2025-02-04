@@ -22,6 +22,7 @@
 
 #if TOOLS
 
+using System;
 using AssetSnap.Component;
 using AssetSnap.Front.Nodes;
 using AssetSnap.Nodes;
@@ -61,7 +62,7 @@ namespace AssetSnap.Front.Components.Library
 		private string _Filename;
 		private string _FormattedFileName;
 		private int _ImageRotation = 0;
-		
+
 		private AsLibraryPanelContainer _PanelContainer;
 		private MarginContainer _MarginContainer;
 		private MarginContainer _LabelMarginContainer;
@@ -85,7 +86,7 @@ namespace AssetSnap.Front.Components.Library
 		{
 			Name = "LibraryListEntry";
 			//_include = false;
-			
+
 			_UsingTraits = new()
 			{
 				{ typeof(Buttonable).ToString() },
@@ -100,13 +101,13 @@ namespace AssetSnap.Front.Components.Library
 		{
 			//
 		}
-		
+
 		/// <summary>
 		/// Initializes the component.
 		/// </summary>
 		public void _Initialize()
 		{
-			SizeFlagsHorizontal = SizeFlags.ShrinkBegin;
+			SizeFlagsHorizontal = SizeFlags.ExpandFill;
 			SizeFlagsVertical = SizeFlags.ExpandFill;
 
 			base.Initialize();
@@ -147,19 +148,19 @@ namespace AssetSnap.Front.Components.Library
 			_MiddleInnerContainer = Trait<Containerable>()
 				.Select(0)
 				.GetInnerContainer(1);
-			
+
 			_RightInnerContainer = Trait<Containerable>()
 				.Select(0)
 				.GetInnerContainer(2);
-				
-			if( null == _LeftInnerContainer || null == _MiddleInnerContainer || null == _RightInnerContainer)	
+
+			if (null == _LeftInnerContainer || null == _MiddleInnerContainer || null == _RightInnerContainer)
 			{
 				return;
 			}
 
 			_LeftInnerContainer.SizeFlagsHorizontal = SizeFlags.ShrinkBegin;
 			_RightInnerContainer.SizeFlagsHorizontal = SizeFlags.ShrinkBegin;
-			
+
 			_LeftInnerContainer.CustomMinimumSize = new Vector2(30, 0);
 			_RightInnerContainer.CustomMinimumSize = new Vector2(30, 0);
 
@@ -220,7 +221,7 @@ namespace AssetSnap.Front.Components.Library
 			absoluteVboxcontainer.AddChild(_ZLabel);
 			_AbsoluteContainer.AddChild(absoluteVboxcontainer);
 			_MiddleInnerContainer.AddChild(_AbsoluteContainer);
-			
+
 			_InitializeLeftArrow(_LeftInnerContainer, Filename, Folder, Library.GetName());
 			_InitializeRightArrow(_RightInnerContainer, Filename, Folder, Library.GetName());
 			_InitializePreviewContainer(Filename, Folder, _MiddleInnerContainer);
@@ -230,15 +231,20 @@ namespace AssetSnap.Front.Components.Library
 			AddChild(_PanelContainer);
 			Library.AddPanel(_PanelContainer);
 
-			Plugin.Singleton.ModelSizeCacheChanged += (string name, Vector3 value) => _OnModelSizeChanged( name, value );
+			Plugin.Singleton.ModelSizeCacheChanged += (string name, Vector3 value) => _OnModelSizeChanged(name, value);
 		}
-		
+
+		public override void _ExitTree()
+		{
+			Trait<Containerable>().Clear();
+		}
+
 		/// <summary>
 		/// Handles the event when the model size changes.
 		/// </summary>
 		/// <param name="name">The name of the model.</param>
 		/// <param name="value">The new size of the model.</param>
-		private void _OnModelSizeChanged( string name, Vector3 value )
+		private void _OnModelSizeChanged(string name, Vector3 value)
 		{
 			if (name == Filename)
 			{
@@ -285,7 +291,7 @@ namespace AssetSnap.Front.Components.Library
 				.SetCursorShape(CursorShape.PointingHand)
 				.SetMouseFilter(MouseFilterEnum.Stop)
 				.SetTheme(_SnapTheme)
-				.SetAction( () => { _OnLeftArrowPressed(); })
+				.SetAction(() => { _OnLeftArrowPressed(); })
 				.Instantiate()
 				.Select(0)
 				.AddToContainer(
@@ -310,20 +316,20 @@ namespace AssetSnap.Front.Components.Library
 				.SetCursorShape(CursorShape.PointingHand)
 				.SetMouseFilter(MouseFilterEnum.Stop)
 				.SetTheme(_SnapTheme)
-				.SetAction( () => { _OnRightArrowPressed(); })
+				.SetAction(() => { _OnRightArrowPressed(); })
 				.Instantiate()
 				.Select(1)
 				.AddToContainer(
 					BoxContainer
 				);
 		}
-		
+
 		/// <summary>
 		/// Handles the event when the right arrow button is pressed.
 		/// </summary>
 		private void _OnRightArrowPressed()
 		{
-			if( EditorPlugin.IsInstanceValid(_TextureRect) ) 
+			if (EditorPlugin.IsInstanceValid(_TextureRect))
 			{
 				if (_ImageRotation == 180)
 				{
@@ -338,13 +344,13 @@ namespace AssetSnap.Front.Components.Library
 				_TextureRect._MeshPreviewReady(Folder + "/" + Filename, image, image, _TextureRect);
 			}
 		}
-		
+
 		/// <summary>
 		/// Handles the event when the left arrow button is pressed.
 		/// </summary>
 		private void _OnLeftArrowPressed()
 		{
-			if( EditorPlugin.IsInstanceValid(_TextureRect) ) 
+			if (EditorPlugin.IsInstanceValid(_TextureRect))
 			{
 				if (_ImageRotation == -180)
 				{
@@ -359,7 +365,7 @@ namespace AssetSnap.Front.Components.Library
 				_TextureRect._MeshPreviewReady(Folder + "/" + Filename, image, image, _TextureRect);
 			}
 		}
-		
+
 
 		/// <summary>
 		/// Initializes the preview container.
@@ -379,7 +385,7 @@ namespace AssetSnap.Front.Components.Library
 			{
 				// CustomMinimumSize = new Vector2(0, 125),
 				SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
-				SizeFlagsVertical = Control.SizeFlags.ShrinkBegin,
+				SizeFlagsVertical = Control.SizeFlags.ExpandFill,
 			};
 
 			_TextureRect = new()
@@ -477,7 +483,7 @@ namespace AssetSnap.Front.Components.Library
 
 			_FormattedFileName = filename.Substring(0, filename.Length > 18 ? 19 : filename.Length).Split("_").Join(" ").Split("-").Join(" ");
 		}
-		
+
 		/// <summary>
 		/// Sets the rotated image based on the current rotation angle.
 		/// </summary>
@@ -490,21 +496,21 @@ namespace AssetSnap.Front.Components.Library
 			string BasePath = "res://assetsnap/previews/" + LibraryName + "/" + FileName.Split(".")[0];
 			if (_ImageRotation == 0)
 			{
-				if( FileAccess.FileExists( BasePath + "/default.png" ) ) 
+				if (FileAccess.FileExists(BasePath + "/default.png"))
 				{
 					image = GD.Load<Texture2D>("res://assetsnap/previews/" + LibraryName + "/" + FileName.Split(".")[0] + "/default.png");
 				}
 			}
 			else if (_ImageRotation < 0)
 			{
-				if( FileAccess.FileExists( BasePath + "/default-minus" + _ImageRotation + ".png" ) ) 
+				if (FileAccess.FileExists(BasePath + "/default-minus" + _ImageRotation + ".png"))
 				{
 					image = GD.Load<Texture2D>("res://assetsnap/previews/" + LibraryName + "/" + FileName.Split(".")[0] + "/default-minus" + _ImageRotation + ".png");
 				}
 			}
 			else
 			{
-				if( FileAccess.FileExists( BasePath + "/default-" + _ImageRotation + ".png" ) ) 
+				if (FileAccess.FileExists(BasePath + "/default-" + _ImageRotation + ".png"))
 				{
 					image = GD.Load<Texture2D>("res://assetsnap/previews/" + LibraryName + "/" + FileName.Split(".")[0] + "/default-" + _ImageRotation + ".png");
 				}
