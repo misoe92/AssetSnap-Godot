@@ -22,6 +22,7 @@
 
 #if TOOLS
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using AssetSnap.Component;
@@ -46,7 +47,7 @@ namespace AssetSnap.Front.Components.Library
 				_Folder = value;
 			}
 		}
-		
+
 		private string _Folder;
 		private Godot.Collections.Array<HBoxContainer> _Containers = new();
 
@@ -153,7 +154,7 @@ namespace AssetSnap.Front.Components.Library
 				}
 			}
 
-			 _IterateFiles(Folder, Trait<Containerable>().Select(1).GetInnerContainer());
+			_IterateFiles(Folder, Trait<Containerable>().Select(1).GetInnerContainer());
 		}
 
 		/// <summary>
@@ -176,6 +177,12 @@ namespace AssetSnap.Front.Components.Library
 				int max_iteration = 4;
 
 				HBoxContainer CurrentBoxContainer = _SetupListContainer(BoxContainer);
+
+				if (System.IO.Directory.Exists(folderPath.Split("res://").Join("")) == false)
+				{
+					GD.Print("Required folder path res://assets/models was not found");
+					return;
+				}
 
 				// Build array of compatible models
 				string[] fileNames = System.IO.Directory.GetFiles(
@@ -256,7 +263,7 @@ namespace AssetSnap.Front.Components.Library
 
 			return _Con;
 		}
-		
+
 		/// <summary>
 		/// Checks if an extension is valid to be used as a model.
 		/// </summary>
@@ -265,6 +272,19 @@ namespace AssetSnap.Front.Components.Library
 		private bool _IsValidExtension(string Extension)
 		{
 			return Extension == ".obj" || Extension == ".fbx" || Extension == ".glb" || Extension == ".gltf";
+		}
+
+		public override void _ExitTree()
+		{
+			base._ExitTree();
+			if (GetChildCount() > 0)
+			{
+				foreach (Node child in GetChildren())
+				{
+					RemoveChild(child);
+					child.QueueFree();
+				}
+			}
 		}
 	}
 }
