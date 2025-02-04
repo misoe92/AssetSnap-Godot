@@ -61,7 +61,7 @@ namespace AssetSnap
 		/* Bottom Dock */
 		[Export]
 		public AsBottomDock Dock;
-		
+
 		/* The `public static Plugin Singleton` property is providing a way to access the singleton instance of
 		the `Plugin` class. By defining this property as static, it allows other parts of the code to access
 		the single instance of the `Plugin` class that is stored in the `_Instance` variable. This ensures
@@ -74,16 +74,16 @@ namespace AssetSnap
 				return _Instance;
 			}
 		}
-		
+
 		public TraitGlobal TraitGlobal
 		{
 			get
 			{
-				if( false == IsInstanceValid( TraitGlobal.Singleton ) ) 
+				if (false == IsInstanceValid(TraitGlobal.Singleton))
 				{
 					return null;
 				}
-				
+
 				return TraitGlobal.Singleton;
 			}
 			set
@@ -91,15 +91,15 @@ namespace AssetSnap
 				//
 			}
 		}
-		
+
 		/** Editor Node Types **/
 		public NodeType[] NodeTypes = Array.Empty<NodeType>();
-		
+
 		/** Internal data **/
 		protected Callable? _UpdateHandleCallable;
 
 		private static Plugin _Instance;
-		
+
 		private readonly string _Version = "0.1.2";
 		private readonly string _Name = "Plugin";
 		private bool _Disposed = false;
@@ -135,24 +135,7 @@ namespace AssetSnap
 		*/
 		public override void _EnterTree()
 		{
-			_Instance = this;
-
-			AddChild(TraitGlobal);
-			
-			if ( false == HasInternalContainer() )
-			{
-				Node InternalNode = new()
-				{
-					Name = "InternalNode"
-				};
-
-				AddChild(InternalNode);
-			}
-			
-			Dock = new AsBottomDock();
-			AddControlToBottomPanel(Dock, "Assets");
-			
-			Connect(EditorPlugin.SignalName.SceneChanged, 
+			Connect(EditorPlugin.SignalName.SceneChanged,
 				Callable.From(
 					(Node scene) =>
 					{
@@ -161,6 +144,23 @@ namespace AssetSnap
 				)
 			);
 
+			_Instance = this;
+
+			AddChild(TraitGlobal);
+
+			if (false == HasInternalContainer())
+			{
+				Node InternalNode = new()
+				{
+					Name = "InternalNode"
+				};
+
+				AddChild(InternalNode);
+			}
+
+			Dock = new AsBottomDock();
+			AddControlToBottomPanel(Dock, "Assets");
+
 			if (null == GlobalExplorer.InitializeExplorer())
 			{
 				GD.PushError("No explorer is available");
@@ -168,11 +168,11 @@ namespace AssetSnap
 			}
 
 			_UpdateHandleCallable = new(this, "UpdateHandle");
-			if(false == _IsUpdateHandleConnected()) 
+			if (false == _IsUpdateHandleConnected())
 			{
 				EditorInterface.Singleton.GetInspector().Connect(EditorInspector.SignalName.EditedObjectChanged, UpdateCallable());
 			}
-			
+
 			_CoreEnter.InitializeCore();
 		}
 
@@ -185,7 +185,7 @@ namespace AssetSnap
 			ModelPreviewer.Singleton.Enter();
 			ModelPreviewer.Singleton.GeneratePreviews();
 		}
-		
+
 		/// <summary>
 		/// This C# function overrides the _Process method to tick the _CoreProcess object if it is not null and
 		/// not disposed.
@@ -206,11 +206,16 @@ namespace AssetSnap
 				return;
 			}
 
+			if (StatesUtils.Get().CurrentScene == null)
+			{
+				_OnSceneChanged(GetTree().EditedSceneRoot);
+			}
+
 			_CoreProcess.Tick(delta);
 
 			return;
 		}
-		
+
 		/// <summary>
 		/// The _ExitTree function disposes of various custom node types, frees nodes in dispose queues,
 		/// removes and frees controls, and queues free the internal container and traitGlobal.
@@ -218,20 +223,20 @@ namespace AssetSnap
 		public override void _ExitTree()
 		{
 			_Disposed = true;
-			
-			/** Initialize custom node types **/  
-			new ASNode.Types.AsNodeType().Dispose( this );
-			new ASNode.Types.AsGroupType().Dispose( this );
-			new ASNode.Types.AsGroupedType().Dispose( this );
-			new ASNode.Types.AsArrayModifierType().Dispose( this );
-			new ASNode.Types.AsScatterModifierType().Dispose( this );
-			new ASNode.Types.AsStaticBodyType().Dispose( this );
-			new ASNode.Types.AsListSelectType().Dispose( this );
-			new ASNode.Types.AsMeshInstanceType().Dispose( this );
-			new ASNode.Types.AsMultiMeshInstanceType().Dispose( this );
-			new ASNode.Types.AsOptimizedMultiMeshGroupType().Dispose( this );
-			new ASNode.Types.AsMultiMeshType().Dispose( this );
-			
+
+			/** Initialize custom node types **/
+			new ASNode.Types.AsNodeType().Dispose(this);
+			new ASNode.Types.AsGroupType().Dispose(this);
+			new ASNode.Types.AsGroupedType().Dispose(this);
+			new ASNode.Types.AsArrayModifierType().Dispose(this);
+			new ASNode.Types.AsScatterModifierType().Dispose(this);
+			new ASNode.Types.AsStaticBodyType().Dispose(this);
+			new ASNode.Types.AsListSelectType().Dispose(this);
+			new ASNode.Types.AsMeshInstanceType().Dispose(this);
+			new ASNode.Types.AsMultiMeshInstanceType().Dispose(this);
+			new ASNode.Types.AsOptimizedMultiMeshGroupType().Dispose(this);
+			new ASNode.Types.AsMultiMeshType().Dispose(this);
+
 			Plugin.Singleton.RemoveChild(ExplorerUtils.Get().Library);
 			Plugin.Singleton.RemoveChild(ExplorerUtils.Get().Components);
 			Plugin.Singleton.RemoveChild(ExplorerUtils.Get().ContextMenu);
@@ -241,7 +246,7 @@ namespace AssetSnap
 			ExplorerUtils.Get().Components.Free();
 			ExplorerUtils.Get().ContextMenu.Free();
 			ExplorerUtils.Get().Inspector.Free();
-			
+
 			foreach (GodotObject _object in TraitGlobal.DisposeQueue)
 			{
 				if (IsInstanceValid(_object) && _object is Node node)
@@ -282,8 +287,8 @@ namespace AssetSnap
 				RemoveControlFromBottomPanel(Dock);
 				Dock.Free();
 			}
-			
-			if ( HasInternalContainer() && null != GetInternalContainer())
+
+			if (HasInternalContainer() && null != GetInternalContainer())
 			{
 				GetInternalContainer().QueueFree();
 			}
@@ -293,7 +298,7 @@ namespace AssetSnap
 				TraitGlobal.Free();
 			}
 		}
-		
+
 		/// <summary>
 		/// This C# function overrides a method to handle 3D GUI input using a specified camera and input event.
 		/// </summary>
@@ -317,7 +322,7 @@ namespace AssetSnap
 
 			return _CoreInput.Handle(camera, @event);
 		}
-		
+
 		/// <summary>
 		/// The UpdateCallable function returns a Callable object.
 		/// </summary>
@@ -328,7 +333,7 @@ namespace AssetSnap
 		{
 			return (Callable)_UpdateHandleCallable;
 		}
-		
+
 		/// <summary>
 		/// This C# function returns the internal container node named "InternalNode" if it exists, otherwise
 		/// it returns null.
@@ -340,14 +345,14 @@ namespace AssetSnap
 		/// </returns>
 		public Node GetInternalContainer()
 		{
-			if( false == HasInternalContainer() )
+			if (false == HasInternalContainer())
 			{
 				return null;
 			}
-			
+
 			return GetNode("InternalNode");
 		}
-		
+
 		/// <summary>
 		/// The GetTabContainer function returns the TabContainer from the _dock object.
 		/// </summary>
@@ -358,7 +363,7 @@ namespace AssetSnap
 		{
 			return Dock._TabContainer;
 		}
-		
+
 		/// <summary>
 		/// The GetVersion function in C# returns the version of the software.
 		/// </summary>
@@ -380,7 +385,7 @@ namespace AssetSnap
 		{
 			return _Version;
 		}
-		
+
 		/// <summary>
 		/// The _Handles function checks if _CoreHandles is valid and not disposed before calling its Handle
 		/// method on a GodotObject.
@@ -400,7 +405,7 @@ namespace AssetSnap
 
 			return _CoreHandles.Handle(_object);
 		}
-		
+
 		/// <summary>
 		/// The function `HasInternalContainer` checks if an internal node exists and is valid.
 		/// </summary>
