@@ -22,23 +22,24 @@
 
 #if TOOLS
 
+using System;
 using AssetSnap.Explorer;
 using AssetSnap.Settings;
 using Godot;
 
-namespace AssetSnap.Core 
+namespace AssetSnap.Core
 {
 	/// <summary>
 	/// Handles initialization and setup of the plugin upon entering the tree.
 	/// </summary>
-	public class CoreEnter : Core 
-	{ 
+	public class CoreEnter : Core
+	{
 		/// <summary>
 		/// Initializes our plugin.
 		/// </summary>
 		public void InitializeCore()
-		{	 
-			/** Initialize custom node types **/  
+		{
+			/** Initialize custom node types **/
 			new ASNode.Types.AsNodeType().Initialize();
 			new ASNode.Types.AsGroupType().Initialize();
 			new ASNode.Types.AsGroupedType().Initialize();
@@ -53,77 +54,54 @@ namespace AssetSnap.Core
 			new Library.Base();
 			new ContextMenu.Base();
 			new Debug.Inspector();
-			
+
 			_GlobalExplorer._Plugin.FoldersLoaded += () => { _OnLoadContainers(); };
 
 			/** Initialize **/
 			_GlobalExplorer.Waypoints.Initialize();
 			_GlobalExplorer.ContextMenu.Initialize();
 			_GlobalExplorer.Snap.Initialize();
-			
-			_GlobalExplorer.Decal.Initialize();  
+
+			_GlobalExplorer.Decal.Initialize();
 			_GlobalExplorer.Raycast.Initialize();
-			
-			// Finalize Group builder container 
-			_GlobalExplorer.GroupBuilder.Initialize(); 
-			 
+
 			_GlobalExplorer.Inspector.Initialize();
 			_GlobalExplorer.Inspector.AddToDock();
-			
+
 			Plugin.Singleton.AddChild(ExplorerUtils.Get().Library);
 			Plugin.Singleton.AddChild(ExplorerUtils.Get().Components);
 			Plugin.Singleton.AddChild(ExplorerUtils.Get().ContextMenu);
 			Plugin.Singleton.AddChild(ExplorerUtils.Get().Inspector);
-			
+
 			_GlobalExplorer.Settings.MaybeEmitFoldersLoaded();
-		} 
-		
+		}
+
 		/// <summary>
 		/// Handles the loading of containers upon the plugin's initialization.
 		/// </summary>
-		private void _OnLoadContainers() 
+		private void _OnLoadContainers()
 		{
-			if( _GlobalExplorer.Settings.Initialized ) 
+			if (_GlobalExplorer.Settings.Initialized)
 			{
 				_GlobalExplorer.Settings.Reset();
 			}
-			
-			if( _GlobalExplorer.GroupBuilder.Initialized ) 
-			{
-				_GlobalExplorer.GroupBuilder.ClearContainer();
-			}
-			
-			if( SettingsUtils.Get().FolderCount != 0 ) 
-			{
-				_GlobalExplorer.GroupBuilder.InitializeContainer();
-				
-				if(
-					null == _GlobalExplorer.GroupBuilder.Container ||
-					false == EditorPlugin.IsInstanceValid( _GlobalExplorer.GroupBuilder.Container )
-				) 
-				{
-					GD.PushError("Invalid Group Container");
-				}
-			
-				_GlobalExplorer.BottomDock.Add(_GlobalExplorer.GroupBuilder.Container); 
-			}
-			
+
 			_GlobalExplorer.Library.Initialize();
-			if( SettingsUtils.Get().FolderCount != 0 ) 
+			if (SettingsUtils.Get().FolderCount != 0)
 			{
 				_GlobalExplorer.Settings.InitializeContainer();
-				if(
+				if (
 					null == _GlobalExplorer.Settings.Container ||
-					false == EditorPlugin.IsInstanceValid( _GlobalExplorer.Settings.Container )
-				) 
+					false == EditorPlugin.IsInstanceValid(_GlobalExplorer.Settings.Container)
+				)
 				{
 					GD.PushError("Invalid Settings Container");
 				}
-			
+
 				_GlobalExplorer.BottomDock.Add(_GlobalExplorer.Settings.Container);
 			}
 		}
-		
+
 		/// <summary>
 		/// Handles cleanup when the plugin exits the tree.
 		/// </summary>
