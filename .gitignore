@@ -6,7 +6,7 @@ icon.svg
 icon.svg.import
 images/*.import
 assetsnap/previews/*
-addons/assetsnap/config.cfg
+addons\assetsnap\config.cfg
 assets/models/*
 *.sln
 *.csproj
